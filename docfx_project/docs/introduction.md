@@ -1,10 +1,10 @@
 # Introduction
 
-Welcome to {{PROJECT_NAME}}!
+Welcome to Wolfgang.Etl.FixedWidth!
 
 ## Overview
 
-{{PROJECT_DESCRIPTION}}
+Extractor and Loader for reading and writing fixed width files and text streams
 
 <!-- Add your project overview here -->
 
@@ -18,9 +18,9 @@ Welcome to {{PROJECT_NAME}}!
 
 ## Getting Help
 
-If you need help with {{PROJECT_NAME}}, please:
+If you need help with Wolfgang.Etl.FixedWidth, please:
 
 - Check the [Getting Started](getting-started.md) guide
 - Review the [API Reference](../api/index.md)
-- Visit the [GitHub repository]({{GITHUB_REPO_URL}})
-- Open an issue on [GitHub Issues]({{GITHUB_REPO_URL}}/issues)
+- Visit the [GitHub repository](https://github.com/Chris-Wolfgang/ETL-FixedWidth)
+- Open an issue on [GitHub Issues](https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues)
