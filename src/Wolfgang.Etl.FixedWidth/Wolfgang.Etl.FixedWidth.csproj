@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>
+      net462;net481;
+      netstandard2.0;
+      net8.0;net10.0
+    </TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Version>0.1.0</Version>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <Title>Wolfgang.Etl.FixedWidth</Title>
+    <Authors>Chris Wolfgang</Authors>
+    <Description>Extractor and Loader implementations for reading and writing fixed-width text files, built on Wolfgang.Etl.Abstractions.</Description>
+    <Copyright>Copyright 2026 Chris Wolfgang</Copyright>
+    <PackageProjectUrl>https://github.com/Chris-Wolfgang/ETL-FixedWidth</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Chris-Wolfgang/ETL-FixedWidth</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <SignAssembly>False</SignAssembly>
+    <PackageTags>ETL;Extract-Transform-Load;FixedWidth;Fixed-Width;FlatFile</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Wolfgang.Etl.Abstractions" Version="0.6.0" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.3" />
+  </ItemGroup>
+
+</Project>
