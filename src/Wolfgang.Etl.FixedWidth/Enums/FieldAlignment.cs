@@ -1,20 +1,19 @@
-namespace Wolfgang.Etl.FixedWidth.Enums
+namespace Wolfgang.Etl.FixedWidth.Enums;
+
+/// <summary>
+/// Specifies how a field value is aligned within its fixed-width column.
+/// </summary>
+public enum FieldAlignment
 {
     /// <summary>
-    /// Specifies how a field value is aligned within its fixed-width column.
+    /// The value is left-aligned and padded on the right.
+    /// This is the default alignment for string fields.
     /// </summary>
-    public enum FieldAlignment
-    {
-        /// <summary>
-        /// The value is left-aligned and padded on the right.
-        /// This is the default alignment for string fields.
-        /// </summary>
-        Left,
+    Left = 0,
 
-        /// <summary>
-        /// The value is right-aligned and padded on the left.
-        /// This is the default alignment for numeric fields.
-        /// </summary>
-        Right
-    }
+    /// <summary>
+    /// The value is right-aligned and padded on the left.
+    /// This is the default alignment for numeric fields.
+    /// </summary>
+    Right = 1,
 }
