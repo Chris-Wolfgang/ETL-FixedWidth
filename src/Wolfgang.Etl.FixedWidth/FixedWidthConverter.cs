@@ -43,8 +43,28 @@ public static class FixedWidthConverter
     /// <summary>
     /// Converts the value to a string and throws a <see cref="FieldOverflowException"/>
     /// if the result exceeds <see cref="FieldContext.FieldLength"/>. This is the default
-    /// value converter.
+    /// value converter used by <see cref="FixedWidthLoader{TRecord,TProgress}"/>.
     /// </summary>
+    /// <exception cref="FieldOverflowException">
+    /// Thrown when the converted string is longer than <see cref="FieldContext.FieldLength"/>.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when converting a <see cref="DateTime"/>, <see cref="DateTimeOffset"/>, or
+    /// <see cref="TimeSpan"/> value and no <see cref="FieldContext.Format"/> has been
+    /// specified on the field attribute.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// // Use Strict explicitly (it is also the default):
+    /// loader.ValueConverter = FixedWidthConverter.Strict;
+    ///
+    /// // Fall back to Strict for all types except bool:
+    /// loader.ValueConverter = (value, ctx) =>
+    ///     ctx.PropertyType == typeof(bool)
+    ///         ? ((bool)value ? "Y" : "N")
+    ///         : FixedWidthConverter.Strict(value, ctx);
+    /// </code>
+    /// </example>
     public static readonly Func<object, FieldContext, string> Strict =
         (value, context) =>
         {
@@ -74,6 +94,17 @@ public static class FixedWidthConverter
     /// Converts the value to a string and silently truncates it to
     /// <see cref="FieldContext.FieldLength"/> if it is too long.
     /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when converting a <see cref="DateTime"/>, <see cref="DateTimeOffset"/>, or
+    /// <see cref="TimeSpan"/> value and no <see cref="FieldContext.Format"/> has been
+    /// specified on the field attribute.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// // Use Truncate when long values should be silently clipped:
+    /// loader.ValueConverter = FixedWidthConverter.Truncate;
+    /// </code>
+    /// </example>
     public static readonly Func<object, FieldContext, string> Truncate =
         (value, context) =>
         {
@@ -97,13 +128,26 @@ public static class FixedWidthConverter
     /// Validates that the header label fits within <see cref="FieldContext.FieldLength"/>,
     /// throwing a <see cref="FieldOverflowException"/> if it does not, then returns the
     /// label unchanged. Space-padding is applied by the framework after the converter returns.
-    /// This is the default header converter.
+    /// This is the default header converter used by <see cref="FixedWidthLoader{TRecord,TProgress}"/>.
     /// </summary>
     /// <remarks>
     /// The <see cref="FieldContext"/> is passed as-is from the attribute. If you want
     /// different alignment or padding for header cells, supply a custom
     /// <see cref="FixedWidthLoader{TRecord,TProgress}.HeaderConverter"/>.
     /// </remarks>
+    /// <exception cref="FieldOverflowException">
+    /// Thrown when the header label is longer than <see cref="FieldContext.FieldLength"/>.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// // Use StrictHeader explicitly (it is also the default):
+    /// loader.HeaderConverter = FixedWidthConverter.StrictHeader;
+    ///
+    /// // Convert header labels to upper-case, still enforcing the field width:
+    /// loader.HeaderConverter = (label, ctx) =>
+    ///     FixedWidthConverter.StrictHeader(label.ToUpperInvariant(), ctx);
+    /// </code>
+    /// </example>
     public static readonly Func<string, FieldContext, string> StrictHeader =
         (header, context) =>
         {
@@ -130,6 +174,12 @@ public static class FixedWidthConverter
     /// is too long, then returns it unchanged otherwise. Space-padding is applied by the
     /// framework after the converter returns.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// // Use TruncateHeader when header labels may exceed the field width:
+    /// loader.HeaderConverter = FixedWidthConverter.TruncateHeader;
+    /// </code>
+    /// </example>
     public static readonly Func<string, FieldContext, string> TruncateHeader =
         (header, context) =>
             header.Length > context.FieldLength
@@ -143,9 +193,9 @@ public static class FixedWidthConverter
     // ------------------------------------------------------------------
 
     /// <summary>
-    /// The default value parser. Converts a raw string read from the file to the
-    /// target property type indicated by <see cref="FieldContext.PropertyType"/>.
-    /// This is the default <see cref="FixedWidthExtractor{TRecord,TProgress}.ValueParser"/>.
+    /// Converts a raw string read from the file to the target property type indicated by
+    /// <see cref="FieldContext.PropertyType"/>. This is the default
+    /// <see cref="FixedWidthExtractor{TRecord,TProgress}.ValueParser"/>.
     /// </summary>
     /// <remarks>
     /// <list type="bullet">
@@ -161,6 +211,27 @@ public static class FixedWidthConverter
     ///   <see cref="CultureInfo.InvariantCulture"/>.</item>
     /// </list>
     /// </remarks>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when parsing a <see cref="DateTime"/>, <see cref="DateTimeOffset"/>, or
+    /// <see cref="TimeSpan"/> value and no <see cref="FieldContext.Format"/> has been
+    /// specified on the field attribute.
+    /// </exception>
+    /// <exception cref="FormatException">
+    /// Thrown when the raw string value cannot be parsed into the target type because
+    /// the value does not match the expected format.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// // Use DefaultParser explicitly (it is also the default):
+    /// extractor.ValueParser = FixedWidthConverter.DefaultParser;
+    ///
+    /// // Handle "Y"/"N" booleans, fall back to DefaultParser for everything else:
+    /// extractor.ValueParser = (text, ctx) =>
+    ///     ctx.PropertyType == typeof(bool)
+    ///         ? (object)(text.Trim() == "Y")
+    ///         : FixedWidthConverter.DefaultParser(text, ctx);
+    /// </code>
+    /// </example>
     public static readonly Func<string, FieldContext, object> DefaultParser =
         (text, context) => ParseValue
         (
