@@ -18,12 +18,12 @@ public class FixedWidthLineParserTests
     private class SimpleRecord
     {
         [FixedWidthField(0, 10)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
 
 
 
         [FixedWidthField(1, 10)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = string.Empty;
 
 
 
@@ -46,7 +46,7 @@ public class FixedWidthLineParserTests
     private class NullableRecord
     {
         [FixedWidthField(0, 10)]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
 
 
@@ -385,7 +385,7 @@ public class FixedWidthLineParserTests
     public void FormatSegments_when_field_value_is_null_writes_spaces()
     {
         var fieldMap = FieldMap.GetResult<SimpleRecord>();
-        var record = new SimpleRecord { FirstName = null, LastName = "Smith", Age = 0 };
+        var record = new SimpleRecord { FirstName = null!, LastName = "Smith", Age = 0 };
 
         var line = string.Concat(FixedWidthLineParser.FormatSegments(record, fieldMap, FixedWidthConverter.Strict));
 
@@ -472,7 +472,7 @@ public class FixedWidthConverterTests
     (
         string propertyName,
         int fieldLength,
-        string format = null
+        string? format = null
     )
         => new FieldContext
         (
@@ -621,7 +621,7 @@ public class FixedWidthConverterTests
     {
         var result = FixedWidthConverter.ConvertToString
         (
-            null,
+            value: null,
             MakeContext
             (
                 "Name",
@@ -645,7 +645,7 @@ public class FixedWidthConverterTests
     [Fact]
     public void ParseValue_when_targetType_is_DateTime_and_format_is_null_throws_InvalidOperationException()
     {
-        var ex = Assert.Throws<InvalidOperationException>( () => FixedWidthConverter.ParseValue("19900115", typeof(DateTime), null));
+        var ex = Assert.Throws<InvalidOperationException>( () => FixedWidthConverter.ParseValue("19900115", typeof(DateTime), format: null));
 
         Assert.Contains
         (
@@ -659,7 +659,7 @@ public class FixedWidthConverterTests
     [Fact]
     public void ParseValue_when_targetType_is_DateTimeOffset_and_format_is_null_throws_InvalidOperationException()
     {
-        Assert.Throws<InvalidOperationException>( () => FixedWidthConverter.ParseValue("20260101T120000", typeof(DateTimeOffset), null));
+        Assert.Throws<InvalidOperationException>( () => FixedWidthConverter.ParseValue("20260101T120000", typeof(DateTimeOffset), format: null));
     }
 
 
@@ -667,7 +667,7 @@ public class FixedWidthConverterTests
     [Fact]
     public void ParseValue_when_targetType_is_TimeSpan_and_format_is_null_throws_InvalidOperationException()
     {
-        Assert.Throws<InvalidOperationException>( () => FixedWidthConverter.ParseValue("01:30:00", typeof(TimeSpan), null));
+        Assert.Throws<InvalidOperationException>( () => FixedWidthConverter.ParseValue("01:30:00", typeof(TimeSpan), format: null));
     }
 
 
@@ -769,7 +769,7 @@ public class FixedWidthConverterTests
             10,
             ' ',
             FieldAlignment.Left,
-            null,
+            format: null,
             "Name"
         );
         var result = FixedWidthConverter.Truncate
@@ -797,7 +797,7 @@ public class FixedWidthConverterTests
             10,
             ' ',
             FieldAlignment.Left,
-            null,
+            format: null,
             "Name"
         );
         var result = FixedWidthConverter.TruncateHeader
@@ -825,7 +825,7 @@ public class FixedWidthConverterTests
             4,
             ' ',
             FieldAlignment.Left,
-            null,
+            format: null,
             "Name"
         );
         var result = FixedWidthConverter.TruncateHeader
@@ -852,7 +852,7 @@ public class FixedWidthConverterTests
         (
             "A",
             typeof(char),
-            null
+            format: null
         );
 
         Assert.Equal
@@ -880,7 +880,7 @@ public class NullableParsingTests
 
 
         [FixedWidthField(1, 10)]
-        public string NullableString { get; set; }
+        public string NullableString { get; set; } = string.Empty;
 
 
 

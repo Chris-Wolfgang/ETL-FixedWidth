@@ -34,39 +34,12 @@ internal static class FixedWidthLineParser
 
         for (var i = 0; i < descriptors.Count; i++)
         {
-            var attr = descriptors[i].Attribute;
-            var prop = descriptors[i].Property;
-            var value = prop.GetValue(record);
-            var context = descriptors[i].Context;
-
-            var text = converter
-            (
-                value,
-                context
-            );
-
-            // Safety net — throw if the converter didn't honor the field width contract.
-            if (text.Length > attr.Length)
-            {
-                throw new FieldOverflowException
-                (
-                    $"The value converter returned a string of length {text.Length} " +
-                    $"for property '{prop.Name}' which exceeds the defined field " +
-                    $"width of {attr.Length}. Ensure your ValueConverter honors the " +
-                    $"FieldLength in FieldContext.",
-                    prop.Name,
-                    attr.Length,
-                    text.Length
-                );
-            }
-
-            segments[i] = attr.Alignment == FieldAlignment.Right
-                ? text.PadLeft(attr.Length, attr.Pad)
-                : text.PadRight(attr.Length, attr.Pad);
+            segments[i] = FormatSegment(record, descriptors[i], converter);
         }
 
         return segments;
     }
+
 
 
     /// <summary>
@@ -89,33 +62,7 @@ internal static class FixedWidthLineParser
 
         for (var i = 0; i < descriptors.Count; i++)
         {
-            var attr = descriptors[i].Attribute;
-            var prop = descriptors[i].Property;
-            var headerLabel = attr.Header ?? prop.Name;
-            var context = descriptors[i].Context;
-
-            var text = headerConverter
-            (
-                headerLabel,
-                context
-            );
-
-            if (text.Length > attr.Length)
-            {
-                throw new FieldOverflowException
-                (
-                    $"The header converter returned a string of length {text.Length} for property " + $"'{prop.Name}' which exceeds the defined field width of {attr.Length}.",
-                    prop.Name,
-                    attr.Length,
-                    text.Length
-                );
-            }
-
-            segments[i] = text.PadRight
-            (
-                attr.Length,
-                ' '
-            );
+            segments[i] = FormatHeaderSegment(descriptors[i], headerConverter);
         }
 
         return segments;
@@ -178,7 +125,7 @@ internal static class FixedWidthLineParser
         valueParser ??= FixedWidthConverter.DefaultParser;
         var delimiterWidth = string.IsNullOrEmpty(fieldDelimiter)
             ? 0
-            : fieldDelimiter.Length;
+            : fieldDelimiter!.Length;
         var fullExpectedWidth = fieldMap.ExpectedLineWidth + delimiterWidth * (fieldMap.TotalColumnCount - 1);
 
         if (line.Length < fullExpectedWidth)
@@ -200,55 +147,134 @@ internal static class FixedWidthLineParser
         }
 
         var record = new T();
-        var descriptors = fieldMap.Descriptors;
 
-        foreach (var descriptor in descriptors)
+        foreach (var descriptor in fieldMap.Descriptors)
         {
-            var attr = descriptor.Attribute;
-            var prop = descriptor.Property;
-
-            // Use AbsoluteColumnIndex so skipped columns are accounted for
-            // when offsetting for delimiter characters.
-            var start = descriptor.Start
-                        + (delimiterWidth * descriptor.AbsoluteColumnIndex);
-
-            var raw = line.Substring
-            (
-                start,
-                attr.Length
-            );
-            var value = attr.TrimValue
-                ? raw.Trim()
-                : raw;
-
-            try
-            {
-                var converted = valueParser
-                (
-                    value,
-                    descriptor.Context
-                );
-                prop.SetValue
-                (
-                    record,
-                    converted
-                );
-            }
-            catch (Exception ex) when (!(ex is MalformedLineException))
-            {
-                throw new FieldConversionException
-                (
-                    $"Line {lineNumber}: could not convert value '{value}' to type " + $"'{prop.PropertyType.Name}' for property '{prop.Name}'.",
-                    lineNumber,
-                    line,
-                    prop.Name,
-                    prop.PropertyType,
-                    value,
-                    ex
-                );
-            }
+            ParseField(record, descriptor, line, lineNumber, delimiterWidth, valueParser);
         }
 
         return record;
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // Private helpers
+    // ------------------------------------------------------------------
+
+    /// <summary>
+    /// Converts and assigns a single field value from <paramref name="line"/>
+    /// into the matching property on <paramref name="record"/>.
+    /// </summary>
+    /// <exception cref="FieldConversionException"></exception>
+    private static void ParseField<T>
+    (
+        T record,
+        FieldDescriptor descriptor,
+        string line,
+        long lineNumber,
+        int delimiterWidth,
+        Func<string, FieldContext, object> valueParser
+    )
+    {
+        var attr = descriptor.Attribute;
+        var prop = descriptor.Property;
+
+        // Use AbsoluteColumnIndex so skipped columns are accounted for
+        // when offsetting for delimiter characters.
+        var start = descriptor.Start + (delimiterWidth * descriptor.AbsoluteColumnIndex);
+        var raw = line.Substring(start, attr.Length);
+        var value = attr.TrimValue
+            ? raw.Trim()
+            : raw;
+
+        try
+        {
+            var converted = valueParser(value, descriptor.Context);
+            prop.SetValue(record, converted);
+        }
+        catch (Exception ex) when (!(ex is MalformedLineException))
+        {
+            throw new FieldConversionException
+            (
+                $"Line {lineNumber}: could not convert value '{value}' to type " +
+                $"'{prop.PropertyType.Name}' for property '{prop.Name}'.",
+                lineNumber,
+                line,
+                prop.Name,
+                prop.PropertyType,
+                value,
+                ex
+            );
+        }
+    }
+
+
+
+    /// <summary>
+    /// Formats a single data field value into a padded string segment.
+    /// </summary>
+    /// <exception cref="FieldOverflowException"></exception>
+    private static string FormatSegment<T>
+    (
+        T record,
+        FieldDescriptor descriptor,
+        Func<object, FieldContext, string> converter
+    )
+    {
+        var attr = descriptor.Attribute;
+        var prop = descriptor.Property;
+        var text = converter(prop.GetValue(record)!, descriptor.Context);
+
+        // Safety net — throw if the converter didn't honor the field width contract.
+        if (text.Length > attr.Length)
+        {
+            throw new FieldOverflowException
+            (
+                $"The value converter returned a string of length {text.Length} " +
+                $"for property '{prop.Name}' which exceeds the defined field " +
+                $"width of {attr.Length}. Ensure your ValueConverter honors the " +
+                $"FieldLength in FieldContext.",
+                prop.Name,
+                attr.Length,
+                text.Length
+            );
+        }
+
+        return attr.Alignment == FieldAlignment.Right
+            ? text.PadLeft(attr.Length, attr.Pad)
+            : text.PadRight(attr.Length, attr.Pad);
+    }
+
+
+
+    /// <summary>
+    /// Formats a single header label into a left-aligned, space-padded string segment.
+    /// </summary>
+    /// <exception cref="FieldOverflowException"></exception>
+    private static string FormatHeaderSegment
+    (
+        FieldDescriptor descriptor,
+        Func<string, FieldContext, string> headerConverter
+    )
+    {
+        var attr = descriptor.Attribute;
+        var prop = descriptor.Property;
+        var headerLabel = attr.Header ?? prop.Name;
+        var text = headerConverter(headerLabel, descriptor.Context);
+
+        if (text.Length > attr.Length)
+        {
+            throw new FieldOverflowException
+            (
+                $"The header converter returned a string of length {text.Length} for property " +
+                $"'{prop.Name}' which exceeds the defined field width of {attr.Length}.",
+                prop.Name,
+                attr.Length,
+                text.Length
+            );
+        }
+
+        return text.PadRight(attr.Length, ' ');
     }
 }

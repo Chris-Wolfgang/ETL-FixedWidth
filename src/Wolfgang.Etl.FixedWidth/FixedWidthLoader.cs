@@ -128,7 +128,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// fixed-width output with no delimiter. Use a value like <c>" | "</c> for
     /// human-readable report output.
     /// </summary>
-    public string FieldDelimiter { get; set; }
+    public string? FieldDelimiter { get; set; }
 
 
 
@@ -152,7 +152,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
             );
         }
 
-        throw new NotImplementedException
+        throw new NotSupportedException
         (
             $"Override {nameof(CreateProgressReport)} to supply a " +
             $"{typeof(TProgress).Name} instance."
@@ -179,24 +179,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
 
         if (WriteHeader)
         {
-            var headerSegments = FixedWidthLineParser.FormatHeaderSegments
-            (
-                fieldMap,
-                HeaderConverter
-            );
-            Interlocked.Increment(ref _currentLineNumber);
-            await _writer.WriteLineAsync(Join(headerSegments)).ConfigureAwait(false);
-
-            if (FieldSeparator.HasValue)
-            {
-                var separatorSegments = FixedWidthLineParser.FormatSeparatorSegments
-                (
-                    fieldMap,
-                    FieldSeparator.Value
-                );
-                Interlocked.Increment(ref _currentLineNumber);
-                await _writer.WriteLineAsync(Join(separatorSegments)).ConfigureAwait(false);
-            }
+            await WriteHeaderAsync(fieldMap).ConfigureAwait(false);
         }
 
         await foreach (var item in items.WithCancellation(token).ConfigureAwait(false))
@@ -228,6 +211,34 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
             Interlocked.Increment(ref _currentLineNumber);
             await _writer.WriteLineAsync(Join(segments)).ConfigureAwait(false);
             IncrementCurrentItemCount();
+        }
+    }
+
+
+
+    /// <summary>
+    /// Writes the header line and, if <see cref="FieldSeparator"/> is set, the
+    /// separator line that follows it.
+    /// </summary>
+    private async Task WriteHeaderAsync(FieldMapResult fieldMap)
+    {
+        var headerSegments = FixedWidthLineParser.FormatHeaderSegments
+        (
+            fieldMap,
+            HeaderConverter
+        );
+        Interlocked.Increment(ref _currentLineNumber);
+        await _writer.WriteLineAsync(Join(headerSegments)).ConfigureAwait(false);
+
+        if (FieldSeparator.HasValue)
+        {
+            var separatorSegments = FixedWidthLineParser.FormatSeparatorSegments
+            (
+                fieldMap,
+                FieldSeparator.Value
+            );
+            Interlocked.Increment(ref _currentLineNumber);
+            await _writer.WriteLineAsync(Join(separatorSegments)).ConfigureAwait(false);
         }
     }
 

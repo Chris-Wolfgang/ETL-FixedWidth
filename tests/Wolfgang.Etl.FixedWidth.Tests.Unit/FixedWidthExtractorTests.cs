@@ -18,6 +18,7 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 [ExcludeFromCodeCoverage]
 public class PersonRecord
 {
+#pragma warning disable CS8618 // null by design — tests verify default(PersonRecord) has null strings
     [FixedWidthField(0, 10)]
     public string FirstName { get; set; }
 
@@ -25,6 +26,7 @@ public class PersonRecord
 
     [FixedWidthField(1, 10)]
     public string LastName { get; set; }
+#pragma warning restore CS8618
 
 
 
@@ -44,18 +46,6 @@ public class FixedWidthExtractorTests
         new(new StringReader(content));
 
 
-    private static async Task<List<PersonRecord>> ExtractAll( FixedWidthExtractor<PersonRecord, Report> extractor)
-    {
-        var results = new List<PersonRecord>();
-        await foreach (var record in extractor.ExtractAsync())
-        {
-            results.Add(record);
-        }
-
-        return results;
-    }
-
-
 
     // ------------------------------------------------------------------
     // Happy path
@@ -64,7 +54,7 @@ public class FixedWidthExtractorTests
     [Fact]
     public async Task ExtractAsync_with_valid_content_returns_all_records()
     {
-        var results = await ExtractAll(CreateExtractor( "John      Smith     042\n" + "Jane      Doe       030"));
+        var results = await CreateExtractor( "John      Smith     042\n" + "Jane      Doe       030").ExtractAsync().ToListAsync();
 
         Assert.Equal
         (
@@ -105,7 +95,7 @@ public class FixedWidthExtractorTests
         var extractor = CreateExtractor( "FirstName LastName  Age\n" + "John      Smith     042\n" + "Jane      Doe       030");
         extractor.HeaderLineCount = 1;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Equal
         (
@@ -127,7 +117,7 @@ public class FixedWidthExtractorTests
         var extractor = CreateExtractor( "FirstName LastName  Age\n" + "John      Smith     042\n" + "Jane      Doe       030");
         extractor.HasHeader = true;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Equal
         (
@@ -195,7 +185,7 @@ public class FixedWidthExtractorTests
         extractor.HeaderLineCount = 1;
         extractor.FieldSeparator = '-';
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Single(results);
         Assert.Equal
@@ -214,7 +204,7 @@ public class FixedWidthExtractorTests
         var extractor = CreateExtractor( "John      Smith     042\n" + "Jane      Doe       030");
         extractor.FieldSeparator = '-';
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Equal
         (
@@ -234,7 +224,7 @@ public class FixedWidthExtractorTests
     {
         var extractor = CreateExtractor("John      Smith     042\n\nJane      Doe       030");
 
-        await Assert.ThrowsAsync<LineTooShortException>( async () => await ExtractAll(extractor));
+        await Assert.ThrowsAsync<LineTooShortException>( async () => await extractor.ExtractAsync().ToListAsync());
     }
 
 
@@ -245,7 +235,7 @@ public class FixedWidthExtractorTests
         var extractor = CreateExtractor("John      Smith     042\n\nJane      Doe       030");
         extractor.BlankLineHandling = BlankLineHandling.Skip;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Equal
         (
@@ -262,7 +252,7 @@ public class FixedWidthExtractorTests
         var extractor = CreateExtractor("John      Smith     042\n\nJane      Doe       030");
         extractor.BlankLineHandling = BlankLineHandling.ReturnDefault;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Equal
         (
@@ -284,7 +274,7 @@ public class FixedWidthExtractorTests
         // Line too short — only 15 chars, need 23.
         var extractor = CreateExtractor("John      Smith ");
 
-        await Assert.ThrowsAsync<LineTooShortException>( async () => await ExtractAll(extractor));
+        await Assert.ThrowsAsync<LineTooShortException>( async () => await extractor.ExtractAsync().ToListAsync());
     }
 
 
@@ -296,7 +286,7 @@ public class FixedWidthExtractorTests
                                          "Jane      Doe       030");
         extractor.MalformedLineHandling = MalformedLineHandling.Skip;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Single(results);
         Assert.Equal
@@ -315,7 +305,7 @@ public class FixedWidthExtractorTests
                                          "Jane      Doe       030");
         extractor.MalformedLineHandling = MalformedLineHandling.ReturnDefault;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Equal
         (
@@ -342,7 +332,7 @@ public class FixedWidthExtractorTests
         var extractor = CreateExtractor("John      Smith     042");
         extractor.LineFilter = _ => LineAction.Process;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Single(results);
         Assert.Equal
@@ -362,7 +352,7 @@ public class FixedWidthExtractorTests
             ? LineAction.Skip
             : LineAction.Process;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Single(results);
         Assert.Equal
@@ -382,7 +372,7 @@ public class FixedWidthExtractorTests
             ? LineAction.Stop
             : LineAction.Process;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Single(results);
         Assert.Equal
@@ -402,7 +392,7 @@ public class FixedWidthExtractorTests
             ? LineAction.Stop
             : LineAction.Process;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Equal
         (
@@ -431,7 +421,7 @@ public class FixedWidthExtractorTests
             return LineAction.Process;
         };
 
-        await ExtractAll(extractor);
+        await extractor.ExtractAsync().ToListAsync();
 
         Assert.False(filterInvokedForBlank);
     }
@@ -458,7 +448,7 @@ public class FixedWidthExtractorTests
         var extractor = CreateExtractor(lines);
         extractor.SkipItemCount = 12;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Empty(results);
     }
@@ -482,7 +472,7 @@ public class FixedWidthExtractorTests
         extractor.SkipItemCount = 7;
         extractor.MaximumItemCount = 10;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Equal
         (
@@ -510,7 +500,7 @@ public class FixedWidthExtractorTests
         extractor.SkipItemCount = 7;
         extractor.MaximumItemCount = 10;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Equal
         (
@@ -533,7 +523,7 @@ public class FixedWidthExtractorTests
         ); // PersonRecord is 10+10+3 = 23
         var extractor = CreateExtractor( "John      Smith     042\n" + allSpaces + "\n" + "Jane      Doe       030");
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Equal
         (
@@ -565,7 +555,7 @@ public class FixedWidthExtractorTests
         var extractor = CreateExtractor( allSpaces + "\n" + "John      Smith     042");
         extractor.SkipItemCount = 1;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Single(results);
         Assert.Equal
@@ -593,7 +583,7 @@ public class FixedWidthExtractorTests
         extractor.BlankLineHandling = BlankLineHandling.Skip;
         extractor.SkipItemCount = 1;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Single(results);
         Assert.Equal
@@ -615,7 +605,7 @@ public class FixedWidthExtractorTests
         extractor.BlankLineHandling = BlankLineHandling.ReturnDefault;
         extractor.SkipItemCount = 2;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Single(results);
         Assert.Equal
@@ -641,7 +631,7 @@ public class FixedWidthExtractorTests
         extractor.BlankLineHandling = BlankLineHandling.ReturnDefault;
         extractor.MaximumItemCount = 2;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Equal
         (
@@ -667,7 +657,7 @@ public class FixedWidthExtractorTests
             ? LineAction.Skip
             : LineAction.Process;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Single(results);
         Assert.Equal
@@ -690,7 +680,7 @@ public class FixedWidthExtractorTests
         var extractor = CreateExtractor( "John      Smith     042\n" + "Jane      Doe       030\n" + "Bob       Jones     055");
         extractor.MaximumItemCount = 2;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Equal
         (
@@ -707,7 +697,7 @@ public class FixedWidthExtractorTests
         var extractor = CreateExtractor( "John      Smith     042\n" + "Jane      Doe       030\n" + "Bob       Jones     055");
         extractor.SkipItemCount = 1;
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Equal
         (
@@ -736,7 +726,7 @@ public class FixedWidthExtractorTests
             FieldDelimiter = " | ",
         };
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Single(results);
         Assert.Equal
@@ -772,7 +762,7 @@ public class FixedWidthExtractorTests
             HeaderLineCount = 1,
         };
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Equal
         (
@@ -807,7 +797,7 @@ public class FixedWidthExtractorTests
             FieldSeparator = '-',
         };
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Single(results);
         Assert.Equal
@@ -829,7 +819,7 @@ public class FixedWidthExtractorTests
             FieldDelimiter = " | ",
         };
 
-        await Assert.ThrowsAsync<LineTooShortException>( async () => await ExtractAll(extractor));
+        await Assert.ThrowsAsync<LineTooShortException>( async () => await extractor.ExtractAsync().ToListAsync());
     }
 
 
@@ -847,7 +837,7 @@ public class FixedWidthExtractorTests
             MalformedLineHandling = MalformedLineHandling.Skip
         };
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Single(results);
         Assert.Equal
@@ -871,7 +861,7 @@ public class FixedWidthExtractorTests
             MalformedLineHandling = MalformedLineHandling.ReturnDefault
         };
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Equal
         (
@@ -906,7 +896,7 @@ public class FixedWidthExtractorTests
                     ? text.Trim().ToUpperInvariant()
                     : FixedWidthConverter.DefaultParser(text, ctx);
 
-        var results = await ExtractAll(extractor);
+        var results = await extractor.ExtractAsync().ToListAsync();
 
         Assert.Single(results);
         Assert.Equal
@@ -1040,19 +1030,19 @@ public class FixedWidthExtractorTests
     private class EmployeeRecord
     {
         [FixedWidthField(0, 10)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
 
 
 
         [FixedWidthSkip(1, 8, Message = "DOB")]
         [FixedWidthSkip(2, 8, Message = "HireDate")]
         [FixedWidthField(3, 5)]
-        public string EmployeeNumber { get; set; }
+        public string EmployeeNumber { get; set; } = string.Empty;
 
 
 
         [FixedWidthField(4, 10)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = string.Empty;
     }
 
 
@@ -1138,11 +1128,11 @@ public class FixedWidthExtractorTests
 
 
     [Fact]
-    public void GetProgressReport_when_TProgress_is_not_FixedWidthReport_throws_NotImplementedException()
+    public void GetProgressReport_when_TProgress_is_not_FixedWidthReport_throws_NotSupportedException()
     {
         var extractor = new FixedWidthExtractor<PersonRecord, Exception>(new StringReader(string.Empty));
 
-        Assert.Throws<NotImplementedException>(() => extractor.GetProgressReport());
+        Assert.Throws<NotSupportedException>(extractor.GetProgressReport);
     }
 
 }

@@ -225,7 +225,7 @@ public static class FixedWidthConverter
     (
         string text,
         Type targetType,
-        string format
+        string? format
     )
     {
         var underlying = Nullable.GetUnderlyingType(targetType);
@@ -233,7 +233,7 @@ public static class FixedWidthConverter
         {
             if (string.IsNullOrEmpty(text))
             {
-                return null;
+                return null!;
             }
             return ParseValue
             (
@@ -251,58 +251,73 @@ public static class FixedWidthConverter
         if (string.IsNullOrEmpty(text))
         {
             return targetType.IsValueType
-                ? Activator.CreateInstance(targetType)
-                : null;
+                ? Activator.CreateInstance(targetType)!
+                : null!;
         }
 
         if (targetType == typeof(DateTime) || targetType == typeof(DateTimeOffset) || targetType == typeof(TimeSpan))
         {
-            if (string.IsNullOrEmpty(format))
-            {
-                throw new InvalidOperationException
-                (
-                    $"Cannot parse a value of type '{targetType.Name}' without " +
-                    "a format string. Specify a Format on the [FixedWidthField] " +
-                    "attribute (e.g. \"yyyyMMdd\", \"HHmmss\")."
-                );
-            }
-
-            if (targetType == typeof(DateTime))
-            {
-                return DateTime.ParseExact
-                (
-                    text,
-                    format,
-                    CultureInfo.InvariantCulture
-                );
-            }
-            if (targetType == typeof(DateTimeOffset))
-            {
-                return DateTimeOffset.ParseExact
-                (
-                    text,
-                    format,
-                    CultureInfo.InvariantCulture
-                );
-            }
-            return TimeSpan.ParseExact
-            (
-                text,
-                format,
-                CultureInfo.InvariantCulture
-            );
+            return ParseDateTimeValue(text, targetType, format);
         }
 
         var converter = TypeDescriptor.GetConverter(targetType);
         if (converter.CanConvertFrom(typeof(string)))
         {
-            return converter.ConvertFromInvariantString(text);
+            return converter.ConvertFromInvariantString(text)!;
         }
 
         return Convert.ChangeType
         (
             text,
             targetType,
+            CultureInfo.InvariantCulture
+        );
+    }
+
+
+
+    /// <summary>
+    /// Parses a <see cref="DateTime"/>, <see cref="DateTimeOffset"/>, or
+    /// <see cref="TimeSpan"/> value from <paramref name="text"/> using the
+    /// required <paramref name="format"/> string.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when <paramref name="format"/> is null or empty.
+    /// </exception>
+    private static object ParseDateTimeValue(string text, Type targetType, string? format)
+    {
+        if (string.IsNullOrEmpty(format))
+        {
+            throw new InvalidOperationException
+            (
+                $"Cannot parse a value of type '{targetType.Name}' without " +
+                "a format string. Specify a Format on the [FixedWidthField] " +
+                "attribute (e.g. \"yyyyMMdd\", \"HHmmss\")."
+            );
+        }
+
+        if (targetType == typeof(DateTime))
+        {
+            return DateTime.ParseExact
+            (
+                text,
+                format,
+                CultureInfo.InvariantCulture
+            );
+        }
+        if (targetType == typeof(DateTimeOffset))
+        {
+            return DateTimeOffset.ParseExact
+            (
+                text,
+                format,
+                CultureInfo.InvariantCulture
+            );
+        }
+        return TimeSpan.ParseExact
+        (
+            text,
+            format,
             CultureInfo.InvariantCulture
         );
     }

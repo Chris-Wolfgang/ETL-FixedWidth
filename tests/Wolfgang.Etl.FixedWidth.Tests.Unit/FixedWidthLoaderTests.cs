@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,12 +14,12 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 public class HeaderRecord
 {
     [FixedWidthField(0, 10, Header = "FIRST_NM")]
-    public string FirstName { get; set; }
+    public string FirstName { get; set; } = string.Empty;
 
 
 
     [FixedWidthField(1, 10, Header = "LAST_NM")]
-    public string LastName { get; set; }
+    public string LastName { get; set; } = string.Empty;
 }
 
 
@@ -46,7 +45,7 @@ public class FixedWidthLoaderTests
             ["\r\n", "\n"],
             StringSplitOptions.None
         );
-        if (parts.Length <= 0 || parts[^1] != "")
+        if (parts.Length == 0 || parts[^1] != "")
         {
             return parts;
         }
@@ -62,26 +61,6 @@ public class FixedWidthLoaderTests
     }
 
 
-    private static async IAsyncEnumerable<PersonRecord> ToAsyncEnumerable( IEnumerable<PersonRecord?> records)
-    {
-        foreach (var r in records)
-        {
-            yield return r;
-            await Task.Yield();
-        }
-    }
-
-
-
-    private static async IAsyncEnumerable<HeaderRecord> ToAsyncEnumerable2( IEnumerable<HeaderRecord> records)
-    {
-        foreach (var r in records)
-        {
-            yield return r;
-            await Task.Yield();
-        }
-    }
-
 
 
     // ------------------------------------------------------------------
@@ -93,12 +72,11 @@ public class FixedWidthLoaderTests
     {
         var loader = CreateLoader(out var writer);
 
-        await loader.LoadAsync(ToAsyncEnumerable(
-        [
+        await loader.LoadAsync(new[]
+        {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
-            new PersonRecord { FirstName = "Jane", LastName = "Doe", Age = 30 }
-            ]
-            ));
+            new PersonRecord { FirstName = "Jane", LastName = "Doe", Age = 30 },
+        }.ToAsyncEnumerable());
 
         var lines = GetLines(writer);
 
@@ -126,10 +104,10 @@ public class FixedWidthLoaderTests
     {
         var loader = CreateLoader(out var writer);
 
-        await loader.LoadAsync(ToAsyncEnumerable(new[]
+        await loader.LoadAsync(new[]
         {
-            new PersonRecord() // all properties at default — null/0
-        }));
+            new PersonRecord(), // all properties at default — null/0
+        }.ToAsyncEnumerable());
 
         var lines = GetLines(writer);
 
@@ -153,11 +131,11 @@ public class FixedWidthLoaderTests
     {
         var loader = CreateLoader(out _);
 
-        await loader.LoadAsync(ToAsyncEnumerable(new[]
+        await loader.LoadAsync(new[]
         {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
             new PersonRecord { FirstName = "Jane", LastName = "Doe", Age = 30 },
-        }));
+        }.ToAsyncEnumerable());
 
         Assert.Equal
         (
@@ -174,15 +152,16 @@ public class FixedWidthLoaderTests
         using var writer = new StringWriter();
         var loader = new FixedWidthLoader<PersonRecord, Report>(writer);
 
-        await loader.LoadAsync(ToAsyncEnumerable(new[]
+        await loader.LoadAsync(new[]
         {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
-        }));
+        }.ToAsyncEnumerable());
 
         Assert.Contains
         (
             "John",
-            writer.ToString()
+            writer.ToString(),
+            StringComparison.Ordinal
         );
     }
 
@@ -198,10 +177,10 @@ public class FixedWidthLoaderTests
         var loader = CreateLoader(out var writer);
         loader.WriteHeader = true;
 
-        await loader.LoadAsync(ToAsyncEnumerable(new[]
+        await loader.LoadAsync(new[]
         {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
-        }));
+        }.ToAsyncEnumerable());
 
         var lines = GetLines(writer);
 
@@ -225,10 +204,10 @@ public class FixedWidthLoaderTests
         var writer = new StringWriter();
         var loader = new FixedWidthLoader<HeaderRecord, Report>(writer) { WriteHeader = true };
 
-        await loader.LoadAsync(ToAsyncEnumerable2(new[]
+        await loader.LoadAsync(new[]
         {
             new HeaderRecord { FirstName = "John", LastName = "Smith" },
-        }));
+        }.ToAsyncEnumerable());
 
         var lines = GetLines(writer);
 
@@ -256,12 +235,12 @@ public class FixedWidthLoaderTests
         var loader = CreateLoader(out var writer);
         loader.MaximumItemCount = 2;
 
-        await loader.LoadAsync(ToAsyncEnumerable(new[]
+        await loader.LoadAsync(new[]
         {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
             new PersonRecord { FirstName = "Jane", LastName = "Doe", Age = 30 },
             new PersonRecord { FirstName = "Bob", LastName = "Jones", Age = 55 },
-        }));
+        }.ToAsyncEnumerable());
 
         Assert.Equal
         (
@@ -278,12 +257,12 @@ public class FixedWidthLoaderTests
         var loader = CreateLoader(out var writer);
         loader.SkipItemCount = 1;
 
-        await loader.LoadAsync(ToAsyncEnumerable(new[]
+        await loader.LoadAsync(new[]
         {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
             new PersonRecord { FirstName = "Jane", LastName = "Doe", Age = 30 },
             new PersonRecord { FirstName = "Bob", LastName = "Jones", Age = 55 },
-        }));
+        }.ToAsyncEnumerable());
 
         var lines = GetLines(writer);
 
@@ -295,7 +274,8 @@ public class FixedWidthLoaderTests
         Assert.StartsWith
         (
             "Jane",
-            lines[0]
+            lines[0],
+            StringComparison.Ordinal
         );
     }
 
@@ -310,7 +290,7 @@ public class FixedWidthLoaderTests
     {
         var loader = CreateLoader(out _);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(async () => await loader.LoadAsync(ToAsyncEnumerable([null])));
+        await Assert.ThrowsAsync<InvalidOperationException>(async () => await loader.LoadAsync(new PersonRecord[] { null! }.ToAsyncEnumerable()));
     }
 
 
@@ -325,10 +305,10 @@ public class FixedWidthLoaderTests
         var loader = CreateLoader(out var writer);
         loader.FieldDelimiter = " | ";
 
-        await loader.LoadAsync(ToAsyncEnumerable(new[]
+        await loader.LoadAsync(new[]
         {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
-        }));
+        }.ToAsyncEnumerable());
 
         var lines = GetLines(writer);
 
@@ -348,10 +328,10 @@ public class FixedWidthLoaderTests
         loader.WriteHeader = true;
         loader.FieldDelimiter = " | ";
 
-        await loader.LoadAsync(ToAsyncEnumerable(new[]
+        await loader.LoadAsync(new[]
         {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
-        }));
+        }.ToAsyncEnumerable());
 
         var lines = GetLines(writer);
 
@@ -373,12 +353,12 @@ public class FixedWidthLoaderTests
     private class SpacePaddedRecord
     {
         [FixedWidthField(0, 10)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
 
 
 
         [FixedWidthField(1, 10)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = string.Empty;
 
 
 
@@ -394,17 +374,16 @@ public class FixedWidthLoaderTests
         var writer = new StringWriter();
         var loader = new FixedWidthLoader<SpacePaddedRecord, Report>(writer)
         {
-            WriteHeader = true, FieldDelimiter = " | "
+            WriteHeader = true,
+            FieldDelimiter = " | ",
         };
 
         await loader.LoadAsync
         (
-
             new[]
-                {
-                    new SpacePaddedRecord { FirstName = "John", LastName = "Smith", Age = 42 },
-                }
-                .ToAsyncEnumerable()
+            {
+                new SpacePaddedRecord { FirstName = "John", LastName = "Smith", Age = 42 },
+            }.ToAsyncEnumerable()
         );
 
         var lines = GetLines(writer);
@@ -434,10 +413,10 @@ public class FixedWidthLoaderTests
         loader.WriteHeader = true;
         loader.FieldSeparator = '-';
 
-        await loader.LoadAsync(ToAsyncEnumerable(new[]
+        await loader.LoadAsync(new[]
         {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
-        }));
+        }.ToAsyncEnumerable());
 
         var lines = GetLines(writer);
 
@@ -446,7 +425,7 @@ public class FixedWidthLoaderTests
             3,
             lines.Length
         );
-        Assert.True(lines[1].Replace("-", "").Trim().Length == 0 || lines[1].All(c => c == '-'));
+        Assert.True(lines[1].Replace('-', ' ').Trim().Length == 0 || lines[1].All(c => c == '-'));
         Assert.Equal
         (
             "John      Smith     042",
@@ -464,17 +443,18 @@ public class FixedWidthLoaderTests
         loader.FieldSeparator = '-';
         loader.FieldDelimiter = "-|-";
 
-        await loader.LoadAsync(ToAsyncEnumerable(new[]
+        await loader.LoadAsync(new[]
         {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
-        }));
+        }.ToAsyncEnumerable());
 
         var lines = GetLines(writer);
 
         Assert.Contains
         (
             "-|-",
-            lines[1]
+            lines[1],
+            StringComparison.Ordinal
         );
     }
 
@@ -487,10 +467,10 @@ public class FixedWidthLoaderTests
         loader.WriteHeader = false;
         loader.FieldSeparator = '-';
 
-        await loader.LoadAsync(ToAsyncEnumerable(new[]
+        await loader.LoadAsync(new[]
         {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
-        }));
+        }.ToAsyncEnumerable());
 
         Assert.Single(GetLines(writer));
     }
@@ -508,14 +488,15 @@ public class FixedWidthLoaderTests
         var writer = new StringWriter();
         var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>(writer)
         {
-            WriteHeader = true, FieldSeparator = '-'
+            WriteHeader = true,
+            FieldSeparator = '-',
         };
 
-        await loader.LoadAsync( ToAsyncEnumerable(new[]
+        await loader.LoadAsync(new[]
         {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
             new PersonRecord { FirstName = "Jane", LastName = "Doe", Age = 30 },
-        }));
+        }.ToAsyncEnumerable());
 
         Assert.Equal
         (
@@ -538,12 +519,12 @@ public class FixedWidthLoaderTests
         var writer = new StringWriter();
         var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>(writer);
 
-        await loader.LoadAsync( ToAsyncEnumerable(new[]
+        await loader.LoadAsync(new[]
         {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
             new PersonRecord { FirstName = "Jane", LastName = "Doe", Age = 30 },
             new PersonRecord { FirstName = "Bob", LastName = "Jones", Age = 55 },
-        }));
+        }.ToAsyncEnumerable());
 
         Assert.Equal
         (
@@ -567,19 +548,21 @@ public class FixedWidthLoaderTests
                     value,
                     ctx
                 ) =>
-                ctx.PropertyName == nameof(PersonRecord.FirstName)
+                string.Equals(ctx.PropertyName, nameof(PersonRecord.FirstName), StringComparison.Ordinal)
                     ? ((string)value).ToUpperInvariant()
                     : FixedWidthConverter.Strict(value, ctx);
 
-        await loader.LoadAsync(ToAsyncEnumerable([
-            new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 }
-        ]));
+        await loader.LoadAsync(new[]
+        {
+            new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
+        }.ToAsyncEnumerable());
 
         var lines = GetLines(writer);
         Assert.StartsWith
         (
             "JOHN      ",
-            lines[0]
+            lines[0],
+            StringComparison.Ordinal
         );
     }
 
@@ -593,19 +576,20 @@ public class FixedWidthLoaderTests
         loader.HeaderConverter =
         (
             label,
-            ctx
+            _
         ) => label.ToUpperInvariant();
 
-        await loader.LoadAsync(ToAsyncEnumerable(
-        [
-            new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 }
-        ]));
+        await loader.LoadAsync(new[]
+        {
+            new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
+        }.ToAsyncEnumerable());
 
         var lines = GetLines(writer);
         Assert.StartsWith
         (
             "FIRSTNAME ",
-            lines[0]
+            lines[0],
+            StringComparison.Ordinal
         );
     }
 
@@ -621,12 +605,11 @@ public class FixedWidthLoaderTests
         var writer = new StringWriter();
         var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>(writer);
 
-        await loader.LoadAsync(ToAsyncEnumerable(
-        [
+        await loader.LoadAsync(new[]
+        {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
-            new PersonRecord { FirstName = "Jane", LastName = "Doe", Age = 30 }
-        ]
-            ));
+            new PersonRecord { FirstName = "Jane", LastName = "Doe", Age = 30 },
+        }.ToAsyncEnumerable());
 
         var report = loader.GetProgressReport();
 
@@ -650,10 +633,10 @@ public class FixedWidthLoaderTests
 
 
     [Fact]
-    public void GetProgressReport_when_TProgress_is_not_FixedWidthReport_throws_NotImplementedException()
+    public void GetProgressReport_when_TProgress_is_not_FixedWidthReport_throws_NotSupportedException()
     {
         var loader = new FixedWidthLoader<PersonRecord, Exception>(new StringWriter());
 
-        Assert.Throws<NotImplementedException>(() => loader.GetProgressReport());
+        Assert.Throws<NotSupportedException>(loader.GetProgressReport);
     }
 }
