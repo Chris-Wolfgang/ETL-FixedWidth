@@ -84,6 +84,25 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// The function used to convert a field value to its string representation
     /// before padding and writing. Defaults to <see cref="FixedWidthConverter.Strict"/>.
     /// </summary>
+    /// <remarks>
+    /// The converter receives the raw boxed property value and a <see cref="FieldContext"/>
+    /// describing the field. It must return a string no longer than
+    /// <see cref="FieldContext.FieldLength"/>; otherwise the safety-net inside
+    /// <c>FormatSegment</c> will throw a
+    /// <see cref="Exceptions.FieldOverflowException"/>.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// // Write booleans as "Y"/"N" instead of "True"/"False":
+    /// loader.ValueConverter = (value, ctx) =>
+    ///     ctx.PropertyType == typeof(bool)
+    ///         ? ((bool)value ? "Y" : "N")
+    ///         : FixedWidthConverter.Strict(value, ctx);
+    ///
+    /// // Silently truncate all values instead of throwing on overflow:
+    /// loader.ValueConverter = FixedWidthConverter.Truncate;
+    /// </code>
+    /// </example>
     public Func<object, FieldContext, string> ValueConverter { get; set; } = FixedWidthConverter.Strict;
 
 
@@ -92,6 +111,22 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// The function used to convert a header label to its string representation.
     /// Defaults to <see cref="FixedWidthConverter.StrictHeader"/>.
     /// </summary>
+    /// <remarks>
+    /// Only called when <see cref="WriteHeader"/> is <see langword="true"/>.
+    /// Space-padding to <see cref="FieldContext.FieldLength"/> is applied by
+    /// the framework after this converter returns — the converter must only
+    /// ensure the returned string is not longer than the field width.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// // Render all headers in upper-case:
+    /// loader.HeaderConverter = (label, ctx) =>
+    ///     FixedWidthConverter.StrictHeader(label.ToUpperInvariant(), ctx);
+    ///
+    /// // Silently truncate headers that are too long:
+    /// loader.HeaderConverter = FixedWidthConverter.TruncateHeader;
+    /// </code>
+    /// </example>
     public Func<string, FieldContext, string> HeaderConverter { get; set; } = FixedWidthConverter.StrictHeader;
 
 
@@ -100,6 +135,18 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// When <see langword="true"/>, a header line is written before any records.
     /// Defaults to <see langword="false"/>.
     /// </summary>
+    /// <remarks>
+    /// The header label for each field is taken from
+    /// <see cref="Attributes.FixedWidthFieldAttribute.Header"/> if set, or the
+    /// property name otherwise. Labels are passed through
+    /// <see cref="HeaderConverter"/> before being written.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// loader.WriteHeader = true;
+    /// // Produces a header line like: "FirstName LastName  Age  "
+    /// </code>
+    /// </example>
     public bool WriteHeader { get; set; }
 
 
@@ -128,6 +175,19 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// fixed-width output with no delimiter. Use a value like <c>" | "</c> for
     /// human-readable report output.
     /// </summary>
+    /// <remarks>
+    /// When set, the delimiter is inserted between every adjacent pair of fields — it
+    /// is not appended after the last field. The
+    /// <see cref="FixedWidthExtractor{TRecord,TProgress}.FieldDelimiter"/> on the
+    /// corresponding extractor must be set to the same value so that field boundaries
+    /// are correctly identified during extraction.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// loader.FieldDelimiter = " | ";   // human-readable table: "John       | Smith      |  42 "
+    /// loader.FieldDelimiter = null;    // pure fixed-width (default): "John      Smith        42 "
+    /// </code>
+    /// </example>
     public string? FieldDelimiter { get; set; }
 
 
@@ -137,9 +197,42 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// Updated after each line is written. Includes the header line and separator line
     /// if written. Matches the line number shown in a text editor.
     /// </summary>
+    /// <remarks>
+    /// Thread-safe: reads are performed with <see cref="Interlocked.Read(ref long)"/>
+    /// so this property may be sampled from a progress-reporting timer thread
+    /// without a data race.
+    /// </remarks>
     public long CurrentLineNumber => Interlocked.Read(ref _currentLineNumber);
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Creates a progress report snapshot for the current loader state.
+    /// Override in a derived class to return a custom <typeparamref name="TProgress"/>
+    /// instance. The default implementation returns a <see cref="FixedWidthReport"/>
+    /// when <typeparamref name="TProgress"/> is <see cref="FixedWidthReport"/> or the
+    /// base <see cref="Report"/>, and throws <see cref="NotSupportedException"/> otherwise.
+    /// </summary>
+    /// <returns>
+    /// A <typeparamref name="TProgress"/> snapshot containing
+    /// <see cref="LoaderBase{TRecord,TProgress}.CurrentItemCount"/>,
+    /// <see cref="LoaderBase{TRecord,TProgress}.CurrentSkippedItemCount"/>,
+    /// and <see cref="CurrentLineNumber"/> at the moment of the call.
+    /// </returns>
+    /// <exception cref="NotSupportedException">
+    /// Thrown when <typeparamref name="TProgress"/> is not <see cref="FixedWidthReport"/>
+    /// or <see cref="Report"/> and <see cref="CreateProgressReport"/> has not been overridden.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// // To use a custom progress type, subclass and override:
+    /// public class MyLoader : FixedWidthLoader&lt;MyRecord, MyProgress&gt;
+    /// {
+    ///     public MyLoader(TextWriter writer) : base(writer) { }
+    ///
+    ///     protected override MyProgress CreateProgressReport() =>
+    ///         new MyProgress(CurrentItemCount, CurrentLineNumber);
+    /// }
+    /// </code>
+    /// </example>
     protected override TProgress CreateProgressReport()
     {
         if (typeof(TProgress) == typeof(FixedWidthReport) || typeof(TProgress) == typeof(Report))

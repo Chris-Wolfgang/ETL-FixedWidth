@@ -169,12 +169,30 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// Defaults to <see cref="FixedWidthConverter.DefaultParser"/>.
     /// Mirrors <see cref="FixedWidthLoader{TRecord,TProgress}.ValueConverter"/>.
     /// </summary>
+    /// <remarks>
+    /// The delegate must return a value that is assignable to the property's CLR type.
+    /// Returning an incompatible type will cause an <see cref="InvalidCastException"/>
+    /// when the framework attempts to set the property value.
+    /// </remarks>
+    /// <exception cref="Exceptions.FieldConversionException">
+    /// The default <see cref="FixedWidthConverter.DefaultParser"/> wraps any parse
+    /// failure in a <see cref="Exceptions.FieldConversionException"/>. Custom parsers
+    /// should do the same so that <see cref="MalformedLineHandling"/> can handle them
+    /// uniformly.
+    /// </exception>
     /// <example>
     /// <code>
-    /// // Custom parser — treat "Y"/"N" as bool
+    /// // Treat "Y"/"N" as bool, fall back to DefaultParser for everything else:
     /// extractor.ValueParser = (text, ctx) =>
-    ///     ctx.PropertyType == typeof(bool) ? (object)(text.Trim() == "Y") :
-    ///     FixedWidthConverter.DefaultParser(text, ctx);
+    ///     ctx.PropertyType == typeof(bool)
+    ///         ? (object)(text.Trim() == "Y")
+    ///         : FixedWidthConverter.DefaultParser(text, ctx);
+    ///
+    /// // Parse a custom date format for a specific field:
+    /// extractor.ValueParser = (text, ctx) =>
+    ///     ctx.PropertyName == "BirthDate"
+    ///         ? DateTime.ParseExact(text, "dd/MM/yyyy", CultureInfo.InvariantCulture)
+    ///         : FixedWidthConverter.DefaultParser(text, ctx);
     /// </code>
     /// </example>
     public Func<string, FieldContext, object> ValueParser { get; set; } = FixedWidthConverter.DefaultParser;
@@ -186,6 +204,20 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// extracting records. Defaults to 0.
     /// For the common single-header case, use <see cref="HasHeader"/> instead.
     /// </summary>
+    /// <remarks>
+    /// Lines 1 through <see cref="HeaderLineCount"/> are skipped entirely without
+    /// parsing. If <see cref="FieldSeparator"/> is also set, the line immediately
+    /// after the last header line is additionally skipped as a separator line.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// // File has two header lines followed by data:
+    /// extractor.HeaderLineCount = 2;
+    ///
+    /// // Equivalent shorthand for the common single-header case:
+    /// extractor.HasHeader = true;
+    /// </code>
+    /// </example>
     public int HeaderLineCount { get; set; }
 
 
@@ -197,6 +229,16 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// Returns <see langword="true"/> if <see cref="HeaderLineCount"/> is greater than zero.
     /// Mirrors <see cref="FixedWidthLoader{TRecord,TProgress}.WriteHeader"/>.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// // Skip one header line before reading records:
+    /// extractor.HasHeader = true;
+    ///
+    /// // Skip one header line and one separator line:
+    /// extractor.HasHeader    = true;
+    /// extractor.FieldSeparator = '-';
+    /// </code>
+    /// </example>
     public bool HasHeader
     {
         get => HeaderLineCount > 0;
@@ -214,16 +256,36 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// Set to <see langword="null"/> (default) for no separator.
     /// Mirrors <see cref="FixedWidthLoader{TRecord,TProgress}.FieldSeparator"/>.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// extractor.HasHeader      = true;
+    /// extractor.FieldSeparator = '-';  // skips a "----------" separator line after the header
+    /// extractor.FieldSeparator = null; // no separator line (default)
+    /// </code>
+    /// </example>
     public char? FieldSeparator { get; set; }
 
 
 
     /// <summary>
-    /// The delimiter string written between fields by the loader, or <see langword="null"/>
-    /// (default) for pure fixed-width input with no delimiter. Must match the
-    /// <see cref="FixedWidthLoader{TRecord,TProgress}.FieldDelimiter"/> used when the
-    /// file was written.
+    /// The delimiter string present between fields in the source file, or
+    /// <see langword="null"/> (default) for pure fixed-width input with no delimiter.
+    /// Must match the <see cref="FixedWidthLoader{TRecord,TProgress}.FieldDelimiter"/>
+    /// used when the file was written.
     /// </summary>
+    /// <remarks>
+    /// When set, the extractor accounts for the delimiter width when calculating
+    /// field start positions, ensuring each field is read from the correct offset.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// // File was written with FieldDelimiter = " | " — set the same value on the extractor:
+    /// extractor.FieldDelimiter = " | ";
+    ///
+    /// // Pure fixed-width file with no delimiter (default):
+    /// extractor.FieldDelimiter = null;
+    /// </code>
+    /// </example>
     public string? FieldDelimiter { get; set; }
 
 
@@ -234,19 +296,42 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// this value points to the offending line. Matches the line number shown
     /// in a text editor — no adjustment is needed for header or separator lines.
     /// </summary>
+    /// <remarks>
+    /// Thread-safe: reads are performed with <see cref="Interlocked.Read(ref long)"/>
+    /// so this property may be sampled from a progress-reporting timer thread
+    /// without a data race.
+    /// </remarks>
     public long CurrentLineNumber => Interlocked.Read(ref _currentLineNumber);
 
     /// <summary>
-    /// Creates a progress report. Override in a derived class to return a custom
-    /// <typeparamref name="TProgress"/> instance. The default implementation returns a
-    /// <see cref="FixedWidthReport"/> if <typeparamref name="TProgress"/> is
-    /// <see cref="FixedWidthReport"/> or the base <see cref="Report"/>, and throws
-    /// <see cref="NotSupportedException"/> otherwise.
+    /// Creates a progress report snapshot for the current extractor state.
+    /// Override in a derived class to return a custom <typeparamref name="TProgress"/>
+    /// instance. The default implementation returns a <see cref="FixedWidthReport"/>
+    /// when <typeparamref name="TProgress"/> is <see cref="FixedWidthReport"/> or the
+    /// base <see cref="Report"/>, and throws <see cref="NotSupportedException"/> otherwise.
     /// </summary>
+    /// <returns>
+    /// A <typeparamref name="TProgress"/> snapshot containing
+    /// <see cref="ExtractorBase{TRecord,TProgress}.CurrentItemCount"/>,
+    /// <see cref="ExtractorBase{TRecord,TProgress}.CurrentSkippedItemCount"/>,
+    /// and <see cref="CurrentLineNumber"/> at the moment of the call.
+    /// </returns>
     /// <exception cref="NotSupportedException">
     /// Thrown when <typeparamref name="TProgress"/> is not <see cref="FixedWidthReport"/>
     /// or <see cref="Report"/> and <see cref="CreateProgressReport"/> has not been overridden.
     /// </exception>
+    /// <example>
+    /// <code>
+    /// // To use a custom progress type, subclass and override:
+    /// public class MyExtractor : FixedWidthExtractor&lt;MyRecord, MyProgress&gt;
+    /// {
+    ///     public MyExtractor(TextReader reader) : base(reader) { }
+    ///
+    ///     protected override MyProgress CreateProgressReport() =>
+    ///         new MyProgress(CurrentItemCount, CurrentLineNumber);
+    /// }
+    /// </code>
+    /// </example>
     protected override TProgress CreateProgressReport()
     {
         if (typeof(TProgress) == typeof(FixedWidthReport) || typeof(TProgress) == typeof(Report))
