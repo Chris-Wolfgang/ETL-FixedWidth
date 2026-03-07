@@ -29,7 +29,7 @@ public sealed class FieldContext
         int fieldLength,
         char pad,
         FieldAlignment alignment,
-        string format,
+        string? format,
         string headerLabel
     )
     {
@@ -98,5 +98,5 @@ public sealed class FieldContext
     /// The optional format string defined on the field attribute, or
     /// <see langword="null"/> if none was specified.
     /// </summary>
-    public string Format { get; }
+    public string? Format { get; }
 }

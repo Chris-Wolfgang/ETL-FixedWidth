@@ -111,7 +111,9 @@ public static class FixedWidthConverter
             {
                 throw new FieldOverflowException
                 (
-                    $"Header label '{header}' for property '{context.PropertyName}' has length " + $"{header.Length} which exceeds the defined field width of {context.FieldLength}.",
+                    $"Header label '{header}' for property '{context.PropertyName}' " +
+                    $"has length {header.Length} which exceeds the defined field width " +
+                    $"of {context.FieldLength}.",
                     context.PropertyName,
                     context.FieldLength,
                     header.Length
