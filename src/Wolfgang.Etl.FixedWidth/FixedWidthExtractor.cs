@@ -277,11 +277,14 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
     /// <inheritdoc/>
+#pragma warning disable MA0051 // async iterator methods cannot delegate 'yield return' to sub-methods
     protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync([EnumeratorCancellation] CancellationToken token)
 #else
     /// <inheritdoc/>
+#pragma warning disable MA0051 // async iterator methods cannot delegate 'yield return' to sub-methods
     protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync([System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
 #endif
+#pragma warning restore MA0051
     {
         var fieldMap = FieldMap.GetResult<TRecord>();
         long dataLinesSkipped = 0;
@@ -391,6 +394,10 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// Throws <see cref="LineTooShortException"/> when the policy is
     /// <see cref="BlankLineHandling.ThrowException"/>.
     /// </summary>
+    /// <exception cref="LineTooShortException">
+    /// Thrown when <see cref="BlankLineHandling"/> is
+    /// <see cref="BlankLineHandling.ThrowException"/> (the default).
+    /// </exception>
     private bool HandleBlankLine(FieldMapResult fieldMap, out TRecord defaultRecord)
     {
         defaultRecord = default!;

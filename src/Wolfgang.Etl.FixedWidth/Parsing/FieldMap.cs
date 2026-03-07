@@ -52,7 +52,9 @@ internal static class FieldMap
 
     // Represents a single entry in the globally-sorted column list — either
     // a mapped field or a skipped column.
-    private readonly struct ColumnEntry : IEquatable<ColumnEntry>
+#pragma warning disable S3898 // value type only used for internal sorting — equality is never needed
+    private readonly struct ColumnEntry
+#pragma warning restore S3898
     {
         public ColumnEntry
         (
@@ -91,10 +93,6 @@ internal static class FieldMap
         public int Length => IsSkip
             ? Skip!.Length
             : Field!.Length;
-
-        public bool Equals(ColumnEntry other) => Index == other.Index;
-        public override bool Equals(object? obj) => obj is ColumnEntry other && Equals(other);
-        public override int GetHashCode() => Index;
     }
 
 
@@ -126,6 +124,10 @@ internal static class FieldMap
     /// Collects all <see cref="FixedWidthFieldAttribute"/> and
     /// <see cref="FixedWidthSkipAttribute"/> entries from the type's public properties.
     /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when a property decorated with <see cref="FixedWidthFieldAttribute"/>
+    /// has no public setter.
+    /// </exception>
     private static List<ColumnEntry> CollectEntries(Type type)
     {
         var entries = new List<ColumnEntry>();
@@ -159,6 +161,9 @@ internal static class FieldMap
     /// <summary>
     /// Throws if any two entries share the same column index.
     /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when two or more entries share the same column index value.
+    /// </exception>
     private static void ValidateNoDuplicateIndexes(Type type, List<ColumnEntry> entries)
     {
         var seen = new HashSet<int>();

@@ -429,6 +429,67 @@ public class FixedWidthLineParserTests
     // ------------------------------------------------------------------
 
     [Fact]
+    public void FormatSegments_when_custom_converter_returns_string_longer_than_field_width_throws_FieldOverflowException()
+    {
+        // Verifies the safety-net throw inside FormatSegment — fires when a custom
+        // converter bypasses length validation and returns an overlong string.
+        var fieldMap = FieldMap.GetResult<SimpleRecord>();
+        var record = new SimpleRecord { FirstName = "John", LastName = "Smith", Age = 1 };
+
+        // Custom converter that ignores field-length constraints.
+        Func<object, FieldContext, string> badConverter = (value, _) => "This string is far too long";
+
+        var ex = Assert.Throws<FieldOverflowException>
+        (
+            () => string.Concat(FixedWidthLineParser.FormatSegments(record, fieldMap, badConverter))
+        );
+
+        Assert.Equal
+        (
+            "FirstName",
+            ex.PropertyName
+        );
+        Assert.Equal
+        (
+            10,
+            ex.FieldLength
+        );
+        Assert.True(ex.ActualLength > 10);
+    }
+
+
+
+    [Fact]
+    public void FormatHeaderSegments_when_custom_header_converter_returns_string_longer_than_field_width_throws_FieldOverflowException()
+    {
+        // Verifies the overflow throw inside FormatHeaderSegment — fires when a custom
+        // header converter returns a label that exceeds the field width.
+        var fieldMap = FieldMap.GetResult<SimpleRecord>();
+
+        // Custom header converter that returns an overlong label.
+        Func<string, FieldContext, string> badConverter = (_, _) => "This header is way too long for the field";
+
+        var ex = Assert.Throws<FieldOverflowException>
+        (
+            () => string.Concat(FixedWidthLineParser.FormatHeaderSegments(fieldMap, badConverter))
+        );
+
+        Assert.Equal
+        (
+            "FirstName",
+            ex.PropertyName
+        );
+        Assert.Equal
+        (
+            10,
+            ex.FieldLength
+        );
+        Assert.True(ex.ActualLength > 10);
+    }
+
+
+
+    [Fact]
     public void ParseLine_and_FormatSegments_round_trip_is_stable()
     {
         var fieldMap = FieldMap.GetResult<SimpleRecord>();
