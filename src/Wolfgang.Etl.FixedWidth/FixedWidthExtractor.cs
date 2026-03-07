@@ -99,7 +99,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
     /// <summary>
     /// Specifies what happens when a truly blank line (zero length) is encountered
-    /// in the file. Evaluated before the skip budget and <see cref="MaximumItemCount"/>.
+    /// in the file. Evaluated before the skip budget and <see cref="ExtractorBase{TRecord,TProgress}.MaximumItemCount"/>.
     /// </summary>
     /// <remarks>
     /// <list type="bullet">
@@ -224,7 +224,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// <see cref="FixedWidthLoader{TRecord,TProgress}.FieldDelimiter"/> used when the
     /// file was written.
     /// </summary>
-    public string FieldDelimiter { get; set; }
+    public string? FieldDelimiter { get; set; }
 
 
 
@@ -241,9 +241,12 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// <typeparamref name="TProgress"/> instance. The default implementation returns a
     /// <see cref="FixedWidthReport"/> if <typeparamref name="TProgress"/> is
     /// <see cref="FixedWidthReport"/> or the base <see cref="Report"/>, and throws
-    /// <see cref="NotImplementedException"/> otherwise.
+    /// <see cref="NotSupportedException"/> otherwise.
     /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
+    /// <exception cref="NotSupportedException">
+    /// Thrown when <typeparamref name="TProgress"/> is not <see cref="FixedWidthReport"/>
+    /// or <see cref="Report"/> and <see cref="CreateProgressReport"/> has not been overridden.
+    /// </exception>
     protected override TProgress CreateProgressReport()
     {
         if (typeof(TProgress) == typeof(FixedWidthReport) || typeof(TProgress) == typeof(Report))
@@ -256,7 +259,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
             );
         }
 
-        throw new NotImplementedException
+        throw new NotSupportedException
         (
             $"Override {nameof(CreateProgressReport)} to supply a " +
             $"{typeof(TProgress).Name} instance."
@@ -273,9 +276,11 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
 
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
+    /// <inheritdoc/>
     protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync([EnumeratorCancellation] CancellationToken token)
 #else
-    protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync(CancellationToken token)
+    /// <inheritdoc/>
+    protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync([System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
 #endif
     {
         var fieldMap = FieldMap.GetResult<TRecord>();
@@ -284,7 +289,11 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
             ? HeaderLineCount + 1
             : -1;
 
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
+        while (await _reader.ReadLineAsync(token).ConfigureAwait(false) is { } line)
+#else
         while (await _reader.ReadLineAsync().ConfigureAwait(false) is { } line)
+#endif
         {
             token.ThrowIfCancellationRequested();
 
@@ -292,67 +301,48 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
             // CurrentLineNumber points to the offending line in the file.
             Interlocked.Increment(ref _currentLineNumber);
 
-            // Skip header lines.
-            if (_currentLineNumber <= HeaderLineCount)
+            if (IsStructuralLine(separatorLineNo))
             {
                 continue;
             }
 
-            // Skip the separator line that immediately follows the header.
-            if (_currentLineNumber == separatorLineNo)
-            {
-                continue;
-            }
-
-            // Handle blank lines before any counting logic.
-            // - ThrowException: always throws regardless of position in file.
-            // - Skip: line is invisible — does not count toward skip budget or MaximumItemCount.
-            // - ReturnDefault: counts toward skip budget or MaximumItemCount depending on position.
             if (string.IsNullOrEmpty(line))
             {
-                switch (BlankLineHandling)
+                if (!HandleBlankLine(fieldMap, out var defaultRecord))
                 {
-                    case BlankLineHandling.Skip:
-                        continue;
-
-                    case BlankLineHandling.ReturnDefault:
-                        // Falls through to counting logic below.
-                        break;
-
-                    default:
-                        throw new LineTooShortException
-                        (
-                            $"Blank line encountered at line {_currentLineNumber}.",
-                            _currentLineNumber,
-                            string.Empty,
-                            fieldMap.ExpectedLineWidth,
-                            0
-                        );
+                    // BlankLineHandling.Skip — invisible to all counting logic.
+                    continue;
                 }
-            }
 
+                // BlankLineHandling.ReturnDefault — participates in skip/max budgets
+                // exactly like a normal data line.
+                if (dataLinesSkipped < SkipItemCount)
+                {
+                    dataLinesSkipped++;
+                    IncrementCurrentSkippedItemCount();
+                    continue;
+                }
 
-
-            // Apply user-defined line filter. Skip and Stop do not count toward
-            // skip budget, MaximumItemCount, or CurrentSkippedItemCount —
-            // the line is treated as invisible.
-            if (!string.IsNullOrEmpty(line))
-            {
-                var action = LineFilter(line);
-                if (action == LineAction.Stop)
+                if (CurrentItemCount >= MaximumItemCount)
                 {
                     yield break;
                 }
-                if (action == LineAction.Skip)
-                {
-                    continue;
-                }
+
+                IncrementCurrentItemCount();
+                yield return defaultRecord;
+                continue;
             }
 
+            var filterAction = LineFilter(line);
+            if (filterAction == LineAction.Stop)
+            {
+                yield break;
+            }
+            if (filterAction == LineAction.Skip)
+            {
+                continue;
+            }
 
-
-            // Skip the first SkipItemCount data lines. Blank lines with
-            // ReturnDefault count toward the skip budget.
             if (dataLinesSkipped < SkipItemCount)
             {
                 dataLinesSkipped++;
@@ -360,67 +350,115 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
                 continue;
             }
 
-
-
-            // Stop when MaximumItemCount is reached.
             if (CurrentItemCount >= MaximumItemCount)
             {
                 yield break;
             }
 
-            // If the line is blank and ReturnDefault, yield a default record.
-            if (string.IsNullOrEmpty(line))
+            if (!TryParseLine(line, fieldMap, out var record))
             {
-                IncrementCurrentItemCount();
-                yield return new TRecord();
-                continue;
-            }
-
-
-
-            // Parse the line.
-            TRecord record = default!;
-            bool malformedReturnDefault = false;
-            try
-            {
-                record = FixedWidthLineParser.ParseLine<TRecord>
-                (
-                    line,
-                    _currentLineNumber,
-                    fieldMap,
-                    FieldDelimiter,
-                    ValueParser
-                );
-            }
-            catch (MalformedLineException)
-            {
-                switch (MalformedLineHandling)
-                {
-                    case MalformedLineHandling.Skip:
-                        IncrementCurrentSkippedItemCount();
-                        continue;
-
-                    case MalformedLineHandling.ReturnDefault:
-                        malformedReturnDefault = true;
-                        break;
-
-                    default:
-                        throw;
-                }
-            }
-
-
-
-            // Cannot yield inside a catch block — handle ReturnDefault after the try/catch.
-            if (malformedReturnDefault)
-            {
-                IncrementCurrentItemCount();
-                yield return new TRecord();
                 continue;
             }
 
             IncrementCurrentItemCount();
             yield return record;
+        }
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // Private helpers
+    // ------------------------------------------------------------------
+
+    /// <summary>
+    /// Returns <see langword="true"/> if the current line is a header or separator
+    /// line that should be skipped without any further processing.
+    /// </summary>
+    private bool IsStructuralLine(long separatorLineNo)
+    {
+        return _currentLineNumber <= HeaderLineCount
+            || _currentLineNumber == separatorLineNo;
+    }
+
+
+
+    /// <summary>
+    /// Handles a blank line according to <see cref="BlankLineHandling"/>.
+    /// Returns <see langword="true"/> when a default record should be yielded,
+    /// passing it back via <paramref name="defaultRecord"/>.
+    /// Returns <see langword="false"/> when the line should be silently skipped.
+    /// Throws <see cref="LineTooShortException"/> when the policy is
+    /// <see cref="BlankLineHandling.ThrowException"/>.
+    /// </summary>
+    private bool HandleBlankLine(FieldMapResult fieldMap, out TRecord defaultRecord)
+    {
+        defaultRecord = default!;
+
+        switch (BlankLineHandling)
+        {
+            case BlankLineHandling.Skip:
+                return false;
+
+            case BlankLineHandling.ReturnDefault:
+                defaultRecord = new TRecord();
+                return true;
+
+            default:
+                throw new LineTooShortException
+                (
+                    $"Blank line encountered at line {_currentLineNumber}.",
+                    _currentLineNumber,
+                    string.Empty,
+                    fieldMap.ExpectedLineWidth,
+                    0
+                );
+        }
+    }
+
+
+
+    /// <summary>
+    /// Attempts to parse <paramref name="line"/> into a <typeparamref name="TRecord"/>.
+    /// Returns <see langword="true"/> and sets <paramref name="record"/> on success.
+    /// Returns <see langword="false"/> when <see cref="MalformedLineHandling"/> is
+    /// <see cref="MalformedLineHandling.Skip"/> and the line cannot be parsed.
+    /// Yields a default record and returns <see langword="false"/> when the policy
+    /// is <see cref="MalformedLineHandling.ReturnDefault"/>.
+    /// Re-throws on <see cref="MalformedLineHandling.ThrowException"/>.
+    /// </summary>
+    private bool TryParseLine(string line, FieldMapResult fieldMap, out TRecord record)
+    {
+        record = default!;
+        try
+        {
+            record = FixedWidthLineParser.ParseLine<TRecord>
+            (
+                line,
+                _currentLineNumber,
+                fieldMap,
+                FieldDelimiter,
+                ValueParser
+            );
+            return true;
+        }
+        catch (MalformedLineException)
+        {
+            switch (MalformedLineHandling)
+            {
+                case MalformedLineHandling.Skip:
+                    IncrementCurrentSkippedItemCount();
+                    return false;
+
+                case MalformedLineHandling.ReturnDefault:
+                    // Cannot yield inside catch — caller handles the yield.
+                    IncrementCurrentItemCount();
+                    record = new TRecord();
+                    return true;
+
+                default:
+                    throw;
+            }
         }
     }
 }

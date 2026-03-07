@@ -22,12 +22,12 @@ public class FieldMapTests
 
 
         [FixedWidthField(0, 10)]
-        public string First { get; set; }
+        public string First { get; set; } = string.Empty;
 
 
 
         [FixedWidthField(1, 10)]
-        public string Last { get; set; }
+        public string Last { get; set; } = string.Empty;
     }
 
 
@@ -36,12 +36,12 @@ public class FieldMapTests
     private class DuplicateIndexRecord
     {
         [FixedWidthField(0, 10)]
-        public string First { get; set; }
+        public string First { get; set; } = string.Empty;
 
 
 
         [FixedWidthField(0, 10)] // duplicate!
-        public string Last { get; set; }
+        public string Last { get; set; } = string.Empty;
     }
 
 
@@ -50,7 +50,9 @@ public class FieldMapTests
     private class NoSetterRecord
     {
         [FixedWidthField(0, 10)]
+#pragma warning disable CS8618 // no setter — intentional for test coverage
         public string ReadOnly { get; } // no setter!
+#pragma warning restore CS8618
     }
 
 
@@ -58,7 +60,7 @@ public class FieldMapTests
     [ExcludeFromCodeCoverage]
     private class UnannotatedRecord
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 
 
@@ -67,19 +69,19 @@ public class FieldMapTests
     private class SkipMiddleRecord
     {
         [FixedWidthField(0, 10)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
 
 
 
         [FixedWidthSkip(1, 8, Message = "DOB")]
         [FixedWidthSkip(2, 8, Message = "HireDate")]
         [FixedWidthField(3, 5)]
-        public string EmployeeNumber { get; set; }
+        public string EmployeeNumber { get; set; } = string.Empty;
 
 
 
         [FixedWidthField(4, 10)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = string.Empty;
     }
 
 
@@ -89,12 +91,12 @@ public class FieldMapTests
     {
         [FixedWidthSkip(0, 5, Message = "RecordType")]
         [FixedWidthField(1, 10)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
 
 
 
         [FixedWidthField(2, 10)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = string.Empty;
     }
 
 
@@ -103,12 +105,12 @@ public class FieldMapTests
     private class SkipTrailingRecord
     {
         [FixedWidthField(0, 10)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
 
 
 
         [FixedWidthSkip(1, 3, Message = "Filler")]
-        public string Unused { get; set; }
+        public string Unused { get; set; } = string.Empty;
     }
 
 
@@ -117,13 +119,13 @@ public class FieldMapTests
     private class SkipDuplicateIndexRecord
     {
         [FixedWidthField(0, 10)]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
 
 
 
         [FixedWidthSkip(0, 5)] // duplicate of above
         [FixedWidthField(1, 5)]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = string.Empty;
     }
 
 
