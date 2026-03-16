@@ -41,7 +41,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// </code>
 /// </example>
 public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TProgress>
-    where TRecord : new()
+    where TRecord : notnull, new()
     where TProgress : notnull
 {
     // ------------------------------------------------------------------
@@ -505,6 +505,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
         return _currentLineNumber <= HeaderLineCount
             || _currentLineNumber == separatorLineNo;
     }
+
 
 
     /// <summary>
