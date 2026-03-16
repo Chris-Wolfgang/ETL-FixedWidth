@@ -8,6 +8,7 @@ using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Wolfgang.Etl.FixedWidth.Exceptions;
+using Wolfgang.Etl.TestKit.Xunit;
 using Xunit;
 
 namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
@@ -16,7 +17,7 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 // ------------------------------------------------------------------
 
 [ExcludeFromCodeCoverage]
-public class PersonRecord
+public record PersonRecord
 {
 #pragma warning disable CS8618 // null by design — tests verify default(PersonRecord) has null strings
     [FixedWidthField(0, 10)]
@@ -37,51 +38,66 @@ public class PersonRecord
 
 
 public class FixedWidthExtractorTests
+    : ExtractorBaseContractTests<
+        FixedWidthExtractor<PersonRecord, FixedWidthReport>,
+        PersonRecord,
+        FixedWidthReport>
 {
+    // ------------------------------------------------------------------
+    // Contract test factory methods
+    // ------------------------------------------------------------------
+
+    private static readonly IReadOnlyList<PersonRecord> ExpectedItems = new[]
+    {
+        new PersonRecord { FirstName = "Alice", LastName = "Anderson", Age = 25 },
+        new PersonRecord { FirstName = "Bob", LastName = "Brown", Age = 30 },
+        new PersonRecord { FirstName = "Carol", LastName = "Clark", Age = 35 },
+        new PersonRecord { FirstName = "Dan", LastName = "Davis", Age = 40 },
+        new PersonRecord { FirstName = "Eve", LastName = "Evans", Age = 45 },
+    };
+
+
+
+    /// <summary>
+    /// Builds fixed-width content for the first <paramref name="count"/> expected items.
+    /// Each line is 23 chars: FirstName(10) + LastName(10) + Age(3, right-aligned, zero-padded).
+    /// </summary>
+    private static string BuildPersonContent(int count) =>
+        string.Join
+        (
+            "\n",
+            ExpectedItems.Take(count).Select
+            (
+                p => $"{(p.FirstName ?? ""),-10}{(p.LastName ?? ""),-10}{p.Age.ToString().PadLeft(3, '0')}"
+            )
+        );
+
+
+
+    /// <inheritdoc/>
+    protected override FixedWidthExtractor<PersonRecord, FixedWidthReport> CreateSut(int itemCount) =>
+        new(new StringReader(BuildPersonContent(itemCount)));
+
+
+
+    /// <inheritdoc/>
+    protected override IReadOnlyList<PersonRecord> CreateExpectedItems() => ExpectedItems;
+
+
+
+    /// <inheritdoc/>
+    protected override FixedWidthExtractor<PersonRecord, FixedWidthReport> CreateSutWithTimer(
+        IProgressTimer timer) =>
+        new(new StringReader(BuildPersonContent(5)), timer);
+
+
+
     // ------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------
 
     private static FixedWidthExtractor<PersonRecord, Report> CreateExtractor(string content) =>
         new(new StringReader(content));
-
-
-
-    // ------------------------------------------------------------------
-    // Happy path
-    // ------------------------------------------------------------------
-
-    [Fact]
-    public async Task ExtractAsync_with_valid_content_returns_all_records()
-    {
-        var results = await CreateExtractor( "John      Smith     042\n" + "Jane      Doe       030").ExtractAsync().ToListAsync();
-
-        Assert.Equal
-        (
-            2,
-            results.Count
-        );
-        Assert.Equal
-        (
-            "John",
-            results[0].FirstName
-        );
-        Assert.Equal
-        (
-            "Smith",
-            results[0].LastName
-        );
-        Assert.Equal
-        (
-            42,
-            results[0].Age
-        );
-        Assert.Equal
-        (
-            "Jane",
-            results[1].FirstName
-        );
-    }
 
 
 
@@ -429,87 +445,8 @@ public class FixedWidthExtractorTests
 
 
     // ------------------------------------------------------------------
-    // SkipItemCount / MaximumItemCount scenarios
+    // All-spaces row / blank line + skip/max interaction
     // ------------------------------------------------------------------
-
-    [Fact]
-    public async Task ExtractAsync_when_SkipItemCount_exceeds_total_row_count_returns_no_records()
-    {
-        // 10 rows, SkipItemCount = 12 → returns nothing.
-        var lines = string.Join
-        (
-            "\n",
-            Enumerable.Range
-            (
-                1,
-                10
-            ) .Select(i => $"Person{i,4}Smith     {i:D3}")
-        );
-        var extractor = CreateExtractor(lines);
-        extractor.SkipItemCount = 12;
-
-        var results = await extractor.ExtractAsync().ToListAsync();
-
-        Assert.Empty(results);
-    }
-
-
-
-    [Fact]
-    public async Task ExtractAsync_when_SkipItemCount_and_MaximumItemCount_together_exceed_remaining_rows_reads_to_end_of_file()
-    {
-        // 10 rows, SkipItemCount = 7, MaximumItemCount = 10 → yields 3.
-        var lines = string.Join
-        (
-            "\n",
-            Enumerable.Range
-            (
-                1,
-                10
-            ) .Select(i => $"Person{i,4}Smith     {i:D3}")
-        );
-        var extractor = CreateExtractor(lines);
-        extractor.SkipItemCount = 7;
-        extractor.MaximumItemCount = 10;
-
-        var results = await extractor.ExtractAsync().ToListAsync();
-
-        Assert.Equal
-        (
-            3,
-            results.Count
-        );
-    }
-
-
-
-    [Fact]
-    public async Task ExtractAsync_when_SkipItemCount_is_set_and_MaximumItemCount_fits_within_remaining_rows_returns_exactly_MaximumItemCount_records()
-    {
-        // 100 rows, SkipItemCount = 7, MaximumItemCount = 10 → yields 10.
-        var lines = string.Join
-        (
-            "\n",
-            Enumerable.Range
-            (
-                1,
-                100
-            ) .Select(i => $"Person{i,4}Smith     {i:D3}")
-        );
-        var extractor = CreateExtractor(lines);
-        extractor.SkipItemCount = 7;
-        extractor.MaximumItemCount = 10;
-
-        var results = await extractor.ExtractAsync().ToListAsync();
-
-        Assert.Equal
-        (
-            10,
-            results.Count
-        );
-    }
-
-
 
     [Fact]
     public async Task ExtractAsync_when_row_is_all_spaces_parses_as_a_default_record_and_counts_toward_MaximumItemCount()
@@ -669,45 +606,6 @@ public class FixedWidthExtractorTests
         (
             1,
             extractor.CurrentItemCount
-        );
-    }
-
-
-
-    [Fact]
-    public async Task ExtractAsync_when_MaximumItemCount_is_reached_stops_extracting()
-    {
-        var extractor = CreateExtractor( "John      Smith     042\n" + "Jane      Doe       030\n" + "Bob       Jones     055");
-        extractor.MaximumItemCount = 2;
-
-        var results = await extractor.ExtractAsync().ToListAsync();
-
-        Assert.Equal
-        (
-            2,
-            results.Count
-        );
-    }
-
-
-
-    [Fact]
-    public async Task ExtractAsync_when_SkipItemCount_is_set_skips_the_first_N_records()
-    {
-        var extractor = CreateExtractor( "John      Smith     042\n" + "Jane      Doe       030\n" + "Bob       Jones     055");
-        extractor.SkipItemCount = 1;
-
-        var results = await extractor.ExtractAsync().ToListAsync();
-
-        Assert.Equal
-        (
-            2,
-            results.Count
-        );
-        Assert.Equal
-        (
-            "Jane",
-            results[0].FirstName
         );
     }
 
@@ -1133,6 +1031,31 @@ public class FixedWidthExtractorTests
         var extractor = new FixedWidthExtractor<PersonRecord, Exception>(new StringReader(string.Empty));
 
         Assert.Throws<NotSupportedException>(extractor.GetProgressReport);
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // BlankLineHandling.ReturnDefault + MaximumItemCount already reached
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public async Task ExtractAsync_when_BlankLineHandling_is_ReturnDefault_and_MaximumItemCount_is_already_reached_stops_before_yielding_blank_default()
+    {
+        // MaximumItemCount = 1, first line is a normal record, second line is blank.
+        // The blank line should NOT be yielded because the budget is already full.
+        var extractor = CreateExtractor("John      Smith     042\n\nJane      Doe       030");
+        extractor.BlankLineHandling = BlankLineHandling.ReturnDefault;
+        extractor.MaximumItemCount = 1;
+
+        var results = await extractor.ExtractAsync().ToListAsync();
+
+        Assert.Single(results);
+        Assert.Equal
+        (
+            "John",
+            results[0].FirstName
+        );
     }
 
 }
