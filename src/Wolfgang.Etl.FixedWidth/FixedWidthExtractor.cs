@@ -49,9 +49,10 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     // ------------------------------------------------------------------
 
     private readonly TextReader _reader;
+    private readonly IProgressTimer? _progressTimer;
     private long _currentLineNumber;
 
-    // _currentLineNumber is read by CreateProgressReport on a Timer threadpool thread
+    // _currentLineNumber is read by CreateProgressReport on a Timer thread pool thread
     // and written by ExtractWorkerAsync on the async continuation thread.
     // Interlocked.Read/Increment ensures atomicity on all targets including 32-bit net462.
 
@@ -74,6 +75,28 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     public FixedWidthExtractor(TextReader reader)
     {
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthExtractor{TRecord,TProgress}"/> that reads
+    /// from the specified <see cref="TextReader"/> and uses the supplied
+    /// <see cref="IProgressTimer"/> instead of the default system timer.
+    /// </summary>
+    /// <param name="reader">
+    /// The <see cref="TextReader"/> to read fixed-width records from.
+    /// </param>
+    /// <param name="timer">
+    /// The <see cref="IProgressTimer"/> to use for progress reporting.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="reader"/> or <paramref name="timer"/> is null.
+    /// </exception>
+    internal FixedWidthExtractor(TextReader reader, IProgressTimer timer)
+    {
+        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
+        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }
 
 
@@ -360,6 +383,20 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
 
 
+    /// <inheritdoc/>
+    protected override IProgressTimer CreateProgressTimer(IProgress<TProgress> progress)
+    {
+        if (_progressTimer != null)
+        {
+            _progressTimer.Elapsed += () => progress.Report(CreateProgressReport());
+            return _progressTimer;
+        }
+
+        return base.CreateProgressTimer(progress);
+    }
+
+
+
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
     /// <inheritdoc/>
 #pragma warning disable MA0051 // async iterator methods cannot delegate 'yield return' to sub-methods
@@ -367,7 +404,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 #else
     /// <inheritdoc/>
 #pragma warning disable MA0051 // async iterator methods cannot delegate 'yield return' to sub-methods
-    protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync([System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
+    protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync([EnumeratorCancellation] CancellationToken token)
 #endif
 #pragma warning restore MA0051
     {
@@ -470,7 +507,6 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     }
 
 
-
     /// <summary>
     /// Handles a blank line according to <see cref="BlankLineHandling"/>.
     /// Returns <see langword="true"/> when a default record should be yielded,
@@ -479,6 +515,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// Throws <see cref="LineTooShortException"/> when the policy is
     /// <see cref="BlankLineHandling.ThrowException"/>.
     /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     /// <exception cref="LineTooShortException">
     /// Thrown when <see cref="BlankLineHandling"/> is
     /// <see cref="BlankLineHandling.ThrowException"/> (the default).
@@ -496,7 +533,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
                 defaultRecord = new TRecord();
                 return true;
 
-            default:
+            case BlankLineHandling.ThrowException:
                 throw new LineTooShortException
                 (
                     $"Blank line encountered at line {_currentLineNumber}.",
@@ -505,9 +542,10 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
                     fieldMap.ExpectedLineWidth,
                     0
                 );
+            default:
+                throw new ArgumentOutOfRangeException(nameof(BlankLineHandling));
         }
     }
-
 
 
     /// <summary>
@@ -519,6 +557,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// is <see cref="MalformedLineHandling.ReturnDefault"/>.
     /// Re-throws on <see cref="MalformedLineHandling.ThrowException"/>.
     /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     private bool TryParseLine(string line, FieldMapResult fieldMap, out TRecord record)
     {
         record = default!;
@@ -548,8 +587,11 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
                     record = new TRecord();
                     return true;
 
-                default:
+                case MalformedLineHandling.ThrowException:
                     throw;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(MalformedLineHandling));
             }
         }
     }

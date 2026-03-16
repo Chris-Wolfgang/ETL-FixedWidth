@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -6,6 +7,8 @@ using System.Threading.Tasks;
 using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Enums;
+using Wolfgang.Etl.FixedWidth.Exceptions;
+using Wolfgang.Etl.TestKit.Xunit;
 using Xunit;
 
 namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
@@ -25,7 +28,42 @@ public class HeaderRecord
 
 
 public class FixedWidthLoaderTests
+    : LoaderBaseContractTests
+    <
+        FixedWidthLoader<PersonRecord, FixedWidthReport>,
+        PersonRecord,
+        FixedWidthReport
+    >
 {
+    // ------------------------------------------------------------------
+    // Contract test factory methods
+    // ------------------------------------------------------------------
+
+    /// <inheritdoc/>
+    protected override FixedWidthLoader<PersonRecord, FixedWidthReport> CreateSut(int itemCount) =>
+        new(new StringWriter());
+
+
+
+    /// <inheritdoc/>
+    protected override IReadOnlyList<PersonRecord> CreateSourceItems() => new[]
+    {
+        new PersonRecord { FirstName = "Alice", LastName = "Anderson", Age = 25 },
+        new PersonRecord { FirstName = "Bob", LastName = "Brown", Age = 30 },
+        new PersonRecord { FirstName = "Carol", LastName = "Clark", Age = 35 },
+        new PersonRecord { FirstName = "Dan", LastName = "Davis", Age = 40 },
+        new PersonRecord { FirstName = "Eve", LastName = "Evans", Age = 45 },
+    };
+
+
+
+    /// <inheritdoc/>
+    protected override FixedWidthLoader<PersonRecord, FixedWidthReport> CreateSutWithTimer(
+        IProgressTimer timer) =>
+        new(new StringWriter(), timer);
+
+
+
     // ------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------
@@ -126,47 +164,6 @@ public class FixedWidthLoaderTests
 
 
 
-    [Fact]
-    public async Task LoadAsync_increments_CurrentItemCount_for_each_record_written()
-    {
-        var loader = CreateLoader(out _);
-
-        await loader.LoadAsync(new[]
-        {
-            new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
-            new PersonRecord { FirstName = "Jane", LastName = "Doe", Age = 30 },
-        }.ToAsyncEnumerable());
-
-        Assert.Equal
-        (
-            2,
-            loader.CurrentItemCount
-        );
-    }
-
-
-
-    [Fact]
-    public async Task LoadAsync_writes_to_any_TextWriter()
-    {
-        using var writer = new StringWriter();
-        var loader = new FixedWidthLoader<PersonRecord, Report>(writer);
-
-        await loader.LoadAsync(new[]
-        {
-            new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
-        }.ToAsyncEnumerable());
-
-        Assert.Contains
-        (
-            "John",
-            writer.ToString(),
-            StringComparison.Ordinal
-        );
-    }
-
-
-
     // ------------------------------------------------------------------
     // Header
     // ------------------------------------------------------------------
@@ -226,30 +223,8 @@ public class FixedWidthLoaderTests
 
 
     // ------------------------------------------------------------------
-    // MaximumItemCount / SkipItemCount
+    // SkipItemCount (verifies output content, not just counts)
     // ------------------------------------------------------------------
-
-    [Fact]
-    public async Task LoadAsync_when_MaximumItemCount_is_reached_stops_writing()
-    {
-        var loader = CreateLoader(out var writer);
-        loader.MaximumItemCount = 2;
-
-        await loader.LoadAsync(new[]
-        {
-            new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
-            new PersonRecord { FirstName = "Jane", LastName = "Doe", Age = 30 },
-            new PersonRecord { FirstName = "Bob", LastName = "Jones", Age = 55 },
-        }.ToAsyncEnumerable());
-
-        Assert.Equal
-        (
-            2,
-            GetLines(writer).Length
-        );
-    }
-
-
 
     [Fact]
     public async Task LoadAsync_when_SkipItemCount_is_set_skips_the_first_N_records()
@@ -638,5 +613,73 @@ public class FixedWidthLoaderTests
         var loader = new FixedWidthLoader<PersonRecord, Exception>(new StringWriter());
 
         Assert.Throws<NotSupportedException>(loader.GetProgressReport);
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // StrictHeader overflow
+    // ------------------------------------------------------------------
+
+    [ExcludeFromCodeCoverage]
+    private class OverflowHeaderRecord
+    {
+        [FixedWidthField(0, 3, Header = "VERY_LONG_HEADER")]
+        public int Id { get; set; }
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_WriteHeader_is_true_and_header_exceeds_field_width_throws_FieldOverflowException()
+    {
+        var writer = new StringWriter();
+        var loader = new FixedWidthLoader<OverflowHeaderRecord, Report>(writer)
+        {
+            WriteHeader = true,
+        };
+
+        await Assert.ThrowsAsync<FieldOverflowException>
+        (
+            async () => await loader.LoadAsync
+            (
+                new[] { new OverflowHeaderRecord { Id = 1 } }.ToAsyncEnumerable()
+            )
+        );
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // TruncateHeader converter
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public async Task LoadAsync_when_HeaderConverter_is_TruncateHeader_truncates_long_headers()
+    {
+        var writer = new StringWriter();
+        var loader = new FixedWidthLoader<OverflowHeaderRecord, Report>(writer)
+        {
+            WriteHeader = true,
+            HeaderConverter = FixedWidthConverter.TruncateHeader,
+        };
+
+        await loader.LoadAsync
+        (
+            new[] { new OverflowHeaderRecord { Id = 1 } }.ToAsyncEnumerable()
+        );
+
+        var lines = GetLines(writer);
+
+        Assert.Equal
+        (
+            2,
+            lines.Length
+        );
+        Assert.Equal
+        (
+            "VER",
+            lines[0]
+        ); // "VERY_LONG_HEADER" truncated to 3 chars
     }
 }

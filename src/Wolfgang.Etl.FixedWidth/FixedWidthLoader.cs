@@ -46,9 +46,10 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     // ------------------------------------------------------------------
 
     private readonly TextWriter _writer;
+    private readonly IProgressTimer? _progressTimer;
     private long _currentLineNumber;
 
-    // _currentLineNumber is read by CreateProgressReport on a Timer threadpool thread
+    // _currentLineNumber is read by CreateProgressReport on a Timer thread pool thread
     // and written by LoadWorkerAsync on the async continuation thread.
     // Interlocked.Read/Increment ensures atomicity on all targets including 32-bit net462.
 
@@ -72,6 +73,28 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     public FixedWidthLoader(TextWriter writer)
     {
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthLoader{TRecord,TProgress}"/> that writes
+    /// to the specified <see cref="TextWriter"/> and uses the supplied
+    /// <see cref="IProgressTimer"/> instead of the default system timer.
+    /// </summary>
+    /// <param name="writer">
+    /// The <see cref="TextWriter"/> to write fixed-width records to.
+    /// </param>
+    /// <param name="timer">
+    /// The <see cref="IProgressTimer"/> to use for progress reporting.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="writer"/> or <paramref name="timer"/> is null.
+    /// </exception>
+    internal FixedWidthLoader(TextWriter writer, IProgressTimer timer)
+    {
+        _writer = writer ?? throw new ArgumentNullException(nameof(writer));
+        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }
 
 
@@ -258,6 +281,20 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// Returns a snapshot progress report. Visible to the test assembly via InternalsVisibleTo.
     /// </summary>
     internal TProgress GetProgressReport() => CreateProgressReport();
+
+
+
+    /// <inheritdoc/>
+    protected override IProgressTimer CreateProgressTimer(IProgress<TProgress> progress)
+    {
+        if (_progressTimer != null)
+        {
+            _progressTimer.Elapsed += () => progress.Report(CreateProgressReport());
+            return _progressTimer;
+        }
+
+        return base.CreateProgressTimer(progress);
+    }
 
 
 
