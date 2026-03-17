@@ -20,15 +20,15 @@ namespace Wolfgang.Etl.FixedWidth;
 /// <code>
 /// // Write to a file
 /// await using var writer = new StreamWriter("output.txt");
-/// var loader = new ReportLoader(writer);
+/// var loader = new FixedWidthLoader&lt;MyRecord, Report&gt;(writer);
 ///
 /// // Write to a string (useful for testing or building string output)
 /// var sw = new StringWriter();
-/// var loader = new ReportLoader(sw);
+/// var loader = new FixedWidthLoader&lt;MyRecord, Report&gt;(sw);
 /// var result = sw.ToString();
 ///
 /// // Write a formatted table to the console
-/// var loader = new ReportLoader(Console.Out);
+/// var loader = new FixedWidthLoader&lt;MyRecord, Report&gt;(Console.Out);
 /// loader.WriteHeader    = true;
 /// loader.FieldSeparator = '-';
 /// loader.FieldDelimiter = " | ";
