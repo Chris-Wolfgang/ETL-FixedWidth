@@ -30,14 +30,39 @@ internal static class FixedWidthLineParser
     )
     {
         var descriptors = fieldMap.Descriptors;
-        var segments = new string[descriptors.Count];
+        var segments = new List<string>(descriptors.Count);
+        var currentPosition = 0;
 
         for (var i = 0; i < descriptors.Count; i++)
         {
-            segments[i] = FormatSegment(record, descriptors[i], converter);
+            var descriptor = descriptors[i];
+
+            // Insert placeholder for any skipped columns before this field.
+            if (descriptor.Start > currentPosition)
+            {
+                var skipWidth = descriptor.Start - currentPosition;
+                if (skipWidth > 0)
+                {
+                    segments.Add(new string(' ', skipWidth));
+                }
+            }
+
+            // Format the actual field segment.
+            segments.Add(FormatSegment(record, descriptor, converter));
+            currentPosition = descriptor.Start + descriptor.Attribute.Length;
         }
 
-        return segments;
+        // Pad any remaining columns at the end of the line.
+        if (fieldMap.ExpectedLineWidth > currentPosition)
+        {
+            var trailingWidth = fieldMap.ExpectedLineWidth - currentPosition;
+            if (trailingWidth > 0)
+            {
+                segments.Add(new string(' ', trailingWidth));
+            }
+        }
+
+        return segments.ToArray();
     }
 
 
@@ -58,14 +83,39 @@ internal static class FixedWidthLineParser
     )
     {
         var descriptors = fieldMap.Descriptors;
-        var segments = new string[descriptors.Count];
+        var segments = new List<string>(descriptors.Count);
+        var currentPosition = 0;
 
         for (var i = 0; i < descriptors.Count; i++)
         {
-            segments[i] = FormatHeaderSegment(descriptors[i], headerConverter);
+            var descriptor = descriptors[i];
+
+            // Insert placeholder for any skipped columns before this header field.
+            if (descriptor.Start > currentPosition)
+            {
+                var skipWidth = descriptor.Start - currentPosition;
+                if (skipWidth > 0)
+                {
+                    segments.Add(new string(' ', skipWidth));
+                }
+            }
+
+            // Format the header segment for the actual field.
+            segments.Add(FormatHeaderSegment(descriptor, headerConverter));
+            currentPosition = descriptor.Start + descriptor.Attribute.Length;
         }
 
-        return segments;
+        // Pad any remaining columns at the end of the header line.
+        if (fieldMap.ExpectedLineWidth > currentPosition)
+        {
+            var trailingWidth = fieldMap.ExpectedLineWidth - currentPosition;
+            if (trailingWidth > 0)
+            {
+                segments.Add(new string(' ', trailingWidth));
+            }
+        }
+
+        return segments.ToArray();
     }
 
 
@@ -81,18 +131,38 @@ internal static class FixedWidthLineParser
     )
     {
         var descriptors = fieldMap.Descriptors;
-        var segments = new string[descriptors.Count];
+        var segments = new List<string>(descriptors.Count);
+        var currentPosition = 0;
 
         for (var i = 0; i < descriptors.Count; i++)
         {
-            segments[i] = new string
-            (
-                separatorChar,
-                descriptors[i].Attribute.Length
-            );
+            var descriptor = descriptors[i];
+
+            // Insert separator chars for any skipped columns before this field.
+            if (descriptor.Start > currentPosition)
+            {
+                var skipWidth = descriptor.Start - currentPosition;
+                if (skipWidth > 0)
+                {
+                    segments.Add(new string(separatorChar, skipWidth));
+                }
+            }
+
+            segments.Add(new string(separatorChar, descriptor.Attribute.Length));
+            currentPosition = descriptor.Start + descriptor.Attribute.Length;
         }
 
-        return segments;
+        // Pad any remaining columns at the end.
+        if (fieldMap.ExpectedLineWidth > currentPosition)
+        {
+            var trailingWidth = fieldMap.ExpectedLineWidth - currentPosition;
+            if (trailingWidth > 0)
+            {
+                segments.Add(new string(separatorChar, trailingWidth));
+            }
+        }
+
+        return segments.ToArray();
     }
 
 
@@ -126,7 +196,8 @@ internal static class FixedWidthLineParser
         var delimiterWidth = string.IsNullOrEmpty(fieldDelimiter)
             ? 0
             : fieldDelimiter!.Length;
-        var fullExpectedWidth = fieldMap.ExpectedLineWidth + delimiterWidth * (fieldMap.TotalColumnCount - 1);
+        var delimiterCount = Math.Max(0, fieldMap.TotalColumnCount - 1);
+        var fullExpectedWidth = fieldMap.ExpectedLineWidth + delimiterWidth * delimiterCount;
 
         if (line.Length < fullExpectedWidth)
         {
@@ -135,7 +206,7 @@ internal static class FixedWidthLineParser
                 $"Line {lineNumber} is too short. Expected {fullExpectedWidth} characters" +
                 (
                     delimiterWidth > 0
-                    ? $" ({fieldMap.ExpectedLineWidth} field/skip width {delimiterWidth * (fieldMap.TotalColumnCount - 1)} delimiter width)"
+                    ? $" ({fieldMap.ExpectedLineWidth} field/skip width {delimiterWidth * delimiterCount} delimiter width)"
                     : string.Empty
                 )
                 + $" but found {line.Length}.",

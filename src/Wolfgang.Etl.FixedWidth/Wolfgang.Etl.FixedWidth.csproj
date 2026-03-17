@@ -28,10 +28,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AdditionalFiles Remove="C:\Source\GitHub\ETL-Framework\ETL-Fixed Width\BannedSymbols.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Wolfgang.Etl.Abstractions" Version="0.10.2" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.5" />
   </ItemGroup>

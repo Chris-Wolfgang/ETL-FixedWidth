@@ -535,18 +535,23 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
                 return true;
 
             case BlankLineHandling.ThrowException:
+                var delimiterWidth = string.IsNullOrEmpty(FieldDelimiter) ? 0 : FieldDelimiter!.Length;
+                var delimiterCount = Math.Max(0, fieldMap.TotalColumnCount - 1);
+                var expectedWidth = fieldMap.ExpectedLineWidth + delimiterWidth * delimiterCount;
+
                 throw new LineTooShortException
                 (
                     $"Blank line encountered at line {_currentLineNumber}.",
                     _currentLineNumber,
                     string.Empty,
-                    fieldMap.ExpectedLineWidth,
+                    expectedWidth,
                     0
                 );
             default:
                 throw new ArgumentOutOfRangeException(nameof(BlankLineHandling));
         }
     }
+
 
 
     /// <summary>
@@ -583,8 +588,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
                     return false;
 
                 case MalformedLineHandling.ReturnDefault:
-                    // Cannot yield inside catch — caller handles the yield.
-                    IncrementCurrentItemCount();
+                    // Cannot yield inside catch — caller handles the yield and increment.
                     record = new TRecord();
                     return true;
 

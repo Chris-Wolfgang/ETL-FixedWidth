@@ -137,7 +137,7 @@ internal static class FieldMap
             var fieldAttr = prop.GetCustomAttribute<FixedWidthFieldAttribute>();
             if (fieldAttr != null)
             {
-                if (!prop.CanWrite)
+                if (prop.SetMethod == null || !prop.SetMethod.IsPublic)
                 {
                     throw new InvalidOperationException(
                         $"Property '{prop.Name}' on '{type.FullName}' is decorated with " +
