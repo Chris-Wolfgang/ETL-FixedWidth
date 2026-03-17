@@ -591,7 +591,7 @@ public class FixedWidthLoaderTests
         Assert.Equal
         (
             2,
-            report.CurrentCount
+            report.CurrentItemCount
         );
         Assert.Equal
         (

@@ -47,9 +47,10 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
 
     private readonly TextWriter _writer;
     private readonly IProgressTimer? _progressTimer;
+    private bool _progressTimerWired;
     private long _currentLineNumber;
 
-    // _currentLineNumber is read by CreateProgressReport on a Timer thread pool thread
+    // _currentLineNumber is read by CreateProgressReport on a Timer threadpool thread
     // and written by LoadWorkerAsync on the async continuation thread.
     // Interlocked.Read/Increment ensures atomicity on all targets including 32-bit net462.
 
@@ -221,7 +222,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// if written. Matches the line number shown in a text editor.
     /// </summary>
     /// <remarks>
-    /// Thread-safe: reads are performed with <see cref="Interlocked.Read(ref long)"/>
+    /// Thread-safe: reads are performed with <see cref="Interlocked"/>
     /// so this property may be sampled from a progress-reporting timer thread
     /// without a data race.
     /// </remarks>
@@ -289,7 +290,12 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     {
         if (_progressTimer != null)
         {
-            _progressTimer.Elapsed += () => progress.Report(CreateProgressReport());
+            if (!_progressTimerWired)
+            {
+                _progressTimerWired = true;
+                _progressTimer.Elapsed += () => progress.Report(CreateProgressReport());
+            }
+
             return _progressTimer;
         }
 
