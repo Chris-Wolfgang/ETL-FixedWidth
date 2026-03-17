@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Parsing;
 
@@ -46,6 +48,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     // ------------------------------------------------------------------
 
     private readonly TextWriter _writer;
+    private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
     private long _currentLineNumber;
@@ -70,10 +73,19 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// formatted console table output, or any other <see cref="TextWriter"/> implementation.
     /// The caller is responsible for the writer's lifetime — the loader does not dispose it.
     /// </param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
+    /// Pass <see langword="null"/> (the default) to disable logging.
+    /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="writer"/> is null.</exception>
-    public FixedWidthLoader(TextWriter writer)
+    public FixedWidthLoader
+    (
+        TextWriter writer,
+        ILogger<FixedWidthLoader<TRecord, TProgress>>? logger = null
+    )
     {
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -89,13 +101,23 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// <param name="timer">
     /// The <see cref="IProgressTimer"/> to use for progress reporting.
     /// </param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
+    /// Pass <see langword="null"/> to disable logging.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="writer"/> or <paramref name="timer"/> is null.
     /// </exception>
-    internal FixedWidthLoader(TextWriter writer, IProgressTimer timer)
+    internal FixedWidthLoader
+    (
+        TextWriter writer,
+        IProgressTimer timer,
+        ILogger<FixedWidthLoader<TRecord, TProgress>>? logger = null
+    )
     {
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -312,6 +334,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     )
     {
         var fieldMap = FieldMap.GetResult<TRecord>();
+        LogLoadingStarted(fieldMap);
 
         if (WriteHeader)
         {
@@ -324,17 +347,19 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
 
             if (CurrentItemCount >= MaximumItemCount)
             {
+                LogDebugMaxReached();
                 break;
             }
 
             if (item == null)
             {
-                throw new InvalidOperationException( $"A null record was encountered at item {CurrentItemCount + CurrentSkippedItemCount + 1}. " + $"The loader writes what it is given — null records are not permitted.");
+                throw LogAndCreateNullRecordError();
             }
 
             if (CurrentSkippedItemCount < SkipItemCount)
             {
                 IncrementCurrentSkippedItemCount();
+                LogDebugItemSkipped();
                 continue;
             }
 
@@ -347,7 +372,10 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
             Interlocked.Increment(ref _currentLineNumber);
             await _writer.WriteLineAsync(Join(segments)).ConfigureAwait(false);
             IncrementCurrentItemCount();
+            LogDebugRecordWritten();
         }
+
+        LogLoadingCompleted();
     }
 
 
@@ -366,6 +394,11 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
         Interlocked.Increment(ref _currentLineNumber);
         await _writer.WriteLineAsync(Join(headerSegments)).ConfigureAwait(false);
 
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Wrote header at line {LineNumber}", _currentLineNumber);
+        }
+
         if (FieldSeparator.HasValue)
         {
             var separatorSegments = FixedWidthLineParser.FormatSeparatorSegments
@@ -375,7 +408,132 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
             );
             Interlocked.Increment(ref _currentLineNumber);
             await _writer.WriteLineAsync(Join(separatorSegments)).ConfigureAwait(false);
+
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug
+                (
+                    "Wrote separator at line {LineNumber} (char='{SeparatorChar}')",
+                    _currentLineNumber,
+                    FieldSeparator.Value
+                );
+            }
         }
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // Logging helpers
+    // ------------------------------------------------------------------
+
+    private void LogLoadingStarted(FieldMapResult fieldMap)
+    {
+        _logger.LogInformation
+        (
+            "Loading started for {RecordType}. WriteHeader={WriteHeader}, " +
+            "FieldSeparator={FieldSeparator}, FieldDelimiter={FieldDelimiter}, " +
+            "SkipItemCount={SkipItemCount}, MaximumItemCount={MaximumItemCount}",
+            typeof(TRecord).Name,
+            WriteHeader,
+            FieldSeparator?.ToString() ?? "(none)",
+            FieldDelimiter ?? "(none)",
+            SkipItemCount,
+            MaximumItemCount
+        );
+
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "Field map resolved for {RecordType}: {FieldCount} fields, " +
+                "ExpectedLineWidth={ExpectedLineWidth}, TotalColumnCount={TotalColumnCount}",
+                typeof(TRecord).Name,
+                fieldMap.Descriptors.Count,
+                fieldMap.ExpectedLineWidth,
+                fieldMap.TotalColumnCount
+            );
+        }
+    }
+
+
+
+    private void LogLoadingCompleted()
+    {
+        _logger.LogInformation
+        (
+            "Loading completed for {RecordType}: {ItemCount} items loaded, " +
+            "{SkippedCount} skipped, {LineCount} lines written",
+            typeof(TRecord).Name,
+            CurrentItemCount,
+            CurrentSkippedItemCount,
+            Interlocked.Read(ref _currentLineNumber)
+        );
+    }
+
+
+
+    private void LogDebugMaxReached()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "MaximumItemCount ({MaximumItemCount}) reached, stopping loading",
+                MaximumItemCount
+            );
+        }
+    }
+
+
+
+    private void LogDebugItemSkipped()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "Skipping item ({SkippedCount}/{SkipItemCount})",
+                CurrentSkippedItemCount,
+                SkipItemCount
+            );
+        }
+    }
+
+
+
+    private void LogDebugRecordWritten()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "Wrote record at line {LineNumber} (item #{ItemCount})",
+                _currentLineNumber,
+                CurrentItemCount
+            );
+        }
+    }
+
+
+
+    private InvalidOperationException LogAndCreateNullRecordError()
+    {
+        var ex = new InvalidOperationException
+        (
+            $"A null record was encountered at item " +
+            $"{CurrentItemCount + CurrentSkippedItemCount + 1}. " +
+            $"The loader writes what it is given — null records are not permitted."
+        );
+
+        _logger.LogError
+        (
+            ex,
+            "Null record encountered at item {ItemPosition}",
+            CurrentItemCount + CurrentSkippedItemCount + 1
+        );
+
+        return ex;
     }
 
 
