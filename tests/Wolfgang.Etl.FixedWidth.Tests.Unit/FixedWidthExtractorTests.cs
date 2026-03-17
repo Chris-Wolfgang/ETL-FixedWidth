@@ -68,7 +68,7 @@ public class FixedWidthExtractorTests
             "\n",
             ExpectedItems.Take(count).Select
             (
-                p => $"{(p.FirstName ?? ""),-10}{(p.LastName ?? ""),-10}{p.Age.ToString().PadLeft(3, '0')}"
+                p => $"{(p.FirstName ?? "").PadRight(10)}{(p.LastName ?? "").PadRight(10)}{p.Age.ToString().PadLeft(3, '0')}"
             )
         );
 
@@ -1009,7 +1009,7 @@ public class FixedWidthExtractorTests
         Assert.Equal
         (
             2,
-            report.CurrentCount
+            report.CurrentItemCount
         );
         Assert.Equal
         (

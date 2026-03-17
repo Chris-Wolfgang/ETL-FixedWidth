@@ -437,7 +437,7 @@ public class FixedWidthLineParserTests
         var record = new SimpleRecord { FirstName = "John", LastName = "Smith", Age = 1 };
 
         // Custom converter that ignores field-length constraints.
-        Func<object, FieldContext, string> badConverter = (value, _) => "This string is far too long";
+        Func<object, FieldContext, string> badConverter = (_, _) => "This string is far too long";
 
         var ex = Assert.Throws<FieldOverflowException>
         (

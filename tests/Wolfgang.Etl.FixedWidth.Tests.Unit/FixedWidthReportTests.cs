@@ -17,7 +17,7 @@ public class FixedWidthReportTests
         Assert.Equal
         (
             10,
-            report.CurrentCount
+            report.CurrentItemCount
         );
         Assert.Equal
         (
@@ -46,7 +46,7 @@ public class FixedWidthReportTests
         Assert.Equal
         (
             0,
-            report.CurrentCount
+            report.CurrentItemCount
         );
         Assert.Equal
         (

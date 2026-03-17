@@ -50,9 +50,10 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
     private readonly TextReader _reader;
     private readonly IProgressTimer? _progressTimer;
+    private bool _progressTimerWired;
     private long _currentLineNumber;
 
-    // _currentLineNumber is read by CreateProgressReport on a Timer thread pool thread
+    // _currentLineNumber is read by CreateProgressReport on a Timer threadpool thread
     // and written by ExtractWorkerAsync on the async continuation thread.
     // Interlocked.Read/Increment ensures atomicity on all targets including 32-bit net462.
 
@@ -320,7 +321,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// in a text editor — no adjustment is needed for header or separator lines.
     /// </summary>
     /// <remarks>
-    /// Thread-safe: reads are performed with <see cref="Interlocked.Read(ref long)"/>
+    /// Thread-safe: reads are performed with <see cref="Interlocked"/>
     /// so this property may be sampled from a progress-reporting timer thread
     /// without a data race.
     /// </remarks>
@@ -388,7 +389,12 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     {
         if (_progressTimer != null)
         {
-            _progressTimer.Elapsed += () => progress.Report(CreateProgressReport());
+            if (!_progressTimerWired)
+            {
+                _progressTimerWired = true;
+                _progressTimer.Elapsed += () => progress.Report(CreateProgressReport());
+            }
+
             return _progressTimer;
         }
 
@@ -404,7 +410,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 #else
     /// <inheritdoc/>
 #pragma warning disable MA0051 // async iterator methods cannot delegate 'yield return' to sub-methods
-    protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync([EnumeratorCancellation] CancellationToken token)
+    protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync([System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
 #endif
 #pragma warning restore MA0051
     {
@@ -505,7 +511,6 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
         return _currentLineNumber <= HeaderLineCount
             || _currentLineNumber == separatorLineNo;
     }
-
 
 
     /// <summary>
