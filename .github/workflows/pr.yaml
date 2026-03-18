@@ -56,7 +56,7 @@ jobs:
   # STAGE 1: Linux - .NET Core/5+ Tests with Coverage Gate
   # ============================================================================
   test-linux-core: 
-    name: "Stage 1: Linux Tests (.NET 5.0-10.0) + Coverage Gate"
+    name: "Stage 1: Linux Tests (.NET Core 3.1, .NET 5.0-10.0) + Coverage Gate"
     runs-on:  ubuntu-latest
     needs: detect-projects
     if: github.repository != 'Chris-Wolfgang/repo-template' && needs.detect-projects.outputs.has-projects == 'true'
@@ -81,6 +81,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
+            3.1.x
             5.0.x
             6.0.x
             7.0.x
@@ -197,7 +198,7 @@ jobs:
             
             # Extract target frameworks from the project file
             # Support both <TargetFramework> (single) and <TargetFrameworks> (multiple)
-            frameworks=$(grep -oP '<TargetFramework[s]?>\K[^<]+' "$test_proj" | tr ';' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -E '^net(5\.0|6\.0|7\.0|8\.0|9\.0|10\.0)$' || true)
+            frameworks=$(grep -oP '<TargetFramework[s]?>\K[^<]+' "$test_proj" | tr ';' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -E '^(net(5\.0|6\.0|7\.0|8\.0|9\.0|10\.0)|netcoreapp3\.1)$' || true)
             
             if [ -z "$frameworks" ]; then
               echo "⊘ Skipping: No compatible .NET 5.0-10.0 target frameworks found"
@@ -317,7 +318,7 @@ jobs:
   # STAGE 2: Windows - All .NET Tests (Gated by Stage 1)
   # ============================================================================
   test-windows:
-    name: "Stage 2: Windows Tests (.NET 5.0-10.0, Framework 4.6.2-4.8.1)"
+    name: "Stage 2: Windows Tests (.NET Core 3.1, .NET 5.0-10.0, Framework 4.6.2-4.8.1)"
     runs-on: windows-latest
     needs: [detect-projects, test-linux-core]
     if: github.repository != 'Chris-Wolfgang/repo-template' && needs.detect-projects.outputs.has-projects == 'true'
@@ -333,6 +334,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
+            3.1.x
             5.0.x
             6.0.x
             7.0.x
@@ -346,7 +348,7 @@ jobs:
       - name: Build solution
         run: dotnet build --no-restore --configuration Release
 
-      - name: Run all .NET tests (.NET 5.0-10.0 and Framework 4.6.2-4.8.1)
+      - name: Run all .NET tests (.NET Core 3.1, .NET 5.0-10.0, and Framework 4.6.2-4.8.1)
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -381,7 +383,7 @@ jobs:
             }
             
             # Split by semicolon for multi-targeting projects
-            $frameworks = $tfmMatch.Groups[1].Value -split ';' | ForEach-Object { $_.Trim() } | Where-Object { $_ -match '^net(5\.0|6\.0|7\.0|8\.0|9\.0|10\.0|462|47|471|472|48|481)$' }
+            $frameworks = $tfmMatch.Groups[1].Value -split ';' | ForEach-Object { $_.Trim() } | Where-Object { $_ -match '^(net(5\.0|6\.0|7\.0|8\.0|9\.0|10\.0|462|47|471|472|48|481)|netcoreapp3\.1)$' }
             
             if ($frameworks.Count -eq 0) {
               Write-Host "⊘ Skipping: No compatible .NET 5.0-10.0 or Framework 4.6.2-4.8.1 target frameworks found" -ForegroundColor Yellow
