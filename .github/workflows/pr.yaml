@@ -81,6 +81,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
+            3.1.x
             5.0.x
             6.0.x
             7.0.x
@@ -197,7 +198,7 @@ jobs:
             
             # Extract target frameworks from the project file
             # Support both <TargetFramework> (single) and <TargetFrameworks> (multiple)
-            frameworks=$(grep -oP '<TargetFramework[s]?>\K[^<]+' "$test_proj" | tr ';' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -E '^net(5\.0|6\.0|7\.0|8\.0|9\.0|10\.0)$' || true)
+            frameworks=$(grep -oP '<TargetFramework[s]?>\K[^<]+' "$test_proj" | tr ';' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -E '^(net(5\.0|6\.0|7\.0|8\.0|9\.0|10\.0)|netcoreapp3\.1)$' || true)
             
             if [ -z "$frameworks" ]; then
               echo "⊘ Skipping: No compatible .NET 5.0-10.0 target frameworks found"
@@ -333,6 +334,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
+            3.1.x
             5.0.x
             6.0.x
             7.0.x
@@ -381,7 +383,7 @@ jobs:
             }
             
             # Split by semicolon for multi-targeting projects
-            $frameworks = $tfmMatch.Groups[1].Value -split ';' | ForEach-Object { $_.Trim() } | Where-Object { $_ -match '^net(5\.0|6\.0|7\.0|8\.0|9\.0|10\.0|462|47|471|472|48|481)$' }
+            $frameworks = $tfmMatch.Groups[1].Value -split ';' | ForEach-Object { $_.Trim() } | Where-Object { $_ -match '^(net(5\.0|6\.0|7\.0|8\.0|9\.0|10\.0|462|47|471|472|48|481)|netcoreapp3\.1)$' }
             
             if ($frameworks.Count -eq 0) {
               Write-Host "⊘ Skipping: No compatible .NET 5.0-10.0 or Framework 4.6.2-4.8.1 target frameworks found" -ForegroundColor Yellow
