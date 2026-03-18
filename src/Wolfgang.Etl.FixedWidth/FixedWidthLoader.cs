@@ -39,7 +39,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// The caller owns the <see cref="TextWriter"/> lifetime. The loader does not dispose it.
 /// </para>
 /// </remarks>
-public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgress>
+public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgress>, IDisposable
     where TRecord : notnull
     where TProgress : notnull
 {
@@ -47,7 +47,15 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     // Fields
     // ------------------------------------------------------------------
 
+    /// <summary>
+    /// Default buffer size used when constructing a <see cref="StreamWriter"/>
+    /// from a <see cref="Stream"/>. 64 KB reduces syscall frequency compared
+    /// to the <see cref="StreamWriter"/> default of 1 KB.
+    /// </summary>
+    private const int DefaultBufferSize = 65536;
+
     private readonly TextWriter _writer;
+    private readonly bool _ownsWriter;
     private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
@@ -116,6 +124,68 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     )
     {
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
+        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthLoader{TRecord,TProgress}"/> that writes
+    /// to the specified <see cref="Stream"/> using an internal <see cref="StreamWriter"/>
+    /// with a 64 KB buffer for improved throughput on large files.
+    /// </summary>
+    /// <param name="stream">
+    /// The <see cref="Stream"/> to write fixed-width records to. The stream must be
+    /// writable. The caller retains ownership — the loader does not dispose the stream.
+    /// </param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
+    /// Pass <see langword="null"/> (the default) to disable logging.
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
+    public FixedWidthLoader
+    (
+        Stream stream,
+        ILogger<FixedWidthLoader<TRecord, TProgress>>? logger = null
+    )
+    {
+        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        _writer = new StreamWriter(stream, encoding: null, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _ownsWriter = true;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthLoader{TRecord,TProgress}"/> that writes
+    /// to the specified <see cref="Stream"/> and uses the supplied
+    /// <see cref="IProgressTimer"/> instead of the default system timer.
+    /// </summary>
+    /// <param name="stream">
+    /// The <see cref="Stream"/> to write fixed-width records to.
+    /// </param>
+    /// <param name="timer">
+    /// The <see cref="IProgressTimer"/> to use for progress reporting.
+    /// </param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
+    /// Pass <see langword="null"/> to disable logging.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="stream"/> or <paramref name="timer"/> is null.
+    /// </exception>
+    internal FixedWidthLoader
+    (
+        Stream stream,
+        IProgressTimer timer,
+        ILogger<FixedWidthLoader<TRecord, TProgress>>? logger = null
+    )
+    {
+        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        _writer = new StreamWriter(stream, encoding: null, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _ownsWriter = true;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
@@ -326,6 +396,37 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
 
 
 
+    /// <summary>
+    /// Disposes the internal <see cref="StreamWriter"/> when this instance was
+    /// constructed from a <see cref="Stream"/>. Has no effect when constructed
+    /// from a caller-owned <see cref="TextWriter"/>.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+
+
+    /// <summary>
+    /// Releases managed resources when <paramref name="disposing"/> is
+    /// <see langword="true"/>. Override in a derived class to add cleanup logic.
+    /// </summary>
+    /// <param name="disposing">
+    /// <see langword="true"/> when called from <see cref="Dispose()"/>;
+    /// <see langword="false"/> when called from a finalizer.
+    /// </param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing && _ownsWriter)
+        {
+            _writer.Dispose();
+        }
+    }
+
+
+
     /// <inheritdoc/>
     protected override async Task LoadWorkerAsync
     (
@@ -373,6 +474,16 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
             await _writer.WriteLineAsync(Join(segments)).ConfigureAwait(false);
             IncrementCurrentItemCount();
             LogDebugRecordWritten();
+        }
+
+        if (_ownsWriter)
+        {
+#if NET8_0_OR_GREATER
+            await _writer.FlushAsync(token).ConfigureAwait(false);
+#else
+            token.ThrowIfCancellationRequested();
+            await _writer.FlushAsync().ConfigureAwait(false);
+#endif
         }
 
         LogLoadingCompleted();
