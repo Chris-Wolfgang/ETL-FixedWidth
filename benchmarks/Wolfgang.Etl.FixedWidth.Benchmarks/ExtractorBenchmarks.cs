@@ -85,7 +85,7 @@ public class ExtractorBenchmarks
     [Benchmark]
     public async Task<int> Memory_Stream()
     {
-        var stream = new MemoryStream(_data);
+        using var stream = new MemoryStream(_data);
         using var extractor = new FixedWidthExtractor<BenchmarkRecord, Report>(stream);
 
         var count = 0;
