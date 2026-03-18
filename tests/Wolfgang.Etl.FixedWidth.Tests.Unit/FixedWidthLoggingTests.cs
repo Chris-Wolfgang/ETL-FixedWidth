@@ -60,12 +60,21 @@ internal sealed class SpyLogger<T> : ILogger<T>
 
 
 [ExcludeFromCodeCoverage]
-internal sealed record LogEntry
-(
-    LogLevel Level,
-    string Message,
-    Exception? Exception
-);
+internal sealed class LogEntry
+{
+    public LogEntry(LogLevel level, string message, Exception? exception)
+    {
+        Level = level;
+        Message = message;
+        Exception = exception;
+    }
+
+
+
+    public LogLevel Level { get; }
+    public string Message { get; }
+    public Exception? Exception { get; }
+}
 
 
 
