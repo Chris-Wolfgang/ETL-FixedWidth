@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Wolfgang.Etl.FixedWidth.Exceptions;
@@ -49,6 +51,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     // ------------------------------------------------------------------
 
     private readonly TextReader _reader;
+    private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
     private long _currentLineNumber;
@@ -72,10 +75,19 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// <see cref="StringReader"/> for in-memory content, or any other <see cref="TextReader"/>
     /// implementation. The caller is responsible for the reader's lifetime.
     /// </param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
+    /// Pass <see langword="null"/> (the default) to disable logging.
+    /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="reader"/> is null.</exception>
-    public FixedWidthExtractor(TextReader reader)
+    public FixedWidthExtractor
+    (
+        TextReader reader,
+        ILogger<FixedWidthExtractor<TRecord, TProgress>>? logger = null
+    )
     {
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -91,13 +103,23 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// <param name="timer">
     /// The <see cref="IProgressTimer"/> to use for progress reporting.
     /// </param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
+    /// Pass <see langword="null"/> to disable logging.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="reader"/> or <paramref name="timer"/> is null.
     /// </exception>
-    internal FixedWidthExtractor(TextReader reader, IProgressTimer timer)
+    internal FixedWidthExtractor
+    (
+        TextReader reader,
+        IProgressTimer timer,
+        ILogger<FixedWidthExtractor<TRecord, TProgress>>? logger = null
+    )
     {
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -420,6 +442,8 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
             ? HeaderLineCount + 1
             : -1;
 
+        LogExtractionStarted(fieldMap);
+
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
         while (await _reader.ReadLineAsync(token).ConfigureAwait(false) is { } line)
 #else
@@ -434,6 +458,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
             if (IsStructuralLine(separatorLineNo))
             {
+                LogDebugStructuralLineSkipped();
                 continue;
             }
 
@@ -441,7 +466,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
             {
                 if (!HandleBlankLine(fieldMap, out var defaultRecord))
                 {
-                    // BlankLineHandling.Skip — invisible to all counting logic.
+                    LogDebugBlankLineSkipped();
                     continue;
                 }
 
@@ -451,14 +476,18 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
                 {
                     dataLinesSkipped++;
                     IncrementCurrentSkippedItemCount();
+                    LogDebugBlankLineInSkipBudget(dataLinesSkipped);
                     continue;
                 }
 
                 if (CurrentItemCount >= MaximumItemCount)
                 {
+                    LogDebugMaxReached();
+                    LogExtractionCompleted();
                     yield break;
                 }
 
+                LogDebugBlankLineYieldedAsDefault();
                 IncrementCurrentItemCount();
                 yield return defaultRecord;
                 continue;
@@ -467,10 +496,13 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
             var filterAction = LineFilter(line);
             if (filterAction == LineAction.Stop)
             {
+                LogDebugLineFilterStop();
+                LogExtractionCompleted();
                 yield break;
             }
             if (filterAction == LineAction.Skip)
             {
+                LogDebugLineFilterSkip();
                 continue;
             }
 
@@ -478,11 +510,14 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
             {
                 dataLinesSkipped++;
                 IncrementCurrentSkippedItemCount();
+                LogDebugDataLineSkipped(dataLinesSkipped);
                 continue;
             }
 
             if (CurrentItemCount >= MaximumItemCount)
             {
+                LogDebugMaxReached();
+                LogExtractionCompleted();
                 yield break;
             }
 
@@ -491,8 +526,230 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
                 continue;
             }
 
+            LogDebugRecordParsed();
             IncrementCurrentItemCount();
             yield return record;
+        }
+
+        LogExtractionCompleted();
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // Logging helpers
+    // ------------------------------------------------------------------
+
+    private void LogExtractionStarted(FieldMapResult fieldMap)
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation
+            (
+                "Extraction started for {RecordType}. HeaderLineCount={HeaderLineCount}, " +
+                "FieldSeparator={FieldSeparator}, FieldDelimiter={FieldDelimiter}, " +
+                "SkipItemCount={SkipItemCount}, MaximumItemCount={MaximumItemCount}",
+                typeof(TRecord).Name,
+                HeaderLineCount,
+                FieldSeparator?.ToString() ?? "(none)",
+                FieldDelimiter ?? "(none)",
+                SkipItemCount,
+                MaximumItemCount
+            );
+        }
+
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "Field map resolved for {RecordType}: {FieldCount} fields, " +
+                "ExpectedLineWidth={ExpectedLineWidth}, TotalColumnCount={TotalColumnCount}",
+                typeof(TRecord).Name,
+                fieldMap.Descriptors.Count,
+                fieldMap.ExpectedLineWidth,
+                fieldMap.TotalColumnCount
+            );
+        }
+    }
+
+
+
+    private void LogExtractionCompleted()
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation
+            (
+                "Extraction completed for {RecordType}: {ItemCount} items extracted, " +
+                "{SkippedCount} skipped, {LineCount} lines read",
+                typeof(TRecord).Name,
+                CurrentItemCount,
+                CurrentSkippedItemCount,
+                Interlocked.Read(ref _currentLineNumber)
+            );
+        }
+    }
+
+
+
+    private void LogDebugStructuralLineSkipped()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "Skipping structural line {LineNumber} (header or separator)",
+                _currentLineNumber
+            );
+        }
+    }
+
+
+
+    private void LogDebugBlankLineSkipped()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "Blank line at line {LineNumber} skipped (BlankLineHandling=Skip)",
+                _currentLineNumber
+            );
+        }
+    }
+
+
+
+    private void LogDebugBlankLineInSkipBudget(long dataLinesSkipped)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "Blank line at line {LineNumber} counted toward skip budget " +
+                "({DataLinesSkipped}/{SkipItemCount})",
+                _currentLineNumber,
+                dataLinesSkipped,
+                SkipItemCount
+            );
+        }
+    }
+
+
+
+    private void LogDebugBlankLineYieldedAsDefault()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "Blank line at line {LineNumber} yielded as default {RecordType} " +
+                "(BlankLineHandling=ReturnDefault, item #{ItemCount})",
+                _currentLineNumber,
+                typeof(TRecord).Name,
+                CurrentItemCount + 1
+            );
+        }
+    }
+
+
+
+    private void LogDebugMaxReached()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "MaximumItemCount ({MaximumItemCount}) reached at line {LineNumber}, " +
+                "stopping extraction",
+                MaximumItemCount,
+                _currentLineNumber
+            );
+        }
+    }
+
+
+
+    private void LogDebugLineFilterStop()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "LineFilter returned Stop at line {LineNumber}, ending extraction",
+                _currentLineNumber
+            );
+        }
+    }
+
+
+
+    private void LogDebugLineFilterSkip()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "LineFilter returned Skip at line {LineNumber}",
+                _currentLineNumber
+            );
+        }
+    }
+
+
+
+    private void LogDebugDataLineSkipped(long dataLinesSkipped)
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "Skipping data line {LineNumber} ({DataLinesSkipped}/{SkipItemCount})",
+                _currentLineNumber,
+                dataLinesSkipped,
+                SkipItemCount
+            );
+        }
+    }
+
+
+
+    private void LogDebugRecordParsed()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "Parsed record at line {LineNumber} (item #{ItemCount})",
+                _currentLineNumber,
+                CurrentItemCount + 1
+            );
+        }
+    }
+
+
+
+    private void LogMalformedLine(MalformedLineException ex)
+    {
+        if (MalformedLineHandling == MalformedLineHandling.ThrowException)
+        {
+            _logger.LogError
+            (
+                ex,
+                "Malformed line {LineNumber}: {ErrorMessage}",
+                _currentLineNumber,
+                ex.Message
+            );
+        }
+        else if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                ex,
+                "Malformed line {LineNumber} handled with {MalformedLineHandling}",
+                _currentLineNumber,
+                MalformedLineHandling
+            );
         }
     }
 
@@ -544,7 +801,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
                 var delimiterCount = Math.Max(0, fieldMap.TotalColumnCount - 1);
                 var expectedWidth = fieldMap.ExpectedLineWidth + delimiterWidth * delimiterCount;
 
-                throw new LineTooShortException
+                var ex = new LineTooShortException
                 (
                     $"Blank line encountered at line {_currentLineNumber}.",
                     _currentLineNumber,
@@ -552,6 +809,16 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
                     expectedWidth,
                     0
                 );
+
+                _logger.LogError
+                (
+                    ex,
+                    "Blank line at line {LineNumber}. Expected width {ExpectedWidth}, got 0",
+                    _currentLineNumber,
+                    expectedWidth
+                );
+
+                throw ex;
             default:
                 throw new ArgumentOutOfRangeException(nameof(BlankLineHandling));
         }
@@ -584,8 +851,10 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
             );
             return true;
         }
-        catch (MalformedLineException)
+        catch (MalformedLineException ex)
         {
+            LogMalformedLine(ex);
+
             switch (MalformedLineHandling)
             {
                 case MalformedLineHandling.Skip:
