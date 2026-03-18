@@ -26,16 +26,34 @@ namespace Wolfgang.Etl.FixedWidth;
 /// Override <see cref="CreateProgressReport"/> to return an instance of this type.
 /// If you do not need a custom progress type, use <see cref="FixedWidthReport"/>.
 /// </typeparam>
+/// <remarks>
+/// <para>
+/// Two construction modes are supported, each with different ownership semantics:
+/// </para>
+/// <list type="bullet">
+///   <item><b>TextReader constructor</b> — the caller owns the <see cref="TextReader"/>
+///   lifetime. The extractor does not dispose it. Calling <see cref="Dispose()"/> is
+///   optional and has no effect.</item>
+///   <item><b>Stream constructor</b> — the extractor creates an internal
+///   <see cref="StreamReader"/> with a 64 KB buffer for improved throughput on large files.
+///   The caller retains ownership of the <see cref="Stream"/> (it is not closed), but
+///   <see cref="Dispose()"/> must be called to release the internal reader.</item>
+/// </list>
+/// </remarks>
 /// <example>
 /// <code>
-/// // For most cases, no subclassing is needed — FixedWidthReport is supported directly:
+/// // Stream-based (preferred for files — 64 KB buffer reduces syscall overhead):
+/// await using var stream = File.OpenRead("data.txt");
+/// using var extractor = new FixedWidthExtractor&lt;CustomerRecord, FixedWidthReport&gt;(stream);
+///
+/// // TextReader-based (caller owns the reader):
 /// var extractor = new FixedWidthExtractor&lt;CustomerRecord, FixedWidthReport&gt;(reader);
 ///
-/// // To use a fully custom progress type, subclass and override CreateProgressReport:
+/// // Custom progress type — subclass and override CreateProgressReport:
 /// public class CustomerExtractor : FixedWidthExtractor&lt;CustomerRecord, MyProgress&gt;
 /// {
-///     public CustomerExtractor(string filePath)
-///         : base(new StreamReader(filePath)) { }
+///     public CustomerExtractor(Stream stream)
+///         : base(stream) { }
 ///
 ///     protected override MyProgress CreateProgressReport() =>
 ///         new MyProgress(CurrentItemCount, CurrentSkippedItemCount);
