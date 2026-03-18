@@ -429,18 +429,21 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
 
     private void LogLoadingStarted(FieldMapResult fieldMap)
     {
-        _logger.LogInformation
-        (
-            "Loading started for {RecordType}. WriteHeader={WriteHeader}, " +
-            "FieldSeparator={FieldSeparator}, FieldDelimiter={FieldDelimiter}, " +
-            "SkipItemCount={SkipItemCount}, MaximumItemCount={MaximumItemCount}",
-            typeof(TRecord).Name,
-            WriteHeader,
-            FieldSeparator?.ToString() ?? "(none)",
-            FieldDelimiter ?? "(none)",
-            SkipItemCount,
-            MaximumItemCount
-        );
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation
+            (
+                "Loading started for {RecordType}. WriteHeader={WriteHeader}, " +
+                "FieldSeparator={FieldSeparator}, FieldDelimiter={FieldDelimiter}, " +
+                "SkipItemCount={SkipItemCount}, MaximumItemCount={MaximumItemCount}",
+                typeof(TRecord).Name,
+                WriteHeader,
+                FieldSeparator?.ToString() ?? "(none)",
+                FieldDelimiter ?? "(none)",
+                SkipItemCount,
+                MaximumItemCount
+            );
+        }
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
@@ -460,15 +463,18 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
 
     private void LogLoadingCompleted()
     {
-        _logger.LogInformation
-        (
-            "Loading completed for {RecordType}: {ItemCount} items loaded, " +
-            "{SkippedCount} skipped, {LineCount} lines written",
-            typeof(TRecord).Name,
-            CurrentItemCount,
-            CurrentSkippedItemCount,
-            Interlocked.Read(ref _currentLineNumber)
-        );
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation
+            (
+                "Loading completed for {RecordType}: {ItemCount} items loaded, " +
+                "{SkippedCount} skipped, {LineCount} lines written",
+                typeof(TRecord).Name,
+                CurrentItemCount,
+                CurrentSkippedItemCount,
+                Interlocked.Read(ref _currentLineNumber)
+            );
+        }
     }
 
 

@@ -542,18 +542,21 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
     private void LogExtractionStarted(FieldMapResult fieldMap)
     {
-        _logger.LogInformation
-        (
-            "Extraction started for {RecordType}. HeaderLineCount={HeaderLineCount}, " +
-            "FieldSeparator={FieldSeparator}, FieldDelimiter={FieldDelimiter}, " +
-            "SkipItemCount={SkipItemCount}, MaximumItemCount={MaximumItemCount}",
-            typeof(TRecord).Name,
-            HeaderLineCount,
-            FieldSeparator?.ToString() ?? "(none)",
-            FieldDelimiter ?? "(none)",
-            SkipItemCount,
-            MaximumItemCount
-        );
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation
+            (
+                "Extraction started for {RecordType}. HeaderLineCount={HeaderLineCount}, " +
+                "FieldSeparator={FieldSeparator}, FieldDelimiter={FieldDelimiter}, " +
+                "SkipItemCount={SkipItemCount}, MaximumItemCount={MaximumItemCount}",
+                typeof(TRecord).Name,
+                HeaderLineCount,
+                FieldSeparator?.ToString() ?? "(none)",
+                FieldDelimiter ?? "(none)",
+                SkipItemCount,
+                MaximumItemCount
+            );
+        }
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
@@ -573,15 +576,18 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
     private void LogExtractionCompleted()
     {
-        _logger.LogInformation
-        (
-            "Extraction completed for {RecordType}: {ItemCount} items extracted, " +
-            "{SkippedCount} skipped, {LineCount} lines read",
-            typeof(TRecord).Name,
-            CurrentItemCount,
-            CurrentSkippedItemCount,
-            Interlocked.Read(ref _currentLineNumber)
-        );
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation
+            (
+                "Extraction completed for {RecordType}: {ItemCount} items extracted, " +
+                "{SkippedCount} skipped, {LineCount} lines read",
+                typeof(TRecord).Name,
+                CurrentItemCount,
+                CurrentSkippedItemCount,
+                Interlocked.Read(ref _currentLineNumber)
+            );
+        }
     }
 
 
@@ -723,6 +729,32 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
 
 
+    private void LogMalformedLine(MalformedLineException ex)
+    {
+        if (MalformedLineHandling == MalformedLineHandling.ThrowException)
+        {
+            _logger.LogError
+            (
+                ex,
+                "Malformed line {LineNumber}: {ErrorMessage}",
+                _currentLineNumber,
+                ex.Message
+            );
+        }
+        else if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                ex,
+                "Malformed line {LineNumber} handled with {MalformedLineHandling}",
+                _currentLineNumber,
+                MalformedLineHandling
+            );
+        }
+    }
+
+
+
     // ------------------------------------------------------------------
     // Private helpers
     // ------------------------------------------------------------------
@@ -821,42 +853,20 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
         }
         catch (MalformedLineException ex)
         {
+            LogMalformedLine(ex);
+
             switch (MalformedLineHandling)
             {
                 case MalformedLineHandling.Skip:
-                    _logger.LogDebug
-                    (
-                        ex,
-                        "Malformed line {LineNumber} skipped (MalformedLineHandling=Skip)",
-                        _currentLineNumber
-                    );
-
                     IncrementCurrentSkippedItemCount();
                     return false;
 
                 case MalformedLineHandling.ReturnDefault:
-                    _logger.LogDebug
-                    (
-                        ex,
-                        "Malformed line {LineNumber} yielded as default {RecordType} " +
-                        "(MalformedLineHandling=ReturnDefault)",
-                        _currentLineNumber,
-                        typeof(TRecord).Name
-                    );
-
                     // Cannot yield inside catch — caller handles the yield and increment.
                     record = new TRecord();
                     return true;
 
                 case MalformedLineHandling.ThrowException:
-                    _logger.LogError
-                    (
-                        ex,
-                        "Malformed line {LineNumber}: {ErrorMessage}",
-                        _currentLineNumber,
-                        ex.Message
-                    );
-
                     throw;
 
                 default:

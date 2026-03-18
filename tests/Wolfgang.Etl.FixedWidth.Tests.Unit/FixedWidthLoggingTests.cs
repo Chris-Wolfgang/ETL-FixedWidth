@@ -317,7 +317,7 @@ public class FixedWidthExtractorLoggingTests
         (
             logger.Entries,
             e => e.Level == LogLevel.Debug
-                && e.Message.Contains("MalformedLineHandling=Skip", StringComparison.Ordinal)
+                && e.Message.Contains("handled with Skip", StringComparison.Ordinal)
         );
     }
 
@@ -343,7 +343,7 @@ public class FixedWidthExtractorLoggingTests
         (
             logger.Entries,
             e => e.Level == LogLevel.Debug
-                && e.Message.Contains("MalformedLineHandling=ReturnDefault", StringComparison.Ordinal)
+                && e.Message.Contains("handled with ReturnDefault", StringComparison.Ordinal)
         );
     }
 
