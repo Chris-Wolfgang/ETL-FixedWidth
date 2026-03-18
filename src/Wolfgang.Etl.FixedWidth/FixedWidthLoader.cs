@@ -16,15 +16,24 @@ namespace Wolfgang.Etl.FixedWidth;
 /// </summary>
 /// <remarks>
 /// <para>
-/// The loader writes to any <see cref="TextWriter"/>, making it suitable for files,
-/// in-memory strings, network streams, and console output:
+/// Two construction modes are supported, each with different ownership semantics:
 /// </para>
+/// <list type="bullet">
+///   <item><b>TextWriter constructor</b> — the caller owns the <see cref="TextWriter"/>
+///   lifetime. The loader does not dispose it, and calling <see cref="Dispose()"/> is
+///   optional (no-op). The caller is responsible for flushing the writer.</item>
+///   <item><b>Stream constructor</b> — the loader creates an internal
+///   <see cref="StreamWriter"/> with a 64 KB buffer for improved throughput.
+///   The caller retains ownership of the <see cref="Stream"/> (it is not closed).
+///   The internal writer is flushed automatically at the end of
+///   <c>LoadWorkerAsync</c>, and <see cref="Dispose()"/> must be called to release it.</item>
+/// </list>
 /// <code>
-/// // Write to a file
-/// await using var writer = new StreamWriter("output.txt");
-/// var loader = new FixedWidthLoader&lt;MyRecord, Report&gt;(writer);
+/// // Stream-based (preferred for files — 64 KB buffer reduces syscall overhead):
+/// await using var stream = File.OpenWrite("output.txt");
+/// using var loader = new FixedWidthLoader&lt;MyRecord, Report&gt;(stream);
 ///
-/// // Write to a string (useful for testing or building string output)
+/// // TextWriter-based (caller owns the writer):
 /// var sw = new StringWriter();
 /// var loader = new FixedWidthLoader&lt;MyRecord, Report&gt;(sw);
 /// var result = sw.ToString();
@@ -35,9 +44,6 @@ namespace Wolfgang.Etl.FixedWidth;
 /// loader.FieldSeparator = '-';
 /// loader.FieldDelimiter = " | ";
 /// </code>
-/// <para>
-/// The caller owns the <see cref="TextWriter"/> lifetime. The loader does not dispose it.
-/// </para>
 /// </remarks>
 public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgress>, IDisposable
     where TRecord : notnull
