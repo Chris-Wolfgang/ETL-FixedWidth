@@ -42,7 +42,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// }
 /// </code>
 /// </example>
-public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TProgress>
+public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TProgress>, IDisposable
     where TRecord : notnull, new()
     where TProgress : notnull
 {
@@ -50,7 +50,15 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     // Fields
     // ------------------------------------------------------------------
 
+    /// <summary>
+    /// Default buffer size used when constructing a <see cref="StreamReader"/>
+    /// from a <see cref="Stream"/>. 64 KB reduces syscall frequency compared
+    /// to the <see cref="StreamReader"/> default of 1 KB.
+    /// </summary>
+    private const int DefaultBufferSize = 65536;
+
     private readonly TextReader _reader;
+    private readonly bool _ownsReader;
     private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
@@ -118,6 +126,68 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     )
     {
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
+        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthExtractor{TRecord,TProgress}"/> that reads
+    /// from the specified <see cref="Stream"/> using an internal <see cref="StreamReader"/>
+    /// with a 64 KB buffer for improved throughput on large files.
+    /// </summary>
+    /// <param name="stream">
+    /// The <see cref="Stream"/> to read fixed-width records from. The stream must be
+    /// readable. The caller retains ownership — the extractor does not dispose the stream.
+    /// </param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
+    /// Pass <see langword="null"/> (the default) to disable logging.
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
+    public FixedWidthExtractor
+    (
+        Stream stream,
+        ILogger<FixedWidthExtractor<TRecord, TProgress>>? logger = null
+    )
+    {
+        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        _reader = new StreamReader(stream, encoding: null, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _ownsReader = true;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthExtractor{TRecord,TProgress}"/> that reads
+    /// from the specified <see cref="Stream"/> and uses the supplied
+    /// <see cref="IProgressTimer"/> instead of the default system timer.
+    /// </summary>
+    /// <param name="stream">
+    /// The <see cref="Stream"/> to read fixed-width records from.
+    /// </param>
+    /// <param name="timer">
+    /// The <see cref="IProgressTimer"/> to use for progress reporting.
+    /// </param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
+    /// Pass <see langword="null"/> to disable logging.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="stream"/> or <paramref name="timer"/> is null.
+    /// </exception>
+    internal FixedWidthExtractor
+    (
+        Stream stream,
+        IProgressTimer timer,
+        ILogger<FixedWidthExtractor<TRecord, TProgress>>? logger = null
+    )
+    {
+        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        _reader = new StreamReader(stream, encoding: null, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _ownsReader = true;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
@@ -421,6 +491,37 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
         }
 
         return base.CreateProgressTimer(progress);
+    }
+
+
+
+    /// <summary>
+    /// Disposes the internal <see cref="StreamReader"/> when this instance was
+    /// constructed from a <see cref="Stream"/>. Has no effect when constructed
+    /// from a caller-owned <see cref="TextReader"/>.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+
+
+    /// <summary>
+    /// Releases managed resources when <paramref name="disposing"/> is
+    /// <see langword="true"/>. Override in a derived class to add cleanup logic.
+    /// </summary>
+    /// <param name="disposing">
+    /// <see langword="true"/> when called from <see cref="Dispose()"/>;
+    /// <see langword="false"/> when called from a finalizer.
+    /// </param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing && _ownsReader)
+        {
+            _reader.Dispose();
+        }
     }
 
 
