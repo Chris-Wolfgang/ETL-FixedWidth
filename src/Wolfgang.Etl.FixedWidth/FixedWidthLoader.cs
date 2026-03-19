@@ -470,14 +470,16 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
                 continue;
             }
 
-            var segments = FixedWidthLineParser.FormatSegments
+            FixedWidthLineParser.WriteRecord
             (
+                _writer,
                 item,
                 fieldMap,
-                ValueConverter
+                ValueConverter,
+                FieldDelimiter
             );
             Interlocked.Increment(ref _currentLineNumber);
-            await _writer.WriteLineAsync(Join(segments)).ConfigureAwait(false);
+            await _writer.WriteLineAsync().ConfigureAwait(false);
             IncrementCurrentItemCount();
             LogDebugRecordWritten();
         }
@@ -503,13 +505,15 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// </summary>
     private async Task WriteHeaderAsync(FieldMapResult fieldMap)
     {
-        var headerSegments = FixedWidthLineParser.FormatHeaderSegments
+        FixedWidthLineParser.WriteHeader
         (
+            _writer,
             fieldMap,
-            HeaderConverter
+            HeaderConverter,
+            FieldDelimiter
         );
         Interlocked.Increment(ref _currentLineNumber);
-        await _writer.WriteLineAsync(Join(headerSegments)).ConfigureAwait(false);
+        await _writer.WriteLineAsync().ConfigureAwait(false);
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
@@ -518,13 +522,15 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
 
         if (FieldSeparator.HasValue)
         {
-            var separatorSegments = FixedWidthLineParser.FormatSeparatorSegments
+            FixedWidthLineParser.WriteSeparator
             (
+                _writer,
                 fieldMap,
-                FieldSeparator.Value
+                FieldSeparator.Value,
+                FieldDelimiter
             );
             Interlocked.Increment(ref _currentLineNumber);
-            await _writer.WriteLineAsync(Join(separatorSegments)).ConfigureAwait(false);
+            await _writer.WriteLineAsync().ConfigureAwait(false);
 
             if (_logger.IsEnabled(LogLevel.Debug))
             {
@@ -661,25 +667,4 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
 
 
 
-    // ------------------------------------------------------------------
-    // Private helpers
-    // ------------------------------------------------------------------
-
-    /// <summary>
-    /// Joins field segments with <see cref="FieldDelimiter"/> between them,
-    /// or concatenates them directly when no delimiter is set.
-    /// </summary>
-    private string Join(IReadOnlyList<string> segments)
-    {
-        if (string.IsNullOrEmpty(FieldDelimiter))
-        {
-            return string.Concat(segments);
-        }
-
-        return string.Join
-        (
-            FieldDelimiter,
-            segments
-        );
-    }
 }
