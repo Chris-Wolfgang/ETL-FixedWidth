@@ -355,7 +355,7 @@ internal static class FixedWidthLineParser
         long lineNumber,
         FieldMapResult fieldMap,
         string? fieldDelimiter = null,
-        Func<string, FieldContext, object>? valueParser = null
+        FixedWidthValueParser? valueParser = null
     )
     {
         valueParser ??= FixedWidthConverter.DefaultParser;
@@ -411,7 +411,7 @@ internal static class FixedWidthLineParser
         string line,
         long lineNumber,
         int delimiterWidth,
-        Func<string, FieldContext, object> valueParser
+        FixedWidthValueParser valueParser
     )
     {
         var attr = descriptor.Attribute;
@@ -420,9 +420,9 @@ internal static class FixedWidthLineParser
         // Use AbsoluteColumnIndex so skipped columns are accounted for
         // when offsetting for delimiter characters.
         var start = descriptor.Start + (delimiterWidth * descriptor.AbsoluteColumnIndex);
-        var raw = line.Substring(start, attr.Length);
+        var raw = line.AsMemory().Slice(start, attr.Length);
         var value = attr.TrimValue
-            ? raw.Trim()
+            ? raw.TrimMemory()
             : raw;
 
         try
@@ -440,7 +440,7 @@ internal static class FixedWidthLineParser
                 line,
                 prop.Name,
                 prop.PropertyType,
-                value,
+                value.ToString(),
                 ex
             );
         }

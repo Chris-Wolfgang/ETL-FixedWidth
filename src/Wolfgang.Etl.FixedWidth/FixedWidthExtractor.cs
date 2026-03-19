@@ -319,17 +319,17 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// // Treat "Y"/"N" as bool, fall back to DefaultParser for everything else:
     /// extractor.ValueParser = (text, ctx) =>
     ///     ctx.PropertyType == typeof(bool)
-    ///         ? (object)(text.Trim() == "Y")
+    ///         ? (object)(text.Span.SequenceEqual("Y".AsSpan()))
     ///         : FixedWidthConverter.DefaultParser(text, ctx);
     ///
     /// // Parse a custom date format for a specific field:
     /// extractor.ValueParser = (text, ctx) =>
     ///     ctx.PropertyName == "BirthDate"
-    ///         ? DateTime.ParseExact(text, "dd/MM/yyyy", CultureInfo.InvariantCulture)
+    ///         ? DateTime.ParseExact(text.ToString(), "dd/MM/yyyy", CultureInfo.InvariantCulture)
     ///         : FixedWidthConverter.DefaultParser(text, ctx);
     /// </code>
     /// </example>
-    public Func<string, FieldContext, object> ValueParser { get; set; } = FixedWidthConverter.DefaultParser;
+    public FixedWidthValueParser ValueParser { get; set; } = FixedWidthConverter.DefaultParser;
 
 
 

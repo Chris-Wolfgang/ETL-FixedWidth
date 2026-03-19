@@ -706,7 +706,7 @@ public class FixedWidthConverterTests
     [Fact]
     public void ParseValue_when_targetType_is_DateTime_and_format_is_null_throws_InvalidOperationException()
     {
-        var ex = Assert.Throws<InvalidOperationException>( () => FixedWidthConverter.ParseValue("19900115", typeof(DateTime), format: null));
+        var ex = Assert.Throws<InvalidOperationException>( () => FixedWidthConverter.ParseValue("19900115".AsMemory(), typeof(DateTime), format: null));
 
         Assert.Contains
         (
@@ -720,7 +720,7 @@ public class FixedWidthConverterTests
     [Fact]
     public void ParseValue_when_targetType_is_DateTimeOffset_and_format_is_null_throws_InvalidOperationException()
     {
-        Assert.Throws<InvalidOperationException>( () => FixedWidthConverter.ParseValue("20260101T120000", typeof(DateTimeOffset), format: null));
+        Assert.Throws<InvalidOperationException>( () => FixedWidthConverter.ParseValue("20260101T120000".AsMemory(), typeof(DateTimeOffset), format: null));
     }
 
 
@@ -728,7 +728,7 @@ public class FixedWidthConverterTests
     [Fact]
     public void ParseValue_when_targetType_is_TimeSpan_and_format_is_null_throws_InvalidOperationException()
     {
-        Assert.Throws<InvalidOperationException>( () => FixedWidthConverter.ParseValue("01:30:00", typeof(TimeSpan), format: null));
+        Assert.Throws<InvalidOperationException>( () => FixedWidthConverter.ParseValue("01:30:00".AsMemory(), typeof(TimeSpan), format: null));
     }
 
 
@@ -738,7 +738,7 @@ public class FixedWidthConverterTests
     {
         var result = FixedWidthConverter.ParseValue
         (
-            "19900115",
+            "19900115".AsMemory(),
             typeof(DateTime),
             "yyyyMMdd"
         );
@@ -762,7 +762,7 @@ public class FixedWidthConverterTests
     {
         var result = (DateTimeOffset)FixedWidthConverter.ParseValue
         (
-            "20260101T1200",
+            "20260101T1200".AsMemory(),
             typeof(DateTimeOffset),
             "yyyyMMddTHHmm"
         );
@@ -801,7 +801,7 @@ public class FixedWidthConverterTests
     {
         var result = FixedWidthConverter.ParseValue
         (
-            "013000",
+            "013000".AsMemory(),
             typeof(TimeSpan),
             "hhmmss"
         );
@@ -911,7 +911,7 @@ public class FixedWidthConverterTests
         // falls through to TypeDescriptor.GetConverter path.
         var result = FixedWidthConverter.ParseValue
         (
-            "A",
+            "A".AsMemory(),
             typeof(char),
             format: null
         );

@@ -228,11 +228,11 @@ public static class FixedWidthConverter
     /// // Handle "Y"/"N" booleans, fall back to DefaultParser for everything else:
     /// extractor.ValueParser = (text, ctx) =>
     ///     ctx.PropertyType == typeof(bool)
-    ///         ? (object)(text.Trim() == "Y")
+    ///         ? (object)(text.Span.SequenceEqual("Y".AsSpan()))
     ///         : FixedWidthConverter.DefaultParser(text, ctx);
     /// </code>
     /// </example>
-    public static readonly Func<string, FieldContext, object> DefaultParser =
+    public static readonly FixedWidthValueParser DefaultParser =
         (text, context) => ParseValue
         (
             text,
@@ -296,15 +296,16 @@ public static class FixedWidthConverter
 
     internal static object ParseValue
     (
-        string text,
+        ReadOnlyMemory<char> text,
         Type targetType,
         string? format
     )
     {
+        var span = text.Span;
         var underlying = Nullable.GetUnderlyingType(targetType);
         if (underlying != null)
         {
-            if (string.IsNullOrEmpty(text))
+            if (span.IsEmpty)
             {
                 return null!;
             }
@@ -318,10 +319,10 @@ public static class FixedWidthConverter
 
         if (targetType == typeof(string))
         {
-            return text;
+            return text.ToString();
         }
 
-        if (string.IsNullOrEmpty(text))
+        if (span.IsEmpty)
         {
             return targetType.IsValueType
                 ? Activator.CreateInstance(targetType)!
@@ -330,18 +331,19 @@ public static class FixedWidthConverter
 
         if (targetType == typeof(DateTime) || targetType == typeof(DateTimeOffset) || targetType == typeof(TimeSpan))
         {
-            return ParseDateTimeValue(text, targetType, format);
+            return ParseDateTimeValue(text.ToString(), targetType, format);
         }
 
+        var str = text.ToString();
         var converter = TypeDescriptor.GetConverter(targetType);
         if (converter.CanConvertFrom(typeof(string)))
         {
-            return converter.ConvertFromInvariantString(text)!;
+            return converter.ConvertFromInvariantString(str)!;
         }
 
         return Convert.ChangeType
         (
-            text,
+            str,
             targetType,
             CultureInfo.InvariantCulture
         );
