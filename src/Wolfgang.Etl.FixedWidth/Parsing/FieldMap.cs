@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using Wolfgang.Etl.FixedWidth.Attributes;
@@ -15,9 +16,7 @@ internal static class FieldMap
     // Fields
     // ------------------------------------------------------------------
 
-    private static readonly Dictionary<Type, FieldMapResult> Cache = new();
-
-    private static readonly object Lock = new();
+    private static readonly ConcurrentDictionary<Type, FieldMapResult> Cache = new();
 
 
 
@@ -26,23 +25,7 @@ internal static class FieldMap
     // ------------------------------------------------------------------
 
     internal static FieldMapResult GetResult<T>()
-        => GetResult(typeof(T));
-
-
-    private static FieldMapResult GetResult(Type type)
-    {
-        lock (Lock)
-        {
-            if (Cache.TryGetValue(type, out var cached))
-            {
-                return cached;
-            }
-
-            var resolved = Resolve(type);
-            Cache[type] = resolved;
-            return resolved;
-        }
-    }
+        => Cache.GetOrAdd(typeof(T), Resolve);
 
 
 
@@ -107,7 +90,8 @@ internal static class FieldMap
             (
                 Array.AsReadOnly(Array.Empty<FieldDescriptor>()),
                 expectedLineWidth: 0,
-                totalColumnCount: 0
+                totalColumnCount: 0,
+                factory: FieldMapResult.CompileFactory(type)
             );
         }
 
@@ -115,7 +99,7 @@ internal static class FieldMap
 
         entries.Sort((a, b) => a.Index.CompareTo(b.Index));
 
-        return BuildResult(entries);
+        return BuildResult(type, entries);
     }
 
 
@@ -184,7 +168,7 @@ internal static class FieldMap
     /// Walks the sorted entries, accumulates start positions, and builds the
     /// <see cref="FieldMapResult"/>.
     /// </summary>
-    private static FieldMapResult BuildResult(List<ColumnEntry> entries)
+    private static FieldMapResult BuildResult(Type type, List<ColumnEntry> entries)
     {
         var descriptors = new List<FieldDescriptor>();
         var position = 0;
@@ -205,7 +189,8 @@ internal static class FieldMap
         (
             descriptors.AsReadOnly(),
             expectedLineWidth: position,
-            totalColumnCount: absoluteColIndex
+            totalColumnCount: absoluteColIndex,
+            factory: FieldMapResult.CompileFactory(type)
         );
     }
 }

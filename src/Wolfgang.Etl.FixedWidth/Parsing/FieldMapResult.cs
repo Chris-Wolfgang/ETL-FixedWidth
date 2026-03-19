@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace Wolfgang.Etl.FixedWidth.Parsing;
 
@@ -17,12 +19,14 @@ internal sealed class FieldMapResult
     (
         IReadOnlyList<FieldDescriptor> descriptors,
         int expectedLineWidth,
-        int totalColumnCount
+        int totalColumnCount,
+        Func<object> factory
     )
     {
         Descriptors = descriptors;
         ExpectedLineWidth = expectedLineWidth;
         TotalColumnCount = totalColumnCount;
+        Factory = factory;
     }
 
 
@@ -52,4 +56,32 @@ internal sealed class FieldMapResult
     /// <c>delimiter.Length * (TotalColumnCount - 1)</c>.
     /// </summary>
     internal int TotalColumnCount { get; }
+
+
+
+    /// <summary>
+    /// Compiled factory delegate that creates a new instance of the record type
+    /// via <see cref="Expression.New(Type)"/>, avoiding the overhead of
+    /// <see cref="Activator.CreateInstance{T}"/> on every record.
+    /// </summary>
+    internal Func<object> Factory { get; }
+
+
+
+    // ------------------------------------------------------------------
+    // Factory compilation
+    // ------------------------------------------------------------------
+
+    /// <summary>
+    /// Compiles a factory delegate: () => (object)new T()
+    /// </summary>
+    internal static Func<object> CompileFactory(Type type)
+    {
+        var body = Expression.Convert
+        (
+            Expression.New(type),
+            typeof(object)
+        );
+        return Expression.Lambda<Func<object>>(body).Compile();
+    }
 }
