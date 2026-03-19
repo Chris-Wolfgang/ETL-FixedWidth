@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Wolfgang.Etl.FixedWidth.Exceptions;
@@ -163,6 +164,172 @@ internal static class FixedWidthLineParser
         }
 
         return segments.ToArray();
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // Direct-write formatting — writes segments directly to a TextWriter
+    // to avoid intermediate List<string> and Join allocations.
+    // ------------------------------------------------------------------
+
+    /// <summary>
+    /// Writes a data record directly to <paramref name="writer"/>, one field at a time.
+    /// Skipped-column gaps are filled with spaces, and <paramref name="fieldDelimiter"/>
+    /// is inserted between adjacent columns when non-null.
+    /// </summary>
+    /// <exception cref="FieldOverflowException"></exception>
+    internal static void WriteRecord<T>
+    (
+        TextWriter writer,
+        T record,
+        FieldMapResult fieldMap,
+        Func<object, FieldContext, string> converter,
+        string? fieldDelimiter
+    )
+    {
+        var descriptors = fieldMap.Descriptors;
+        var hasDelimiter = !string.IsNullOrEmpty(fieldDelimiter);
+        var currentPosition = 0;
+
+        for (var i = 0; i < descriptors.Count; i++)
+        {
+            var descriptor = descriptors[i];
+
+            if (descriptor.Start > currentPosition)
+            {
+                var skipWidth = descriptor.Start - currentPosition;
+                if (hasDelimiter)
+                {
+                    writer.Write(fieldDelimiter);
+                }
+                if (skipWidth > 0)
+                {
+                    writer.Write(new string(' ', skipWidth));
+                }
+            }
+            else if (i > 0 && hasDelimiter)
+            {
+                writer.Write(fieldDelimiter);
+            }
+
+            writer.Write(FormatSegment(record, descriptor, converter));
+            currentPosition = descriptor.Start + descriptor.Attribute.Length;
+        }
+
+        if (fieldMap.ExpectedLineWidth > currentPosition)
+        {
+            var trailingWidth = fieldMap.ExpectedLineWidth - currentPosition;
+            if (trailingWidth > 0)
+            {
+                writer.Write(new string(' ', trailingWidth));
+            }
+        }
+    }
+
+
+
+    /// <summary>
+    /// Writes a header line directly to <paramref name="writer"/>.
+    /// </summary>
+    /// <exception cref="FieldOverflowException"></exception>
+    internal static void WriteHeader
+    (
+        TextWriter writer,
+        FieldMapResult fieldMap,
+        Func<string, FieldContext, string> headerConverter,
+        string? fieldDelimiter
+    )
+    {
+        var descriptors = fieldMap.Descriptors;
+        var hasDelimiter = !string.IsNullOrEmpty(fieldDelimiter);
+        var currentPosition = 0;
+
+        for (var i = 0; i < descriptors.Count; i++)
+        {
+            var descriptor = descriptors[i];
+
+            if (descriptor.Start > currentPosition)
+            {
+                var skipWidth = descriptor.Start - currentPosition;
+                if (hasDelimiter)
+                {
+                    writer.Write(fieldDelimiter);
+                }
+                if (skipWidth > 0)
+                {
+                    writer.Write(new string(' ', skipWidth));
+                }
+            }
+            else if (i > 0 && hasDelimiter)
+            {
+                writer.Write(fieldDelimiter);
+            }
+
+            writer.Write(FormatHeaderSegment(descriptor, headerConverter));
+            currentPosition = descriptor.Start + descriptor.Attribute.Length;
+        }
+
+        if (fieldMap.ExpectedLineWidth > currentPosition)
+        {
+            var trailingWidth = fieldMap.ExpectedLineWidth - currentPosition;
+            if (trailingWidth > 0)
+            {
+                writer.Write(new string(' ', trailingWidth));
+            }
+        }
+    }
+
+
+
+    /// <summary>
+    /// Writes a separator line directly to <paramref name="writer"/>.
+    /// </summary>
+    internal static void WriteSeparator
+    (
+        TextWriter writer,
+        FieldMapResult fieldMap,
+        char separatorChar,
+        string? fieldDelimiter
+    )
+    {
+        var descriptors = fieldMap.Descriptors;
+        var hasDelimiter = !string.IsNullOrEmpty(fieldDelimiter);
+        var currentPosition = 0;
+
+        for (var i = 0; i < descriptors.Count; i++)
+        {
+            var descriptor = descriptors[i];
+
+            if (descriptor.Start > currentPosition)
+            {
+                var skipWidth = descriptor.Start - currentPosition;
+                if (hasDelimiter)
+                {
+                    writer.Write(fieldDelimiter);
+                }
+                if (skipWidth > 0)
+                {
+                    writer.Write(new string(separatorChar, skipWidth));
+                }
+            }
+            else if (i > 0 && hasDelimiter)
+            {
+                writer.Write(fieldDelimiter);
+            }
+
+            writer.Write(new string(separatorChar, descriptor.Attribute.Length));
+            currentPosition = descriptor.Start + descriptor.Attribute.Length;
+        }
+
+        if (fieldMap.ExpectedLineWidth > currentPosition)
+        {
+            var trailingWidth = fieldMap.ExpectedLineWidth - currentPosition;
+            if (trailingWidth > 0)
+            {
+                writer.Write(new string(separatorChar, trailingWidth));
+            }
+        }
     }
 
 
