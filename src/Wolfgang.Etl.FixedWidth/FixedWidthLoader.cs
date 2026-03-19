@@ -157,7 +157,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     )
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
-        _writer = new StreamWriter(stream, encoding: null, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _writer = new StreamWriter(stream, encoding: System.Text.Encoding.UTF8, bufferSize: DefaultBufferSize, leaveOpen: true);
         _ownsWriter = true;
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
@@ -190,7 +190,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     )
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
-        _writer = new StreamWriter(stream, encoding: null, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _writer = new StreamWriter(stream, encoding: System.Text.Encoding.UTF8, bufferSize: DefaultBufferSize, leaveOpen: true);
         _ownsWriter = true;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
         _logger = logger ?? (ILogger)NullLogger.Instance;
