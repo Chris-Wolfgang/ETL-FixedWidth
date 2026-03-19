@@ -190,7 +190,6 @@ internal static class FixedWidthLineParser
         string? fieldDelimiter = null,
         Func<string, FieldContext, object>? valueParser = null
     )
-        where T : new()
     {
         valueParser ??= FixedWidthConverter.DefaultParser;
         var delimiterWidth = string.IsNullOrEmpty(fieldDelimiter)
@@ -217,7 +216,7 @@ internal static class FixedWidthLineParser
             );
         }
 
-        var record = new T();
+        var record = (T)fieldMap.Factory();
 
         foreach (var descriptor in fieldMap.Descriptors)
         {
@@ -262,7 +261,7 @@ internal static class FixedWidthLineParser
         try
         {
             var converted = valueParser(value, descriptor.Context);
-            prop.SetValue(record, converted);
+            descriptor.Setter(record!, converted);
         }
         catch (Exception ex) when (!(ex is MalformedLineException))
         {
@@ -295,7 +294,7 @@ internal static class FixedWidthLineParser
     {
         var attr = descriptor.Attribute;
         var prop = descriptor.Property;
-        var text = converter(prop.GetValue(record)!, descriptor.Context);
+        var text = converter(descriptor.Getter(record!)!, descriptor.Context);
 
         // Safety net — throw if the converter didn't honor the field width contract.
         if (text.Length > attr.Length)

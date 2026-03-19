@@ -912,7 +912,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
                 return false;
 
             case BlankLineHandling.ReturnDefault:
-                defaultRecord = new TRecord();
+                defaultRecord = (TRecord)fieldMap.Factory();
                 return true;
 
             case BlankLineHandling.ThrowException:
@@ -982,7 +982,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
                 case MalformedLineHandling.ReturnDefault:
                     // Cannot yield inside catch — caller handles the yield and increment.
-                    record = new TRecord();
+                    record = (TRecord)fieldMap.Factory();
                     return true;
 
                 case MalformedLineHandling.ThrowException:
