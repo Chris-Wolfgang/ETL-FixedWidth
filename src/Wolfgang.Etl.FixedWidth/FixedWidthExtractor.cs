@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
@@ -555,6 +556,12 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 #endif
 #pragma warning restore MA0051
     {
+        // Use synchronous ReadLine to avoid async state machine overhead per line.
+        // The TextReader/StreamReader already buffers internally, so async I/O adds
+        // cost without benefit for file-based and memory-based streams.
+        // The method remains async IAsyncEnumerable as required by the base class.
+        await Task.CompletedTask.ConfigureAwait(false);
+
         var fieldMap = FieldMap.GetResult<TRecord>();
         long dataLinesSkipped = 0;
         var separatorLineNo = HeaderLineCount > 0 && FieldSeparator.HasValue
@@ -563,11 +570,10 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
         LogExtractionStarted(fieldMap);
 
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
-        while (await _reader.ReadLineAsync(token).ConfigureAwait(false) is { } line)
-#else
-        while (await _reader.ReadLineAsync().ConfigureAwait(false) is { } line)
-#endif
+        string? line;
+#pragma warning disable CA1849, VSTHRD103 // ReadLine is intentionally synchronous — see comment above
+        while ((line = _reader.ReadLine()) != null)
+#pragma warning restore CA1849, VSTHRD103
         {
             token.ThrowIfCancellationRequested();
 
