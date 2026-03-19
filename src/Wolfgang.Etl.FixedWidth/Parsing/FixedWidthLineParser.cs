@@ -427,7 +427,11 @@ internal static class FixedWidthLineParser
 
         try
         {
-            var converted = valueParser(value, descriptor.Context);
+            // Fast path: when using the default parser, pass the cached TypeConverter
+            // to avoid TypeDescriptor.GetConverter on every field of every record.
+            var converted = ReferenceEquals(valueParser, FixedWidthConverter.DefaultParser)
+                ? FixedWidthConverter.ParseValue(value, descriptor.Context.PropertyType, descriptor.Context.Format, descriptor.TypeConverter)
+                : valueParser(value, descriptor.Context);
             descriptor.Setter(record!, converted);
         }
         catch (Exception ex) when (!(ex is MalformedLineException))

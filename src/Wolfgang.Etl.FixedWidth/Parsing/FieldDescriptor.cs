@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 using Wolfgang.Etl.FixedWidth.Attributes;
@@ -39,6 +40,7 @@ internal sealed class FieldDescriptor
         );
         Getter = CompileGetter(property);
         Setter = CompileSetter(property);
+        TypeConverter = TypeDescriptor.GetConverter(property.PropertyType);
     }
 
 
@@ -91,6 +93,15 @@ internal sealed class FieldDescriptor
     /// reflection overhead on every record.
     /// </summary>
     internal Action<object, object?> Setter { get; }
+
+
+
+    /// <summary>
+    /// Cached <see cref="System.ComponentModel.TypeConverter"/> for the property type,
+    /// resolved once via <see cref="TypeDescriptor.GetConverter(Type)"/> to avoid
+    /// repeated lookups on every record.
+    /// </summary>
+    internal TypeConverter TypeConverter { get; }
 
 
 
