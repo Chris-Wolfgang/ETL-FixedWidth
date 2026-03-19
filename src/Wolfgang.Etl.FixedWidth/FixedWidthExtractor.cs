@@ -171,7 +171,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     )
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
-        _reader = new StreamReader(stream, encoding: null, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _reader = new StreamReader(stream, encoding: System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
         _ownsReader = true;
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
@@ -204,7 +204,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     )
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
-        _reader = new StreamReader(stream, encoding: null, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _reader = new StreamReader(stream, encoding: System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
         _ownsReader = true;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
         _logger = logger ?? (ILogger)NullLogger.Instance;

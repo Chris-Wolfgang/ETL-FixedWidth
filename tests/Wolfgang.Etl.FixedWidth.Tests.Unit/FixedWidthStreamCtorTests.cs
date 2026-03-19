@@ -146,7 +146,7 @@ public class FixedWidthLoaderStreamCtorTests
 
         // Verify content is flushed to the stream without needing manual flush.
         stream.Position = 0;
-        using var reader = new StreamReader(stream, leaveOpen: true);
+        using var reader = new StreamReader(stream, encoding: System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: 1024, leaveOpen: true);
         var content = await reader.ReadToEndAsync();
         Assert.Contains("John", content, StringComparison.Ordinal);
 
