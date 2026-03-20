@@ -298,7 +298,8 @@ public static class FixedWidthConverter
     (
         ReadOnlyMemory<char> text,
         Type targetType,
-        string? format
+        string? format,
+        TypeConverter? cachedConverter = null
     )
     {
         var span = text.Span;
@@ -335,7 +336,7 @@ public static class FixedWidthConverter
         }
 
         var str = text.ToString();
-        var converter = TypeDescriptor.GetConverter(targetType);
+        var converter = cachedConverter ?? TypeDescriptor.GetConverter(targetType);
         if (converter.CanConvertFrom(typeof(string)))
         {
             return converter.ConvertFromInvariantString(str)!;
