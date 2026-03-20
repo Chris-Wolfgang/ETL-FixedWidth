@@ -73,13 +73,25 @@ internal sealed class FieldMapResult
     // ------------------------------------------------------------------
 
     /// <summary>
-    /// Compiles a factory delegate: () => (object)new T()
+    /// Compiles a factory delegate: () => (object)new T().
+    /// Returns a throwing delegate if the type has no public parameterless constructor
+    /// (e.g. when used by the loader which never needs to instantiate records).
     /// </summary>
     internal static Func<object> CompileFactory(Type type)
     {
+        var ctor = type.GetConstructor(Type.EmptyTypes);
+        if (ctor == null)
+        {
+            return () => throw new InvalidOperationException
+            (
+                $"Type '{type.FullName}' has no public parameterless constructor. " +
+                "Records must have a public parameterless constructor for extraction."
+            );
+        }
+
         var body = Expression.Convert
         (
-            Expression.New(type),
+            Expression.New(ctor),
             typeof(object)
         );
         return Expression.Lambda<Func<object>>(body).Compile();
