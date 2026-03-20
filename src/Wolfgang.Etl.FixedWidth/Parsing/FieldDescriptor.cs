@@ -38,7 +38,9 @@ internal sealed class FieldDescriptor
             attribute.Format,
             attribute.Header ?? property.Name
         );
-        Getter = CompileGetter(property);
+        Getter = property.GetMethod != null && property.GetMethod.IsPublic
+            ? CompileGetter(property)
+            : null;
         Setter = CompileSetter(property);
         TypeConverter = TypeDescriptor.GetConverter(property.PropertyType);
     }
@@ -83,7 +85,7 @@ internal sealed class FieldDescriptor
     /// Replaces <see cref="PropertyInfo.GetValue(object)"/> to avoid
     /// reflection overhead on every record.
     /// </summary>
-    internal Func<object, object?> Getter { get; }
+    internal Func<object, object?>? Getter { get; }
 
 
 

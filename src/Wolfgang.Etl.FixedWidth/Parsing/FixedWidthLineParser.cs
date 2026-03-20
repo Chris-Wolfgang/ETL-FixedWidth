@@ -176,7 +176,8 @@ internal static class FixedWidthLineParser
     /// <summary>
     /// Writes a data record directly to <paramref name="writer"/>, one field at a time.
     /// Skipped-column gaps are filled with spaces, and <paramref name="fieldDelimiter"/>
-    /// is inserted between adjacent columns when non-null.
+    /// is inserted between adjacent logical columns (including skip columns) to match
+    /// the parser's <see cref="FieldDescriptor.AbsoluteColumnIndex"/> semantics.
     /// </summary>
     /// <exception cref="FieldOverflowException"></exception>
     internal static void WriteRecord<T>
@@ -191,40 +192,24 @@ internal static class FixedWidthLineParser
         var descriptors = fieldMap.Descriptors;
         var hasDelimiter = !string.IsNullOrEmpty(fieldDelimiter);
         var currentPosition = 0;
+        var nextColumnIndex = 0;
 
         for (var i = 0; i < descriptors.Count; i++)
         {
             var descriptor = descriptors[i];
+            WriteGapDelimiters(writer, descriptor, fieldDelimiter, hasDelimiter, ref nextColumnIndex);
 
             if (descriptor.Start > currentPosition)
             {
-                var skipWidth = descriptor.Start - currentPosition;
-                if (hasDelimiter)
-                {
-                    writer.Write(fieldDelimiter);
-                }
-                if (skipWidth > 0)
-                {
-                    writer.Write(new string(' ', skipWidth));
-                }
-            }
-            else if (i > 0 && hasDelimiter)
-            {
-                writer.Write(fieldDelimiter);
+                writer.Write(new string(' ', descriptor.Start - currentPosition));
             }
 
             writer.Write(FormatSegment(record, descriptor, converter));
             currentPosition = descriptor.Start + descriptor.Attribute.Length;
         }
 
-        if (fieldMap.ExpectedLineWidth > currentPosition)
-        {
-            var trailingWidth = fieldMap.ExpectedLineWidth - currentPosition;
-            if (trailingWidth > 0)
-            {
-                writer.Write(new string(' ', trailingWidth));
-            }
-        }
+        WriteTrailingDelimiters(writer, fieldMap, fieldDelimiter, hasDelimiter, nextColumnIndex);
+        WriteTrailingPadding(writer, fieldMap, currentPosition, ' ');
     }
 
 
@@ -244,40 +229,24 @@ internal static class FixedWidthLineParser
         var descriptors = fieldMap.Descriptors;
         var hasDelimiter = !string.IsNullOrEmpty(fieldDelimiter);
         var currentPosition = 0;
+        var nextColumnIndex = 0;
 
         for (var i = 0; i < descriptors.Count; i++)
         {
             var descriptor = descriptors[i];
+            WriteGapDelimiters(writer, descriptor, fieldDelimiter, hasDelimiter, ref nextColumnIndex);
 
             if (descriptor.Start > currentPosition)
             {
-                var skipWidth = descriptor.Start - currentPosition;
-                if (hasDelimiter)
-                {
-                    writer.Write(fieldDelimiter);
-                }
-                if (skipWidth > 0)
-                {
-                    writer.Write(new string(' ', skipWidth));
-                }
-            }
-            else if (i > 0 && hasDelimiter)
-            {
-                writer.Write(fieldDelimiter);
+                writer.Write(new string(' ', descriptor.Start - currentPosition));
             }
 
             writer.Write(FormatHeaderSegment(descriptor, headerConverter));
             currentPosition = descriptor.Start + descriptor.Attribute.Length;
         }
 
-        if (fieldMap.ExpectedLineWidth > currentPosition)
-        {
-            var trailingWidth = fieldMap.ExpectedLineWidth - currentPosition;
-            if (trailingWidth > 0)
-            {
-                writer.Write(new string(' ', trailingWidth));
-            }
-        }
+        WriteTrailingDelimiters(writer, fieldMap, fieldDelimiter, hasDelimiter, nextColumnIndex);
+        WriteTrailingPadding(writer, fieldMap, currentPosition, ' ');
     }
 
 
@@ -296,38 +265,115 @@ internal static class FixedWidthLineParser
         var descriptors = fieldMap.Descriptors;
         var hasDelimiter = !string.IsNullOrEmpty(fieldDelimiter);
         var currentPosition = 0;
+        var nextColumnIndex = 0;
 
         for (var i = 0; i < descriptors.Count; i++)
         {
             var descriptor = descriptors[i];
+            WriteGapDelimiters(writer, descriptor, fieldDelimiter, hasDelimiter, ref nextColumnIndex);
 
             if (descriptor.Start > currentPosition)
             {
-                var skipWidth = descriptor.Start - currentPosition;
-                if (hasDelimiter)
-                {
-                    writer.Write(fieldDelimiter);
-                }
-                if (skipWidth > 0)
-                {
-                    writer.Write(new string(separatorChar, skipWidth));
-                }
-            }
-            else if (i > 0 && hasDelimiter)
-            {
-                writer.Write(fieldDelimiter);
+                writer.Write(new string(separatorChar, descriptor.Start - currentPosition));
             }
 
             writer.Write(new string(separatorChar, descriptor.Attribute.Length));
             currentPosition = descriptor.Start + descriptor.Attribute.Length;
         }
 
+        WriteTrailingDelimiters(writer, fieldMap, fieldDelimiter, hasDelimiter, nextColumnIndex);
+        WriteTrailingPadding(writer, fieldMap, currentPosition, separatorChar);
+    }
+
+
+
+    /// <summary>
+    /// Writes delimiters for all logical columns (including skip columns) between
+    /// the last written column and the current descriptor. Aligns with the parser's
+    /// <see cref="FieldDescriptor.AbsoluteColumnIndex"/> semantics.
+    /// </summary>
+    private static void WriteGapDelimiters
+    (
+        TextWriter writer,
+        FieldDescriptor descriptor,
+        string? fieldDelimiter,
+        bool hasDelimiter,
+        ref int nextColumnIndex
+    )
+    {
+        if (!hasDelimiter)
+        {
+            return;
+        }
+
+        // Emit a delimiter for each logical column between the previous and current
+        var targetColumnIndex = descriptor.AbsoluteColumnIndex;
+        while (nextColumnIndex < targetColumnIndex)
+        {
+            if (nextColumnIndex > 0)
+            {
+                writer.Write(fieldDelimiter);
+            }
+            nextColumnIndex++;
+        }
+
+        // Emit the delimiter before this descriptor's column (unless it's the first)
+        if (targetColumnIndex > 0)
+        {
+            writer.Write(fieldDelimiter);
+        }
+
+        nextColumnIndex = targetColumnIndex + 1;
+    }
+
+
+
+    /// <summary>
+    /// Writes delimiters for any trailing skip columns after the last field descriptor.
+    /// </summary>
+    private static void WriteTrailingDelimiters
+    (
+        TextWriter writer,
+        FieldMapResult fieldMap,
+        string? fieldDelimiter,
+        bool hasDelimiter,
+        int nextColumnIndex
+    )
+    {
+        if (!hasDelimiter || fieldMap.TotalColumnCount <= 0)
+        {
+            return;
+        }
+
+        while (nextColumnIndex < fieldMap.TotalColumnCount)
+        {
+            if (nextColumnIndex > 0)
+            {
+                writer.Write(fieldDelimiter);
+            }
+            nextColumnIndex++;
+        }
+    }
+
+
+
+    /// <summary>
+    /// Writes trailing padding to fill any remaining width after the last field.
+    /// </summary>
+    private static void WriteTrailingPadding
+    (
+        TextWriter writer,
+        FieldMapResult fieldMap,
+        int currentPosition,
+        char padChar
+    )
+    {
         if (fieldMap.ExpectedLineWidth > currentPosition)
         {
             var trailingWidth = fieldMap.ExpectedLineWidth - currentPosition;
             if (trailingWidth > 0)
             {
-                writer.Write(new string(separatorChar, trailingWidth));
+                writer.Write(new string(padChar, trailingWidth));
             }
         }
     }
@@ -456,6 +502,9 @@ internal static class FixedWidthLineParser
     /// Formats a single data field value into a padded string segment.
     /// </summary>
     /// <exception cref="FieldOverflowException"></exception>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the property has no public getter.
+    /// </exception>
     private static string FormatSegment<T>
     (
         T record,
@@ -465,7 +514,11 @@ internal static class FixedWidthLineParser
     {
         var attr = descriptor.Attribute;
         var prop = descriptor.Property;
-        var text = converter(descriptor.Getter(record!)!, descriptor.Context);
+        var getter = descriptor.Getter
+            ?? throw new InvalidOperationException(
+                $"Property '{prop.Name}' has no public getter. " +
+                "The loader requires readable properties to format field values.");
+        var text = converter(getter(record!)!, descriptor.Context);
 
         // Safety net — throw if the converter didn't honor the field width contract.
         if (text.Length > attr.Length)

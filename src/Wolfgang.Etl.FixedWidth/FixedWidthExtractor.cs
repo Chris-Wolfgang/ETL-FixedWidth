@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
@@ -548,19 +547,21 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
     /// <inheritdoc/>
 #pragma warning disable MA0051 // async iterator methods cannot delegate 'yield return' to sub-methods
+#pragma warning disable CS1998 // async method lacks 'await' — intentionally synchronous; see comment below
     protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync([EnumeratorCancellation] CancellationToken token)
 #else
     /// <inheritdoc/>
 #pragma warning disable MA0051 // async iterator methods cannot delegate 'yield return' to sub-methods
+#pragma warning disable CS1998 // async method lacks 'await' — intentionally synchronous; see comment below
     protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync([System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
 #endif
+#pragma warning restore CS1998
 #pragma warning restore MA0051
     {
         // Use synchronous ReadLine to avoid async state machine overhead per line.
         // The TextReader/StreamReader already buffers internally, so async I/O adds
         // cost without benefit for file-based and memory-based streams.
         // The method remains async IAsyncEnumerable as required by the base class.
-        await Task.CompletedTask.ConfigureAwait(false);
 
         var fieldMap = FieldMap.GetResult<TRecord>();
         long dataLinesSkipped = 0;
@@ -569,6 +570,8 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
             : -1;
 
         LogExtractionStarted(fieldMap);
+
+        token.ThrowIfCancellationRequested();
 
         string? line;
 #pragma warning disable CA1849, VSTHRD103 // ReadLine is intentionally synchronous — see comment above
