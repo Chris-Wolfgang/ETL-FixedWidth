@@ -97,9 +97,11 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// </summary>
     /// <param name="reader">
     /// The <see cref="TextReader"/> to read fixed-width records from. This can be a
-    /// <see cref="StreamReader"/> wrapping a file or network stream, a
+    /// <see cref="StreamReader"/> wrapping a file stream (local or network share), a
     /// <see cref="StringReader"/> for in-memory content, or any other <see cref="TextReader"/>
-    /// implementation. The caller is responsible for the reader's lifetime.
+    /// implementation. Reading is performed synchronously for throughput; callers with
+    /// slow or non-buffered sources should pre-buffer into a <see cref="StringReader"/>.
+    /// The caller is responsible for the reader's lifetime.
     /// </param>
     /// <param name="logger">
     /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
