@@ -4,6 +4,8 @@
   href: introduction.md
 - name: Getting Started
   href: getting-started.md
+- name: Examples
+  href: examples.md
 - name: Project website
   href: 'https://github.com/Chris-Wolfgang/ETL-FixedWidth'
 
