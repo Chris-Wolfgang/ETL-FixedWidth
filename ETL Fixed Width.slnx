@@ -39,7 +39,17 @@
   <Folder Name="/benchmarks/">
     <Project Path="benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks.csproj" />
   </Folder>
-  <Folder Name="/examples/" />
+  <Folder Name="/examples/">
+    <Project Path="examples/BasicExtraction/BasicExtraction.csproj" />
+    <Project Path="examples/BasicLoading/BasicLoading.csproj" />
+    <Project Path="examples/CustomParsersConverters/CustomParsersConverters.csproj" />
+    <Project Path="examples/ErrorHandling/ErrorHandling.csproj" />
+    <Project Path="examples/FieldDelimiter/FieldDelimiter.csproj" />
+    <Project Path="examples/HeadersAndSeparators/HeadersAndSeparators.csproj" />
+    <Project Path="examples/ProgressReporting/ProgressReporting.csproj" />
+    <Project Path="examples/RoundTrip/RoundTrip.csproj" />
+    <Project Path="examples/SkipAndMax/SkipAndMax.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Wolfgang.Etl.FixedWidth/Wolfgang.Etl.FixedWidth.csproj" />
   </Folder>
