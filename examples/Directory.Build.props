@@ -1,0 +1,12 @@
+<Project>
+  <!--
+    Relaxed analyzer rules for example projects.
+    Examples use top-level statements with record types in Program.cs,
+    which triggers MA0048 (file name must match type name) and
+    S3903 (type must be in a namespace). CA2007 (ConfigureAwait) is
+    not meaningful in console apps.
+  -->
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);MA0048;S3903;CA2007</NoWarn>
+  </PropertyGroup>
+</Project>
