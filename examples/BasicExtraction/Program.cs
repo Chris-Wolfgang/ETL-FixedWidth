@@ -2,21 +2,22 @@
 // BasicExtraction Example
 // ---------------------------------------------------------------------------
 //
-// This example demonstrates the simplest use case for the FixedWidthExtractor:
-// reading fixed-width text data and yielding strongly typed records.
+// This example demonstrates the FixedWidthExtractor as part of an ETL pipeline.
+// The extractor reads fixed-width text data and yields strongly typed records,
+// which then flow through a TestTransformer and into a TestLoader from the
+// Wolfgang.Etl.TestKit package.
 //
 // Key concepts covered:
 //   - Defining a record class with [FixedWidthField] attributes
 //   - Column indexing (zero-based) and field lengths
 //   - Right-alignment and custom pad characters for numeric fields
-//   - TrimValue behavior (enabled by default — leading/trailing whitespace
-//     and pad characters are trimmed from extracted values)
-//   - Using StringReader as a stand-in for FileStream
-//   - Iterating records with "await foreach"
-//   - Inspecting the extraction report afterward
+//   - Composing an ETL pipeline: Extractor -> Transformer -> Loader
+//   - Using TestTransformer and TestLoader as stand-ins for real components
+//   - Streaming architecture: records flow one at a time through the pipeline
 //
-// In production, you would typically wrap a FileStream or StreamReader
-// instead of a StringReader. The extractor accepts any TextReader.
+// In production, you would replace the TestTransformer with a real transformer
+// that applies business logic, and the TestLoader with a loader that writes to
+// a database, API, or file. The composition pattern remains the same.
 // ---------------------------------------------------------------------------
 
 using System;
@@ -26,6 +27,7 @@ using System.Threading.Tasks;
 using Wolfgang.Etl.FixedWidth;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Enums;
+using Wolfgang.Etl.TestKit;
 
 // ---------------------------------------------------------------------------
 // Step 1: Prepare the fixed-width input data.
@@ -44,38 +46,56 @@ var inputData =
     "Bob       Baker     042\n" +
     "Charlie   Clark     033";
 
-// StringReader implements TextReader, so the extractor can consume it directly.
-// When using a TextReader constructor, the caller owns the reader's lifetime —
-// the extractor does not dispose it.
 var reader = new StringReader(inputData);
 
 // ---------------------------------------------------------------------------
-// Step 2: Create the extractor.
+// Step 2: Create the pipeline components.
 //
-// The two generic type parameters are:
-//   - TRecord   : the POCO type whose properties map to fixed-width columns.
-//   - TProgress : the progress report type. Use FixedWidthReport for the
-//                 built-in report that includes CurrentItemCount,
-//                 CurrentSkippedItemCount, and CurrentLineNumber.
+// The pipeline uses three components:
+//   - FixedWidthExtractor: parses fixed-width text into PersonRecord objects
+//   - TestTransformer:     a pass-through transformer from Wolfgang.Etl.TestKit
+//                          (in production, this would apply business logic)
+//   - TestLoader:          an in-memory loader from Wolfgang.Etl.TestKit that
+//                          collects records for inspection (in production, this
+//                          would write to a database, file, or API)
 // ---------------------------------------------------------------------------
 
 var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>(reader);
+var transformer = new TestTransformer<PersonRecord>();
+var loader = new TestLoader<PersonRecord>(collectItems: true);
 
 // ---------------------------------------------------------------------------
-// Step 3: Extract records using "await foreach".
+// Step 3: Run the pipeline.
 //
-// ExtractAsync() returns an IAsyncEnumerable<PersonRecord>. Each iteration
-// reads one line, parses it according to the [FixedWidthField] attributes,
-// and yields a populated PersonRecord instance.
+// The three stages are composed using IAsyncEnumerable<T>:
 //
-// A CancellationToken can be passed to ExtractAsync() to support cooperative
-// cancellation in long-running extractions.
+//   extractor.ExtractAsync(token)          -> IAsyncEnumerable<PersonRecord>
+//   transformer.TransformAsync(source)     -> IAsyncEnumerable<PersonRecord>
+//   loader.LoadAsync(source, token)        -> Task (consumes the entire stream)
+//
+// Records flow one at a time from extractor through the transformer to the
+// loader. No intermediate list or buffer is needed.
 // ---------------------------------------------------------------------------
 
-Console.WriteLine("Extracted records:");
+var token = CancellationToken.None;
+
+await loader.LoadAsync
+(
+    transformer.TransformAsync(extractor.ExtractAsync(token), token),
+    token
+);
+
+// ---------------------------------------------------------------------------
+// Step 4: Inspect the results.
+//
+// The TestLoader's GetCollectedItems() returns a snapshot of all records that
+// flowed through the pipeline. Each component also tracks its own item count.
+// ---------------------------------------------------------------------------
+
+Console.WriteLine("Records that flowed through the pipeline:");
 Console.WriteLine(new string('-', 40));
 
-await foreach (var person in extractor.ExtractAsync(CancellationToken.None))
+foreach (var person in loader.GetCollectedItems()!)
 {
     Console.WriteLine
     (
@@ -83,17 +103,10 @@ await foreach (var person in extractor.ExtractAsync(CancellationToken.None))
     );
 }
 
-// ---------------------------------------------------------------------------
-// Step 4: Inspect the final report.
-//
-// After extraction completes, the extractor's CurrentItemCount property
-// reflects how many records were yielded. You can also call
-// GetProgressReport() (internal, used by tests) or simply read the
-// public properties on the extractor.
-// ---------------------------------------------------------------------------
-
 Console.WriteLine(new string('-', 40));
-Console.WriteLine($"Total records extracted: {extractor.CurrentItemCount}");
+Console.WriteLine($"Records extracted:   {extractor.CurrentItemCount}");
+Console.WriteLine($"Records transformed: {transformer.CurrentItemCount}");
+Console.WriteLine($"Records loaded:      {loader.CurrentItemCount}");
 
 // ---------------------------------------------------------------------------
 // PersonRecord — the POCO class with [FixedWidthField] attributes.
