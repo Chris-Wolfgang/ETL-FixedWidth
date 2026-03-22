@@ -2,44 +2,42 @@
 // BasicLoading Example
 // ---------------------------------------------------------------------------
 //
-// This example demonstrates the simplest use case for the FixedWidthLoader:
-// writing strongly typed records to a fixed-width text output.
+// This example demonstrates the FixedWidthLoader as part of an ETL pipeline.
+// A TestExtractor from Wolfgang.Etl.TestKit provides the source data, which
+// flows through a TestTransformer and into the FixedWidthLoader for output.
 //
 // Key concepts covered:
 //   - Defining a record class with [FixedWidthField] attributes
 //   - Creating a FixedWidthLoader with a TextWriter (StringWriter here)
-//   - Converting an IEnumerable<T> to IAsyncEnumerable<T> for the loader
+//   - Composing an ETL pipeline: Extractor -> Transformer -> Loader
+//   - Using TestExtractor and TestTransformer as stand-ins for real components
 //   - Padding, alignment, and pad character behavior during writes
 //   - Ownership semantics: the loader does NOT dispose a caller-owned writer
-//   - Strict vs Truncate converter (the default is Strict — values that
-//     exceed the field length throw a FieldOverflowException)
-//   - Using StringWriter as a stand-in for FileStream
+//   - Streaming architecture: records flow one at a time through the pipeline
 //
-// In production, you would typically write to a FileStream:
-//
-//   await using var stream = File.OpenWrite("people.dat");
-//   using var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>(stream);
-//
-// The Stream constructor creates an internal StreamWriter with a 64 KB buffer
-// for improved throughput. The caller retains ownership of the Stream.
+// In production, you would replace the TestExtractor with a real extractor
+// (e.g., a database reader or API client) and the TestTransformer with a
+// transformer that applies business logic. The composition pattern remains
+// the same.
 // ---------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Wolfgang.Etl.FixedWidth;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Enums;
+using Wolfgang.Etl.TestKit;
 
 // ---------------------------------------------------------------------------
-// Step 1: Create the source data.
+// Step 1: Create the source data using a TestExtractor.
 //
-// The loader consumes an IAsyncEnumerable<TRecord>. Since we have an
-// in-memory list, we need a small helper to convert it. In a real pipeline,
-// the IAsyncEnumerable would typically come from an extractor or transformer.
+// The TestExtractor is an in-memory extractor from Wolfgang.Etl.TestKit. It
+// wraps an IEnumerable<T> and yields items as an IAsyncEnumerable<T>, just
+// like a real extractor would. In production, this would be replaced by a
+// real extractor that reads from a database, API, or another file format.
 // ---------------------------------------------------------------------------
 
 var people = new List<PersonRecord>
@@ -49,37 +47,49 @@ var people = new List<PersonRecord>
     new PersonRecord { FirstName = "Charlie", LastName = "Clark",    Age = 33 },
 };
 
+var extractor = new TestExtractor<PersonRecord>(people);
+
 // ---------------------------------------------------------------------------
-// Step 2: Create the loader with a StringWriter.
+// Step 2: Create the transformer and loader.
 //
-// StringWriter implements TextWriter, so the loader can write to it directly.
+// The pipeline uses three components:
+//   - TestExtractor:       provides in-memory source records (see Step 1)
+//   - TestTransformer:     a pass-through transformer from Wolfgang.Etl.TestKit
+//                          (in production, this would apply business logic)
+//   - FixedWidthLoader:    writes records to fixed-width text output
+//
 // When using the TextWriter constructor, ownership semantics are:
 //   - The caller owns the writer's lifetime (the loader does NOT dispose it).
-//   - The caller is responsible for flushing the writer if needed.
 //   - Calling loader.Dispose() is optional and has no effect.
 //
 // When using the Stream constructor instead, the loader creates an internal
-// StreamWriter and Dispose() must be called to release it.
+// StreamWriter with a 64 KB buffer and Dispose() must be called to release it.
 // ---------------------------------------------------------------------------
 
-var writer = new StringWriter();
+var transformer = new TestTransformer<PersonRecord>();
 
+var writer = new StringWriter();
 var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>(writer);
 
 // ---------------------------------------------------------------------------
-// Step 3: Load the records.
+// Step 3: Run the pipeline.
 //
-// LoadAsync consumes the entire async enumerable and writes each record as
-// a fixed-width line to the underlying TextWriter. The method completes
-// when the enumerable is exhausted or MaximumItemCount is reached.
+// The three stages are composed using IAsyncEnumerable<T>:
 //
-// A CancellationToken can be passed to support cooperative cancellation.
+//   extractor.ExtractAsync(token)          -> IAsyncEnumerable<PersonRecord>
+//   transformer.TransformAsync(source)     -> IAsyncEnumerable<PersonRecord>
+//   loader.LoadAsync(source, token)        -> Task (consumes the entire stream)
+//
+// Records flow one at a time from extractor through the transformer to the
+// loader. No intermediate list or buffer is needed.
 // ---------------------------------------------------------------------------
+
+var token = CancellationToken.None;
 
 await loader.LoadAsync
 (
-    ToAsyncEnumerable(people),
-    CancellationToken.None
+    transformer.TransformAsync(extractor.ExtractAsync(token), token),
+    token
 );
 
 // ---------------------------------------------------------------------------
@@ -95,33 +105,9 @@ Console.WriteLine("Fixed-width output:");
 Console.WriteLine(new string('-', 40));
 Console.WriteLine(writer.ToString());
 Console.WriteLine(new string('-', 40));
-Console.WriteLine($"Total records loaded: {loader.CurrentItemCount}");
-
-// ---------------------------------------------------------------------------
-// Helper: Convert IEnumerable<T> to IAsyncEnumerable<T>.
-//
-// The #pragma suppresses CS1998 ("async method lacks await") because this
-// method is intentionally synchronous — it wraps a synchronous enumerable
-// in an async iterator so the loader can consume it.
-//
-// In a real ETL pipeline, the IAsyncEnumerable would typically come from
-// an extractor's ExtractAsync() method, making this helper unnecessary.
-// ---------------------------------------------------------------------------
-
-#pragma warning disable CS1998 // Async method lacks 'await' operators
-static async IAsyncEnumerable<T> ToAsyncEnumerable<T>
-(
-    IEnumerable<T> source,
-    [EnumeratorCancellation] CancellationToken token = default
-)
-{
-    foreach (var item in source)
-    {
-        token.ThrowIfCancellationRequested();
-        yield return item;
-    }
-}
-#pragma warning restore CS1998
+Console.WriteLine($"Records extracted:   {extractor.CurrentItemCount}");
+Console.WriteLine($"Records transformed: {transformer.CurrentItemCount}");
+Console.WriteLine($"Records loaded:      {loader.CurrentItemCount}");
 
 // ---------------------------------------------------------------------------
 // PersonRecord — the POCO class with [FixedWidthField] attributes.
