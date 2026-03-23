@@ -228,11 +228,11 @@ public static class FixedWidthConverter
     /// // Handle "Y"/"N" booleans, fall back to DefaultParser for everything else:
     /// extractor.ValueParser = (text, ctx) =>
     ///     ctx.PropertyType == typeof(bool)
-    ///         ? (object)(text.Trim() == "Y")
+    ///         ? (object)(text.Span.SequenceEqual("Y".AsSpan()))
     ///         : FixedWidthConverter.DefaultParser(text, ctx);
     /// </code>
     /// </example>
-    public static readonly Func<string, FieldContext, object> DefaultParser =
+    public static readonly FixedWidthValueParser DefaultParser =
         (text, context) => ParseValue
         (
             text,
@@ -296,15 +296,17 @@ public static class FixedWidthConverter
 
     internal static object ParseValue
     (
-        string text,
+        ReadOnlyMemory<char> text,
         Type targetType,
-        string? format
+        string? format,
+        TypeConverter? cachedConverter = null
     )
     {
+        var span = text.Span;
         var underlying = Nullable.GetUnderlyingType(targetType);
         if (underlying != null)
         {
-            if (string.IsNullOrEmpty(text))
+            if (span.IsEmpty)
             {
                 return null!;
             }
@@ -318,10 +320,10 @@ public static class FixedWidthConverter
 
         if (targetType == typeof(string))
         {
-            return text;
+            return text.ToString();
         }
 
-        if (string.IsNullOrEmpty(text))
+        if (span.IsEmpty)
         {
             return targetType.IsValueType
                 ? Activator.CreateInstance(targetType)!
@@ -330,18 +332,29 @@ public static class FixedWidthConverter
 
         if (targetType == typeof(DateTime) || targetType == typeof(DateTimeOffset) || targetType == typeof(TimeSpan))
         {
-            return ParseDateTimeValue(text, targetType, format);
+            return ParseDateTimeValue(text.ToString(), targetType, format);
         }
 
-        var converter = TypeDescriptor.GetConverter(targetType);
+#if NET8_0_OR_GREATER
+        // Fast path: parse common numeric and boolean types directly from the span,
+        // avoiding the .ToString() allocation and TypeDescriptor overhead.
+        var numericResult = ParseNumericSpan(span, targetType);
+        if (numericResult != null)
+        {
+            return numericResult;
+        }
+#endif
+
+        var str = text.ToString();
+        var converter = cachedConverter ?? TypeDescriptor.GetConverter(targetType);
         if (converter.CanConvertFrom(typeof(string)))
         {
-            return converter.ConvertFromInvariantString(text)!;
+            return converter.ConvertFromInvariantString(str)!;
         }
 
         return Convert.ChangeType
         (
-            text,
+            str,
             targetType,
             CultureInfo.InvariantCulture
         );
@@ -394,4 +407,49 @@ public static class FixedWidthConverter
             CultureInfo.InvariantCulture
         );
     }
+
+
+
+#if NET8_0_OR_GREATER
+    /// <summary>
+    /// Attempts to parse <paramref name="span"/> directly into a common numeric or
+    /// boolean type using <see cref="ReadOnlySpan{T}"/>-based overloads, avoiding
+    /// the <see cref="string"/> allocation that <see cref="TypeDescriptor"/> requires.
+    /// Returns <see langword="null"/> if <paramref name="targetType"/> is not a
+    /// recognized type, signalling the caller to fall back to the
+    /// <see cref="TypeDescriptor"/> path.
+    /// </summary>
+    private static object? ParseNumericSpan(ReadOnlySpan<char> span, Type targetType)
+    {
+        var style = NumberStyles.Any;
+        var culture = CultureInfo.InvariantCulture;
+
+        if (targetType == typeof(int))
+            return int.Parse(span, style, culture);
+        if (targetType == typeof(long))
+            return long.Parse(span, style, culture);
+        if (targetType == typeof(decimal))
+            return decimal.Parse(span, style, culture);
+        if (targetType == typeof(double))
+            return double.Parse(span, style, culture);
+        if (targetType == typeof(float))
+            return float.Parse(span, style, culture);
+        if (targetType == typeof(short))
+            return short.Parse(span, style, culture);
+        if (targetType == typeof(byte))
+            return byte.Parse(span, style, culture);
+        if (targetType == typeof(bool))
+            return bool.Parse(span);
+        if (targetType == typeof(uint))
+            return uint.Parse(span, style, culture);
+        if (targetType == typeof(ulong))
+            return ulong.Parse(span, style, culture);
+        if (targetType == typeof(ushort))
+            return ushort.Parse(span, style, culture);
+        if (targetType == typeof(sbyte))
+            return sbyte.Parse(span, style, culture);
+
+        return null;
+    }
+#endif
 }

@@ -791,7 +791,7 @@ public class FixedWidthExtractorTests
                     ctx
                 ) =>
                 ctx.PropertyType == typeof(string)
-                    ? text.Trim().ToUpperInvariant()
+                    ? text.ToString().Trim().ToUpperInvariant()
                     : FixedWidthConverter.DefaultParser(text, ctx);
 
         var results = await extractor.ExtractAsync().ToListAsync();

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Parsing;
 
@@ -14,15 +16,24 @@ namespace Wolfgang.Etl.FixedWidth;
 /// </summary>
 /// <remarks>
 /// <para>
-/// The loader writes to any <see cref="TextWriter"/>, making it suitable for files,
-/// in-memory strings, network streams, and console output:
+/// Two construction modes are supported, each with different ownership semantics:
 /// </para>
+/// <list type="bullet">
+///   <item><b>TextWriter constructor</b> — the caller owns the <see cref="TextWriter"/>
+///   lifetime. The loader does not dispose it, and calling <see cref="Dispose()"/> is
+///   optional (no-op). The caller is responsible for flushing the writer.</item>
+///   <item><b>Stream constructor</b> — the loader creates an internal
+///   <see cref="StreamWriter"/> with a 64 KB buffer for improved throughput.
+///   The caller retains ownership of the <see cref="Stream"/> (it is not closed).
+///   The internal writer is flushed automatically at the end of
+///   <c>LoadWorkerAsync</c>, and <see cref="Dispose()"/> must be called to release it.</item>
+/// </list>
 /// <code>
-/// // Write to a file
-/// await using var writer = new StreamWriter("output.txt");
-/// var loader = new FixedWidthLoader&lt;MyRecord, Report&gt;(writer);
+/// // Stream-based (preferred for files — 64 KB buffer reduces syscall overhead):
+/// await using var stream = File.OpenWrite("output.txt");
+/// using var loader = new FixedWidthLoader&lt;MyRecord, Report&gt;(stream);
 ///
-/// // Write to a string (useful for testing or building string output)
+/// // TextWriter-based (caller owns the writer):
 /// var sw = new StringWriter();
 /// var loader = new FixedWidthLoader&lt;MyRecord, Report&gt;(sw);
 /// var result = sw.ToString();
@@ -33,11 +44,8 @@ namespace Wolfgang.Etl.FixedWidth;
 /// loader.FieldSeparator = '-';
 /// loader.FieldDelimiter = " | ";
 /// </code>
-/// <para>
-/// The caller owns the <see cref="TextWriter"/> lifetime. The loader does not dispose it.
-/// </para>
 /// </remarks>
-public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgress>
+public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgress>, IDisposable
     where TRecord : notnull
     where TProgress : notnull
 {
@@ -45,7 +53,16 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     // Fields
     // ------------------------------------------------------------------
 
+    /// <summary>
+    /// Default buffer size used when constructing a <see cref="StreamWriter"/>
+    /// from a <see cref="Stream"/>. 64 KB reduces syscall frequency compared
+    /// to the <see cref="StreamWriter"/> default of 1 KB.
+    /// </summary>
+    private const int DefaultBufferSize = 65536;
+
     private readonly TextWriter _writer;
+    private readonly bool _ownsWriter;
+    private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
     private long _currentLineNumber;
@@ -70,10 +87,19 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// formatted console table output, or any other <see cref="TextWriter"/> implementation.
     /// The caller is responsible for the writer's lifetime — the loader does not dispose it.
     /// </param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
+    /// Pass <see langword="null"/> (the default) to disable logging.
+    /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="writer"/> is null.</exception>
-    public FixedWidthLoader(TextWriter writer)
+    public FixedWidthLoader
+    (
+        TextWriter writer,
+        ILogger<FixedWidthLoader<TRecord, TProgress>>? logger = null
+    )
     {
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -89,13 +115,85 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// <param name="timer">
     /// The <see cref="IProgressTimer"/> to use for progress reporting.
     /// </param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
+    /// Pass <see langword="null"/> to disable logging.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="writer"/> or <paramref name="timer"/> is null.
     /// </exception>
-    internal FixedWidthLoader(TextWriter writer, IProgressTimer timer)
+    internal FixedWidthLoader
+    (
+        TextWriter writer,
+        IProgressTimer timer,
+        ILogger<FixedWidthLoader<TRecord, TProgress>>? logger = null
+    )
     {
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthLoader{TRecord,TProgress}"/> that writes
+    /// to the specified <see cref="Stream"/> using an internal <see cref="StreamWriter"/>
+    /// with a 64 KB buffer for improved throughput on large files.
+    /// </summary>
+    /// <param name="stream">
+    /// The <see cref="Stream"/> to write fixed-width records to. The stream must be
+    /// writable. The caller retains ownership — the loader does not dispose the stream.
+    /// </param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
+    /// Pass <see langword="null"/> (the default) to disable logging.
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
+    public FixedWidthLoader
+    (
+        Stream stream,
+        ILogger<FixedWidthLoader<TRecord, TProgress>>? logger = null
+    )
+    {
+        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        _writer = new StreamWriter(stream, encoding: System.Text.Encoding.UTF8, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _ownsWriter = true;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthLoader{TRecord,TProgress}"/> that writes
+    /// to the specified <see cref="Stream"/> and uses the supplied
+    /// <see cref="IProgressTimer"/> instead of the default system timer.
+    /// </summary>
+    /// <param name="stream">
+    /// The <see cref="Stream"/> to write fixed-width records to.
+    /// </param>
+    /// <param name="timer">
+    /// The <see cref="IProgressTimer"/> to use for progress reporting.
+    /// </param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
+    /// Pass <see langword="null"/> to disable logging.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="stream"/> or <paramref name="timer"/> is null.
+    /// </exception>
+    internal FixedWidthLoader
+    (
+        Stream stream,
+        IProgressTimer timer,
+        ILogger<FixedWidthLoader<TRecord, TProgress>>? logger = null
+    )
+    {
+        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        _writer = new StreamWriter(stream, encoding: System.Text.Encoding.UTF8, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _ownsWriter = true;
+        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -304,6 +402,37 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
 
 
 
+    /// <summary>
+    /// Disposes the internal <see cref="StreamWriter"/> when this instance was
+    /// constructed from a <see cref="Stream"/>. Has no effect when constructed
+    /// from a caller-owned <see cref="TextWriter"/>.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+
+
+    /// <summary>
+    /// Releases managed resources when <paramref name="disposing"/> is
+    /// <see langword="true"/>. Override in a derived class to add cleanup logic.
+    /// </summary>
+    /// <param name="disposing">
+    /// <see langword="true"/> when called from <see cref="Dispose()"/>;
+    /// <see langword="false"/> when called from a finalizer.
+    /// </param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing && _ownsWriter)
+        {
+            _writer.Dispose();
+        }
+    }
+
+
+
     /// <inheritdoc/>
     protected override async Task LoadWorkerAsync
     (
@@ -312,6 +441,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     )
     {
         var fieldMap = FieldMap.GetResult<TRecord>();
+        LogLoadingStarted(fieldMap);
 
         if (WriteHeader)
         {
@@ -324,30 +454,47 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
 
             if (CurrentItemCount >= MaximumItemCount)
             {
+                LogDebugMaxReached();
                 break;
             }
 
             if (item == null)
             {
-                throw new InvalidOperationException( $"A null record was encountered at item {CurrentItemCount + CurrentSkippedItemCount + 1}. " + $"The loader writes what it is given — null records are not permitted.");
+                throw LogAndCreateNullRecordError();
             }
 
             if (CurrentSkippedItemCount < SkipItemCount)
             {
                 IncrementCurrentSkippedItemCount();
+                LogDebugItemSkipped();
                 continue;
             }
 
-            var segments = FixedWidthLineParser.FormatSegments
+            FixedWidthLineParser.WriteRecord
             (
+                _writer,
                 item,
                 fieldMap,
-                ValueConverter
+                ValueConverter,
+                FieldDelimiter
             );
             Interlocked.Increment(ref _currentLineNumber);
-            await _writer.WriteLineAsync(Join(segments)).ConfigureAwait(false);
+            await _writer.WriteLineAsync().ConfigureAwait(false);
             IncrementCurrentItemCount();
+            LogDebugRecordWritten();
         }
+
+        if (_ownsWriter)
+        {
+#if NET8_0_OR_GREATER
+            await _writer.FlushAsync(token).ConfigureAwait(false);
+#else
+            token.ThrowIfCancellationRequested();
+            await _writer.FlushAsync().ConfigureAwait(false);
+#endif
+        }
+
+        LogLoadingCompleted();
     }
 
 
@@ -358,47 +505,166 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// </summary>
     private async Task WriteHeaderAsync(FieldMapResult fieldMap)
     {
-        var headerSegments = FixedWidthLineParser.FormatHeaderSegments
+        FixedWidthLineParser.WriteHeader
         (
+            _writer,
             fieldMap,
-            HeaderConverter
+            HeaderConverter,
+            FieldDelimiter
         );
         Interlocked.Increment(ref _currentLineNumber);
-        await _writer.WriteLineAsync(Join(headerSegments)).ConfigureAwait(false);
+        await _writer.WriteLineAsync().ConfigureAwait(false);
+
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Wrote header at line {LineNumber}", _currentLineNumber);
+        }
 
         if (FieldSeparator.HasValue)
         {
-            var separatorSegments = FixedWidthLineParser.FormatSeparatorSegments
+            FixedWidthLineParser.WriteSeparator
             (
+                _writer,
                 fieldMap,
-                FieldSeparator.Value
+                FieldSeparator.Value,
+                FieldDelimiter
             );
             Interlocked.Increment(ref _currentLineNumber);
-            await _writer.WriteLineAsync(Join(separatorSegments)).ConfigureAwait(false);
+            await _writer.WriteLineAsync().ConfigureAwait(false);
+
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug
+                (
+                    "Wrote separator at line {LineNumber} (char='{SeparatorChar}')",
+                    _currentLineNumber,
+                    FieldSeparator.Value
+                );
+            }
         }
     }
 
 
 
     // ------------------------------------------------------------------
-    // Private helpers
+    // Logging helpers
     // ------------------------------------------------------------------
 
-    /// <summary>
-    /// Joins field segments with <see cref="FieldDelimiter"/> between them,
-    /// or concatenates them directly when no delimiter is set.
-    /// </summary>
-    private string Join(IReadOnlyList<string> segments)
+    private void LogLoadingStarted(FieldMapResult fieldMap)
     {
-        if (string.IsNullOrEmpty(FieldDelimiter))
+        if (_logger.IsEnabled(LogLevel.Information))
         {
-            return string.Concat(segments);
+            _logger.LogInformation
+            (
+                "Loading started for {RecordType}. WriteHeader={WriteHeader}, " +
+                "FieldSeparator={FieldSeparator}, FieldDelimiter={FieldDelimiter}, " +
+                "SkipItemCount={SkipItemCount}, MaximumItemCount={MaximumItemCount}",
+                typeof(TRecord).Name,
+                WriteHeader,
+                FieldSeparator?.ToString() ?? "(none)",
+                FieldDelimiter ?? "(none)",
+                SkipItemCount,
+                MaximumItemCount
+            );
         }
 
-        return string.Join
-        (
-            FieldDelimiter,
-            segments
-        );
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "Field map resolved for {RecordType}: {FieldCount} fields, " +
+                "ExpectedLineWidth={ExpectedLineWidth}, TotalColumnCount={TotalColumnCount}",
+                typeof(TRecord).Name,
+                fieldMap.Descriptors.Count,
+                fieldMap.ExpectedLineWidth,
+                fieldMap.TotalColumnCount
+            );
+        }
     }
+
+
+
+    private void LogLoadingCompleted()
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation
+            (
+                "Loading completed for {RecordType}: {ItemCount} items loaded, " +
+                "{SkippedCount} skipped, {LineCount} lines written",
+                typeof(TRecord).Name,
+                CurrentItemCount,
+                CurrentSkippedItemCount,
+                Interlocked.Read(ref _currentLineNumber)
+            );
+        }
+    }
+
+
+
+    private void LogDebugMaxReached()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "MaximumItemCount ({MaximumItemCount}) reached, stopping loading",
+                MaximumItemCount
+            );
+        }
+    }
+
+
+
+    private void LogDebugItemSkipped()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "Skipping item ({SkippedCount}/{SkipItemCount})",
+                CurrentSkippedItemCount,
+                SkipItemCount
+            );
+        }
+    }
+
+
+
+    private void LogDebugRecordWritten()
+    {
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug
+            (
+                "Wrote record at line {LineNumber} (item #{ItemCount})",
+                _currentLineNumber,
+                CurrentItemCount
+            );
+        }
+    }
+
+
+
+    private InvalidOperationException LogAndCreateNullRecordError()
+    {
+        var ex = new InvalidOperationException
+        (
+            $"A null record was encountered at item " +
+            $"{CurrentItemCount + CurrentSkippedItemCount + 1}. " +
+            $"The loader writes what it is given — null records are not permitted."
+        );
+
+        _logger.LogError
+        (
+            ex,
+            "Null record encountered at item {ItemPosition}",
+            CurrentItemCount + CurrentSkippedItemCount + 1
+        );
+
+        return ex;
+    }
+
+
+
 }
