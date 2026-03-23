@@ -20,7 +20,7 @@
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <SignAssembly>False</SignAssembly>
-    <PackageTags>ETL;Extract-Transform-Load;FixedWidth;Fixed-Width;FlatFile</PackageTags>
+    <PackageTags>ETL;Extract-Transform-Load;FixedWidth;Fixed-Width;Fixed-Length;Positional;FlatFile;Text-File;Data-Pipeline;Parser;Formatter;IAsyncEnumerable;Streaming;dotnet;Wolfgang-ETL;Wolfgang.Etl.Abstractions</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <PackageIcon>icon_256.png</PackageIcon>
