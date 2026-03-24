@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class FixedWidthConverter | Wolfgang.Etl.FixedWidth Documentation </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class FixedWidthConverter | Wolfgang.Etl.FixedWidth Documentation ">
+      
+      <meta name="description" content="Provides built-in value converter, header converter, and value parser functions for use with  and .">
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v.0.1.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthConverter.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthConverter%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="Wolfgang.Etl.FixedWidth">
+            Wolfgang.Etl.FixedWidth
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+
+      <div class="content">
+        <div class="actionbar">
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Wolfgang.Etl.FixedWidth.FixedWidthConverter">
+
+
+
+  <h1 id="Wolfgang_Etl_FixedWidth_FixedWidthConverter" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthConverter" class="text-break">
+Class FixedWidthConverter  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Wolfgang.html">Wolfgang</a>.<a class="xref" href="Wolfgang.Etl.html">Etl</a>.<a class="xref" href="Wolfgang.Etl.FixedWidth.html">FixedWidth</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Wolfgang.Etl.FixedWidth.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Provides built-in value converter, header converter, and value parser functions
+for use with <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html">FixedWidthLoader&lt;TRecord, TProgress&gt;</a> and
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html">FixedWidthExtractor&lt;TRecord, TProgress&gt;</a>.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class FixedWidthConverter</code></pre>
+  </div>
+
+
+
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">FixedWidthConverter</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>
+<b>Value converters</b> (<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func&lt;T1, T2, TResult&gt;</a> of <code>object, FieldContext, string</code>)
+convert a typed property value to its string representation. Rules:
+<ul><li><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetimeoffset">DateTimeOffset</a>, and <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>
+  require an explicit <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html#Wolfgang_Etl_FixedWidth_FieldContext_Format">Format</a>. An <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a>
+  is thrown if none is provided.</li><li>All other <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iformattable">IFormattable</a> types use <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture">InvariantCulture</a>
+  with the optional <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html#Wolfgang_Etl_FixedWidth_FieldContext_Format">Format</a> if supplied.</li><li>Null values are converted to <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string.empty">Empty</a>.</li></ul>
+
+<p>
+<b>Header converters</b> (<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func&lt;T1, T2, TResult&gt;</a> of <code>string, FieldContext, string</code>)
+convert a header label to its padded string representation.
+</p>
+<p>
+<b>Value parsers</b> (<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func&lt;T1, T2, TResult&gt;</a> of <code>string, FieldContext, object</code>)
+convert a raw string read from the file back to the target property type.
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthConverter.html#Wolfgang_Etl_FixedWidth_FixedWidthConverter_DefaultParser">DefaultParser</a> is the built-in implementation used by
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html">FixedWidthExtractor&lt;TRecord, TProgress&gt;</a> by default.
+</p>
+</div>
+
+
+  <h2 class="section" id="fields">Fields
+</h2>
+
+
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_DefaultParser" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthConverter.DefaultParser">
+  DefaultParser
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L235"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Converts a raw string read from the file to the target property type indicated by
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html#Wolfgang_Etl_FixedWidth_FieldContext_PropertyType">PropertyType</a>. This is the default
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_ValueParser">ValueParser</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly FixedWidthValueParser DefaultParser</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthValueParser.html">FixedWidthValueParser</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_DefaultParser_examples">Examples</h4>
+  <pre><code class="lang-csharp">// Use DefaultParser explicitly (it is also the default):
+extractor.ValueParser = FixedWidthConverter.DefaultParser;
+
+// Handle "Y"/"N" booleans, fall back to DefaultParser for everything else:
+extractor.ValueParser = (text, ctx) =&gt;
+    ctx.PropertyType == typeof(bool)
+        ? (object)(text.Span.SequenceEqual("Y".AsSpan()))
+        : FixedWidthConverter.DefaultParser(text, ctx);</code></pre>
+
+
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_DefaultParser_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><ul><li>Nullable types: empty string returns <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>, non-empty
+  recurses on the underlying type.</li><li><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>: returned as-is.</li><li>Empty string for non-nullable value types: returns the default value
+  (e.g. <code>0</code> for <code>int</code>).</li><li><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetimeoffset">DateTimeOffset</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>:
+  parsed with <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html#Wolfgang_Etl_FixedWidth_FieldContext_Format">Format</a> using
+  <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture">InvariantCulture</a>.</li><li>All other types: parsed via <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.typedescriptor">TypeDescriptor</a> with
+  <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture">InvariantCulture</a>.</li></ul>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a></dt>
+    <dd><p>Thrown when parsing a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetimeoffset">DateTimeOffset</a>, or
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a> value and no <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html#Wolfgang_Etl_FixedWidth_FieldContext_Format">Format</a> has been
+specified on the field attribute.</p>
+</dd>
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.formatexception">FormatException</a></dt>
+    <dd><p>Thrown when the raw string value cannot be parsed into the target type because
+the value does not match the expected format.</p>
+</dd>
+  </dl>
+
+
+
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_Strict" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthConverter.Strict">
+  Strict
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L68"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Converts the value to a string and throws a <a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException.html">FieldOverflowException</a>
+if the result exceeds <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html#Wolfgang_Etl_FixedWidth_FieldContext_FieldLength">FieldLength</a>. This is the default
+value converter used by <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html">FixedWidthLoader&lt;TRecord, TProgress&gt;</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly Func&lt;object, FieldContext, string&gt; Strict</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>, <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html">FieldContext</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_Strict_examples">Examples</h4>
+  <pre><code class="lang-csharp">// Use Strict explicitly (it is also the default):
+loader.ValueConverter = FixedWidthConverter.Strict;
+
+// Fall back to Strict for all types except bool:
+loader.ValueConverter = (value, ctx) =&gt;
+    ctx.PropertyType == typeof(bool)
+        ? ((bool)value ? "Y" : "N")
+        : FixedWidthConverter.Strict(value, ctx);</code></pre>
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException.html">FieldOverflowException</a></dt>
+    <dd><p>Thrown when the converted string is longer than <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html#Wolfgang_Etl_FixedWidth_FieldContext_FieldLength">FieldLength</a>.</p>
+</dd>
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a></dt>
+    <dd><p>Thrown when converting a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetimeoffset">DateTimeOffset</a>, or
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a> value and no <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html#Wolfgang_Etl_FixedWidth_FieldContext_Format">Format</a> has been
+specified on the field attribute.</p>
+</dd>
+  </dl>
+
+
+
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_StrictHeader" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthConverter.StrictHeader">
+  StrictHeader
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L151"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Validates that the header label fits within <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html#Wolfgang_Etl_FixedWidth_FieldContext_FieldLength">FieldLength</a>,
+throwing a <a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException.html">FieldOverflowException</a> if it does not, then returns the
+label unchanged. Space-padding is applied by the framework after the converter returns.
+This is the default header converter used by <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html">FixedWidthLoader&lt;TRecord, TProgress&gt;</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly Func&lt;string, FieldContext, string&gt; StrictHeader</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html">FieldContext</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_StrictHeader_examples">Examples</h4>
+  <pre><code class="lang-csharp">// Use StrictHeader explicitly (it is also the default):
+loader.HeaderConverter = FixedWidthConverter.StrictHeader;
+
+// Convert header labels to upper-case, still enforcing the field width:
+loader.HeaderConverter = (label, ctx) =&gt;
+    FixedWidthConverter.StrictHeader(label.ToUpperInvariant(), ctx);</code></pre>
+
+
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_StrictHeader_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>The <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html">FieldContext</a> is passed as-is from the attribute. If you want
+different alignment or padding for header cells, supply a custom
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_2_HeaderConverter">HeaderConverter</a>.</p>
+</div>
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException.html">FieldOverflowException</a></dt>
+    <dd><p>Thrown when the header label is longer than <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html#Wolfgang_Etl_FixedWidth_FieldContext_FieldLength">FieldLength</a>.</p>
+</dd>
+  </dl>
+
+
+
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_Truncate" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthConverter.Truncate">
+  Truncate
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L108"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Converts the value to a string and silently truncates it to
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html#Wolfgang_Etl_FixedWidth_FieldContext_FieldLength">FieldLength</a> if it is too long.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly Func&lt;object, FieldContext, string&gt; Truncate</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>, <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html">FieldContext</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_Truncate_examples">Examples</h4>
+  <pre><code class="lang-csharp">// Use Truncate when long values should be silently clipped:
+loader.ValueConverter = FixedWidthConverter.Truncate;</code></pre>
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a></dt>
+    <dd><p>Thrown when converting a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetimeoffset">DateTimeOffset</a>, or
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a> value and no <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html#Wolfgang_Etl_FixedWidth_FieldContext_Format">Format</a> has been
+specified on the field attribute.</p>
+</dd>
+  </dl>
+
+
+
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_TruncateHeader" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthConverter.TruncateHeader">
+  TruncateHeader
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L183"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Silently truncates the header label to <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html#Wolfgang_Etl_FixedWidth_FieldContext_FieldLength">FieldLength</a> if it
+is too long, then returns it unchanged otherwise. Space-padding is applied by the
+framework after the converter returns.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly Func&lt;string, FieldContext, string&gt; TruncateHeader</code></pre>
+  </div>
+
+
+
+
+  <h4 class="section">Field Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html">FieldContext</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_TruncateHeader_examples">Examples</h4>
+  <pre><code class="lang-csharp">// Use TruncateHeader when header labels may exceed the field width:
+loader.HeaderConverter = FixedWidthConverter.TruncateHeader;</code></pre>
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L37" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Made with DocFX
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
