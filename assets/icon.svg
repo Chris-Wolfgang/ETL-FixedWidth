@@ -1,0 +1,45 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+<rect width="512" height="512" rx="80" fill="#350D5E"/>
+<rect x="14" y="14" width="484" height="484" rx="70" fill="#350D5E" stroke="#E8D5F5" stroke-width="1.5"/>
+
+<rect x="59" y="75" width="394" height="28" rx="4" fill="#7C23BB" opacity="0.5"/>
+<rect x="59" y="111" width="394" height="28" rx="4" fill="#6A1FA3" opacity="0.35"/>
+<rect x="59" y="147" width="394" height="28" rx="4" fill="#7C23BB" opacity="0.5"/>
+<rect x="59" y="183" width="394" height="28" rx="4" fill="#6A1FA3" opacity="0.35"/>
+<rect x="59" y="219" width="394" height="28" rx="4" fill="#7C23BB" opacity="0.5"/>
+<rect x="59" y="255" width="394" height="28" rx="4" fill="#6A1FA3" opacity="0.35"/>
+<rect x="59" y="291" width="394" height="28" rx="4" fill="#7C23BB" opacity="0.4"/>
+<rect x="59" y="327" width="394" height="28" rx="4" fill="#6A1FA3" opacity="0.2"/>
+
+<text x="71" y="95" font-family="monospace" font-weight="700" font-size="16" fill="#ffffff" opacity="0.95">N A M E · · · · T Y P E · · · · A G E</text>
+
+<text x="71" y="131" font-family="monospace" font-size="14" fill="#D4A8F0" opacity="0.8">A l i c e · · · · s t r · · · · · · 0 2 5</text>
+<text x="71" y="167" font-family="monospace" font-size="14" fill="#D4A8F0" opacity="0.8">B o b · · · · · · s t r · · · · · · 0 3 0</text>
+<text x="71" y="203" font-family="monospace" font-size="14" fill="#D4A8F0" opacity="0.7">C a r o l · · · · s t r · · · · · · 0 3 5</text>
+<text x="71" y="239" font-family="monospace" font-size="14" fill="#D4A8F0" opacity="0.7">D a n · · · · · · s t r · · · · · · 0 4 0</text>
+<text x="71" y="275" font-family="monospace" font-size="14" fill="#D4A8F0" opacity="0.6">E v e · · · · · · s t r · · · · · · 0 4 5</text>
+<text x="71" y="311" font-family="monospace" font-size="14" fill="#D4A8F0" opacity="0.4">· · · · · · · · · · · · · · · · · · · · ·</text>
+<text x="71" y="347" font-family="monospace" font-size="14" fill="#D4A8F0" opacity="0.2">· · · · · · · · · · · · · · · · · · · · ·</text>
+
+<rect x="219" y="75" width="2" height="280" fill="#ffffff" opacity="0.15"/>
+<rect x="367" y="75" width="2" height="280" fill="#ffffff" opacity="0.15"/>
+
+<!-- Width markers aligned to column separators -->
+<!-- Column 1: x=59 to x=219 -->
+<line x1="59" y1="375" x2="219" y2="375" stroke="#B76FE0" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+<line x1="59" y1="369" x2="59" y2="381" stroke="#B76FE0" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+<line x1="219" y1="369" x2="219" y2="381" stroke="#B76FE0" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+<text x="139" y="395" text-anchor="middle" font-family="monospace" font-size="13" fill="#B76FE0" opacity="0.7">10</text>
+
+<!-- Column 2: x=219 to x=367 -->
+<line x1="219" y1="375" x2="367" y2="375" stroke="#B76FE0" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+<line x1="367" y1="369" x2="367" y2="381" stroke="#B76FE0" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+<text x="293" y="395" text-anchor="middle" font-family="monospace" font-size="13" fill="#B76FE0" opacity="0.7">8</text>
+
+<!-- Column 3: x=367 to x=453 -->
+<line x1="367" y1="375" x2="453" y2="375" stroke="#B76FE0" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+<line x1="453" y1="369" x2="453" y2="381" stroke="#B76FE0" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+<text x="410" y="395" text-anchor="middle" font-family="monospace" font-size="13" fill="#B76FE0" opacity="0.7">3</text>
+
+<text x="256" y="448" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="32" fill="#ffffff" opacity="0.95" letter-spacing="2">FIXED WIDTH</text>
+</svg>
