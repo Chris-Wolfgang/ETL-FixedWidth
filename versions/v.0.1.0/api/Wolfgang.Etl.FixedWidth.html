@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Namespace Wolfgang.Etl.FixedWidth | Wolfgang.Etl.FixedWidth Documentation </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Namespace Wolfgang.Etl.FixedWidth | Wolfgang.Etl.FixedWidth Documentation ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="Wolfgang.Etl.FixedWidth">
+            Wolfgang.Etl.FixedWidth
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+
+      <div class="content">
+        <div class="actionbar">
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Wolfgang.Etl.FixedWidth">
+
+  <h1 id="Wolfgang_Etl_FixedWidth" data-uid="Wolfgang.Etl.FixedWidth" class="text-break">Namespace Wolfgang.Etl.FixedWidth</h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="markdown level0 remarks"></div>
+
+    <h3 id="classes">
+Classes
+</h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html">FieldContext</a></dt>
+      <dd><p>Provides contextual information about a fixed-width field to a
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_2_ValueConverter">ValueConverter</a> or
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_ValueParser">ValueParser</a> delegate.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthConverter.html">FixedWidthConverter</a></dt>
+      <dd><p>Provides built-in value converter, header converter, and value parser functions
+for use with <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html">FixedWidthLoader&lt;TRecord, TProgress&gt;</a> and
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html">FixedWidthExtractor&lt;TRecord, TProgress&gt;</a>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html">FixedWidthExtractor&lt;TRecord, TProgress&gt;</a></dt>
+      <dd><p>Reads a fixed-width text file and yields records of type <code class="typeparamref">TRecord</code>
+as an asynchronous stream.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html">FixedWidthLoader&lt;TRecord, TProgress&gt;</a></dt>
+      <dd><p>Writes records of type <code class="typeparamref">TRecord</code> to a fixed-width text stream
+as an asynchronous operation.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a></dt>
+      <dd><p>A progress report for fixed-width extract and load operations. Extends
+<span class="xref">Wolfgang.Etl.Abstractions.Report</span> with additional diagnostic properties specific to
+fixed-width file processing.</p>
+</dd>
+    </dl>
+    <h3 id="delegates">
+Delegates
+</h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthValueParser.html">FixedWidthValueParser</a></dt>
+      <dd><p>Converts a raw field value read from the file into the target property type.
+The <code class="paramref">text</code> is a zero-copy slice of the source line — call
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlymemory-1.tostring">ToString()</a> only if you need a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>.</p>
+</dd>
+    </dl>
+
+
+</article>
+
+        <div class="contribution d-print-none">
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Made with DocFX
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
