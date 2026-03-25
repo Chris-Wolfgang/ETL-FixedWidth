@@ -54,7 +54,7 @@
 [CmdletBinding()]
 param(
     [Parameter()]
-    [string]$Repository = "Chris-Wolfgang/ETL-FixedWidth",
+    [string]$Repository = "{{GITHUB_USERNAME}}/{{REPO_NAME}}",
     
     [Parameter()]
     [string]$BranchName = "main"
@@ -83,7 +83,7 @@ try {
 }
 
 # Determine repository
-if ($Repository -eq "Chris-Wolfgang/ETL-FixedWidth" -or -not $Repository) {
+if ($Repository -eq "{{GITHUB_USERNAME}}/{{REPO_NAME}}" -or -not $Repository) {
     # Placeholders not replaced or no repository specified - auto-detect
     Write-Host "🔍 Detecting current repository..." -ForegroundColor Cyan
     try {
@@ -91,7 +91,7 @@ if ($Repository -eq "Chris-Wolfgang/ETL-FixedWidth" -or -not $Repository) {
         $Repository = $repoInfo.nameWithOwner
         Write-Host "✅ Using repository: $Repository" -ForegroundColor Green
     } catch {
-        if ($Repository -eq "Chris-Wolfgang/ETL-FixedWidth") {
+        if ($Repository -eq "{{GITHUB_USERNAME}}/{{REPO_NAME}}") {
             Write-Error "❌ Could not detect repository. Please run the setup script (pwsh ./scripts/setup.ps1) first to replace placeholders, or specify -Repository parameter."
         } else {
             Write-Error "❌ Could not detect repository. Please run from within a git repository or specify -Repository parameter."
