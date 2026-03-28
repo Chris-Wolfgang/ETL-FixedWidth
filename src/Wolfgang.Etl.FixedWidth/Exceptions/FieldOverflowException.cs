@@ -17,8 +17,10 @@ namespace Wolfgang.Etl.FixedWidth.Exceptions;
 /// throwing, use <see cref="FixedWidthConverter.Truncate"/> or
 /// <see cref="FixedWidthConverter.TruncateHeader"/>.
 /// </remarks>
+#pragma warning disable RCS1194 // Exception requires contextual parameters — generic constructors are not meaningful
 public sealed class FieldOverflowException : InvalidOperationException
 {
+#pragma warning restore RCS1194
     // ------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------

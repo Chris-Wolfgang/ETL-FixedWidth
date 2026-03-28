@@ -7,8 +7,10 @@ namespace Wolfgang.Etl.FixedWidth.Exceptions;
 /// target property type during a fixed-width read (extract) operation. Derives from
 /// <see cref="MalformedLineException"/>.
 /// </summary>
+#pragma warning disable RCS1194 // Exception requires contextual parameters — generic constructors are not meaningful
 public sealed class FieldConversionException : MalformedLineException
 {
+#pragma warning restore RCS1194
     // ------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------
