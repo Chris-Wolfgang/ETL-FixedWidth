@@ -950,10 +950,8 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
                 throw ex;
             default:
-                throw new ArgumentOutOfRangeException
+                throw new InvalidOperationException
                 (
-                    nameof(BlankLineHandling),
-                    BlankLineHandling,
                     $"Unexpected {nameof(BlankLineHandling)} value: {BlankLineHandling}"
                 );
         }
@@ -1005,10 +1003,8 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
                     throw;
 
                 default:
-                    throw new ArgumentOutOfRangeException
+                    throw new InvalidOperationException
                     (
-                        nameof(MalformedLineHandling),
-                        MalformedLineHandling,
                         $"Unexpected {nameof(MalformedLineHandling)} value: {MalformedLineHandling}"
                     );
             }
