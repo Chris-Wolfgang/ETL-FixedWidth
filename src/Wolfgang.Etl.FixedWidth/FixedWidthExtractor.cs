@@ -908,7 +908,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// Throws <see cref="LineTooShortException"/> when the policy is
     /// <see cref="BlankLineHandling.ThrowException"/>.
     /// </summary>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
     /// <exception cref="LineTooShortException">
     /// Thrown when <see cref="BlankLineHandling"/> is
     /// <see cref="BlankLineHandling.ThrowException"/> (the default).
@@ -968,7 +968,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// is <see cref="MalformedLineHandling.ReturnDefault"/>.
     /// Re-throws on <see cref="MalformedLineHandling.ThrowException"/>.
     /// </summary>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
     private bool TryParseLine(string line, FieldMapResult fieldMap, out TRecord record)
     {
         record = default!;
