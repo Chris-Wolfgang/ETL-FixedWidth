@@ -576,9 +576,9 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
         token.ThrowIfCancellationRequested();
 
         string? line;
-#pragma warning disable CA1849, VSTHRD103 // ReadLine is intentionally synchronous — see comment above
+#pragma warning disable CA1849, VSTHRD103, S6966 // ReadLine is intentionally synchronous — see comment above
         while ((line = _reader.ReadLine()) != null)
-#pragma warning restore CA1849, VSTHRD103
+#pragma warning restore CA1849, VSTHRD103, S6966
         {
             token.ThrowIfCancellationRequested();
 
@@ -950,7 +950,12 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
                 throw ex;
             default:
-                throw new ArgumentOutOfRangeException(nameof(BlankLineHandling));
+                throw new ArgumentOutOfRangeException
+                (
+                    nameof(BlankLineHandling),
+                    BlankLineHandling,
+                    $"Unexpected {nameof(BlankLineHandling)} value: {BlankLineHandling}"
+                );
         }
     }
 
@@ -1000,7 +1005,12 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
                     throw;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(MalformedLineHandling));
+                    throw new ArgumentOutOfRangeException
+                    (
+                        nameof(MalformedLineHandling),
+                        MalformedLineHandling,
+                        $"Unexpected {nameof(MalformedLineHandling)} value: {MalformedLineHandling}"
+                    );
             }
         }
     }
