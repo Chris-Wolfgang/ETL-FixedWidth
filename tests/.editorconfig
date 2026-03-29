@@ -38,6 +38,9 @@ dotnet_diagnostic.S6610.severity = none
 # VSTHRD200: Use Async suffix — test methods follow xunit naming conventions
 dotnet_diagnostic.VSTHRD200.severity = none
 
+# MA0003: Name the parameter — not needed in test assertions and setup
+dotnet_diagnostic.MA0003.severity = none
+
 # S1144: Remove unused private type member — test POCOs have constructors used via reflection
 dotnet_diagnostic.S1144.severity = none
 
