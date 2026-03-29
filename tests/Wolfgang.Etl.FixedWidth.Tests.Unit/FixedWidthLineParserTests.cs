@@ -673,7 +673,179 @@ public class FixedWidthLineParserTests
 
 
     // ------------------------------------------------------------------
-    // Test POCO — skip columns for direct-write tests
+    // FormatSegments with skip columns — trailing padding
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void FormatSegments_when_skip_columns_are_trailing_pads_remaining_width()
+    {
+        var fieldMap = FieldMap.GetResult<TrailingSkipRecord>();
+        var record = new TrailingSkipRecord { Name = "Test" };
+
+        var segments = FixedWidthLineParser.FormatSegments(record, fieldMap, FixedWidthConverter.Strict);
+        var line = string.Concat(segments);
+
+        Assert.Equal
+        (
+            fieldMap.ExpectedLineWidth,
+            line.Length
+        );
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // FormatHeaderSegments — with skip columns
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void FormatHeaderSegments_when_called_returns_header_labels_padded_to_field_widths()
+    {
+        var fieldMap = FieldMap.GetResult<SimpleRecord>();
+
+        var segments = FixedWidthLineParser.FormatHeaderSegments(fieldMap, FixedWidthConverter.StrictHeader);
+        var line = string.Concat(segments);
+
+        Assert.Equal(25, line.Length);
+        Assert.Contains("FirstName", line);
+        Assert.Contains("LastName", line);
+        Assert.Contains("Age", line);
+    }
+
+
+
+    [Fact]
+    public void FormatHeaderSegments_when_skip_columns_present_fills_gaps_with_spaces()
+    {
+        var fieldMap = FieldMap.GetResult<WriteSkipRecord>();
+
+        var segments = FixedWidthLineParser.FormatHeaderSegments(fieldMap, FixedWidthConverter.StrictHeader);
+        var line = string.Concat(segments);
+
+        Assert.Equal
+        (
+            fieldMap.ExpectedLineWidth,
+            line.Length
+        );
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // WriteHeader with skip columns and delimiters
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void WriteHeader_when_skip_columns_and_delimiter_present_emits_gap_delimiters()
+    {
+        var fieldMap = FieldMap.GetResult<WriteSkipRecord>();
+        var writer = new System.IO.StringWriter();
+
+        FixedWidthLineParser.WriteHeader(writer, fieldMap, FixedWidthConverter.StrictHeader, fieldDelimiter: "|");
+
+        var output = writer.ToString();
+        var delimiterCount = output.Split('|').Length - 1;
+        var expectedDelimiters = Math.Max(0, fieldMap.TotalColumnCount - 1);
+        Assert.Equal(expectedDelimiters, delimiterCount);
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // WriteSeparator with skip columns and delimiters
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void WriteSeparator_when_skip_columns_and_delimiter_present_emits_gap_delimiters()
+    {
+        var fieldMap = FieldMap.GetResult<WriteSkipRecord>();
+        var writer = new System.IO.StringWriter();
+
+        FixedWidthLineParser.WriteSeparator(writer, fieldMap, '-', fieldDelimiter: "|");
+
+        var output = writer.ToString();
+        var delimiterCount = output.Split('|').Length - 1;
+        var expectedDelimiters = Math.Max(0, fieldMap.TotalColumnCount - 1);
+        Assert.Equal(expectedDelimiters, delimiterCount);
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // WriteTrailingDelimiters — trailing skip columns
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void WriteRecord_when_trailing_skip_columns_and_delimiter_emits_trailing_delimiters()
+    {
+        var fieldMap = FieldMap.GetResult<TrailingSkipRecord>();
+        var record = new TrailingSkipRecord { Name = "Test" };
+        var writer = new System.IO.StringWriter();
+
+        FixedWidthLineParser.WriteRecord(writer, record, fieldMap, FixedWidthConverter.Strict, fieldDelimiter: "|");
+
+        var output = writer.ToString();
+        var delimiterCount = output.Split('|').Length - 1;
+        var expectedDelimiters = Math.Max(0, fieldMap.TotalColumnCount - 1);
+        Assert.Equal(expectedDelimiters, delimiterCount);
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // ParseLine with custom ValueParser
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void ParseLine_when_custom_valueParser_is_provided_uses_custom_parser()
+    {
+        var fieldMap = FieldMap.GetResult<SimpleRecord>();
+        var line = "John      Smith     00042";
+
+        var record = FixedWidthLineParser.ParseLine<SimpleRecord>
+        (
+            line,
+            lineNumber: 1,
+            fieldMap,
+            fieldDelimiter: null,
+            valueParser: (value, context) => FixedWidthConverter.ParseValue
+            (
+                value,
+                context.PropertyType,
+                context.Format,
+                null
+            )
+        );
+
+        Assert.Equal("John", record.FirstName);
+        Assert.Equal(42, record.Age);
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // FormatSeparatorSegments with trailing skip columns
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void FormatSeparatorSegments_when_trailing_skip_columns_present_fills_trailing_width()
+    {
+        var fieldMap = FieldMap.GetResult<TrailingSkipRecord>();
+
+        var segments = FixedWidthLineParser.FormatSeparatorSegments(fieldMap, '=');
+        var line = string.Concat(segments);
+
+        Assert.Equal
+        (
+            fieldMap.ExpectedLineWidth,
+            line.Length
+        );
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // Test POCOs
     // ------------------------------------------------------------------
 
     [ExcludeFromCodeCoverage]
@@ -687,6 +859,20 @@ public class FixedWidthLineParserTests
         [FixedWidthSkip(1, 5)]
         [FixedWidthField(2, 5, Alignment = FieldAlignment.Right, Pad = '0')]
         public int Value { get; set; }
+    }
+
+
+
+    [ExcludeFromCodeCoverage]
+    private class TrailingSkipRecord
+    {
+        [FixedWidthField(0, 10)]
+        public string Name { get; set; } = string.Empty;
+
+
+
+        [FixedWidthSkip(1, 5)]
+        public string Unused { get; set; } = string.Empty;
     }
 }
 
