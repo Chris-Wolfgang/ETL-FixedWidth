@@ -519,6 +519,175 @@ public class FixedWidthLineParserTests
             parsed.Age
         );
     }
+
+
+
+    // ------------------------------------------------------------------
+    // FormatSeparatorSegments
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void FormatSeparatorSegments_when_called_returns_separator_chars_matching_field_widths()
+    {
+        var fieldMap = FieldMap.GetResult<SimpleRecord>();
+
+        var segments = FixedWidthLineParser.FormatSeparatorSegments(fieldMap, '-');
+        var line = string.Concat(segments);
+
+        Assert.Equal
+        (
+            "----------" + "----------" + "-----",
+            line
+        );
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // WriteRecord — direct TextWriter output
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void WriteRecord_when_called_writes_formatted_record_to_writer()
+    {
+        var fieldMap = FieldMap.GetResult<SimpleRecord>();
+        var record = new SimpleRecord { FirstName = "Alice", LastName = "Jones", Age = 30 };
+        var writer = new System.IO.StringWriter();
+
+        FixedWidthLineParser.WriteRecord(writer, record, fieldMap, FixedWidthConverter.Strict, fieldDelimiter: null);
+
+        Assert.Equal
+        (
+            "Alice     Jones     00030",
+            writer.ToString()
+        );
+    }
+
+
+
+    [Fact]
+    public void WriteRecord_when_field_delimiter_is_set_inserts_delimiter_between_fields()
+    {
+        var fieldMap = FieldMap.GetResult<SimpleRecord>();
+        var record = new SimpleRecord { FirstName = "Alice", LastName = "Jones", Age = 30 };
+        var writer = new System.IO.StringWriter();
+
+        FixedWidthLineParser.WriteRecord(writer, record, fieldMap, FixedWidthConverter.Strict, fieldDelimiter: "|");
+
+        Assert.Contains("|", writer.ToString());
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // WriteHeader — direct TextWriter output
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void WriteHeader_when_called_writes_header_labels_to_writer()
+    {
+        var fieldMap = FieldMap.GetResult<SimpleRecord>();
+        var writer = new System.IO.StringWriter();
+
+        FixedWidthLineParser.WriteHeader(writer, fieldMap, FixedWidthConverter.StrictHeader, fieldDelimiter: null);
+
+        var header = writer.ToString();
+        Assert.Contains("FirstName", header);
+        Assert.Contains("LastName", header);
+        Assert.Contains("Age", header);
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // WriteSeparator — direct TextWriter output
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void WriteSeparator_when_called_writes_separator_chars_to_writer()
+    {
+        var fieldMap = FieldMap.GetResult<SimpleRecord>();
+        var writer = new System.IO.StringWriter();
+
+        FixedWidthLineParser.WriteSeparator(writer, fieldMap, '-', fieldDelimiter: null);
+
+        Assert.Equal
+        (
+            "-------------------------",
+            writer.ToString()
+        );
+    }
+
+
+
+    [Fact]
+    public void WriteSeparator_when_field_delimiter_is_set_inserts_delimiter_between_separators()
+    {
+        var fieldMap = FieldMap.GetResult<SimpleRecord>();
+        var writer = new System.IO.StringWriter();
+
+        FixedWidthLineParser.WriteSeparator(writer, fieldMap, '-', fieldDelimiter: "|");
+
+        Assert.Contains("|", writer.ToString());
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // WriteRecord with skip columns — gap and trailing delimiters
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void WriteRecord_when_skip_columns_present_pads_gaps_with_spaces()
+    {
+        var fieldMap = FieldMap.GetResult<WriteSkipRecord>();
+        var record = new WriteSkipRecord { Name = "Test", Value = 1 };
+        var writer = new System.IO.StringWriter();
+
+        FixedWidthLineParser.WriteRecord(writer, record, fieldMap, FixedWidthConverter.Strict, fieldDelimiter: null);
+
+        Assert.Equal
+        (
+            fieldMap.ExpectedLineWidth,
+            writer.ToString().Length
+        );
+    }
+
+
+
+    [Fact]
+    public void WriteRecord_when_skip_columns_and_delimiter_present_emits_gap_delimiters()
+    {
+        var fieldMap = FieldMap.GetResult<WriteSkipRecord>();
+        var record = new WriteSkipRecord { Name = "Test", Value = 1 };
+        var writer = new System.IO.StringWriter();
+
+        FixedWidthLineParser.WriteRecord(writer, record, fieldMap, FixedWidthConverter.Strict, fieldDelimiter: "|");
+
+        var output = writer.ToString();
+        var delimiterCount = output.Split('|').Length - 1;
+        var expectedDelimiters = Math.Max(0, fieldMap.TotalColumnCount - 1);
+        Assert.Equal(expectedDelimiters, delimiterCount);
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // Test POCO — skip columns for direct-write tests
+    // ------------------------------------------------------------------
+
+    [ExcludeFromCodeCoverage]
+    private class WriteSkipRecord
+    {
+        [FixedWidthField(0, 10)]
+        public string Name { get; set; } = string.Empty;
+
+
+
+        [FixedWidthSkip(1, 5)]
+        [FixedWidthField(2, 5, Alignment = FieldAlignment.Right, Pad = '0')]
+        public int Value { get; set; }
+    }
 }
 
 
