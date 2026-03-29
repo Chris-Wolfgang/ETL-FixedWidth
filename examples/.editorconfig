@@ -1,0 +1,15 @@
+# Analyzer rules relaxed for example projects
+
+[*.cs]
+
+# MA0004: Use ConfigureAwait(false) — examples prioritize readability
+dotnet_diagnostic.MA0004.severity = none
+
+# MA0051: Method is too long — example Main methods can be long for demonstration
+dotnet_diagnostic.MA0051.severity = none
+
+# VSTHRD200: Use Async suffix — example methods follow simple naming
+dotnet_diagnostic.VSTHRD200.severity = none
+
+# AsyncFixer01: Remove async/await — examples prioritize clarity
+dotnet_diagnostic.AsyncFixer01.severity = none

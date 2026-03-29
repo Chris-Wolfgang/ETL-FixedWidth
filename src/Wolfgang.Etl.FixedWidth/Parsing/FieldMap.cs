@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Wolfgang.Etl.FixedWidth.Attributes;
 
@@ -150,15 +151,15 @@ internal static class FieldMap
     /// </exception>
     private static void ValidateNoDuplicateIndexes(Type type, List<ColumnEntry> entries)
     {
-        var seen = new HashSet<int>();
-        foreach (var entry in entries)
+        var duplicate = entries
+            .GroupBy(e => e.Index)
+            .FirstOrDefault(g => g.Count() > 1);
+
+        if (duplicate != null)
         {
-            if (!seen.Add(entry.Index))
-            {
-                throw new InvalidOperationException(
-                    $"Type '{type.FullName}' has duplicate column Index value {entry.Index}. " +
-                    "Each [FixedWidthField] and [FixedWidthSkip] must have a unique Index.");
-            }
+            throw new InvalidOperationException(
+                $"Type '{type.FullName}' has duplicate column Index value {duplicate.Key}. " +
+                "Each [FixedWidthField] and [FixedWidthSkip] must have a unique Index.");
         }
     }
 

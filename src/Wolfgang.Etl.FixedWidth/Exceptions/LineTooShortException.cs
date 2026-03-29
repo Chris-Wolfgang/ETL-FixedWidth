@@ -5,8 +5,10 @@ namespace Wolfgang.Etl.FixedWidth.Exceptions;
 /// width required to read all defined fields. Derives from
 /// <see cref="MalformedLineException"/>.
 /// </summary>
+#pragma warning disable RCS1194 // Exception requires contextual parameters — generic constructors are not meaningful
 public sealed class LineTooShortException : MalformedLineException
 {
+#pragma warning restore RCS1194
     // ------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------

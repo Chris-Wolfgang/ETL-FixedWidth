@@ -20,8 +20,10 @@ namespace Wolfgang.Etl.FixedWidth.Exceptions;
 /// the derived types individually for finer-grained error handling.
 /// </para>
 /// </remarks>
+#pragma warning disable RCS1194 // Exception requires contextual parameters — generic constructors are not meaningful
 public abstract class MalformedLineException : Exception
 {
+#pragma warning restore RCS1194
     // ------------------------------------------------------------------
     // Constructors
     // ------------------------------------------------------------------

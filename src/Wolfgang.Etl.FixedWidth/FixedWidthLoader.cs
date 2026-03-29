@@ -458,7 +458,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
                 break;
             }
 
-            if (item == null)
+            if (EqualityComparer<TRecord>.Default.Equals(item, default!))
             {
                 throw LogAndCreateNullRecordError();
             }
