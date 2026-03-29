@@ -403,4 +403,49 @@ public class FieldMapTests
     {
         Assert.Throws<InvalidOperationException>( () => FieldMap.GetResult<SkipDuplicateIndexRecord>());
     }
+
+
+
+    // ------------------------------------------------------------------
+    // CompileFactory
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void CompileFactory_when_type_has_parameterless_constructor_returns_working_delegate()
+    {
+        var factory = FieldMapResult.CompileFactory(typeof(IndexedRecord));
+
+        var instance = factory();
+
+        Assert.IsType<IndexedRecord>(instance);
+    }
+
+
+
+    [Fact]
+    public void CompileFactory_when_type_has_no_parameterless_constructor_returns_throwing_delegate()
+    {
+        var factory = FieldMapResult.CompileFactory(typeof(NoDefaultCtorRecord));
+
+        var ex = Assert.Throws<InvalidOperationException>(() => factory());
+
+        Assert.Contains
+        (
+            "no public parameterless constructor",
+            ex.Message
+        );
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // Test POCOs — CompileFactory
+    // ------------------------------------------------------------------
+
+    [ExcludeFromCodeCoverage]
+    private class NoDefaultCtorRecord
+    {
+        public NoDefaultCtorRecord(string required) { Name = required; }
+        public string Name { get; }
+    }
 }
