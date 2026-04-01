@@ -95,8 +95,8 @@ public class FixedWidthExtractorLoggingTests
     [Fact]
     public async Task ExtractAsync_logs_Information_at_start_and_completion()
     {
-        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord, FixedWidthReport>>();
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader(PersonLine),
             logger
@@ -124,8 +124,8 @@ public class FixedWidthExtractorLoggingTests
     [Fact]
     public async Task ExtractAsync_logs_Debug_field_map_resolved()
     {
-        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord, FixedWidthReport>>();
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader(PersonLine),
             logger
@@ -153,9 +153,9 @@ public class FixedWidthExtractorLoggingTests
     [Fact]
     public async Task ExtractAsync_when_HasHeader_logs_Debug_structural_line_skipped()
     {
-        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = "FirstName LastName  Age\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader(content),
             logger
@@ -183,9 +183,9 @@ public class FixedWidthExtractorLoggingTests
     [Fact]
     public async Task ExtractAsync_when_BlankLineHandling_is_Skip_logs_Debug_blank_line_skipped()
     {
-        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = PersonLine + "\n\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader(content),
             logger
@@ -209,9 +209,9 @@ public class FixedWidthExtractorLoggingTests
     [Fact]
     public async Task ExtractAsync_when_BlankLineHandling_is_ReturnDefault_logs_Debug_yielded_as_default()
     {
-        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = PersonLine + "\n\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader(content),
             logger
@@ -239,9 +239,9 @@ public class FixedWidthExtractorLoggingTests
     [Fact]
     public async Task ExtractAsync_when_BlankLineHandling_is_ThrowException_logs_Error()
     {
-        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = PersonLine + "\n\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader(content),
             logger
@@ -270,8 +270,8 @@ public class FixedWidthExtractorLoggingTests
     [Fact]
     public async Task ExtractAsync_when_MalformedLineHandling_is_ThrowException_logs_Error()
     {
-        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord, FixedWidthReport>>();
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader("Short"),
             logger
@@ -300,9 +300,9 @@ public class FixedWidthExtractorLoggingTests
     [Fact]
     public async Task ExtractAsync_when_MalformedLineHandling_is_Skip_logs_Debug()
     {
-        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = "Short\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader(content),
             logger
@@ -326,9 +326,9 @@ public class FixedWidthExtractorLoggingTests
     [Fact]
     public async Task ExtractAsync_when_MalformedLineHandling_is_ReturnDefault_logs_Debug()
     {
-        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = "Short\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader(content),
             logger
@@ -356,9 +356,9 @@ public class FixedWidthExtractorLoggingTests
     [Fact]
     public async Task ExtractAsync_when_LineFilter_returns_Skip_logs_Debug()
     {
-        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = "# comment\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader(content),
             logger
@@ -384,9 +384,9 @@ public class FixedWidthExtractorLoggingTests
     [Fact]
     public async Task ExtractAsync_when_LineFilter_returns_Stop_logs_Debug()
     {
-        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = PersonLine + "\nEND\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader(content),
             logger
@@ -416,9 +416,9 @@ public class FixedWidthExtractorLoggingTests
     [Fact]
     public async Task ExtractAsync_when_SkipItemCount_is_set_logs_Debug_data_line_skipped()
     {
-        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = PersonLine + "\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader(content),
             logger
@@ -442,9 +442,9 @@ public class FixedWidthExtractorLoggingTests
     [Fact]
     public async Task ExtractAsync_when_MaximumItemCount_is_reached_logs_Debug()
     {
-        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = PersonLine + "\n" + PersonLine + "\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader(content),
             logger
@@ -473,9 +473,9 @@ public class FixedWidthExtractorLoggingTests
     [Fact]
     public async Task ExtractAsync_logs_Debug_for_each_parsed_record()
     {
-        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = PersonLine + "\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader(content),
             logger
@@ -503,7 +503,7 @@ public class FixedWidthExtractorLoggingTests
     [Fact]
     public async Task ExtractAsync_when_no_logger_provided_does_not_throw()
     {
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader(PersonLine)
         );
@@ -536,8 +536,8 @@ public class FixedWidthLoaderLoggingTests
     [Fact]
     public async Task LoadAsync_logs_Information_at_start_and_completion()
     {
-        var logger = new SpyLogger<FixedWidthLoader<PersonRecord, FixedWidthReport>>();
-        var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
+        var logger = new SpyLogger<FixedWidthLoader<PersonRecord>>();
+        var loader = new FixedWidthLoader<PersonRecord>
         (
             new StringWriter(),
             logger
@@ -565,8 +565,8 @@ public class FixedWidthLoaderLoggingTests
     [Fact]
     public async Task LoadAsync_logs_Debug_field_map_resolved()
     {
-        var logger = new SpyLogger<FixedWidthLoader<PersonRecord, FixedWidthReport>>();
-        var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
+        var logger = new SpyLogger<FixedWidthLoader<PersonRecord>>();
+        var loader = new FixedWidthLoader<PersonRecord>
         (
             new StringWriter(),
             logger
@@ -591,8 +591,8 @@ public class FixedWidthLoaderLoggingTests
     [Fact]
     public async Task LoadAsync_when_WriteHeader_is_true_logs_Debug_header_written()
     {
-        var logger = new SpyLogger<FixedWidthLoader<PersonRecord, FixedWidthReport>>();
-        var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
+        var logger = new SpyLogger<FixedWidthLoader<PersonRecord>>();
+        var loader = new FixedWidthLoader<PersonRecord>
         (
             new StringWriter(),
             logger
@@ -616,8 +616,8 @@ public class FixedWidthLoaderLoggingTests
     [Fact]
     public async Task LoadAsync_when_FieldSeparator_is_set_logs_Debug_separator_written()
     {
-        var logger = new SpyLogger<FixedWidthLoader<PersonRecord, FixedWidthReport>>();
-        var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
+        var logger = new SpyLogger<FixedWidthLoader<PersonRecord>>();
+        var loader = new FixedWidthLoader<PersonRecord>
         (
             new StringWriter(),
             logger
@@ -646,13 +646,13 @@ public class FixedWidthLoaderLoggingTests
     [Fact]
     public async Task LoadAsync_when_SkipItemCount_is_set_logs_Debug_item_skipped()
     {
-        var logger = new SpyLogger<FixedWidthLoader<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthLoader<PersonRecord>>();
         var records = new[]
         {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
             new PersonRecord { FirstName = "Jane", LastName = "Doe", Age = 30 },
         };
-        var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
+        var loader = new FixedWidthLoader<PersonRecord>
         (
             new StringWriter(),
             logger
@@ -676,13 +676,13 @@ public class FixedWidthLoaderLoggingTests
     [Fact]
     public async Task LoadAsync_when_MaximumItemCount_is_reached_logs_Debug()
     {
-        var logger = new SpyLogger<FixedWidthLoader<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthLoader<PersonRecord>>();
         var records = new[]
         {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
             new PersonRecord { FirstName = "Jane", LastName = "Doe", Age = 30 },
         };
-        var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
+        var loader = new FixedWidthLoader<PersonRecord>
         (
             new StringWriter(),
             logger
@@ -711,13 +711,13 @@ public class FixedWidthLoaderLoggingTests
     [Fact]
     public async Task LoadAsync_logs_Debug_for_each_record_written()
     {
-        var logger = new SpyLogger<FixedWidthLoader<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthLoader<PersonRecord>>();
         var records = new[]
         {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
             new PersonRecord { FirstName = "Jane", LastName = "Doe", Age = 30 },
         };
-        var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
+        var loader = new FixedWidthLoader<PersonRecord>
         (
             new StringWriter(),
             logger
@@ -745,8 +745,8 @@ public class FixedWidthLoaderLoggingTests
     [Fact]
     public async Task LoadAsync_when_null_record_encountered_logs_Error()
     {
-        var logger = new SpyLogger<FixedWidthLoader<PersonRecord, FixedWidthReport>>();
-        var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
+        var logger = new SpyLogger<FixedWidthLoader<PersonRecord>>();
+        var loader = new FixedWidthLoader<PersonRecord>
         (
             new StringWriter(),
             logger
@@ -778,7 +778,7 @@ public class FixedWidthLoaderLoggingTests
     [Fact]
     public async Task LoadAsync_when_no_logger_provided_does_not_throw()
     {
-        var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
+        var loader = new FixedWidthLoader<PersonRecord>
         (
             new StringWriter()
         );

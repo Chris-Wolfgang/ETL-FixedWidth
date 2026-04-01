@@ -31,23 +31,22 @@ namespace Wolfgang.Etl.FixedWidth;
 /// <code>
 /// // Stream-based (preferred for files — 64 KB buffer reduces syscall overhead):
 /// await using var stream = File.OpenWrite("output.txt");
-/// using var loader = new FixedWidthLoader&lt;MyRecord, Report&gt;(stream);
+/// using var loader = new FixedWidthLoader&lt;MyRecord&gt;(stream);
 ///
 /// // TextWriter-based (caller owns the writer):
 /// var sw = new StringWriter();
-/// var loader = new FixedWidthLoader&lt;MyRecord, Report&gt;(sw);
+/// var loader = new FixedWidthLoader&lt;MyRecord&gt;(sw);
 /// var result = sw.ToString();
 ///
 /// // Write a formatted table to the console
-/// var loader = new FixedWidthLoader&lt;MyRecord, Report&gt;(Console.Out);
+/// var loader = new FixedWidthLoader&lt;MyRecord&gt;(Console.Out);
 /// loader.WriteHeader    = true;
 /// loader.FieldSeparator = '-';
 /// loader.FieldDelimiter = " | ";
 /// </code>
 /// </remarks>
-public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgress>, IDisposable
+public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, IDisposable
     where TRecord : notnull
-    where TProgress : notnull
 {
     // ------------------------------------------------------------------
     // Fields
@@ -77,7 +76,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     // ------------------------------------------------------------------
 
     /// <summary>
-    /// Initializes a new <see cref="FixedWidthLoader{TRecord,TProgress}"/> that writes
+    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> that writes
     /// to the specified <see cref="TextWriter"/>.
     /// </summary>
     /// <param name="writer">
@@ -95,7 +94,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     public FixedWidthLoader
     (
         TextWriter writer,
-        ILogger<FixedWidthLoader<TRecord, TProgress>>? logger = null
+        ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
     {
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
@@ -105,7 +104,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
 
 
     /// <summary>
-    /// Initializes a new <see cref="FixedWidthLoader{TRecord,TProgress}"/> that writes
+    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> that writes
     /// to the specified <see cref="TextWriter"/> and uses the supplied
     /// <see cref="IProgressTimer"/> instead of the default system timer.
     /// </summary>
@@ -126,7 +125,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     (
         TextWriter writer,
         IProgressTimer timer,
-        ILogger<FixedWidthLoader<TRecord, TProgress>>? logger = null
+        ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
     {
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
@@ -137,7 +136,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
 
 
     /// <summary>
-    /// Initializes a new <see cref="FixedWidthLoader{TRecord,TProgress}"/> that writes
+    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> that writes
     /// to the specified <see cref="Stream"/> using an internal <see cref="StreamWriter"/>
     /// with a 64 KB buffer for improved throughput on large files.
     /// </summary>
@@ -153,7 +152,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     public FixedWidthLoader
     (
         Stream stream,
-        ILogger<FixedWidthLoader<TRecord, TProgress>>? logger = null
+        ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
@@ -165,7 +164,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
 
 
     /// <summary>
-    /// Initializes a new <see cref="FixedWidthLoader{TRecord,TProgress}"/> that writes
+    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> that writes
     /// to the specified <see cref="Stream"/> and uses the supplied
     /// <see cref="IProgressTimer"/> instead of the default system timer.
     /// </summary>
@@ -186,7 +185,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     (
         Stream stream,
         IProgressTimer timer,
-        ILogger<FixedWidthLoader<TRecord, TProgress>>? logger = null
+        ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
@@ -278,7 +277,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// the specified character repeated to each field's width.
     /// Set to <see langword="null"/> (default) to write no separator.
     /// Has no effect if <see cref="WriteHeader"/> is <see langword="false"/>.
-    /// Mirrors <see cref="FixedWidthExtractor{TRecord,TProgress}.FieldSeparator"/>.
+    /// Mirrors <see cref="FixedWidthExtractor{TRecord}.FieldSeparator"/>.
     /// </summary>
     /// <example>
     /// <code>
@@ -300,7 +299,7 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// <remarks>
     /// When set, the delimiter is inserted between every adjacent pair of fields — it
     /// is not appended after the last field. The
-    /// <see cref="FixedWidthExtractor{TRecord,TProgress}.FieldDelimiter"/> on the
+    /// <see cref="FixedWidthExtractor{TRecord}.FieldDelimiter"/> on the
     /// corresponding extractor must be set to the same value so that field boundaries
     /// are correctly identified during extraction.
     /// </remarks>
@@ -328,49 +327,20 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
 
     /// <summary>
     /// Creates a progress report snapshot for the current loader state.
-    /// Override in a derived class to return a custom <typeparamref name="TProgress"/>
-    /// instance. The default implementation returns a <see cref="FixedWidthReport"/>
-    /// when <typeparamref name="TProgress"/> is <see cref="FixedWidthReport"/> or the
-    /// base <see cref="Report"/>, and throws <see cref="NotSupportedException"/> otherwise.
     /// </summary>
     /// <returns>
-    /// A <typeparamref name="TProgress"/> snapshot containing
-    /// <see cref="LoaderBase{TRecord,TProgress}.CurrentItemCount"/>,
-    /// <see cref="LoaderBase{TRecord,TProgress}.CurrentSkippedItemCount"/>,
+    /// A <see cref="FixedWidthReport"/> snapshot containing
+    /// <see cref="LoaderBase{TRecord,FixedWidthReport}.CurrentItemCount"/>,
+    /// <see cref="LoaderBase{TRecord,FixedWidthReport}.CurrentSkippedItemCount"/>,
     /// and <see cref="CurrentLineNumber"/> at the moment of the call.
     /// </returns>
-    /// <exception cref="NotSupportedException">
-    /// Thrown when <typeparamref name="TProgress"/> is not <see cref="FixedWidthReport"/>
-    /// or <see cref="Report"/> and <see cref="CreateProgressReport"/> has not been overridden.
-    /// </exception>
-    /// <example>
-    /// <code>
-    /// // To use a custom progress type, subclass and override:
-    /// public class MyLoader : FixedWidthLoader&lt;MyRecord, MyProgress&gt;
-    /// {
-    ///     public MyLoader(TextWriter writer) : base(writer) { }
-    ///
-    ///     protected override MyProgress CreateProgressReport() =>
-    ///         new MyProgress(CurrentItemCount, CurrentLineNumber);
-    /// }
-    /// </code>
-    /// </example>
-    protected override TProgress CreateProgressReport()
+    protected override FixedWidthReport CreateProgressReport()
     {
-        if (typeof(TProgress) == typeof(FixedWidthReport) || typeof(TProgress) == typeof(Report))
-        {
-            return (TProgress)(object)new FixedWidthReport
-            (
-                CurrentItemCount,
-                CurrentSkippedItemCount,
-                Interlocked.Read(ref _currentLineNumber)
-            );
-        }
-
-        throw new NotSupportedException
+        return new FixedWidthReport
         (
-            $"Override {nameof(CreateProgressReport)} to supply a " +
-            $"{typeof(TProgress).Name} instance."
+            CurrentItemCount,
+            CurrentSkippedItemCount,
+            Interlocked.Read(ref _currentLineNumber)
         );
     }
 
@@ -379,12 +349,12 @@ public class FixedWidthLoader<TRecord, TProgress> : LoaderBase<TRecord, TProgres
     /// <summary>
     /// Returns a snapshot progress report. Visible to the test assembly via InternalsVisibleTo.
     /// </summary>
-    internal TProgress GetProgressReport() => CreateProgressReport();
+    internal FixedWidthReport GetProgressReport() => CreateProgressReport();
 
 
 
     /// <inheritdoc/>
-    protected override IProgressTimer CreateProgressTimer(IProgress<TProgress> progress)
+    protected override IProgressTimer CreateProgressTimer(IProgress<FixedWidthReport> progress)
     {
         if (_progressTimer != null)
         {

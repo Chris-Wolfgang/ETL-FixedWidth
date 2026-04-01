@@ -36,7 +36,7 @@ using Wolfgang.Etl.TestKit;
 // In production you would open a file:
 //
 //   await using var stream = File.OpenRead("people.dat");
-//   var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>(stream);
+//   var extractor = new FixedWidthExtractor<PersonRecord>(stream);
 //
 // Here we use a StringReader for a self-contained example.
 // ---------------------------------------------------------------------------
@@ -60,7 +60,7 @@ var reader = new StringReader(inputData);
 //                          would write to a database, file, or API)
 // ---------------------------------------------------------------------------
 
-var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>(reader);
+var extractor = new FixedWidthExtractor<PersonRecord>(reader);
 var transformer = new TestTransformer<PersonRecord>();
 var loader = new TestLoader<PersonRecord>(collectItems: true);
 

@@ -116,7 +116,7 @@ public static class Program
         // -----------------------------------------------------------------
 
         var reader = new StringReader(data);
-        var extractor = new FixedWidthExtractor<EmployeeRecord, FixedWidthReport>(reader);
+        var extractor = new FixedWidthExtractor<EmployeeRecord>(reader);
 
         extractor.ValueParser = (text, ctx) =>
             ctx.PropertyType == typeof(bool)
@@ -156,7 +156,7 @@ public static class Program
         // -----------------------------------------------------------------
 
         var output = new StringWriter();
-        var loader = new FixedWidthLoader<EmployeeRecord, FixedWidthReport>(output);
+        var loader = new FixedWidthLoader<EmployeeRecord>(output);
 
         loader.ValueConverter = (value, ctx) =>
             ctx.PropertyType == typeof(bool)
