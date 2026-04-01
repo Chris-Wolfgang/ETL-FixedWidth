@@ -113,7 +113,7 @@ public sealed class FixedWidthFieldAttribute : Attribute
 
     /// <summary>
     /// The column header label written when
-    /// <see cref="FixedWidthLoader{TRecord,TProgress}.WriteHeader"/> is <see langword="true"/>.
+    /// <see cref="FixedWidthLoader{TRecord}.WriteHeader"/> is <see langword="true"/>.
     /// If not set, the property name is used as the header label.
     /// </summary>
     public string? Header { get; set; }

@@ -42,7 +42,7 @@ using Wolfgang.Etl.FixedWidth.Enums;
 // In production this would be a file:
 //
 //   await using var stream = File.OpenRead("births.dat");
-//   var extractor = new FixedWidthExtractor<InputRecord, FixedWidthReport>(stream);
+//   var extractor = new FixedWidthExtractor<InputRecord>(stream);
 // ---------------------------------------------------------------------------
 
 var inputData =
@@ -57,15 +57,15 @@ var inputData =
 // The extractor reads from a StringReader (stand-in for a file).
 // The loader writes to a StringWriter (stand-in for an output file).
 //
-// Both use FixedWidthReport as their progress type — the built-in report
+// Both report progress via FixedWidthReport — the built-in report
 // that tracks CurrentItemCount, CurrentSkippedItemCount, and CurrentLineNumber.
 // ---------------------------------------------------------------------------
 
 var inputReader = new StringReader(inputData);
 var outputWriter = new StringWriter();
 
-var extractor = new FixedWidthExtractor<InputRecord, FixedWidthReport>(inputReader);
-var loader = new FixedWidthLoader<OutputRecord, FixedWidthReport>(outputWriter);
+var extractor = new FixedWidthExtractor<InputRecord>(inputReader);
+var loader = new FixedWidthLoader<OutputRecord>(outputWriter);
 
 // ---------------------------------------------------------------------------
 // Step 3: Run the pipeline.

@@ -69,7 +69,7 @@ var extractor = new TestExtractor<PersonRecord>(people);
 var transformer = new TestTransformer<PersonRecord>();
 
 var writer = new StringWriter();
-var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>(writer);
+var loader = new FixedWidthLoader<PersonRecord>(writer);
 
 // ---------------------------------------------------------------------------
 // Step 3: Run the pipeline.

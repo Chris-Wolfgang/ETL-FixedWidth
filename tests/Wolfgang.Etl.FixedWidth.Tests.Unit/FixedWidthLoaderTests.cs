@@ -30,7 +30,7 @@ public class HeaderRecord
 public class FixedWidthLoaderTests
     : LoaderBaseContractTests
     <
-        FixedWidthLoader<PersonRecord, FixedWidthReport>,
+        FixedWidthLoader<PersonRecord>,
         PersonRecord,
         FixedWidthReport
     >
@@ -40,7 +40,7 @@ public class FixedWidthLoaderTests
     // ------------------------------------------------------------------
 
     /// <inheritdoc/>
-    protected override FixedWidthLoader<PersonRecord, FixedWidthReport> CreateSut(int itemCount) =>
+    protected override FixedWidthLoader<PersonRecord> CreateSut(int itemCount) =>
         new(new StringWriter());
 
 
@@ -58,7 +58,7 @@ public class FixedWidthLoaderTests
 
 
     /// <inheritdoc/>
-    protected override FixedWidthLoader<PersonRecord, FixedWidthReport> CreateSutWithTimer(
+    protected override FixedWidthLoader<PersonRecord> CreateSutWithTimer(
         IProgressTimer timer) =>
         new(new StringWriter(), timer);
 
@@ -68,10 +68,10 @@ public class FixedWidthLoaderTests
     // Helpers
     // ------------------------------------------------------------------
 
-    private static FixedWidthLoader<PersonRecord, Report> CreateLoader(out StringWriter writer)
+    private static FixedWidthLoader<PersonRecord> CreateLoader(out StringWriter writer)
     {
         writer = new StringWriter();
-        return new FixedWidthLoader<PersonRecord, Report>(writer);
+        return new FixedWidthLoader<PersonRecord>(writer);
     }
 
 
@@ -199,7 +199,7 @@ public class FixedWidthLoaderTests
     public async Task LoadAsync_when_WriteHeader_is_true_and_Header_attribute_is_set_uses_the_attribute_value()
     {
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<HeaderRecord, Report>(writer) { WriteHeader = true };
+        var loader = new FixedWidthLoader<HeaderRecord>(writer) { WriteHeader = true };
 
         await loader.LoadAsync(new[]
         {
@@ -347,7 +347,7 @@ public class FixedWidthLoaderTests
     public async Task LoadAsync_when_WriteHeader_and_FieldDelimiter_are_set_header_line_is_also_delimited_space_padded()
     {
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<SpacePaddedRecord, Report>(writer)
+        var loader = new FixedWidthLoader<SpacePaddedRecord>(writer)
         {
             WriteHeader = true,
             FieldDelimiter = " | ",
@@ -461,7 +461,7 @@ public class FixedWidthLoaderTests
     {
         // 1 header + 1 separator + 2 data rows = 4 physical lines written.
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>(writer)
+        var loader = new FixedWidthLoader<PersonRecord>(writer)
         {
             WriteHeader = true,
             FieldSeparator = '-',
@@ -492,7 +492,7 @@ public class FixedWidthLoaderTests
     {
         // No header or separator — 3 data rows = lines 1-3.
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>(writer);
+        var loader = new FixedWidthLoader<PersonRecord>(writer);
 
         await loader.LoadAsync(new[]
         {
@@ -578,7 +578,7 @@ public class FixedWidthLoaderTests
     public async Task GetProgressReport_returns_FixedWidthReport_with_current_counts()
     {
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>(writer);
+        var loader = new FixedWidthLoader<PersonRecord>(writer);
 
         await loader.LoadAsync(new[]
         {
@@ -607,16 +607,6 @@ public class FixedWidthLoaderTests
 
 
 
-    [Fact]
-    public void GetProgressReport_when_TProgress_is_not_FixedWidthReport_throws_NotSupportedException()
-    {
-        var loader = new FixedWidthLoader<PersonRecord, Exception>(new StringWriter());
-
-        Assert.Throws<NotSupportedException>(loader.GetProgressReport);
-    }
-
-
-
     // ------------------------------------------------------------------
     // StrictHeader overflow
     // ------------------------------------------------------------------
@@ -634,7 +624,7 @@ public class FixedWidthLoaderTests
     public async Task LoadAsync_when_WriteHeader_is_true_and_header_exceeds_field_width_throws_FieldOverflowException()
     {
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<OverflowHeaderRecord, Report>(writer)
+        var loader = new FixedWidthLoader<OverflowHeaderRecord>(writer)
         {
             WriteHeader = true,
         };
@@ -658,7 +648,7 @@ public class FixedWidthLoaderTests
     public async Task LoadAsync_when_HeaderConverter_is_TruncateHeader_truncates_long_headers()
     {
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<OverflowHeaderRecord, Report>(writer)
+        var loader = new FixedWidthLoader<OverflowHeaderRecord>(writer)
         {
             WriteHeader = true,
             HeaderConverter = FixedWidthConverter.TruncateHeader,

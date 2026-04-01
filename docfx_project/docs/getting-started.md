@@ -61,7 +61,7 @@ var inputData =
 
 var reader = new StringReader(inputData);
 
-var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>(reader);
+var extractor = new FixedWidthExtractor<PersonRecord>(reader);
 
 await foreach (var person in extractor.ExtractAsync(CancellationToken.None))
 {
@@ -80,7 +80,7 @@ using Wolfgang.Etl.FixedWidth;
 
 var writer = new StringWriter();
 
-var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>(writer);
+var loader = new FixedWidthLoader<PersonRecord>(writer);
 
 await loader.LoadAsync(recordsAsyncEnumerable, CancellationToken.None);
 

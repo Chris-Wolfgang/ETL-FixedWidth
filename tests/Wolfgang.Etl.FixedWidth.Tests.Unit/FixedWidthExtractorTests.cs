@@ -39,7 +39,7 @@ public record PersonRecord
 
 public class FixedWidthExtractorTests
     : ExtractorBaseContractTests<
-        FixedWidthExtractor<PersonRecord, FixedWidthReport>,
+        FixedWidthExtractor<PersonRecord>,
         PersonRecord,
         FixedWidthReport>
 {
@@ -75,7 +75,7 @@ public class FixedWidthExtractorTests
 
 
     /// <inheritdoc/>
-    protected override FixedWidthExtractor<PersonRecord, FixedWidthReport> CreateSut(int itemCount) =>
+    protected override FixedWidthExtractor<PersonRecord> CreateSut(int itemCount) =>
         new(new StringReader(BuildPersonContent(itemCount)));
 
 
@@ -86,7 +86,7 @@ public class FixedWidthExtractorTests
 
 
     /// <inheritdoc/>
-    protected override FixedWidthExtractor<PersonRecord, FixedWidthReport> CreateSutWithTimer(
+    protected override FixedWidthExtractor<PersonRecord> CreateSutWithTimer(
         IProgressTimer timer) =>
         new(new StringReader(BuildPersonContent(5)), timer);
 
@@ -96,7 +96,7 @@ public class FixedWidthExtractorTests
     // Helpers
     // ------------------------------------------------------------------
 
-    private static FixedWidthExtractor<PersonRecord, Report> CreateExtractor(string content) =>
+    private static FixedWidthExtractor<PersonRecord> CreateExtractor(string content) =>
         new(new StringReader(content));
 
 
@@ -619,7 +619,7 @@ public class FixedWidthExtractorTests
     public async Task ExtractAsync_when_FieldDelimiter_is_set_parses_fields_correctly()
     {
         const string content = "John       | Smith      | 042";
-        var extractor = new FixedWidthExtractor<PersonRecord, Report>(new StringReader(content))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
         {
             FieldDelimiter = " | ",
         };
@@ -654,7 +654,7 @@ public class FixedWidthExtractorTests
             "John       | Smith      | 042\n" +
             "Jane       | Doe        | 030";
 
-        var extractor = new FixedWidthExtractor<PersonRecord, Report>(new StringReader(content))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
         {
             FieldDelimiter = " | ",
             HeaderLineCount = 1,
@@ -688,7 +688,7 @@ public class FixedWidthExtractorTests
                                "-----------| -----------| ---\n" +
                                "John       | Smith      | 042";
 
-        var extractor = new FixedWidthExtractor<PersonRecord, Report>(new StringReader(content))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
         {
             FieldDelimiter = " | ",
             HeaderLineCount = 1,
@@ -712,7 +712,7 @@ public class FixedWidthExtractorTests
     {
         // With " | " delimiter PersonRecord expects 29 chars — line below is too short.
         const string content = "John       | Smith     ";
-        var extractor = new FixedWidthExtractor<PersonRecord, Report>(new StringReader(content))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
         {
             FieldDelimiter = " | ",
         };
@@ -729,7 +729,7 @@ public class FixedWidthExtractorTests
             "John       | Smith     \n" + // too short
             "Jane       | Doe        | 030";
 
-        var extractor = new FixedWidthExtractor<PersonRecord, Report>(new StringReader(content))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
         {
             FieldDelimiter = " | ",
             MalformedLineHandling = MalformedLineHandling.Skip
@@ -753,7 +753,7 @@ public class FixedWidthExtractorTests
         const string content = "John       | Smith     \n" + // too short
                                "Jane       | Doe        | 030";
 
-        var extractor = new FixedWidthExtractor<PersonRecord, Report>(new StringReader(content))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
         {
             FieldDelimiter = " | ",
             MalformedLineHandling = MalformedLineHandling.ReturnDefault
@@ -846,7 +846,7 @@ public class FixedWidthExtractorTests
                                "Jane      Doe       030\n" + // line 4
                                "Bob       Jones     055"; // line 5
 
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>(new StringReader(content))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
         {
             HasHeader = true,
             FieldSeparator = '-',
@@ -876,7 +876,7 @@ public class FixedWidthExtractorTests
                                "Jane      Doe       030\n" + // line 2 — ok
                                "Bad       Line"; // line 3 — too short
 
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>(new StringReader(content));
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content));
 
         var ex = await Assert.ThrowsAsync<LineTooShortException>(async () =>
         {
@@ -899,7 +899,7 @@ public class FixedWidthExtractorTests
                                "Bad       Line     \n" + // too short — skipped
                                "Jane      Doe       030";
 
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>(new StringReader(content))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
         {
             MalformedLineHandling = MalformedLineHandling.Skip,
         };
@@ -945,7 +945,7 @@ public class FixedWidthExtractorTests
 
 
 
-    private static FixedWidthExtractor<EmployeeRecord, Report> CreateEmployeeExtractor(string content) =>
+    private static FixedWidthExtractor<EmployeeRecord> CreateEmployeeExtractor(string content) =>
         new(new StringReader(content));
 
 
@@ -1000,7 +1000,7 @@ public class FixedWidthExtractorTests
     public async Task GetProgressReport_returns_FixedWidthReport_with_current_counts()
     {
         const string content = "John      Smith     042\nJane      Doe       030";
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>(new StringReader(content));
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content));
 
         await foreach (var _ in extractor.ExtractAsync()) { }
 
@@ -1021,16 +1021,6 @@ public class FixedWidthExtractorTests
             2L,
             report.CurrentLineNumber
         );
-    }
-
-
-
-    [Fact]
-    public void GetProgressReport_when_TProgress_is_not_FixedWidthReport_throws_NotSupportedException()
-    {
-        var extractor = new FixedWidthExtractor<PersonRecord, Exception>(new StringReader(string.Empty));
-
-        Assert.Throws<NotSupportedException>(extractor.GetProgressReport);
     }
 
 
