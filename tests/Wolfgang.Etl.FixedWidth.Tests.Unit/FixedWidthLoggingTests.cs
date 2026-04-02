@@ -79,6 +79,35 @@ internal sealed class LogEntry
 
 
 // ------------------------------------------------------------------
+// No-op progress timer for injecting a logger via the internal ctor
+// ------------------------------------------------------------------
+
+[ExcludeFromCodeCoverage]
+internal sealed class NullProgressTimer : IProgressTimer
+{
+    public event Action? Elapsed;
+
+
+
+    public void Start(int intervalMs) { }
+
+
+
+    public void StopTimer() { }
+
+
+
+    public void Dispose() { }
+
+
+
+    /// <summary>Suppresses CS0067 (event never used).</summary>
+    internal void SuppressWarning() => Elapsed?.Invoke();
+}
+
+
+
+// ------------------------------------------------------------------
 // Extractor logging tests
 // ------------------------------------------------------------------
 
@@ -99,6 +128,7 @@ public class FixedWidthExtractorLoggingTests
         var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
         (
             new StringReader(PersonLine),
+            new NullProgressTimer(),
             logger
         );
 
@@ -128,6 +158,7 @@ public class FixedWidthExtractorLoggingTests
         var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
         (
             new StringReader(PersonLine),
+            new NullProgressTimer(),
             logger
         );
 
@@ -158,6 +189,7 @@ public class FixedWidthExtractorLoggingTests
         var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
         (
             new StringReader(content),
+            new NullProgressTimer(),
             logger
         )
         {
@@ -188,6 +220,7 @@ public class FixedWidthExtractorLoggingTests
         var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
         (
             new StringReader(content),
+            new NullProgressTimer(),
             logger
         )
         {
@@ -214,6 +247,7 @@ public class FixedWidthExtractorLoggingTests
         var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
         (
             new StringReader(content),
+            new NullProgressTimer(),
             logger
         )
         {
@@ -244,6 +278,7 @@ public class FixedWidthExtractorLoggingTests
         var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
         (
             new StringReader(content),
+            new NullProgressTimer(),
             logger
         );
 
@@ -274,6 +309,7 @@ public class FixedWidthExtractorLoggingTests
         var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
         (
             new StringReader("Short"),
+            new NullProgressTimer(),
             logger
         );
 
@@ -305,6 +341,7 @@ public class FixedWidthExtractorLoggingTests
         var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
         (
             new StringReader(content),
+            new NullProgressTimer(),
             logger
         )
         {
@@ -331,6 +368,7 @@ public class FixedWidthExtractorLoggingTests
         var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
         (
             new StringReader(content),
+            new NullProgressTimer(),
             logger
         )
         {
@@ -361,6 +399,7 @@ public class FixedWidthExtractorLoggingTests
         var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
         (
             new StringReader(content),
+            new NullProgressTimer(),
             logger
         )
         {
@@ -389,6 +428,7 @@ public class FixedWidthExtractorLoggingTests
         var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
         (
             new StringReader(content),
+            new NullProgressTimer(),
             logger
         )
         {
@@ -421,6 +461,7 @@ public class FixedWidthExtractorLoggingTests
         var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
         (
             new StringReader(content),
+            new NullProgressTimer(),
             logger
         )
         {
@@ -447,6 +488,7 @@ public class FixedWidthExtractorLoggingTests
         var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
         (
             new StringReader(content),
+            new NullProgressTimer(),
             logger
         )
         {
@@ -478,6 +520,7 @@ public class FixedWidthExtractorLoggingTests
         var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
         (
             new StringReader(content),
+            new NullProgressTimer(),
             logger
         );
 
@@ -540,6 +583,7 @@ public class FixedWidthLoaderLoggingTests
         var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
         (
             new StringWriter(),
+            new NullProgressTimer(),
             logger
         );
 
@@ -569,6 +613,7 @@ public class FixedWidthLoaderLoggingTests
         var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
         (
             new StringWriter(),
+            new NullProgressTimer(),
             logger
         );
 
@@ -595,6 +640,7 @@ public class FixedWidthLoaderLoggingTests
         var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
         (
             new StringWriter(),
+            new NullProgressTimer(),
             logger
         )
         {
@@ -620,6 +666,7 @@ public class FixedWidthLoaderLoggingTests
         var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
         (
             new StringWriter(),
+            new NullProgressTimer(),
             logger
         )
         {
@@ -655,6 +702,7 @@ public class FixedWidthLoaderLoggingTests
         var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
         (
             new StringWriter(),
+            new NullProgressTimer(),
             logger
         )
         {
@@ -685,6 +733,7 @@ public class FixedWidthLoaderLoggingTests
         var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
         (
             new StringWriter(),
+            new NullProgressTimer(),
             logger
         )
         {
@@ -720,6 +769,7 @@ public class FixedWidthLoaderLoggingTests
         var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
         (
             new StringWriter(),
+            new NullProgressTimer(),
             logger
         );
 
@@ -749,6 +799,7 @@ public class FixedWidthLoaderLoggingTests
         var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
         (
             new StringWriter(),
+            new NullProgressTimer(),
             logger
         );
 

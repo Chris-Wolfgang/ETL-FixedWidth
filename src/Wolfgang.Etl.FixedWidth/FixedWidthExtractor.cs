@@ -103,19 +103,11 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// slow or non-buffered sources should pre-buffer into a <see cref="StringReader"/>.
     /// The caller is responsible for the reader's lifetime.
     /// </param>
-    /// <param name="logger">
-    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
-    /// Pass <see langword="null"/> (the default) to disable logging.
-    /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="reader"/> is null.</exception>
-    public FixedWidthExtractor
-    (
-        TextReader reader,
-        ILogger<FixedWidthExtractor<TRecord, TProgress>>? logger = null
-    )
+    public FixedWidthExtractor(TextReader reader)
     {
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
+        _logger = NullLogger.Instance;
     }
 
 
@@ -161,21 +153,13 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// The <see cref="Stream"/> to read fixed-width records from. The stream must be
     /// readable. The caller retains ownership — the extractor does not dispose the stream.
     /// </param>
-    /// <param name="logger">
-    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
-    /// Pass <see langword="null"/> (the default) to disable logging.
-    /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
-    public FixedWidthExtractor
-    (
-        Stream stream,
-        ILogger<FixedWidthExtractor<TRecord, TProgress>>? logger = null
-    )
+    public FixedWidthExtractor(Stream stream)
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
         _reader = new StreamReader(stream, encoding: System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
         _ownsReader = true;
-        _logger = logger ?? (ILogger)NullLogger.Instance;
+        _logger = NullLogger.Instance;
     }
 
 
