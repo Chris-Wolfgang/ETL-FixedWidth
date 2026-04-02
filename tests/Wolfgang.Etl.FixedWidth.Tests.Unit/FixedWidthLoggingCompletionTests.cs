@@ -3,7 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.FixedWidth.Enums;
+using Wolfgang.Etl.TestKit.Xunit;
 using Xunit;
 
 namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
@@ -22,7 +23,7 @@ public class FixedWidthLoggingCompletionTests
         var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
         (
             new StringReader(content),
-            new NullProgressTimer(),
+            new ManualProgressTimer(),
             logger
         )
         {
@@ -52,7 +53,7 @@ public class FixedWidthLoggingCompletionTests
         var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
         (
             new StringReader(content),
-            new NullProgressTimer(),
+            new ManualProgressTimer(),
             logger
         )
         {
@@ -88,7 +89,7 @@ public class FixedWidthLoggingCompletionTests
         var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
         (
             new StringWriter(),
-            new NullProgressTimer(),
+            new ManualProgressTimer(),
             logger
         )
         {
