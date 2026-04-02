@@ -86,19 +86,11 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     /// formatted console table output, or any other <see cref="TextWriter"/> implementation.
     /// The caller is responsible for the writer's lifetime — the loader does not dispose it.
     /// </param>
-    /// <param name="logger">
-    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
-    /// Pass <see langword="null"/> (the default) to disable logging.
-    /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="writer"/> is null.</exception>
-    public FixedWidthLoader
-    (
-        TextWriter writer,
-        ILogger<FixedWidthLoader<TRecord>>? logger = null
-    )
+    public FixedWidthLoader(TextWriter writer)
     {
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
+        _logger = NullLogger.Instance;
     }
 
 
@@ -144,21 +136,13 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     /// The <see cref="Stream"/> to write fixed-width records to. The stream must be
     /// writable. The caller retains ownership — the loader does not dispose the stream.
     /// </param>
-    /// <param name="logger">
-    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
-    /// Pass <see langword="null"/> (the default) to disable logging.
-    /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
-    public FixedWidthLoader
-    (
-        Stream stream,
-        ILogger<FixedWidthLoader<TRecord>>? logger = null
-    )
+    public FixedWidthLoader(Stream stream)
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
         _writer = new StreamWriter(stream, encoding: System.Text.Encoding.UTF8, bufferSize: DefaultBufferSize, leaveOpen: true);
         _ownsWriter = true;
-        _logger = logger ?? (ILogger)NullLogger.Instance;
+        _logger = NullLogger.Instance;
     }
 
 
