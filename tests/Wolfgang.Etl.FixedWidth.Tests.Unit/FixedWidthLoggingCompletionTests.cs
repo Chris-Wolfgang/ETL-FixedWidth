@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Wolfgang.Etl.Abstractions;
-using Wolfgang.Etl.FixedWidth.Enums;
 using Xunit;
 
 namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
