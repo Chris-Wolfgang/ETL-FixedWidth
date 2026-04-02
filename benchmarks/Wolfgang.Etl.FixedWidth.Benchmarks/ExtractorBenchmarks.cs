@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
-using Wolfgang.Etl.Abstractions;
 
 namespace Wolfgang.Etl.FixedWidth.Benchmarks;
 
@@ -69,7 +68,7 @@ public class ExtractorBenchmarks
             bufferSize: 1024,
             leaveOpen: false
         );
-        var extractor = new FixedWidthExtractor<BenchmarkRecord, Report>(reader);
+        var extractor = new FixedWidthExtractor<BenchmarkRecord>(reader);
 
         var count = 0;
         await foreach (var _ in extractor.ExtractAsync())
@@ -86,7 +85,7 @@ public class ExtractorBenchmarks
     public async Task<int> Memory_Stream()
     {
         using var stream = new MemoryStream(_data);
-        using var extractor = new FixedWidthExtractor<BenchmarkRecord, Report>(stream);
+        using var extractor = new FixedWidthExtractor<BenchmarkRecord>(stream);
 
         var count = 0;
         await foreach (var _ in extractor.ExtractAsync())
@@ -108,7 +107,7 @@ public class ExtractorBenchmarks
     {
         using var stream = new FileStream(_filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096);
         using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: false, bufferSize: 1024);
-        var extractor = new FixedWidthExtractor<BenchmarkRecord, Report>(reader);
+        var extractor = new FixedWidthExtractor<BenchmarkRecord>(reader);
 
         var count = 0;
         await foreach (var _ in extractor.ExtractAsync())
@@ -125,7 +124,7 @@ public class ExtractorBenchmarks
     public async Task<int> File_Stream_64KB()
     {
         using var stream = new FileStream(_filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096);
-        using var extractor = new FixedWidthExtractor<BenchmarkRecord, Report>(stream);
+        using var extractor = new FixedWidthExtractor<BenchmarkRecord>(stream);
 
         var count = 0;
         await foreach (var _ in extractor.ExtractAsync())

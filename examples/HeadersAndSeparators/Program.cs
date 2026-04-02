@@ -49,7 +49,6 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Enums;
@@ -110,7 +109,7 @@ public static class Program
         Console.WriteLine();
 
         var writer1 = new StringWriter();
-        var loader1 = new FixedWidthLoader<ReportRecord, FixedWidthReport>(writer1);
+        var loader1 = new FixedWidthLoader<ReportRecord>(writer1);
 
         // WriteHeader: emit a header row. The header labels come from the
         // Header property on [FixedWidthField] — "Region", "Sales ($)", "Units".
@@ -145,7 +144,7 @@ public static class Program
         Console.WriteLine();
 
         var reader2 = new StringReader(output1);
-        var extractor2 = new FixedWidthExtractor<ReportRecord, FixedWidthReport>(reader2);
+        var extractor2 = new FixedWidthExtractor<ReportRecord>(reader2);
 
         // HasHeader: tells the extractor that line 1 is a header — skip it.
         // This is a convenience for HeaderLineCount = 1. If your file has
@@ -173,7 +172,7 @@ public static class Program
         Console.WriteLine();
 
         var writer3 = new StringWriter();
-        var loader3 = new FixedWidthLoader<ReportRecord, FixedWidthReport>(writer3);
+        var loader3 = new FixedWidthLoader<ReportRecord>(writer3);
         loader3.WriteHeader = true;
         loader3.FieldSeparator = '=';
 
@@ -210,7 +209,7 @@ public static class Program
         // Build a fixed-width string that has data rows followed by a footer.
         // The footer starts with "TOTAL" — a common pattern in report files.
         var writer4 = new StringWriter();
-        var loader4 = new FixedWidthLoader<ReportRecord, FixedWidthReport>(writer4);
+        var loader4 = new FixedWidthLoader<ReportRecord>(writer4);
         loader4.WriteHeader = true;
         loader4.FieldSeparator = '-';
 
@@ -230,7 +229,7 @@ public static class Program
 
         // Extract with a LineFilter that stops when it sees "TOTAL".
         var reader4 = new StringReader(dataWithFooter);
-        var extractor4 = new FixedWidthExtractor<ReportRecord, FixedWidthReport>(reader4);
+        var extractor4 = new FixedWidthExtractor<ReportRecord>(reader4);
         extractor4.HasHeader = true;
         extractor4.FieldSeparator = '-';
 

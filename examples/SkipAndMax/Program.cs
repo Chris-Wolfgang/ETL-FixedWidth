@@ -37,7 +37,6 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Enums;
@@ -88,7 +87,7 @@ public static class Program
         // Write all 20 records to a string using the loader.
         // No header — just raw data lines (one per record).
         var dataWriter = new StringWriter();
-        var loader = new FixedWidthLoader<ItemRecord, FixedWidthReport>(dataWriter);
+        var loader = new FixedWidthLoader<ItemRecord>(dataWriter);
 
         await loader.LoadAsync
         (
@@ -120,7 +119,7 @@ public static class Program
             // the reader's position is past line 5. We cannot rewind a StringReader,
             // so we must create a new one from the original string each time.
             var pageReader = new StringReader(allData);
-            var extractor = new FixedWidthExtractor<ItemRecord, FixedWidthReport>(pageReader);
+            var extractor = new FixedWidthExtractor<ItemRecord>(pageReader);
 
             // SkipItemCount: skip the first N data items. For page 1, skip 0.
             // For page 2, skip 5 (the first page's worth). For page 3, skip 10.

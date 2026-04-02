@@ -3,7 +3,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
-using Wolfgang.Etl.Abstractions;
 
 namespace Wolfgang.Etl.FixedWidth.Benchmarks;
 
@@ -54,7 +53,7 @@ public class PeakMemoryBenchmarks
         var before = GC.GetTotalMemory(forceFullCollection: true);
 
         using var stream = new MemoryStream(_dataBySize[0]);
-        var extractor = new FixedWidthExtractor<BenchmarkRecord, Report>(stream);
+        var extractor = new FixedWidthExtractor<BenchmarkRecord>(stream);
 
         var count = 0;
         await foreach (var _ in extractor.ExtractAsync())

@@ -5,8 +5,8 @@ namespace Wolfgang.Etl.FixedWidth;
 
 /// <summary>
 /// Provides contextual information about a fixed-width field to a
-/// <see cref="FixedWidthLoader{TRecord,TProgress}.ValueConverter"/> or
-/// <see cref="FixedWidthExtractor{TRecord,TProgress}.ValueParser"/> delegate.
+/// <see cref="FixedWidthLoader{TRecord}.ValueConverter"/> or
+/// <see cref="FixedWidthExtractor{TRecord}.ValueParser"/> delegate.
 /// </summary>
 /// <remarks>
 /// An instance of this class is constructed by the framework for each field and passed
@@ -57,7 +57,7 @@ public sealed class FieldContext
 
     /// <summary>
     /// The CLR type of the property being parsed. Available to
-    /// <see cref="FixedWidthExtractor{TRecord,TProgress}.ValueParser"/> delegates
+    /// <see cref="FixedWidthExtractor{TRecord}.ValueParser"/> delegates
     /// so the parser knows what type to return.
     /// </summary>
     public Type PropertyType { get; }

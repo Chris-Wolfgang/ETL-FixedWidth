@@ -7,8 +7,8 @@ namespace Wolfgang.Etl.FixedWidth;
 
 /// <summary>
 /// Provides built-in value converter, header converter, and value parser functions
-/// for use with <see cref="FixedWidthLoader{TRecord,TProgress}"/> and
-/// <see cref="FixedWidthExtractor{TRecord,TProgress}"/>.
+/// for use with <see cref="FixedWidthLoader{TRecord}"/> and
+/// <see cref="FixedWidthExtractor{TRecord}"/>.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -31,7 +31,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// <b>Value parsers</b> (<see cref="Func{T1,T2,TResult}"/> of <c>string, FieldContext, object</c>)
 /// convert a raw string read from the file back to the target property type.
 /// <see cref="DefaultParser"/> is the built-in implementation used by
-/// <see cref="FixedWidthExtractor{TRecord,TProgress}"/> by default.
+/// <see cref="FixedWidthExtractor{TRecord}"/> by default.
 /// </para>
 /// </remarks>
 public static class FixedWidthConverter
@@ -43,7 +43,7 @@ public static class FixedWidthConverter
     /// <summary>
     /// Converts the value to a string and throws a <see cref="FieldOverflowException"/>
     /// if the result exceeds <see cref="FieldContext.FieldLength"/>. This is the default
-    /// value converter used by <see cref="FixedWidthLoader{TRecord,TProgress}"/>.
+    /// value converter used by <see cref="FixedWidthLoader{TRecord}"/>.
     /// </summary>
     /// <exception cref="FieldOverflowException">
     /// Thrown when the converted string is longer than <see cref="FieldContext.FieldLength"/>.
@@ -128,12 +128,12 @@ public static class FixedWidthConverter
     /// Validates that the header label fits within <see cref="FieldContext.FieldLength"/>,
     /// throwing a <see cref="FieldOverflowException"/> if it does not, then returns the
     /// label unchanged. Space-padding is applied by the framework after the converter returns.
-    /// This is the default header converter used by <see cref="FixedWidthLoader{TRecord,TProgress}"/>.
+    /// This is the default header converter used by <see cref="FixedWidthLoader{TRecord}"/>.
     /// </summary>
     /// <remarks>
     /// The <see cref="FieldContext"/> is passed as-is from the attribute. If you want
     /// different alignment or padding for header cells, supply a custom
-    /// <see cref="FixedWidthLoader{TRecord,TProgress}.HeaderConverter"/>.
+    /// <see cref="FixedWidthLoader{TRecord}.HeaderConverter"/>.
     /// </remarks>
     /// <exception cref="FieldOverflowException">
     /// Thrown when the header label is longer than <see cref="FieldContext.FieldLength"/>.
@@ -195,7 +195,7 @@ public static class FixedWidthConverter
     /// <summary>
     /// Converts a raw string read from the file to the target property type indicated by
     /// <see cref="FieldContext.PropertyType"/>. This is the default
-    /// <see cref="FixedWidthExtractor{TRecord,TProgress}.ValueParser"/>.
+    /// <see cref="FixedWidthExtractor{TRecord}.ValueParser"/>.
     /// </summary>
     /// <remarks>
     /// <list type="bullet">

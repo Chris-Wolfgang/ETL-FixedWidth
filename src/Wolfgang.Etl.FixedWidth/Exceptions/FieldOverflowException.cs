@@ -11,8 +11,8 @@ namespace Wolfgang.Etl.FixedWidth.Exceptions;
 /// </summary>
 /// <remarks>
 /// This exception is not thrown for data values in the file that are too wide for
-/// a target type — it is only thrown when a <see cref="FixedWidthLoader{TRecord,TProgress}.ValueConverter"/>
-/// or <see cref="FixedWidthLoader{TRecord,TProgress}.HeaderConverter"/> returns a
+/// a target type — it is only thrown when a <see cref="FixedWidthLoader{TRecord}.ValueConverter"/>
+/// or <see cref="FixedWidthLoader{TRecord}.HeaderConverter"/> returns a
 /// string longer than <see cref="FieldLength"/>. To silently truncate instead of
 /// throwing, use <see cref="FixedWidthConverter.Truncate"/> or
 /// <see cref="FixedWidthConverter.TruncateHeader"/>.

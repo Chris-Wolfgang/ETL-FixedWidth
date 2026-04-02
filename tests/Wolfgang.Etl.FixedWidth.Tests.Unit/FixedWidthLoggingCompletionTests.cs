@@ -18,9 +18,9 @@ public class FixedWidthLoggingCompletionTests
     [Fact]
     public async Task ExtractAsync_when_MaximumItemCount_stops_early_still_logs_completed()
     {
-        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = PersonLine + "\n" + PersonLine + "\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader(content),
             new ManualProgressTimer(),
@@ -48,9 +48,9 @@ public class FixedWidthLoggingCompletionTests
     [Fact]
     public async Task ExtractAsync_when_LineFilter_stops_early_still_logs_completed()
     {
-        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = PersonLine + "\nEND\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>
+        var extractor = new FixedWidthExtractor<PersonRecord>
         (
             new StringReader(content),
             new ManualProgressTimer(),
@@ -80,13 +80,13 @@ public class FixedWidthLoggingCompletionTests
     [Fact]
     public async Task LoadAsync_when_MaximumItemCount_stops_early_still_logs_completed()
     {
-        var logger = new SpyLogger<FixedWidthLoader<PersonRecord, FixedWidthReport>>();
+        var logger = new SpyLogger<FixedWidthLoader<PersonRecord>>();
         var records = new[]
         {
             new PersonRecord { FirstName = "John", LastName = "Smith", Age = 42 },
             new PersonRecord { FirstName = "Jane", LastName = "Doe", Age = 30 },
         };
-        var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>
+        var loader = new FixedWidthLoader<PersonRecord>
         (
             new StringWriter(),
             new ManualProgressTimer(),

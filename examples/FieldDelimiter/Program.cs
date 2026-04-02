@@ -25,7 +25,6 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth;
 using Wolfgang.Etl.FixedWidth.Attributes;
 
@@ -78,7 +77,7 @@ public static class Program
         Console.WriteLine();
 
         var withDelimiter = new StringWriter();
-        var loaderWithDelim = new FixedWidthLoader<ContactRecord, FixedWidthReport>(withDelimiter);
+        var loaderWithDelim = new FixedWidthLoader<ContactRecord>(withDelimiter);
 
         // FieldDelimiter: the string placed between every pair of adjacent fields.
         // " | " adds 3 characters of visual separation between each column.
@@ -122,7 +121,7 @@ public static class Program
         // extractor will calculate incorrect field start positions and produce
         // garbled data.
         var readerWithDelim = new StringReader(outputWithDelimiter);
-        var extractorWithDelim = new FixedWidthExtractor<ContactRecord, FixedWidthReport>(readerWithDelim);
+        var extractorWithDelim = new FixedWidthExtractor<ContactRecord>(readerWithDelim);
         extractorWithDelim.FieldDelimiter = " | ";
         extractorWithDelim.HasHeader = true;
         extractorWithDelim.FieldSeparator = '-';
@@ -141,7 +140,7 @@ public static class Program
         Console.WriteLine();
 
         var withoutDelimiter = new StringWriter();
-        var loaderNoDelim = new FixedWidthLoader<ContactRecord, FixedWidthReport>(withoutDelimiter);
+        var loaderNoDelim = new FixedWidthLoader<ContactRecord>(withoutDelimiter);
 
         // No delimiter — fields are concatenated directly with no visual separator.
         // Each field occupies exactly its declared width (15 + 25 + 12 = 52 chars).

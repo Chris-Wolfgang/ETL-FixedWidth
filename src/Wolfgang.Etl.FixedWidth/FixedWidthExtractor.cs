@@ -21,11 +21,6 @@ namespace Wolfgang.Etl.FixedWidth;
 /// <see cref="Attributes.FixedWidthFieldAttribute"/> are populated from each line.
 /// The type must have a public parameterless constructor.
 /// </typeparam>
-/// <typeparam name="TProgress">
-/// The type of the progress object reported during extraction.
-/// Override <see cref="CreateProgressReport"/> to return an instance of this type.
-/// If you do not need a custom progress type, use <see cref="FixedWidthReport"/>.
-/// </typeparam>
 /// <remarks>
 /// <para>
 /// Two construction modes are supported, each with different ownership semantics:
@@ -44,25 +39,14 @@ namespace Wolfgang.Etl.FixedWidth;
 /// <code>
 /// // Stream-based (preferred for files — 64 KB buffer reduces syscall overhead):
 /// await using var stream = File.OpenRead("data.txt");
-/// using var extractor = new FixedWidthExtractor&lt;CustomerRecord, FixedWidthReport&gt;(stream);
+/// using var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;(stream);
 ///
 /// // TextReader-based (caller owns the reader):
-/// var extractor = new FixedWidthExtractor&lt;CustomerRecord, FixedWidthReport&gt;(reader);
-///
-/// // Custom progress type — subclass and override CreateProgressReport:
-/// public class CustomerExtractor : FixedWidthExtractor&lt;CustomerRecord, MyProgress&gt;
-/// {
-///     public CustomerExtractor(Stream stream)
-///         : base(stream) { }
-///
-///     protected override MyProgress CreateProgressReport() =>
-///         new MyProgress(CurrentItemCount, CurrentSkippedItemCount);
-/// }
+/// var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;(reader);
 /// </code>
 /// </example>
-public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TProgress>, IDisposable
+public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthReport>, IDisposable
     where TRecord : notnull, new()
-    where TProgress : notnull
 {
     // ------------------------------------------------------------------
     // Fields
@@ -92,7 +76,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     // ------------------------------------------------------------------
 
     /// <summary>
-    /// Initializes a new <see cref="FixedWidthExtractor{TRecord,TProgress}"/> that reads
+    /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> that reads
     /// from the specified <see cref="TextReader"/>.
     /// </summary>
     /// <param name="reader">
@@ -113,7 +97,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
 
     /// <summary>
-    /// Initializes a new <see cref="FixedWidthExtractor{TRecord,TProgress}"/> that reads
+    /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> that reads
     /// from the specified <see cref="TextReader"/> and uses the supplied
     /// <see cref="IProgressTimer"/> instead of the default system timer.
     /// </summary>
@@ -134,7 +118,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     (
         TextReader reader,
         IProgressTimer timer,
-        ILogger<FixedWidthExtractor<TRecord, TProgress>>? logger = null
+        ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
     {
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
@@ -145,7 +129,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
 
     /// <summary>
-    /// Initializes a new <see cref="FixedWidthExtractor{TRecord,TProgress}"/> that reads
+    /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> that reads
     /// from the specified <see cref="Stream"/> using an internal <see cref="StreamReader"/>
     /// with a 64 KB buffer for improved throughput on large files.
     /// </summary>
@@ -165,7 +149,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
 
     /// <summary>
-    /// Initializes a new <see cref="FixedWidthExtractor{TRecord,TProgress}"/> that reads
+    /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> that reads
     /// from the specified <see cref="Stream"/> and uses the supplied
     /// <see cref="IProgressTimer"/> instead of the default system timer.
     /// </summary>
@@ -186,7 +170,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     (
         Stream stream,
         IProgressTimer timer,
-        ILogger<FixedWidthExtractor<TRecord, TProgress>>? logger = null
+        ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
@@ -219,19 +203,19 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
     /// <summary>
     /// Specifies what happens when a truly blank line (zero length) is encountered
-    /// in the file. Evaluated before the skip budget and <see cref="ExtractorBase{TRecord,TProgress}.MaximumItemCount"/>.
+    /// in the file. Evaluated before the skip budget and <see cref="ExtractorBase{TRecord,FixedWidthReport}.MaximumItemCount"/>.
     /// </summary>
     /// <remarks>
     /// <list type="bullet">
     ///   <item><see cref="BlankLineHandling.ThrowException"/> (default) — always throws
     ///   a <see cref="Exceptions.LineTooShortException"/> regardless of position.</item>
     ///   <item><see cref="BlankLineHandling.Skip"/> — the line is invisible to all counting
-    ///   logic. Does not count toward <see cref="ExtractorBase{TRecord,TProgress}.SkipItemCount"/>
-    ///   or <see cref="ExtractorBase{TRecord,TProgress}.MaximumItemCount"/>.</item>
+    ///   logic. Does not count toward <see cref="ExtractorBase{TRecord,FixedWidthReport}.SkipItemCount"/>
+    ///   or <see cref="ExtractorBase{TRecord,FixedWidthReport}.MaximumItemCount"/>.</item>
     ///   <item><see cref="BlankLineHandling.ReturnDefault"/> — a default
     ///   <typeparamref name="TRecord"/> instance is yielded. Counts toward the skip budget
-    ///   if within <see cref="ExtractorBase{TRecord,TProgress}.SkipItemCount"/>, otherwise
-    ///   counts toward <see cref="ExtractorBase{TRecord,TProgress}.MaximumItemCount"/>.</item>
+    ///   if within <see cref="ExtractorBase{TRecord,FixedWidthReport}.SkipItemCount"/>, otherwise
+    ///   counts toward <see cref="ExtractorBase{TRecord,FixedWidthReport}.MaximumItemCount"/>.</item>
     /// </list>
     /// <para>
     /// Note: a line consisting entirely of spaces is not blank — it is a valid data line
@@ -253,10 +237,10 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// </summary>
     /// <remarks>
     /// Evaluated after <see cref="BlankLineHandling"/> — blank lines never reach the filter.
-    /// Evaluated before the skip budget and <see cref="ExtractorBase{TRecord,TProgress}.MaximumItemCount"/>.
+    /// Evaluated before the skip budget and <see cref="ExtractorBase{TRecord,FixedWidthReport}.MaximumItemCount"/>.
     /// Both <see cref="LineAction.Skip"/> and <see cref="LineAction.Stop"/> are invisible
-    /// to all counting logic — they do not affect <see cref="ExtractorBase{TRecord,TProgress}.SkipItemCount"/>,
-    /// <see cref="ExtractorBase{TRecord,TProgress}.MaximumItemCount"/>, or
+    /// to all counting logic — they do not affect <see cref="ExtractorBase{TRecord,FixedWidthReport}.SkipItemCount"/>,
+    /// <see cref="ExtractorBase{TRecord,FixedWidthReport}.MaximumItemCount"/>, or
     /// <c>CurrentSkippedItemCount</c>.
     /// Defaults to a function that always returns <see cref="LineAction.Process"/>.
     /// </remarks>
@@ -287,7 +271,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// type. The <see cref="FieldContext"/> provides the property type, format string, and
     /// other field metadata needed to perform the conversion.
     /// Defaults to <see cref="FixedWidthConverter.DefaultParser"/>.
-    /// Mirrors <see cref="FixedWidthLoader{TRecord,TProgress}.ValueConverter"/>.
+    /// Mirrors <see cref="FixedWidthLoader{TRecord}.ValueConverter"/>.
     /// </summary>
     /// <remarks>
     /// The delegate must return a value that is assignable to the property's CLR type.
@@ -347,7 +331,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// <see cref="HeaderLineCount"/> to 1. When set to <see langword="false"/>,
     /// sets <see cref="HeaderLineCount"/> to 0.
     /// Returns <see langword="true"/> if <see cref="HeaderLineCount"/> is greater than zero.
-    /// Mirrors <see cref="FixedWidthLoader{TRecord,TProgress}.WriteHeader"/>.
+    /// Mirrors <see cref="FixedWidthLoader{TRecord}.WriteHeader"/>.
     /// </summary>
     /// <example>
     /// <code>
@@ -374,7 +358,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// as a separator and skipped. Has no effect if <see cref="HeaderLineCount"/> is 0.
     /// The value of the character is not used for parsing — only its presence matters.
     /// Set to <see langword="null"/> (default) for no separator.
-    /// Mirrors <see cref="FixedWidthLoader{TRecord,TProgress}.FieldSeparator"/>.
+    /// Mirrors <see cref="FixedWidthLoader{TRecord}.FieldSeparator"/>.
     /// </summary>
     /// <example>
     /// <code>
@@ -390,7 +374,7 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// <summary>
     /// The delimiter string present between fields in the source file, or
     /// <see langword="null"/> (default) for pure fixed-width input with no delimiter.
-    /// Must match the <see cref="FixedWidthLoader{TRecord,TProgress}.FieldDelimiter"/>
+    /// Must match the <see cref="FixedWidthLoader{TRecord}.FieldDelimiter"/>
     /// used when the file was written.
     /// </summary>
     /// <remarks>
@@ -425,49 +409,20 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
 
     /// <summary>
     /// Creates a progress report snapshot for the current extractor state.
-    /// Override in a derived class to return a custom <typeparamref name="TProgress"/>
-    /// instance. The default implementation returns a <see cref="FixedWidthReport"/>
-    /// when <typeparamref name="TProgress"/> is <see cref="FixedWidthReport"/> or the
-    /// base <see cref="Report"/>, and throws <see cref="NotSupportedException"/> otherwise.
     /// </summary>
     /// <returns>
-    /// A <typeparamref name="TProgress"/> snapshot containing
-    /// <see cref="ExtractorBase{TRecord,TProgress}.CurrentItemCount"/>,
-    /// <see cref="ExtractorBase{TRecord,TProgress}.CurrentSkippedItemCount"/>,
+    /// A <see cref="FixedWidthReport"/> snapshot containing
+    /// <see cref="ExtractorBase{TRecord,FixedWidthReport}.CurrentItemCount"/>,
+    /// <see cref="ExtractorBase{TRecord,FixedWidthReport}.CurrentSkippedItemCount"/>,
     /// and <see cref="CurrentLineNumber"/> at the moment of the call.
     /// </returns>
-    /// <exception cref="NotSupportedException">
-    /// Thrown when <typeparamref name="TProgress"/> is not <see cref="FixedWidthReport"/>
-    /// or <see cref="Report"/> and <see cref="CreateProgressReport"/> has not been overridden.
-    /// </exception>
-    /// <example>
-    /// <code>
-    /// // To use a custom progress type, subclass and override:
-    /// public class MyExtractor : FixedWidthExtractor&lt;MyRecord, MyProgress&gt;
-    /// {
-    ///     public MyExtractor(TextReader reader) : base(reader) { }
-    ///
-    ///     protected override MyProgress CreateProgressReport() =>
-    ///         new MyProgress(CurrentItemCount, CurrentLineNumber);
-    /// }
-    /// </code>
-    /// </example>
-    protected override TProgress CreateProgressReport()
+    protected override FixedWidthReport CreateProgressReport()
     {
-        if (typeof(TProgress) == typeof(FixedWidthReport) || typeof(TProgress) == typeof(Report))
-        {
-            return (TProgress)(object)new FixedWidthReport
-            (
-                CurrentItemCount,
-                CurrentSkippedItemCount,
-                Interlocked.Read(ref _currentLineNumber)
-            );
-        }
-
-        throw new NotSupportedException
+        return new FixedWidthReport
         (
-            $"Override {nameof(CreateProgressReport)} to supply a " +
-            $"{typeof(TProgress).Name} instance."
+            CurrentItemCount,
+            CurrentSkippedItemCount,
+            Interlocked.Read(ref _currentLineNumber)
         );
     }
 
@@ -476,12 +431,12 @@ public class FixedWidthExtractor<TRecord, TProgress> : ExtractorBase<TRecord, TP
     /// <summary>
     /// Returns a snapshot progress report. Visible to the test assembly via InternalsVisibleTo.
     /// </summary>
-    internal TProgress GetProgressReport() => CreateProgressReport();
+    internal FixedWidthReport GetProgressReport() => CreateProgressReport();
 
 
 
     /// <inheritdoc/>
-    protected override IProgressTimer CreateProgressTimer(IProgress<TProgress> progress)
+    protected override IProgressTimer CreateProgressTimer(IProgress<FixedWidthReport> progress)
     {
         if (_progressTimer != null)
         {

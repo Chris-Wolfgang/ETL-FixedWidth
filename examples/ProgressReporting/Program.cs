@@ -8,7 +8,7 @@
 // Key concepts:
 //   - ReportingInterval (TimeSpan): controls how often the internal timer
 //     fires. The timer starts automatically when ExtractAsync is called with
-//     a non-null IProgress<TProgress> parameter. Set this BEFORE calling
+//     a non-null IProgress<FixedWidthReport> parameter. Set this BEFORE calling
 //     ExtractAsync.
 //
 //   - Progress<FixedWidthReport>: the standard .NET progress reporting
@@ -105,7 +105,7 @@ public static class Program
         // -----------------------------------------------------------------
 
         var reader = new StringReader(data);
-        var extractor = new FixedWidthExtractor<DataRecord, FixedWidthReport>(reader);
+        var extractor = new FixedWidthExtractor<DataRecord>(reader);
 
         // Set the reporting interval BEFORE calling ExtractAsync.
         // The timer is created internally when ExtractAsync starts.
@@ -130,7 +130,7 @@ public static class Program
         // -----------------------------------------------------------------
         // Run the extraction
         // -----------------------------------------------------------------
-        // ExtractAsync accepts an optional IProgress<TProgress> parameter.
+        // ExtractAsync accepts an optional IProgress<FixedWidthReport> parameter.
         // When provided, the extractor starts an internal timer that fires
         // at the configured ReportingInterval and reports snapshots via
         // the IProgress callback.

@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Wolfgang.Etl.Abstractions;
 using Xunit;
 
 namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
@@ -30,7 +29,7 @@ public class FixedWidthExtractorStreamCtorTests
     {
         Assert.Throws<ArgumentNullException>
         (
-            () => new FixedWidthExtractor<PersonRecord, Report>((Stream)null!)
+            () => new FixedWidthExtractor<PersonRecord>((Stream)null!)
         );
     }
 
@@ -40,7 +39,7 @@ public class FixedWidthExtractorStreamCtorTests
     public async Task ExtractAsync_from_Stream_yields_records()
     {
         using var stream = ToStream(PersonLine + "\n" + PersonLine);
-        using var extractor = new FixedWidthExtractor<PersonRecord, Report>(stream);
+        using var extractor = new FixedWidthExtractor<PersonRecord>(stream);
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -54,7 +53,7 @@ public class FixedWidthExtractorStreamCtorTests
     public void Dispose_disposes_internal_StreamReader()
     {
         var stream = ToStream(PersonLine);
-        var extractor = new FixedWidthExtractor<PersonRecord, Report>(stream);
+        var extractor = new FixedWidthExtractor<PersonRecord>(stream);
 
         extractor.Dispose();
 
@@ -69,7 +68,7 @@ public class FixedWidthExtractorStreamCtorTests
     public void Dispose_when_constructed_from_TextReader_does_not_dispose_reader()
     {
         var reader = new StringReader(PersonLine);
-        var extractor = new FixedWidthExtractor<PersonRecord, Report>(reader);
+        var extractor = new FixedWidthExtractor<PersonRecord>(reader);
 
         extractor.Dispose();
 
@@ -84,7 +83,7 @@ public class FixedWidthExtractorStreamCtorTests
     public void Dispose_can_be_called_multiple_times_without_error()
     {
         using var stream = ToStream(PersonLine);
-        var extractor = new FixedWidthExtractor<PersonRecord, Report>(stream);
+        var extractor = new FixedWidthExtractor<PersonRecord>(stream);
 
         extractor.Dispose();
         extractor.Dispose();
@@ -104,7 +103,7 @@ public class FixedWidthLoaderStreamCtorTests
     {
         Assert.Throws<ArgumentNullException>
         (
-            () => new FixedWidthLoader<PersonRecord, Report>((Stream)null!)
+            () => new FixedWidthLoader<PersonRecord>((Stream)null!)
         );
     }
 
@@ -114,7 +113,7 @@ public class FixedWidthLoaderStreamCtorTests
     public async Task LoadAsync_to_Stream_writes_records()
     {
         using var stream = new MemoryStream();
-        using var loader = new FixedWidthLoader<PersonRecord, Report>(stream);
+        using var loader = new FixedWidthLoader<PersonRecord>(stream);
 
         await loader.LoadAsync
         (
@@ -134,7 +133,7 @@ public class FixedWidthLoaderStreamCtorTests
     public async Task LoadAsync_flushes_owned_StreamWriter_at_completion()
     {
         using var stream = new MemoryStream();
-        var loader = new FixedWidthLoader<PersonRecord, Report>(stream);
+        var loader = new FixedWidthLoader<PersonRecord>(stream);
 
         await loader.LoadAsync
         (
@@ -159,7 +158,7 @@ public class FixedWidthLoaderStreamCtorTests
     public void Dispose_disposes_internal_StreamWriter()
     {
         var stream = new MemoryStream();
-        var loader = new FixedWidthLoader<PersonRecord, Report>(stream);
+        var loader = new FixedWidthLoader<PersonRecord>(stream);
 
         loader.Dispose();
 
@@ -174,7 +173,7 @@ public class FixedWidthLoaderStreamCtorTests
     public void Dispose_when_constructed_from_TextWriter_does_not_dispose_writer()
     {
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<PersonRecord, Report>(writer);
+        var loader = new FixedWidthLoader<PersonRecord>(writer);
 
         loader.Dispose();
 
@@ -189,7 +188,7 @@ public class FixedWidthLoaderStreamCtorTests
     public void Dispose_can_be_called_multiple_times_without_error()
     {
         using var stream = new MemoryStream();
-        var loader = new FixedWidthLoader<PersonRecord, Report>(stream);
+        var loader = new FixedWidthLoader<PersonRecord>(stream);
 
         loader.Dispose();
         loader.Dispose();

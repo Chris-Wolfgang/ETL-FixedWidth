@@ -69,7 +69,7 @@ var reader = new StringReader
     "Charlie   Clark     033"
 );
 
-var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>(reader);
+var extractor = new FixedWidthExtractor<PersonRecord>(reader);
 
 // 3. Iterate records asynchronously.
 await foreach (var person in extractor.ExtractAsync(CancellationToken.None))
@@ -87,7 +87,7 @@ await foreach (var person in extractor.ExtractAsync(CancellationToken.None))
 
 ```csharp
 var writer = new StringWriter();
-var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>(writer);
+var loader = new FixedWidthLoader<PersonRecord>(writer);
 
 await loader.LoadAsync(sourceItems, CancellationToken.None);
 
@@ -103,11 +103,11 @@ For file-based I/O, use the `Stream` constructor which creates a 64 KB buffered 
 ```csharp
 // Extraction from a file
 await using var readStream = File.OpenRead("people.dat");
-using var extractor = new FixedWidthExtractor<PersonRecord, FixedWidthReport>(readStream);
+using var extractor = new FixedWidthExtractor<PersonRecord>(readStream);
 
 // Loading to a file
 await using var writeStream = File.OpenWrite("output.dat");
-using var loader = new FixedWidthLoader<PersonRecord, FixedWidthReport>(writeStream);
+using var loader = new FixedWidthLoader<PersonRecord>(writeStream);
 ```
 
 ---

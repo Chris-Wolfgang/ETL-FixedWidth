@@ -135,7 +135,7 @@ public static class Program
         Console.WriteLine("=== Scenario 1: MalformedLineHandling.ThrowException ===");
 
         var reader = new StringReader(BuildSampleData());
-        var extractor = new FixedWidthExtractor<ProductRecord, FixedWidthReport>(reader);
+        var extractor = new FixedWidthExtractor<ProductRecord>(reader);
 
         // ThrowException is the default, but we set it explicitly for clarity.
         extractor.MalformedLineHandling = MalformedLineHandling.ThrowException;
@@ -201,7 +201,7 @@ public static class Program
         Console.WriteLine("=== Scenario 2: MalformedLineHandling.Skip ===");
 
         var reader = new StringReader(BuildSampleData());
-        var extractor = new FixedWidthExtractor<ProductRecord, FixedWidthReport>(reader);
+        var extractor = new FixedWidthExtractor<ProductRecord>(reader);
 
         // Skip malformed lines — the extractor will continue past bad data.
         extractor.MalformedLineHandling = MalformedLineHandling.Skip;
@@ -253,7 +253,7 @@ public static class Program
         Console.WriteLine("=== Scenario 3: MalformedLineHandling.ReturnDefault ===");
 
         var reader = new StringReader(BuildSampleData());
-        var extractor = new FixedWidthExtractor<ProductRecord, FixedWidthReport>(reader);
+        var extractor = new FixedWidthExtractor<ProductRecord>(reader);
 
         // Return a default record for malformed lines.
         extractor.MalformedLineHandling = MalformedLineHandling.ReturnDefault;

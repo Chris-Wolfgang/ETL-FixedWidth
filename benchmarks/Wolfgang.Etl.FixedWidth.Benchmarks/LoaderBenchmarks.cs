@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
-using Wolfgang.Etl.Abstractions;
 
 namespace Wolfgang.Etl.FixedWidth.Benchmarks;
 
@@ -61,7 +60,7 @@ public class LoaderBenchmarks
     {
         using var stream = new MemoryStream();
         using var writer = new StreamWriter(stream, leaveOpen: true);
-        var loader = new FixedWidthLoader<BenchmarkRecord, Report>(writer);
+        var loader = new FixedWidthLoader<BenchmarkRecord>(writer);
 
         await loader.LoadAsync(ToAsyncEnumerable(_records));
         await writer.FlushAsync();
@@ -73,7 +72,7 @@ public class LoaderBenchmarks
     public async Task Memory_Stream()
     {
         using var stream = new MemoryStream();
-        using var loader = new FixedWidthLoader<BenchmarkRecord, Report>(stream);
+        using var loader = new FixedWidthLoader<BenchmarkRecord>(stream);
 
         await loader.LoadAsync(ToAsyncEnumerable(_records));
     }
@@ -89,7 +88,7 @@ public class LoaderBenchmarks
     {
         using var stream = new FileStream(_filePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096);
         using var writer = new StreamWriter(stream, bufferSize: 1024);
-        var loader = new FixedWidthLoader<BenchmarkRecord, Report>(writer);
+        var loader = new FixedWidthLoader<BenchmarkRecord>(writer);
 
         await loader.LoadAsync(ToAsyncEnumerable(_records));
         await writer.FlushAsync();
@@ -101,7 +100,7 @@ public class LoaderBenchmarks
     public async Task File_Stream_64KB()
     {
         using var stream = new FileStream(_filePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096);
-        using var loader = new FixedWidthLoader<BenchmarkRecord, Report>(stream);
+        using var loader = new FixedWidthLoader<BenchmarkRecord>(stream);
 
         await loader.LoadAsync(ToAsyncEnumerable(_records));
     }

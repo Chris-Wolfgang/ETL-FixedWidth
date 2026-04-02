@@ -2,7 +2,7 @@ namespace Wolfgang.Etl.FixedWidth.Enums;
 
 /// <summary>
 /// Indicates what the extractor should do with a line of input.
-/// Returned by the <see cref="FixedWidthExtractor{TRecord,TProgress}.LineFilter"/> delegate.
+/// Returned by the <see cref="FixedWidthExtractor{TRecord}.LineFilter"/> delegate.
 /// </summary>
 public enum LineAction
 {
