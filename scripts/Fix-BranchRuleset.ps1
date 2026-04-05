@@ -12,16 +12,23 @@
 .PARAMETER Repository
     The repository in owner/repo format. If not provided, uses the current repository.
 
-.PARAMETER Confirm
+.PARAMETER Force
     Skip the confirmation prompt and proceed automatically. Alias: -y
+
+.PARAMETER SkipSetup
+    Skip automatic invocation of Setup-BranchRuleset.ps1 after fixing.
 
 .EXAMPLE
     .\Fix-BranchRuleset.ps1
     Inspects and fixes rulesets for the current repository with interactive confirmation
 
 .EXAMPLE
-    .\Fix-BranchRuleset.ps1 -y
+    .Fix-BranchRuleset.ps1 -Force
     Inspects and fixes rulesets without prompting for confirmation
+
+.EXAMPLE
+    .Fix-BranchRuleset.ps1 -Force -SkipSetup
+    Fixes rulesets non-interactively without recreating a fresh ruleset
 
 .EXAMPLE
     .\Fix-BranchRuleset.ps1 -Repository "Chris-Wolfgang/my-repo"
@@ -39,7 +46,10 @@ param(
 
     [Parameter()]
     [Alias("y")]
-    [switch]$Confirm
+    [switch]$Force,
+
+    [Parameter()]
+    [switch]$SkipSetup
 )
 
 # Check if gh CLI is installed
@@ -169,8 +179,8 @@ foreach ($item in $plan) {
 Write-Host ""
 
 # Prompt for confirmation
-if ($Confirm) {
-    Write-Host "Auto-confirmed via -Confirm flag." -ForegroundColor Green
+if ($SkipSetup) {
+    Write-Host "Auto-confirmed via -Force flag." -ForegroundColor Green
 } else {
     $response = Read-Host "Proceed with these changes? (y/N)"
     if ($response -ne 'y' -and $response -ne 'Y') {
