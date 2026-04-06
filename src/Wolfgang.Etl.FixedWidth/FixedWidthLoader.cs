@@ -406,12 +406,6 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         {
             token.ThrowIfCancellationRequested();
 
-            if (CurrentItemCount >= MaximumItemCount)
-            {
-                LogDebugMaxReached();
-                break;
-            }
-
             if (EqualityComparer<TRecord>.Default.Equals(item, default!))
             {
                 throw LogAndCreateNullRecordError();
@@ -422,6 +416,12 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
                 IncrementCurrentSkippedItemCount();
                 LogDebugItemSkipped();
                 continue;
+            }
+
+            if (CurrentItemCount >= MaximumItemCount)
+            {
+                LogDebugMaxReached();
+                break;
             }
 
             FixedWidthLineParser.WriteRecord
