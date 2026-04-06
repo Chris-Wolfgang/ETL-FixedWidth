@@ -256,6 +256,48 @@ public class FixedWidthLoaderTests
 
 
 
+    [Fact]
+    public async Task LoadAsync_when_SkipItemCount_and_MaximumItemCount_are_both_set_skips_then_loads()
+    {
+        var loader = CreateLoader(out var writer);
+        loader.SkipItemCount = 2;
+        loader.MaximumItemCount = 2;
+
+        await loader.LoadAsync(new[]
+        {
+            new PersonRecord { FirstName = "Alice", LastName = "Aaa", Age = 10 },
+            new PersonRecord { FirstName = "Bob", LastName = "Bbb", Age = 20 },
+            new PersonRecord { FirstName = "Carol", LastName = "Ccc", Age = 30 },
+            new PersonRecord { FirstName = "Dave", LastName = "Ddd", Age = 40 },
+            new PersonRecord { FirstName = "Eve", LastName = "Eee", Age = 50 },
+        }.ToAsyncEnumerable());
+
+        var lines = GetLines(writer);
+
+        // Should skip Alice and Bob, then load Carol and Dave, stop before Eve
+        Assert.Equal
+        (
+            2,
+            lines.Length
+        );
+        Assert.StartsWith
+        (
+            "Carol",
+            lines[0],
+            StringComparison.Ordinal
+        );
+        Assert.StartsWith
+        (
+            "Dave",
+            lines[1],
+            StringComparison.Ordinal
+        );
+        Assert.Equal(2, loader.CurrentItemCount);
+        Assert.Equal(2, loader.CurrentSkippedItemCount);
+    }
+
+
+
     // ------------------------------------------------------------------
     // Null record
     // ------------------------------------------------------------------
