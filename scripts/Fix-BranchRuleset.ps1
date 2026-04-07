@@ -23,11 +23,11 @@
     Inspects and fixes rulesets for the current repository with interactive confirmation
 
 .EXAMPLE
-    .Fix-BranchRuleset.ps1 -Force
+    .\Fix-BranchRuleset.ps1 -Force
     Inspects and fixes rulesets without prompting for confirmation
 
 .EXAMPLE
-    .Fix-BranchRuleset.ps1 -Force -SkipSetup
+    .\Fix-BranchRuleset.ps1 -Force -SkipSetup
     Fixes rulesets non-interactively without recreating a fresh ruleset
 
 .EXAMPLE
@@ -179,7 +179,7 @@ foreach ($item in $plan) {
 Write-Host ""
 
 # Prompt for confirmation
-if ($SkipSetup) {
+if ($Force) {
     Write-Host "Auto-confirmed via -Force flag." -ForegroundColor Green
 } else {
     $response = Read-Host "Proceed with these changes? (y/N)"
@@ -256,7 +256,11 @@ if ($errors -gt 0) {
 
     # Invoke Setup-BranchRuleset.ps1 to create a fresh ruleset
     $setupScript = Join-Path $PSScriptRoot "Setup-BranchRuleset.ps1"
-    if (Test-Path $setupScript) {
+    if ($SkipSetup) {
+        Write-Host "Skipping Setup-BranchRuleset.ps1 (-SkipSetup specified)." -ForegroundColor Yellow
+        Write-Host "Run it manually to create a fresh ruleset:" -ForegroundColor Cyan
+        Write-Host "  pwsh -File `"$setupScript`" -Repository $Repository" -ForegroundColor Cyan
+    } elseif (Test-Path $setupScript) {
         Write-Host "Running Setup-BranchRuleset.ps1 to create a fresh ruleset..." -ForegroundColor Cyan
         Write-Host ""
         & $setupScript -Repository $Repository
