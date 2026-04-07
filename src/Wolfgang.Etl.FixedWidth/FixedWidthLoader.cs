@@ -97,6 +97,29 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
     /// <summary>
     /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> that writes
+    /// to the specified <see cref="TextWriter"/> with diagnostic logging.
+    /// </summary>
+    /// <param name="writer">
+    /// The <see cref="TextWriter"/> to write fixed-width records to.
+    /// </param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="writer"/> or <paramref name="logger"/> is null.
+    /// </exception>
+    public FixedWidthLoader
+    (
+        TextWriter writer,
+        ILogger<FixedWidthLoader<TRecord>> logger
+    )
+    {
+        _writer = writer ?? throw new ArgumentNullException(nameof(writer));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> that writes
     /// to the specified <see cref="TextWriter"/> and uses the supplied
     /// <see cref="IProgressTimer"/> instead of the default system timer.
     /// </summary>
@@ -143,6 +166,34 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         _writer = new StreamWriter(stream, encoding: System.Text.Encoding.UTF8, bufferSize: DefaultBufferSize, leaveOpen: true);
         _ownsWriter = true;
         _logger = NullLogger.Instance;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> that writes
+    /// to the specified <see cref="Stream"/> with diagnostic logging.
+    /// The loader creates an internal <see cref="StreamWriter"/> with a 64 KB
+    /// buffer for improved throughput on large files.
+    /// </summary>
+    /// <param name="stream">
+    /// The <see cref="Stream"/> to write fixed-width records to. The stream must be
+    /// writable. The caller retains ownership — the loader does not dispose the stream.
+    /// </param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="stream"/> or <paramref name="logger"/> is null.
+    /// </exception>
+    public FixedWidthLoader
+    (
+        Stream stream,
+        ILogger<FixedWidthLoader<TRecord>> logger
+    )
+    {
+        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        _writer = new StreamWriter(stream, encoding: System.Text.Encoding.UTF8, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _ownsWriter = true;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
 

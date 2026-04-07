@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
@@ -30,6 +31,38 @@ public class FixedWidthExtractorStreamCtorTests
         Assert.Throws<ArgumentNullException>
         (
             () => new FixedWidthExtractor<PersonRecord>((Stream)null!)
+        );
+    }
+
+
+
+    [Fact]
+    public void Constructor_TextReader_Logger_when_logger_is_null_throws_ArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>
+        (
+            () => new FixedWidthExtractor<PersonRecord>
+            (
+                new StringReader(PersonLine),
+                logger: null!
+            )
+        );
+    }
+
+
+
+    [Fact]
+    public void Constructor_Stream_Logger_when_logger_is_null_throws_ArgumentNullException()
+    {
+        using var stream = ToStream(PersonLine);
+
+        Assert.Throws<ArgumentNullException>
+        (
+            () => new FixedWidthExtractor<PersonRecord>
+            (
+                stream,
+                logger: null!
+            )
         );
     }
 
@@ -104,6 +137,38 @@ public class FixedWidthLoaderStreamCtorTests
         Assert.Throws<ArgumentNullException>
         (
             () => new FixedWidthLoader<PersonRecord>((Stream)null!)
+        );
+    }
+
+
+
+    [Fact]
+    public void Constructor_TextWriter_Logger_when_logger_is_null_throws_ArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>
+        (
+            () => new FixedWidthLoader<PersonRecord>
+            (
+                new StringWriter(),
+                logger: null!
+            )
+        );
+    }
+
+
+
+    [Fact]
+    public void Constructor_Stream_Logger_when_logger_is_null_throws_ArgumentNullException()
+    {
+        using var stream = new MemoryStream();
+
+        Assert.Throws<ArgumentNullException>
+        (
+            () => new FixedWidthLoader<PersonRecord>
+            (
+                stream,
+                logger: null!
+            )
         );
     }
 

@@ -98,6 +98,29 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
     /// <summary>
     /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> that reads
+    /// from the specified <see cref="TextReader"/> with diagnostic logging.
+    /// </summary>
+    /// <param name="reader">
+    /// The <see cref="TextReader"/> to read fixed-width records from.
+    /// </param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="reader"/> or <paramref name="logger"/> is null.
+    /// </exception>
+    public FixedWidthExtractor
+    (
+        TextReader reader,
+        ILogger<FixedWidthExtractor<TRecord>> logger
+    )
+    {
+        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> that reads
     /// from the specified <see cref="TextReader"/> and uses the supplied
     /// <see cref="IProgressTimer"/> instead of the default system timer.
     /// </summary>
@@ -144,6 +167,34 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         _reader = new StreamReader(stream, encoding: System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
         _ownsReader = true;
         _logger = NullLogger.Instance;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> that reads
+    /// from the specified <see cref="Stream"/> with diagnostic logging.
+    /// The extractor creates an internal <see cref="StreamReader"/> with a 64 KB
+    /// buffer for improved throughput on large files.
+    /// </summary>
+    /// <param name="stream">
+    /// The <see cref="Stream"/> to read fixed-width records from. The stream must be
+    /// readable. The caller retains ownership — the extractor does not dispose the stream.
+    /// </param>
+    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="stream"/> or <paramref name="logger"/> is null.
+    /// </exception>
+    public FixedWidthExtractor
+    (
+        Stream stream,
+        ILogger<FixedWidthExtractor<TRecord>> logger
+    )
+    {
+        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        _reader = new StreamReader(stream, encoding: System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _ownsReader = true;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
 
