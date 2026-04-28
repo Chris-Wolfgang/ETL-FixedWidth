@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v.0.1.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_Exceptions_FieldOverflowException.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.2.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_Exceptions_FieldOverflowException.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,7 +75,7 @@
 
 
   <h1 id="Wolfgang_Etl_FixedWidth_Exceptions_FieldOverflowException" data-uid="Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException" class="text-break">
-Class FieldOverflowException  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldOverflowException.cs/#L20"><i class="bi bi-code-slash"></i></a>
+Class FieldOverflowException  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldOverflowException.cs/#L21"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -172,8 +172,8 @@ programming error — the converter does not respect the
 
   <h2 id="Wolfgang_Etl_FixedWidth_Exceptions_FieldOverflowException_remarks">Remarks</h2>
   <div class="markdown level0 remarks"><p>This exception is not thrown for data values in the file that are too wide for
-a target type — it is only thrown when a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_2_ValueConverter">ValueConverter</a>
-or <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_2_HeaderConverter">HeaderConverter</a> returns a
+a target type — it is only thrown when a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_ValueConverter">ValueConverter</a>
+or <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_HeaderConverter">HeaderConverter</a> returns a
 string longer than <a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException.html#Wolfgang_Etl_FixedWidth_Exceptions_FieldOverflowException_FieldLength">FieldLength</a>. To silently truncate instead of
 throwing, use <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthConverter.html#Wolfgang_Etl_FixedWidth_FixedWidthConverter_Truncate">Truncate</a> or
 <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthConverter.html#Wolfgang_Etl_FixedWidth_FixedWidthConverter_TruncateHeader">TruncateHeader</a>.</p>
@@ -188,7 +188,7 @@ throwing, use <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthConverter.
 
   <h3 id="Wolfgang_Etl_FixedWidth_Exceptions_FieldOverflowException__ctor_System_String_System_String_System_Int32_System_Int32_" data-uid="Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException.#ctor(System.String,System.String,System.Int32,System.Int32)">
   FieldOverflowException(string, string, int, int)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldOverflowException.cs/#L34"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldOverflowException.cs/#L36"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of <a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException.html">FieldOverflowException</a> with full
@@ -235,7 +235,7 @@ context about the overflowing field.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_Exceptions_FieldOverflowException_ActualLength" data-uid="Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException.ActualLength">
   ActualLength
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldOverflowException.cs/#L72"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldOverflowException.cs/#L74"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The actual number of characters in the string returned by the converter.</p>
@@ -267,7 +267,7 @@ context about the overflowing field.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_Exceptions_FieldOverflowException_FieldLength" data-uid="Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException.FieldLength">
   FieldLength
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldOverflowException.cs/#L65"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldOverflowException.cs/#L67"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The maximum number of characters allowed for the field, as defined by
@@ -300,7 +300,7 @@ context about the overflowing field.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_Exceptions_FieldOverflowException_PropertyName" data-uid="Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException.PropertyName">
   PropertyName
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldOverflowException.cs/#L57"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldOverflowException.cs/#L59"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The name of the property whose converted value exceeded the defined field width.</p>
@@ -332,7 +332,7 @@ context about the overflowing field.</p>
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldOverflowException.cs/#L20" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldOverflowException.cs/#L21" class="edit-link">Edit this page</a>
         </div>
 
 

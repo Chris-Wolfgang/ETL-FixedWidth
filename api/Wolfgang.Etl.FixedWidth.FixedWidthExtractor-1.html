@@ -2,9 +2,9 @@
 <html>
   <head>
     <meta charset="utf-8">
-      <title>Class FixedWidthExtractor&lt;TRecord, TProgress&gt; | Wolfgang.Etl.FixedWidth Documentation </title>
+      <title>Class FixedWidthExtractor&lt;TRecord&gt; | Wolfgang.Etl.FixedWidth Documentation </title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="title" content="Class FixedWidthExtractor&lt;TRecord, TProgress&gt; | Wolfgang.Etl.FixedWidth Documentation ">
+      <meta name="title" content="Class FixedWidthExtractor&lt;TRecord&gt; | Wolfgang.Etl.FixedWidth Documentation ">
       
       <meta name="description" content="Reads a fixed-width text file and yields records of type TRecord as an asynchronous stream.">
       <link rel="icon" href="../favicon.ico">
@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v.0.1.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthExtractor%602%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.2.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -70,12 +70,12 @@
           <nav id="breadcrumb"></nav>
         </div>
 
-        <article data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2">
+        <article data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1">
 
 
 
-  <h1 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2" class="text-break">
-Class FixedWidthExtractor&lt;TRecord, TProgress&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L63"><i class="bi bi-code-slash"></i></a>
+  <h1 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1" class="text-break">
+Class FixedWidthExtractor&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L48"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -89,7 +89,7 @@ as an asynchronous stream.</p>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class FixedWidthExtractor&lt;TRecord, TProgress&gt; : ExtractorBase&lt;TRecord, TProgress&gt;, IExtractWithProgressAndCancellationAsync&lt;TRecord, TProgress&gt;, IExtractWithCancellationAsync&lt;TRecord&gt;, IExtractWithProgressAsync&lt;TRecord, TProgress&gt;, IExtractAsync&lt;TRecord&gt;, IDisposable where TRecord : notnull, new() where TProgress : notnull</code></pre>
+    <pre><code class="lang-csharp hljs">public class FixedWidthExtractor&lt;TRecord&gt; : ExtractorBase&lt;TRecord, FixedWidthReport&gt;, IExtractWithProgressAndCancellationAsync&lt;TRecord, FixedWidthReport&gt;, IExtractWithCancellationAsync&lt;TRecord&gt;, IExtractWithProgressAsync&lt;TRecord, FixedWidthReport&gt;, IExtractAsync&lt;TRecord&gt;, IDisposable where TRecord : notnull, new()</code></pre>
   </div>
 
 
@@ -101,28 +101,23 @@ as an asynchronous stream.</p>
 <a class="xref" href="Wolfgang.Etl.FixedWidth.Attributes.FixedWidthFieldAttribute.html">FixedWidthFieldAttribute</a> are populated from each line.
 The type must have a public parameterless constructor.</p>
 </dd>
-    <dt><code>TProgress</code></dt>
-    <dd><p>The type of the progress object reported during extraction.
-Override <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_CreateProgressReport">CreateProgressReport()</a> to return an instance of this type.
-If you do not need a custom progress type, use <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a>.</p>
-</dd>
   </dl>
 
   <dl class="typelist inheritance">
     <dt>Inheritance</dt>
     <dd>
       <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
-      <div><span class="xref">ExtractorBase</span>&lt;TRecord, TProgress&gt;</div>
-      <div><span class="xref">FixedWidthExtractor&lt;TRecord, TProgress&gt;</span></div>
+      <div><span class="xref">ExtractorBase</span>&lt;TRecord, <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a>&gt;</div>
+      <div><span class="xref">FixedWidthExtractor&lt;TRecord&gt;</span></div>
     </dd>
   </dl>
 
   <dl class="typelist implements">
     <dt>Implements</dt>
     <dd>
-      <div><span class="xref">IExtractWithProgressAndCancellationAsync</span>&lt;TRecord, TProgress&gt;</div>
+      <div><span class="xref">IExtractWithProgressAndCancellationAsync</span>&lt;TRecord, <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a>&gt;</div>
       <div><span class="xref">IExtractWithCancellationAsync</span>&lt;TRecord&gt;</div>
-      <div><span class="xref">IExtractWithProgressAsync</span>&lt;TRecord, TProgress&gt;</div>
+      <div><span class="xref">IExtractWithProgressAsync</span>&lt;TRecord, <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a>&gt;</div>
       <div><span class="xref">IExtractAsync</span>&lt;TRecord&gt;</div>
       <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
     </dd>
@@ -133,46 +128,46 @@ If you do not need a custom progress type, use <a class="xref" href="Wolfgang.Et
     <dt>Inherited Members</dt>
     <dd>
     <div>
-      <span class="xref">ExtractorBase&lt;TRecord, TProgress&gt;.ExtractAsync()</span>
+      <span class="xref">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.ExtractAsync()</span>
     </div>
     <div>
-      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">ExtractorBase&lt;TRecord, TProgress&gt;.ExtractAsync(CancellationToken)</a>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.ExtractAsync(CancellationToken)</a>
     </div>
     <div>
-      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iprogress-1">ExtractorBase&lt;TRecord, TProgress&gt;.ExtractAsync(IProgress&lt;TProgress&gt;)</a>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iprogress-1">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.ExtractAsync(IProgress&lt;FixedWidthReport&gt;)</a>
     </div>
     <div>
-      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iprogress-1">ExtractorBase&lt;TRecord, TProgress&gt;.ExtractAsync(IProgress&lt;TProgress&gt;, CancellationToken)</a>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iprogress-1">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.ExtractAsync(IProgress&lt;FixedWidthReport&gt;, CancellationToken)</a>
     </div>
     <div>
-      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iprogress-1">ExtractorBase&lt;TRecord, TProgress&gt;.CreateProgressTimer(IProgress&lt;TProgress&gt;)</a>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iprogress-1">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.CreateProgressTimer(IProgress&lt;FixedWidthReport&gt;)</a>
     </div>
     <div>
-      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">ExtractorBase&lt;TRecord, TProgress&gt;.ExtractWorkerAsync(CancellationToken)</a>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.ExtractWorkerAsync(CancellationToken)</a>
     </div>
     <div>
-      <span class="xref">ExtractorBase&lt;TRecord, TProgress&gt;.CreateProgressReport()</span>
+      <span class="xref">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.CreateProgressReport()</span>
     </div>
     <div>
-      <span class="xref">ExtractorBase&lt;TRecord, TProgress&gt;.IncrementCurrentItemCount()</span>
+      <span class="xref">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.IncrementCurrentItemCount()</span>
     </div>
     <div>
-      <span class="xref">ExtractorBase&lt;TRecord, TProgress&gt;.IncrementCurrentSkippedItemCount()</span>
+      <span class="xref">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.IncrementCurrentSkippedItemCount()</span>
     </div>
     <div>
-      <span class="xref">ExtractorBase&lt;TRecord, TProgress&gt;.ReportingInterval</span>
+      <span class="xref">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.ReportingInterval</span>
     </div>
     <div>
-      <span class="xref">ExtractorBase&lt;TRecord, TProgress&gt;.CurrentItemCount</span>
+      <span class="xref">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.CurrentItemCount</span>
     </div>
     <div>
-      <span class="xref">ExtractorBase&lt;TRecord, TProgress&gt;.CurrentSkippedItemCount</span>
+      <span class="xref">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.CurrentSkippedItemCount</span>
     </div>
     <div>
-      <span class="xref">ExtractorBase&lt;TRecord, TProgress&gt;.MaximumItemCount</span>
+      <span class="xref">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.MaximumItemCount</span>
     </div>
     <div>
-      <span class="xref">ExtractorBase&lt;TRecord, TProgress&gt;.SkipItemCount</span>
+      <span class="xref">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.SkipItemCount</span>
     </div>
     <div>
       <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
@@ -199,35 +194,25 @@ If you do not need a custom progress type, use <a class="xref" href="Wolfgang.Et
 
 
 
-  <h2 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_examples">Examples</h2>
+  <h2 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_examples">Examples</h2>
   <pre><code class="lang-csharp">// Stream-based (preferred for files — 64 KB buffer reduces syscall overhead):
 await using var stream = File.OpenRead("data.txt");
-using var extractor = new FixedWidthExtractor&lt;CustomerRecord, FixedWidthReport&gt;(stream);
+using var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;(stream);
 
 // TextReader-based (caller owns the reader):
-var extractor = new FixedWidthExtractor&lt;CustomerRecord, FixedWidthReport&gt;(reader);
-
-// Custom progress type — subclass and override CreateProgressReport:
-public class CustomerExtractor : FixedWidthExtractor&lt;CustomerRecord, MyProgress&gt;
-{
-    public CustomerExtractor(Stream stream)
-        : base(stream) { }
-
-    protected override MyProgress CreateProgressReport() =&gt;
-        new MyProgress(CurrentItemCount, CurrentSkippedItemCount);
-}</code></pre>
+var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;(reader);</code></pre>
 
 
-  <h2 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_remarks">Remarks</h2>
+  <h2 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_remarks">Remarks</h2>
   <div class="markdown level0 remarks"><p>
 Two construction modes are supported, each with different ownership semantics:
 </p>
 <ul><li><b>TextReader constructor</b> — the caller owns the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textreader">TextReader</a>
-  lifetime. The extractor does not dispose it. Calling <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_Dispose">Dispose()</a> is
+  lifetime. The extractor does not dispose it. Calling <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Dispose">Dispose()</a> is
   optional and has no effect.</li><li><b>Stream constructor</b> — the extractor creates an internal
   <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.streamreader">StreamReader</a> with a 64 KB buffer for improved throughput on large files.
   The caller retains ownership of the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> (it is not closed), but
-  <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_Dispose">Dispose()</a> must be called to release the internal reader.</li></ul>
+  <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Dispose">Dispose()</a> must be called to release the internal reader.</li></ul>
 </div>
 
 
@@ -235,21 +220,21 @@ Two construction modes are supported, each with different ownership semantics:
 </h2>
 
 
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2__ctor_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.#ctor*"></a>
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2__ctor_System_IO_Stream_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthExtractor__0__1___" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthExtractor{`0,`1}})">
-  FixedWidthExtractor(Stream, ILogger&lt;FixedWidthExtractor&lt;TRecord, TProgress&gt;&gt;?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L169"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_System_IO_Stream_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.Stream)">
+  FixedWidthExtractor(Stream)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L164"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html">FixedWidthExtractor&lt;TRecord, TProgress&gt;</a> that reads
+  <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a> that reads
 from the specified <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> using an internal <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.streamreader">StreamReader</a>
 with a 64 KB buffer for improved throughput on large files.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FixedWidthExtractor(Stream stream, ILogger&lt;FixedWidthExtractor&lt;TRecord, TProgress&gt;&gt;? logger = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public FixedWidthExtractor(Stream stream)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -257,10 +242,6 @@ with a 64 KB buffer for improved throughput on large files.</p>
     <dt><code>stream</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
     <dd><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> to read fixed-width records from. The stream must be
 readable. The caller retains ownership — the extractor does not dispose the stream.</p>
-</dd>
-    <dt><code>logger</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html">FixedWidthExtractor</a>&lt;TRecord, TProgress&gt;&gt;</dt>
-    <dd><p>An optional <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger&lt;TCategoryName&gt;</a> for diagnostic output.
-Pass <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> (the default) to disable logging.</p>
 </dd>
   </dl>
 
@@ -281,20 +262,66 @@ Pass <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywo
 
 
 
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2__ctor_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.#ctor*"></a>
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2__ctor_System_IO_TextReader_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthExtractor__0__1___" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.#ctor(System.IO.TextReader,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthExtractor{`0,`1}})">
-  FixedWidthExtractor(TextReader, ILogger&lt;FixedWidthExtractor&lt;TRecord, TProgress&gt;&gt;?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L111"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_System_IO_Stream_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthExtractor__0___" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthExtractor{`0}})">
+  FixedWidthExtractor(Stream, ILogger&lt;FixedWidthExtractor&lt;TRecord&gt;&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L188"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html">FixedWidthExtractor&lt;TRecord, TProgress&gt;</a> that reads
+  <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a> that reads
+from the specified <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> with diagnostic logging.
+The extractor creates an internal <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.streamreader">StreamReader</a> with a 64 KB
+buffer for improved throughput on large files.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FixedWidthExtractor(Stream stream, ILogger&lt;FixedWidthExtractor&lt;TRecord&gt;&gt; logger)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>stream</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
+    <dd><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> to read fixed-width records from. The stream must be
+readable. The caller retains ownership — the extractor does not dispose the stream.</p>
+</dd>
+    <dt><code>logger</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor</a>&lt;TRecord&gt;&gt;</dt>
+    <dd><p>The logger instance for diagnostic output.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
+    <dd><p><code class="paramref">stream</code> or <code class="paramref">logger</code> is null.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_System_IO_TextReader_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.TextReader)">
+  FixedWidthExtractor(TextReader)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L91"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a> that reads
 from the specified <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textreader">TextReader</a>.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FixedWidthExtractor(TextReader reader, ILogger&lt;FixedWidthExtractor&lt;TRecord, TProgress&gt;&gt;? logger = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public FixedWidthExtractor(TextReader reader)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -306,10 +333,6 @@ from the specified <a class="xref" href="https://learn.microsoft.com/dotnet/api/
 implementation. Reading is performed synchronously for throughput; callers with
 slow or non-buffered sources should pre-buffer into a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stringreader">StringReader</a>.
 The caller is responsible for the reader's lifetime.</p>
-</dd>
-    <dt><code>logger</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html">FixedWidthExtractor</a>&lt;TRecord, TProgress&gt;&gt;</dt>
-    <dd><p>An optional <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger&lt;TCategoryName&gt;</a> for diagnostic output.
-Pass <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> (the default) to disable logging.</p>
 </dd>
   </dl>
 
@@ -330,15 +353,58 @@ Pass <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywo
 
 
 
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_System_IO_TextReader_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthExtractor__0___" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.TextReader,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthExtractor{`0}})">
+  FixedWidthExtractor(TextReader, ILogger&lt;FixedWidthExtractor&lt;TRecord&gt;&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L110"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a> that reads
+from the specified <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textreader">TextReader</a> with diagnostic logging.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FixedWidthExtractor(TextReader reader, ILogger&lt;FixedWidthExtractor&lt;TRecord&gt;&gt; logger)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>reader</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textreader">TextReader</a></dt>
+    <dd><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textreader">TextReader</a> to read fixed-width records from.</p>
+</dd>
+    <dt><code>logger</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor</a>&lt;TRecord&gt;&gt;</dt>
+    <dd><p>The logger instance for diagnostic output.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
+    <dd><p><code class="paramref">reader</code> or <code class="paramref">logger</code> is null.</p>
+</dd>
+  </dl>
+
+
+
   <h2 class="section" id="properties">Properties
 </h2>
 
 
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_BlankLineHandling_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.BlankLineHandling*"></a>
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_BlankLineHandling_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.BlankLineHandling*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_BlankLineHandling" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.BlankLineHandling">
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_BlankLineHandling" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.BlankLineHandling">
   BlankLineHandling
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L260"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L279"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Specifies what happens when a truly blank line (zero length) is encountered
@@ -363,7 +429,7 @@ in the file. Evaluated before the skip budget and <span class="xref">Wolfgang.Et
 
 
 
-  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_BlankLineHandling_remarks">Remarks</h4>
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_BlankLineHandling_remarks">Remarks</h4>
   <div class="markdown level1 remarks"><ul><li><a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling.html#Wolfgang_Etl_FixedWidth_Enums_BlankLineHandling_ThrowException">ThrowException</a> (default) — always throws
   a <a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.LineTooShortException.html">LineTooShortException</a> regardless of position.</li><li><a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling.html#Wolfgang_Etl_FixedWidth_Enums_BlankLineHandling_Skip">Skip</a> — the line is invisible to all counting
   logic. Does not count toward <span class="xref">Wolfgang.Etl.Abstractions.ExtractorBase&lt;TSource, TProgress&gt;.SkipItemCount</span>
@@ -376,18 +442,18 @@ Note: a line consisting entirely of spaces is not blank — it is a valid data l
 that will parse to a record with all whitespace-trimmed (empty/default) fields.
 </p>
 <p>
-<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_LineFilter">LineFilter</a> is not invoked for blank lines.
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_LineFilter">LineFilter</a> is not invoked for blank lines.
 </p>
 </div>
 
 
 
 
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_CurrentLineNumber_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.CurrentLineNumber*"></a>
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_CurrentLineNumber_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.CurrentLineNumber*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_CurrentLineNumber" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.CurrentLineNumber">
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_CurrentLineNumber" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.CurrentLineNumber">
   CurrentLineNumber
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L440"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L459"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The 1-based physical line number of the line most recently read from the file.
@@ -414,7 +480,7 @@ in a text editor — no adjustment is needed for header or separator lines.</p>
 
 
 
-  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_CurrentLineNumber_remarks">Remarks</h4>
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_CurrentLineNumber_remarks">Remarks</h4>
   <div class="markdown level1 remarks"><p>Thread-safe: reads are performed with <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.interlocked">Interlocked</a>
 so this property may be sampled from a progress-reporting timer thread
 without a data race.</p>
@@ -423,16 +489,16 @@ without a data race.</p>
 
 
 
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_FieldDelimiter_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.FieldDelimiter*"></a>
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_FieldDelimiter_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.FieldDelimiter*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_FieldDelimiter" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.FieldDelimiter">
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_FieldDelimiter" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.FieldDelimiter">
   FieldDelimiter
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L425"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L444"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The delimiter string present between fields in the source file, or
 <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> (default) for pure fixed-width input with no delimiter.
-Must match the <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_2_FieldDelimiter">FieldDelimiter</a>
+Must match the <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_FieldDelimiter">FieldDelimiter</a>
 used when the file was written.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -453,7 +519,7 @@ used when the file was written.</p>
 
 
 
-  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_FieldDelimiter_examples">Examples</h4>
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_FieldDelimiter_examples">Examples</h4>
   <pre><code class="lang-csharp">// File was written with FieldDelimiter = " | " — set the same value on the extractor:
 extractor.FieldDelimiter = " | ";
 
@@ -461,7 +527,7 @@ extractor.FieldDelimiter = " | ";
 extractor.FieldDelimiter = null;</code></pre>
 
 
-  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_FieldDelimiter_remarks">Remarks</h4>
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_FieldDelimiter_remarks">Remarks</h4>
   <div class="markdown level1 remarks"><p>When set, the extractor accounts for the delimiter width when calculating
 field start positions, ensuring each field is read from the correct offset.</p>
 </div>
@@ -469,18 +535,18 @@ field start positions, ensuring each field is read from the correct offset.</p>
 
 
 
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_FieldSeparator_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.FieldSeparator*"></a>
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_FieldSeparator_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.FieldSeparator*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_FieldSeparator" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.FieldSeparator">
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_FieldSeparator" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.FieldSeparator">
   FieldSeparator
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L402"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L421"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>When non-null, the line immediately following the last header line is treated
-as a separator and skipped. Has no effect if <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_HeaderLineCount">HeaderLineCount</a> is 0.
+as a separator and skipped. Has no effect if <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_HeaderLineCount">HeaderLineCount</a> is 0.
 The value of the character is not used for parsing — only its presence matters.
 Set to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> (default) for no separator.
-Mirrors <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_2_FieldSeparator">FieldSeparator</a>.</p>
+Mirrors <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_FieldSeparator">FieldSeparator</a>.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
@@ -500,7 +566,7 @@ Mirrors <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html#Wo
 
 
 
-  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_FieldSeparator_examples">Examples</h4>
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_FieldSeparator_examples">Examples</h4>
   <pre><code class="lang-csharp">extractor.HasHeader      = true;
 extractor.FieldSeparator = '-';  // skips a "----------" separator line after the header
 extractor.FieldSeparator = null; // no separator line (default)</code></pre>
@@ -510,18 +576,18 @@ extractor.FieldSeparator = null; // no separator line (default)</code></pre>
 
 
 
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_HasHeader_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.HasHeader*"></a>
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_HasHeader_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.HasHeader*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_HasHeader" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.HasHeader">
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_HasHeader" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.HasHeader">
   HasHeader
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L378"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L397"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Convenience property — when set to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>, sets
-<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_HeaderLineCount">HeaderLineCount</a> to 1. When set to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>,
-sets <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_HeaderLineCount">HeaderLineCount</a> to 0.
-Returns <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> if <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_HeaderLineCount">HeaderLineCount</a> is greater than zero.
-Mirrors <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_2_WriteHeader">WriteHeader</a>.</p>
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_HeaderLineCount">HeaderLineCount</a> to 1. When set to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>,
+sets <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_HeaderLineCount">HeaderLineCount</a> to 0.
+Returns <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> if <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_HeaderLineCount">HeaderLineCount</a> is greater than zero.
+Mirrors <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_WriteHeader">WriteHeader</a>.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
@@ -541,7 +607,7 @@ Mirrors <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html#Wo
 
 
 
-  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_HasHeader_examples">Examples</h4>
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_HasHeader_examples">Examples</h4>
   <pre><code class="lang-csharp">// Skip one header line before reading records:
 extractor.HasHeader = true;
 
@@ -554,16 +620,16 @@ extractor.FieldSeparator = '-';</code></pre>
 
 
 
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_HeaderLineCount_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.HeaderLineCount*"></a>
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_HeaderLineCount_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.HeaderLineCount*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_HeaderLineCount" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.HeaderLineCount">
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_HeaderLineCount" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.HeaderLineCount">
   HeaderLineCount
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L357"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L376"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The number of header lines to skip at the beginning of the file before
 extracting records. Defaults to 0.
-For the common single-header case, use <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_HasHeader">HasHeader</a> instead.</p>
+For the common single-header case, use <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_HasHeader">HasHeader</a> instead.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
@@ -583,7 +649,7 @@ For the common single-header case, use <a class="xref" href="Wolfgang.Etl.FixedW
 
 
 
-  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_HeaderLineCount_examples">Examples</h4>
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_HeaderLineCount_examples">Examples</h4>
   <pre><code class="lang-csharp">// File has two header lines followed by data:
 extractor.HeaderLineCount = 2;
 
@@ -591,20 +657,20 @@ extractor.HeaderLineCount = 2;
 extractor.HasHeader = true;</code></pre>
 
 
-  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_HeaderLineCount_remarks">Remarks</h4>
-  <div class="markdown level1 remarks"><p>Lines 1 through <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_HeaderLineCount">HeaderLineCount</a> are skipped entirely without
-parsing. If <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_FieldSeparator">FieldSeparator</a> is also set, the line immediately
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_HeaderLineCount_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Lines 1 through <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_HeaderLineCount">HeaderLineCount</a> are skipped entirely without
+parsing. If <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_FieldSeparator">FieldSeparator</a> is also set, the line immediately
 after the last header line is additionally skipped as a separator line.</p>
 </div>
 
 
 
 
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_LineFilter_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.LineFilter*"></a>
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_LineFilter_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.LineFilter*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_LineFilter" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.LineFilter">
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_LineFilter" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.LineFilter">
   LineFilter
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L297"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L316"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>A delegate invoked for every data line (after header and separator lines have been
@@ -630,7 +696,7 @@ the line normally, <a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.LineActio
 
 
 
-  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_LineFilter_examples">Examples</h4>
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_LineFilter_examples">Examples</h4>
   <pre><code class="lang-csharp">// Footer string — stop when a known marker line is reached
 extractor.LineFilter = line =&gt; line == "END" ? LineAction.Stop : LineAction.Process;
 
@@ -647,8 +713,8 @@ extractor.LineFilter = line =&gt; line.StartsWith("#") ? LineAction.Skip : LineA
 extractor.LineFilter = line =&gt; string.IsNullOrWhiteSpace(line) ? LineAction.Stop : LineAction.Process;</code></pre>
 
 
-  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_LineFilter_remarks">Remarks</h4>
-  <div class="markdown level1 remarks"><p>Evaluated after <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_BlankLineHandling">BlankLineHandling</a> — blank lines never reach the filter.
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_LineFilter_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Evaluated after <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_BlankLineHandling">BlankLineHandling</a> — blank lines never reach the filter.
 Evaluated before the skip budget and <span class="xref">Wolfgang.Etl.Abstractions.ExtractorBase&lt;TSource, TProgress&gt;.MaximumItemCount</span>.
 Both <a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.LineAction.html#Wolfgang_Etl_FixedWidth_Enums_LineAction_Skip">Skip</a> and <a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.LineAction.html#Wolfgang_Etl_FixedWidth_Enums_LineAction_Stop">Stop</a> are invisible
 to all counting logic — they do not affect <span class="xref">Wolfgang.Etl.Abstractions.ExtractorBase&lt;TSource, TProgress&gt;.SkipItemCount</span>,
@@ -660,11 +726,11 @@ Defaults to a function that always returns <a class="xref" href="Wolfgang.Etl.Fi
 
 
 
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_MalformedLineHandling_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.MalformedLineHandling*"></a>
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_MalformedLineHandling_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.MalformedLineHandling*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_MalformedLineHandling" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.MalformedLineHandling">
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_MalformedLineHandling" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.MalformedLineHandling">
   MalformedLineHandling
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L232"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L251"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Specifies what happens when a line is encountered that is too short or whose
@@ -689,7 +755,7 @@ field values cannot be converted to the target property type.</p>
 
 
 
-  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_MalformedLineHandling_remarks">Remarks</h4>
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_MalformedLineHandling_remarks">Remarks</h4>
   <div class="markdown level1 remarks"><p>Defaults to <a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling.html#Wolfgang_Etl_FixedWidth_Enums_MalformedLineHandling_ThrowException">ThrowException</a>.
 When set to <a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling.html#Wolfgang_Etl_FixedWidth_Enums_MalformedLineHandling_Skip">Skip</a>, the line is skipped and
 <code>CurrentSkippedItemCount</code> is incremented.
@@ -700,18 +766,18 @@ of <code class="typeparamref">TRecord</code> is yielded for the offending line.<
 
 
 
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_ValueParser_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.ValueParser*"></a>
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_ValueParser_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.ValueParser*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_ValueParser" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.ValueParser">
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_ValueParser" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.ValueParser">
   ValueParser
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L334"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L353"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>A delegate that converts a raw string read from the file into the target property
 type. The <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html">FieldContext</a> provides the property type, format string, and
 other field metadata needed to perform the conversion.
 Defaults to <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthConverter.html#Wolfgang_Etl_FixedWidth_FixedWidthConverter_DefaultParser">DefaultParser</a>.
-Mirrors <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_2_ValueConverter">ValueConverter</a>.</p>
+Mirrors <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_ValueConverter">ValueConverter</a>.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
@@ -731,7 +797,7 @@ Mirrors <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html#Wo
 
 
 
-  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_ValueParser_examples">Examples</h4>
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_ValueParser_examples">Examples</h4>
   <pre><code class="lang-csharp">// Treat "Y"/"N" as bool, fall back to DefaultParser for everything else:
 extractor.ValueParser = (text, ctx) =&gt;
     ctx.PropertyType == typeof(bool)
@@ -745,7 +811,7 @@ extractor.ValueParser = (text, ctx) =&gt;
         : FixedWidthConverter.DefaultParser(text, ctx);</code></pre>
 
 
-  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_ValueParser_remarks">Remarks</h4>
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_ValueParser_remarks">Remarks</h4>
   <div class="markdown level1 remarks"><p>The delegate must return a value that is assignable to the property's CLR type.
 Returning an incompatible type will cause an <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidcastexception">InvalidCastException</a>
 when the framework attempts to set the property value.</p>
@@ -756,7 +822,7 @@ when the framework attempts to set the property value.</p>
     <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.html">FieldConversionException</a></dt>
     <dd><p>The default <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthConverter.html#Wolfgang_Etl_FixedWidth_FixedWidthConverter_DefaultParser">DefaultParser</a> wraps any parse
 failure in a <a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.html">FieldConversionException</a>. Custom parsers
-should do the same so that <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_MalformedLineHandling">MalformedLineHandling</a> can handle them
+should do the same so that <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_MalformedLineHandling">MalformedLineHandling</a> can handle them
 uniformly.</p>
 </dd>
   </dl>
@@ -767,33 +833,29 @@ uniformly.</p>
 </h2>
 
 
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_CreateProgressReport_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.CreateProgressReport*"></a>
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_CreateProgressReport_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.CreateProgressReport*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_CreateProgressReport" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.CreateProgressReport">
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_CreateProgressReport" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.CreateProgressReport">
   CreateProgressReport()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L471"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L470"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Creates a progress report snapshot for the current extractor state.
-Override in a derived class to return a custom <code class="typeparamref">TProgress</code>
-instance. The default implementation returns a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a>
-when <code class="typeparamref">TProgress</code> is <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a> or the
-base <span class="xref">Wolfgang.Etl.Abstractions.Report</span>, and throws <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.notsupportedexception">NotSupportedException</a> otherwise.</p>
+  <div class="markdown level1 summary"><p>Creates a progress report snapshot for the current extractor state.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected override TProgress CreateProgressReport()</code></pre>
+    <pre><code class="lang-csharp hljs">protected override FixedWidthReport CreateProgressReport()</code></pre>
   </div>
 
 
   <h4 class="section">Returns</h4>
   <dl class="parameters">
-    <dt><span class="xref">TProgress</span></dt>
-    <dd><p>A <code class="typeparamref">TProgress</code> snapshot containing
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a></dt>
+    <dd><p>A <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a> snapshot containing
 <span class="xref">Wolfgang.Etl.Abstractions.ExtractorBase&lt;TSource, TProgress&gt;.CurrentItemCount</span>,
 <span class="xref">Wolfgang.Etl.Abstractions.ExtractorBase&lt;TSource, TProgress&gt;.CurrentSkippedItemCount</span>,
-and <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_CurrentLineNumber">CurrentLineNumber</a> at the moment of the call.</p>
+and <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_CurrentLineNumber">CurrentLineNumber</a> at the moment of the call.</p>
 </dd>
   </dl>
 
@@ -802,33 +864,16 @@ and <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wol
 
 
 
-  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_CreateProgressReport_examples">Examples</h4>
-  <pre><code class="lang-csharp">// To use a custom progress type, subclass and override:
-public class MyExtractor : FixedWidthExtractor&lt;MyRecord, MyProgress&gt;
-{
-    public MyExtractor(TextReader reader) : base(reader) { }
-
-    protected override MyProgress CreateProgressReport() =&gt;
-        new MyProgress(CurrentItemCount, CurrentLineNumber);
-}</code></pre>
 
 
 
-  <h4 class="section">Exceptions</h4>
-  <dl class="parameters">
-    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.notsupportedexception">NotSupportedException</a></dt>
-    <dd><p>Thrown when <code class="typeparamref">TProgress</code> is not <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a>
-or <span class="xref">Wolfgang.Etl.Abstractions.Report</span> and <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_CreateProgressReport">CreateProgressReport()</a> has not been overridden.</p>
-</dd>
-  </dl>
 
 
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_CreateProgressTimer_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.CreateProgressTimer*"></a>
 
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_CreateProgressTimer_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.CreateProgressTimer*"></a>
-
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_CreateProgressTimer_System_IProgress__1__" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.CreateProgressTimer(System.IProgress{`1})">
-  CreateProgressTimer(IProgress&lt;TProgress&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L500"><i class="bi bi-code-slash"></i></a>
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_CreateProgressTimer_System_IProgress_Wolfgang_Etl_FixedWidth_FixedWidthReport__" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.CreateProgressTimer(System.IProgress{Wolfgang.Etl.FixedWidth.FixedWidthReport})">
+  CreateProgressTimer(IProgress&lt;FixedWidthReport&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L490"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the <span class="xref">Wolfgang.Etl.Abstractions.IProgressTimer</span> used to drive progress callbacks.
@@ -838,12 +883,12 @@ Override this method in a derived class to inject a custom timer
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected override IProgressTimer CreateProgressTimer(IProgress&lt;TProgress&gt; progress)</code></pre>
+    <pre><code class="lang-csharp hljs">protected override IProgressTimer CreateProgressTimer(IProgress&lt;FixedWidthReport&gt; progress)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
-    <dt><code>progress</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iprogress-1">IProgress</a>&lt;TProgress&gt;</dt>
+    <dt><code>progress</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iprogress-1">IProgress</a>&lt;<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a>&gt;</dt>
     <dd><p>The progress sink that will receive callbacks.</p>
 </dd>
   </dl>
@@ -865,11 +910,11 @@ Override this method in a derived class to inject a custom timer
 
 
 
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_Dispose_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.Dispose*"></a>
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Dispose_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.Dispose*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_Dispose" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.Dispose">
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Dispose" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.Dispose">
   Dispose()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L523"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L513"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Disposes the internal <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.streamreader">StreamReader</a> when this instance was
@@ -894,11 +939,11 @@ from a caller-owned <a class="xref" href="https://learn.microsoft.com/dotnet/api
 
 
 
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_Dispose_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.Dispose*"></a>
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Dispose_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.Dispose*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_Dispose_System_Boolean_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.Dispose(System.Boolean)">
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Dispose_System_Boolean_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.Dispose(System.Boolean)">
   Dispose(bool)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L539"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L529"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Releases managed resources when <code class="paramref">disposing</code> is
@@ -913,7 +958,7 @@ from a caller-owned <a class="xref" href="https://learn.microsoft.com/dotnet/api
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>disposing</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
-    <dd><p><a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> when called from <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_Dispose">Dispose()</a>;
+    <dd><p><a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> when called from <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Dispose">Dispose()</a>;
 <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a> when called from a finalizer.</p>
 </dd>
   </dl>
@@ -929,11 +974,11 @@ from a caller-owned <a class="xref" href="https://learn.microsoft.com/dotnet/api
 
 
 
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_ExtractWorkerAsync_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.ExtractWorkerAsync*"></a>
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_ExtractWorkerAsync_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.ExtractWorkerAsync*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_2_ExtractWorkerAsync_System_Threading_CancellationToken_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`2.ExtractWorkerAsync(System.Threading.CancellationToken)">
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_ExtractWorkerAsync_System_Threading_CancellationToken_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.ExtractWorkerAsync(System.Threading.CancellationToken)">
   ExtractWorkerAsync(CancellationToken)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L553"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L543"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>This method is the core implementation of the extraction logic and should be
@@ -974,7 +1019,7 @@ The result may be an empty sequence if no data is available or if the extraction
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v.0.1.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L63" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L48" class="edit-link">Edit this page</a>
         </div>
 
 

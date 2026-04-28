@@ -102,7 +102,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "Wolfgang.Etl.FixedWidth.Enums.LineAction",
-      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.Enums.LineAction.yml\" sourcestartlinenumber=\"1\">Indicates what the extractor should do with a line of input.\nReturned by the <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%602.LineFilter\" data-throw-if-not-resolved=\"false\"></xref> delegate.</p>\n"
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.Enums.LineAction.yml\" sourcestartlinenumber=\"1\">Indicates what the extractor should do with a line of input.\nReturned by the <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601.LineFilter\" data-throw-if-not-resolved=\"false\"></xref> delegate.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -214,7 +214,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "Wolfgang.Etl.FixedWidth.FieldContext",
-      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FieldContext.yml\" sourcestartlinenumber=\"1\">Provides contextual information about a fixed-width field to a\n<xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthLoader%602.ValueConverter\" data-throw-if-not-resolved=\"false\"></xref> or\n<xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%602.ValueParser\" data-throw-if-not-resolved=\"false\"></xref> delegate.</p>\n"
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FieldContext.yml\" sourcestartlinenumber=\"1\">Provides contextual information about a fixed-width field to a\n<xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthLoader%601.ValueConverter\" data-throw-if-not-resolved=\"false\"></xref> or\n<xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601.ValueParser\" data-throw-if-not-resolved=\"false\"></xref> delegate.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -228,35 +228,35 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "Wolfgang.Etl.FixedWidth.FixedWidthConverter",
-      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthConverter.yml\" sourcestartlinenumber=\"1\">Provides built-in value converter, header converter, and value parser functions\nfor use with <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthLoader%602\" data-throw-if-not-resolved=\"false\"></xref> and\n<xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%602\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthConverter.yml\" sourcestartlinenumber=\"1\">Provides built-in value converter, header converter, and value parser functions\nfor use with <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthLoader%601\" data-throw-if-not-resolved=\"false\"></xref> and\n<xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.yml",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.yml",
       "output": {
         ".html": {
-          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.html"
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord, TProgress>",
-      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-2.yml\" sourcestartlinenumber=\"1\">Reads a fixed-width text file and yields records of type <code class=\"typeparamref\">TRecord</code>\nas an asynchronous stream.</p>\n"
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.yml\" sourcestartlinenumber=\"1\">Reads a fixed-width text file and yields records of type <code class=\"typeparamref\">TRecord</code>\nas an asynchronous stream.</p>\n"
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.yml",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.yml",
       "output": {
         ".html": {
-          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.html"
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord, TProgress>",
-      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-2.yml\" sourcestartlinenumber=\"1\">Writes records of type <code class=\"typeparamref\">TRecord</code> to a fixed-width text stream\nas an asynchronous operation.</p>\n"
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.yml\" sourcestartlinenumber=\"1\">Writes records of type <code class=\"typeparamref\">TRecord</code> to a fixed-width text stream\nas an asynchronous operation.</p>\n"
     },
     {
       "type": "ManagedReference",
