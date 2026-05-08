@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using Wolfgang.Etl.FixedWidth.Attributes;
@@ -201,10 +202,10 @@ internal static class FixedWidthLineParser
 
             if (descriptor.Start > currentPosition)
             {
-                writer.Write(new string(' ', descriptor.Start - currentPosition));
+                WritePadding(writer, ' ', descriptor.Start - currentPosition);
             }
 
-            writer.Write(FormatSegment(record, descriptor, converter));
+            WriteFieldSegment(writer, record, descriptor, converter);
             currentPosition = descriptor.Start + descriptor.Attribute.Length;
         }
 
@@ -238,10 +239,10 @@ internal static class FixedWidthLineParser
 
             if (descriptor.Start > currentPosition)
             {
-                writer.Write(new string(' ', descriptor.Start - currentPosition));
+                WritePadding(writer, ' ', descriptor.Start - currentPosition);
             }
 
-            writer.Write(FormatHeaderSegment(descriptor, headerConverter));
+            WriteHeaderSegmentTo(writer, descriptor, headerConverter);
             currentPosition = descriptor.Start + descriptor.Attribute.Length;
         }
 
@@ -274,10 +275,10 @@ internal static class FixedWidthLineParser
 
             if (descriptor.Start > currentPosition)
             {
-                writer.Write(new string(separatorChar, descriptor.Start - currentPosition));
+                WritePadding(writer, separatorChar, descriptor.Start - currentPosition);
             }
 
-            writer.Write(new string(separatorChar, descriptor.Attribute.Length));
+            WritePadding(writer, separatorChar, descriptor.Attribute.Length);
             currentPosition = descriptor.Start + descriptor.Attribute.Length;
         }
 
@@ -373,9 +374,174 @@ internal static class FixedWidthLineParser
             var trailingWidth = fieldMap.ExpectedLineWidth - currentPosition;
             if (trailingWidth > 0)
             {
-                writer.Write(new string(padChar, trailingWidth));
+                WritePadding(writer, padChar, trailingWidth);
             }
         }
+    }
+
+
+
+    /// <summary>
+    /// Writes <paramref name="count"/> copies of <paramref name="padChar"/> to
+    /// <paramref name="writer"/> without allocating an intermediate <see cref="string"/>.
+    /// On net8+ uses a stack-allocated span; on older targets falls back to a
+    /// pooled <see cref="char"/> buffer.
+    /// </summary>
+    private static void WritePadding(TextWriter writer, char padChar, int count)
+    {
+        if (count <= 0)
+        {
+            return;
+        }
+
+#if NET8_0_OR_GREATER
+        // Stack-allocate a small buffer; field widths are typically tiny.
+        const int stackBufferSize = 128;
+        Span<char> buffer = stackalloc char[stackBufferSize];
+        var prefix = count < stackBufferSize ? count : stackBufferSize;
+        buffer.Slice(0, prefix).Fill(padChar);
+        while (count > 0)
+        {
+            var chunk = count < stackBufferSize ? count : stackBufferSize;
+            writer.Write(buffer.Slice(0, chunk));
+            count -= chunk;
+        }
+#else
+        const int maxBufferSize = 128;
+        var bufferSize = count < maxBufferSize ? count : maxBufferSize;
+        var buffer = ArrayPool<char>.Shared.Rent(bufferSize);
+        try
+        {
+            for (var i = 0; i < bufferSize; i++)
+            {
+                buffer[i] = padChar;
+            }
+
+            while (count > 0)
+            {
+                var chunk = count < bufferSize ? count : bufferSize;
+                writer.Write(buffer, 0, chunk);
+                count -= chunk;
+            }
+        }
+        finally
+        {
+            ArrayPool<char>.Shared.Return(buffer);
+        }
+#endif
+    }
+
+
+
+    /// <summary>
+    /// Writes a single data field directly to <paramref name="writer"/> as
+    /// "value + padding" (or "padding + value" for right-aligned fields), avoiding
+    /// the <see cref="string.PadLeft(int,char)"/> / <see cref="string.PadRight(int,char)"/>
+    /// allocation that <see cref="FormatSegment{T}"/> produces.
+    /// </summary>
+    /// <exception cref="FieldOverflowException"></exception>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the property has no public getter.
+    /// </exception>
+    private static void WriteFieldSegment<T>
+    (
+        TextWriter writer,
+        T record,
+        FieldDescriptor descriptor,
+        Func<object, FieldContext, string> converter
+    )
+    {
+        var attr = descriptor.Attribute;
+        var prop = descriptor.Property;
+        var getter = descriptor.Getter
+            ?? throw new InvalidOperationException(
+                $"Property '{prop.Name}' has no public getter. " +
+                "The loader requires readable properties to format field values.");
+        var text = converter(getter(record!)!, descriptor.Context);
+
+        if (text.Length > attr.Length)
+        {
+            throw new FieldOverflowException
+            (
+                $"The value converter returned a string of length {text.Length} " +
+                $"for property '{prop.Name}' which exceeds the defined field " +
+                $"width of {attr.Length}. Ensure your ValueConverter honors the " +
+                $"FieldLength in FieldContext.",
+                prop.Name,
+                attr.Length,
+                text.Length
+            );
+        }
+
+        var padCount = attr.Length - text.Length;
+#if NET8_0_OR_GREATER
+        // Stack-allocate the full padded field so it can be written in a single
+        // call when small enough — typical fixed-width fields are ≤128 chars.
+        const int stackFieldLimit = 256;
+        if (attr.Length <= stackFieldLimit)
+        {
+            Span<char> field = stackalloc char[attr.Length];
+            if (attr.Alignment == FieldAlignment.Right)
+            {
+                field.Slice(0, padCount).Fill(attr.Pad);
+                text.AsSpan().CopyTo(field.Slice(padCount));
+            }
+            else
+            {
+                text.AsSpan().CopyTo(field);
+                field.Slice(text.Length).Fill(attr.Pad);
+            }
+            writer.Write(field);
+            return;
+        }
+#endif
+
+        if (attr.Alignment == FieldAlignment.Right)
+        {
+            WritePadding(writer, attr.Pad, padCount);
+            writer.Write(text);
+        }
+        else
+        {
+            writer.Write(text);
+            WritePadding(writer, attr.Pad, padCount);
+        }
+    }
+
+
+
+    /// <summary>
+    /// Writes a single header label directly to <paramref name="writer"/> as
+    /// "label + space-padding", avoiding the <see cref="string.PadRight(int,char)"/>
+    /// allocation that <see cref="FormatHeaderSegment"/> produces.
+    /// </summary>
+    /// <exception cref="FieldOverflowException"></exception>
+    private static void WriteHeaderSegmentTo
+    (
+        TextWriter writer,
+        FieldDescriptor descriptor,
+        Func<string, FieldContext, string> headerConverter
+    )
+    {
+        var attr = descriptor.Attribute;
+        var prop = descriptor.Property;
+        var headerLabel = attr.Header ?? prop.Name;
+        var text = headerConverter(headerLabel, descriptor.Context);
+
+        if (text.Length > attr.Length)
+        {
+            throw new FieldOverflowException
+            (
+                $"The header converter returned a string of length {text.Length} for property " +
+                $"'{prop.Name}' which exceeds the defined field width of {attr.Length}.",
+                prop.Name,
+                attr.Length,
+                text.Length
+            );
+        }
+
+        writer.Write(text);
+        WritePadding(writer, ' ', attr.Length - text.Length);
     }
 
 
