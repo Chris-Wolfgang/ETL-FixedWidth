@@ -332,12 +332,14 @@ public static class FixedWidthConverter
 
         if (targetType == typeof(DateTime) || targetType == typeof(DateTimeOffset) || targetType == typeof(TimeSpan))
         {
+#if NET8_0_OR_GREATER
+            return ParseDateTimeValueSpan(span, targetType, format);
+#else
             return ParseDateTimeValue(text.ToString(), targetType, format);
+#endif
         }
 
 #if NET8_0_OR_GREATER
-        // Fast path: parse common numeric and boolean types directly from the span,
-        // avoiding the .ToString() allocation and TypeDescriptor overhead.
         var numericResult = ParseNumericSpan(span, targetType);
         if (numericResult != null)
         {
@@ -345,6 +347,22 @@ public static class FixedWidthConverter
         }
 #endif
 
+        return ParseViaTypeConverter(text, targetType, cachedConverter);
+    }
+
+
+
+    /// <summary>
+    /// Fallback parse path that materializes <paramref name="text"/> as a string
+    /// and routes through <see cref="TypeDescriptor"/> or <see cref="Convert.ChangeType(object,Type,IFormatProvider)"/>.
+    /// </summary>
+    private static object ParseViaTypeConverter
+    (
+        ReadOnlyMemory<char> text,
+        Type targetType,
+        TypeConverter? cachedConverter
+    )
+    {
         var str = text.ToString();
         var converter = cachedConverter ?? TypeDescriptor.GetConverter(targetType);
         if (converter.CanConvertFrom(typeof(string)))
@@ -411,6 +429,53 @@ public static class FixedWidthConverter
 
 
 #if NET8_0_OR_GREATER
+    /// <summary>
+    /// Span-based equivalent of <see cref="ParseDateTimeValue"/> that avoids the
+    /// <see cref="string"/> allocation by parsing directly from the source span.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when <paramref name="format"/> is null or empty.
+    /// </exception>
+    private static object ParseDateTimeValueSpan(ReadOnlySpan<char> span, Type targetType, string? format)
+    {
+        if (string.IsNullOrEmpty(format))
+        {
+            throw new InvalidOperationException
+            (
+                $"Cannot parse a value of type '{targetType.Name}' without " +
+                "a format string. Specify a Format on the [FixedWidthField] " +
+                "attribute (e.g. \"yyyyMMdd\", \"HHmmss\")."
+            );
+        }
+
+        if (targetType == typeof(DateTime))
+        {
+            return DateTime.ParseExact
+            (
+                span,
+                format.AsSpan(),
+                CultureInfo.InvariantCulture
+            );
+        }
+        if (targetType == typeof(DateTimeOffset))
+        {
+            return DateTimeOffset.ParseExact
+            (
+                span,
+                format.AsSpan(),
+                CultureInfo.InvariantCulture
+            );
+        }
+        return TimeSpan.ParseExact
+        (
+            span,
+            format,
+            CultureInfo.InvariantCulture
+        );
+    }
+
+
+
     /// <summary>
     /// Attempts to parse <paramref name="span"/> directly into a common numeric or
     /// boolean type using <see cref="ReadOnlySpan{T}"/>-based overloads, avoiding
