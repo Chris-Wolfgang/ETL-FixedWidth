@@ -1460,6 +1460,96 @@ public class FixedWidthConverterTests
             result
         );
     }
+
+
+
+    // ------------------------------------------------------------------
+    // ParseValue — span-based numeric fast path (net8+)
+    //
+    // Each branch of ParseNumericSpan was previously only exercised for int.
+    // These cases hit the remaining branches so the per-class coverage gate
+    // for FixedWidthConverter stays above the 90% threshold and so a future
+    // refactor of the fast path is caught by tests, not just by chart drift.
+    // ------------------------------------------------------------------
+
+    [Theory]
+    [InlineData(typeof(long),    "9000000000",   9000000000L)]
+    [InlineData(typeof(short),   "12345",        (short)12345)]
+    [InlineData(typeof(byte),    "200",          (byte)200)]
+    [InlineData(typeof(uint),    "4000000000",   4000000000u)]
+    [InlineData(typeof(ulong),   "18000000000",  18000000000ul)]
+    [InlineData(typeof(ushort),  "60000",        (ushort)60000)]
+    [InlineData(typeof(sbyte),   "-100",         (sbyte)-100)]
+    [InlineData(typeof(bool),    "true",         true)]
+    public void ParseValue_when_targetType_is_integer_or_bool_uses_span_fast_path
+    (
+        Type targetType,
+        string text,
+        object expected
+    )
+    {
+        var result = FixedWidthConverter.ParseValue(text.AsMemory(), targetType, format: null);
+
+        Assert.Equal(expected, result);
+        Assert.Equal(targetType, result.GetType());
+    }
+
+
+
+    [Fact]
+    public void ParseValue_when_targetType_is_decimal_uses_span_fast_path()
+    {
+        var result = FixedWidthConverter.ParseValue("123.45".AsMemory(), typeof(decimal), format: null);
+
+        Assert.Equal(123.45m, result);
+        Assert.IsType<decimal>(result);
+    }
+
+
+
+    [Fact]
+    public void ParseValue_when_targetType_is_double_uses_span_fast_path()
+    {
+        var result = FixedWidthConverter.ParseValue("3.14159".AsMemory(), typeof(double), format: null);
+
+        Assert.Equal(3.14159, (double)result, precision: 5);
+    }
+
+
+
+    [Fact]
+    public void ParseValue_when_targetType_is_float_uses_span_fast_path()
+    {
+        var result = FixedWidthConverter.ParseValue("2.5".AsMemory(), typeof(float), format: null);
+
+        Assert.Equal(2.5f, (float)result);
+    }
+
+
+
+    [Fact]
+    public void ParseValue_when_value_type_text_is_empty_returns_default()
+    {
+        // Covers the empty-span branch for non-nullable value types — should
+        // return Activator.CreateInstance(targetType), i.e. default(int) == 0.
+        var result = FixedWidthConverter.ParseValue("".AsMemory(), typeof(int), format: null);
+
+        Assert.Equal(0, result);
+    }
+
+
+
+    [Fact]
+    public void ConvertToString_when_value_is_not_IFormattable_uses_object_ToString()
+    {
+        // Covers the non-IFormattable fallback at the bottom of ConvertToString.
+        // System.Version is not IFormattable but has a sensible ToString().
+        var version = new Version(1, 2, 3);
+
+        var result = FixedWidthConverter.ConvertToString(version, MakeContext("Version", 10));
+
+        Assert.Equal("1.2.3", result);
+    }
 }
 
 
