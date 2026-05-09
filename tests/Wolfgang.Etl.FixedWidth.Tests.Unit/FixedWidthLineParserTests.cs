@@ -685,9 +685,11 @@ public class FixedWidthLineParserTests
     [ExcludeFromCodeCoverage]
     private class WideFieldRecord
     {
-        // Exceeds the 256-char stackalloc threshold in WriteFieldSegment so the
-        // pooled-buffer / per-WritePadding fallback path is exercised.
-        [FixedWidthField(0, 300)]
+        // Exceeds the (currently 256-char) stackalloc threshold in
+        // WriteFieldSegment so the pooled-buffer / per-WritePadding fallback
+        // path is exercised. 1024 leaves comfortable headroom; if the
+        // stackalloc limit is ever raised above 1024, this width must grow too.
+        [FixedWidthField(0, 1024)]
         public string Wide { get; set; } = string.Empty;
     }
 
@@ -743,10 +745,13 @@ public class FixedWidthLineParserTests
     public void WriteRecord_when_field_width_exceeds_stackalloc_threshold_uses_writepadding_fallback_left_aligned()
     {
         // Covers the non-stackalloc branch of WriteFieldSegment: when attr.Length
-        // is greater than the 256-char stackalloc cap, the writer falls back to
-        // direct value + WritePadding writes. The counting writer asserts the
-        // fallback branch executed (multiple Write* calls vs the single Write of
-        // the stackalloc path) so the test stays robust if the threshold changes.
+        // is greater than the stackalloc cap, the writer falls back to a direct
+        // value Write + WritePadding writes. The counting writer asserts the
+        // fallback branch executed (>=2 Write calls vs the single Write of the
+        // stackalloc path). The 1024 field width is well above the current
+        // 256-char threshold; if that threshold ever moves above 1024, the
+        // record's FixedWidthField length must be raised to keep this assertion
+        // meaningful.
         var fieldMap = FieldMap.GetResult<WideFieldRecord>();
         var record = new WideFieldRecord { Wide = "value" };
         var writer = new CountingTextWriter();
@@ -754,10 +759,9 @@ public class FixedWidthLineParserTests
         FixedWidthLineParser.WriteRecord(writer, record, fieldMap, FixedWidthConverter.Strict, fieldDelimiter: null);
 
         var output = writer.ToString();
-        Assert.Equal(300, output.Length);
+        Assert.Equal(1024, output.Length);
         Assert.StartsWith("value", output);
-        Assert.Equal(new string(' ', 295), output.Substring(5));
-        // Stackalloc path: 1 Write. Fallback: value Write + WritePadding Write(s) >= 2.
+        Assert.Equal(new string(' ', 1019), output.Substring(5));
         Assert.True
         (
             writer.WriteCallCount >= 2,
@@ -770,7 +774,8 @@ public class FixedWidthLineParserTests
     [ExcludeFromCodeCoverage]
     private class WideRightAlignedRecord
     {
-        [FixedWidthField(0, 300, Alignment = FieldAlignment.Right, Pad = '0')]
+        // See WideFieldRecord for the rationale on the 1024 width.
+        [FixedWidthField(0, 1024, Alignment = FieldAlignment.Right, Pad = '0')]
         public string Wide { get; set; } = string.Empty;
     }
 
@@ -779,10 +784,10 @@ public class FixedWidthLineParserTests
     [Fact]
     public void WriteRecord_when_field_width_exceeds_stackalloc_threshold_uses_writepadding_fallback_right_aligned()
     {
-        // Companion to the left-aligned variant — verifies the right-aligned
-        // branch of the non-stackalloc fallback (WritePadding fires before the
-        // value is written). The counting writer asserts the fallback branch
-        // executed regardless of any future change to the stackalloc threshold.
+        // Right-aligned companion to the left-aligned variant. WritePadding fires
+        // before the value is written; the counting writer asserts the fallback
+        // branch executed (>=2 Write calls). Same threshold caveat as the
+        // left-aligned test — keep the field width above the stackalloc cap.
         var fieldMap = FieldMap.GetResult<WideRightAlignedRecord>();
         var record = new WideRightAlignedRecord { Wide = "42" };
         var writer = new CountingTextWriter();
@@ -790,10 +795,9 @@ public class FixedWidthLineParserTests
         FixedWidthLineParser.WriteRecord(writer, record, fieldMap, FixedWidthConverter.Strict, fieldDelimiter: null);
 
         var output = writer.ToString();
-        Assert.Equal(300, output.Length);
+        Assert.Equal(1024, output.Length);
         Assert.EndsWith("42", output);
-        Assert.Equal(new string('0', 298), output.Substring(0, 298));
-        // Stackalloc path: 1 Write. Fallback: WritePadding Write(s) + value Write >= 2.
+        Assert.Equal(new string('0', 1022), output.Substring(0, 1022));
         Assert.True
         (
             writer.WriteCallCount >= 2,
@@ -1464,12 +1468,12 @@ public class FixedWidthConverterTests
 
 
     // ------------------------------------------------------------------
-    // ParseValue — span-based numeric fast path (net8+)
+    // ParseValue — numeric and bool round-trip
     //
-    // Each branch of ParseNumericSpan was previously only exercised for int.
-    // These cases hit the remaining branches so the per-class coverage gate
-    // for FixedWidthConverter stays above the 90% threshold and so a future
-    // refactor of the fast path is caught by tests, not just by chart drift.
+    // On net8+ these cases exercise the span-based fast path in
+    // ParseNumericSpan; on older TFMs they exercise the TypeDescriptor
+    // fallback. Either way, the observable behavior is the same and the
+    // tests describe parsing behavior rather than which internal branch ran.
     // ------------------------------------------------------------------
 
     [Theory]
@@ -1481,7 +1485,7 @@ public class FixedWidthConverterTests
     [InlineData(typeof(ushort),  "60000",        (ushort)60000)]
     [InlineData(typeof(sbyte),   "-100",         (sbyte)-100)]
     [InlineData(typeof(bool),    "true",         true)]
-    public void ParseValue_when_targetType_is_integer_or_bool_uses_span_fast_path
+    public void ParseValue_when_targetType_is_integer_or_bool_returns_parsed_value
     (
         Type targetType,
         string text,
@@ -1497,7 +1501,7 @@ public class FixedWidthConverterTests
 
 
     [Fact]
-    public void ParseValue_when_targetType_is_decimal_uses_span_fast_path()
+    public void ParseValue_when_targetType_is_decimal_returns_parsed_decimal()
     {
         var result = FixedWidthConverter.ParseValue("123.45".AsMemory(), typeof(decimal), format: null);
 
@@ -1508,7 +1512,7 @@ public class FixedWidthConverterTests
 
 
     [Fact]
-    public void ParseValue_when_targetType_is_double_uses_span_fast_path()
+    public void ParseValue_when_targetType_is_double_returns_parsed_double()
     {
         var result = FixedWidthConverter.ParseValue("3.14159".AsMemory(), typeof(double), format: null);
 
@@ -1518,7 +1522,7 @@ public class FixedWidthConverterTests
 
 
     [Fact]
-    public void ParseValue_when_targetType_is_float_uses_span_fast_path()
+    public void ParseValue_when_targetType_is_float_returns_parsed_float()
     {
         var result = FixedWidthConverter.ParseValue("2.5".AsMemory(), typeof(float), format: null);
 
