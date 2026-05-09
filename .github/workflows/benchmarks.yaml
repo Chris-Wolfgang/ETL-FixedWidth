@@ -60,28 +60,35 @@ jobs:
         # time changes; smaller deltas are not.
         run: dotnet run -c Release --no-build -- --filter "*" --job short --memory --exporters json
 
-      - name: Locate BDN combined report
+      - name: Merge per-class BDN reports
         id: locate
         working-directory: benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks
         run: |
-          # BDN writes a timestamped joined report when running multiple classes.
-          # Pick the newest *-report-full-compact.json — the action consumes one file.
-          # nullglob: when no files match, the glob expands to nothing instead of
-          # the literal pattern. Without it, set -e + pipefail would abort before
-          # our explicit "no report found" error message could run.
+          # BDN's --exporters json writes one *-report-full-compressed.json per
+          # benchmark class. github-action-benchmark consumes a single file, so
+          # we combine the .Benchmarks arrays into one synthetic report.
+          # nullglob: empty match expands to nothing (instead of the literal
+          # pattern), so the explicit "no report found" branch can run before
+          # set -e + pipefail aborts the step.
           shopt -s nullglob
-          reports=(BenchmarkDotNet.Artifacts/results/*-report-full-compact.json)
+          reports=(BenchmarkDotNet.Artifacts/results/*-report-full-compressed.json)
           if [ ${#reports[@]} -eq 0 ]; then
             echo "::error::No BenchmarkDotNet JSON report found"
             exit 1
           fi
-          report=$(ls -t "${reports[@]}" | head -n 1)
-          cp "$report" benchmarks-result.json
+          echo "Merging ${#reports[@]} report(s):"
+          printf '  %s\n' "${reports[@]}"
+          jq -s '{
+            Title: "BenchmarkDotNet combined report",
+            HostEnvironmentInfo: .[0].HostEnvironmentInfo,
+            Benchmarks: [.[].Benchmarks[]]
+          }' "${reports[@]}" > benchmarks-result.json
           echo "report=benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/benchmarks-result.json" >> "$GITHUB_OUTPUT"
-          echo "Found: $report"
 
       - name: Publish chart to gh-pages
-        uses: benchmark-action/github-action-benchmark@v1
+        # Pinned to v1.22.1 commit per repo convention (third-party actions
+        # publishing to gh-pages are pinned by SHA, not mutable tag).
+        uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba  # v1.22.1
         with:
           name: BenchmarkDotNet
           tool: 'benchmarkdotnet'
