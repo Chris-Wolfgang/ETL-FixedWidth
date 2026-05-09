@@ -19,6 +19,13 @@ on:
 permissions:
   contents: read
 
+# Serialize benchmark publishes so two pushes to main close together can't race
+# on the gh-pages branch. cancel-in-progress: false — every merge represents a
+# meaningful data point, so we queue rather than discard.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   benchmark:
     name: Run BenchmarkDotNet & publish chart
@@ -59,11 +66,16 @@ jobs:
         run: |
           # BDN writes a timestamped joined report when running multiple classes.
           # Pick the newest *-report-full-compact.json — the action consumes one file.
-          report=$(ls -t BenchmarkDotNet.Artifacts/results/*-report-full-compact.json | head -n 1)
-          if [ -z "$report" ]; then
+          # nullglob: when no files match, the glob expands to nothing instead of
+          # the literal pattern. Without it, set -e + pipefail would abort before
+          # our explicit "no report found" error message could run.
+          shopt -s nullglob
+          reports=(BenchmarkDotNet.Artifacts/results/*-report-full-compact.json)
+          if [ ${#reports[@]} -eq 0 ]; then
             echo "::error::No BenchmarkDotNet JSON report found"
             exit 1
           fi
+          report=$(ls -t "${reports[@]}" | head -n 1)
           cp "$report" benchmarks-result.json
           echo "report=benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/benchmarks-result.json" >> "$GITHUB_OUTPUT"
           echo "Found: $report"
