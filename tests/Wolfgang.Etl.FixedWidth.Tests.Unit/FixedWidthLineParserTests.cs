@@ -621,6 +621,129 @@ public class FixedWidthLineParserTests
 
 
     [Fact]
+    public void WriteRecord_when_custom_converter_returns_string_longer_than_field_width_throws_FieldOverflowException()
+    {
+        // Covers the safety-net throw inside WriteFieldSegment — fires when a
+        // custom value converter bypasses length validation and returns an
+        // overlong string on the direct-write path.
+        var fieldMap = FieldMap.GetResult<SimpleRecord>();
+        var record = new SimpleRecord { FirstName = "John", LastName = "Smith", Age = 1 };
+        var writer = new System.IO.StringWriter();
+
+        Func<object, FieldContext, string> badConverter = (_, _) => "This string is far too long";
+
+        var ex = Assert.Throws<FieldOverflowException>
+        (
+            () => FixedWidthLineParser.WriteRecord(writer, record, fieldMap, badConverter, fieldDelimiter: null)
+        );
+
+        Assert.Equal
+        (
+            "FirstName",
+            ex.PropertyName
+        );
+        Assert.Equal
+        (
+            10,
+            ex.FieldLength
+        );
+        Assert.True(ex.ActualLength > 10);
+    }
+
+
+
+    [Fact]
+    public void WriteHeader_when_custom_header_converter_returns_string_longer_than_field_width_throws_FieldOverflowException()
+    {
+        // Covers the overflow throw inside WriteHeaderSegmentTo — fires when a
+        // custom header converter returns an overlong label on the direct-write path.
+        var fieldMap = FieldMap.GetResult<SimpleRecord>();
+        var writer = new System.IO.StringWriter();
+
+        Func<string, FieldContext, string> badConverter = (_, _) => "This header is way too long for the field";
+
+        var ex = Assert.Throws<FieldOverflowException>
+        (
+            () => FixedWidthLineParser.WriteHeader(writer, fieldMap, badConverter, fieldDelimiter: null)
+        );
+
+        Assert.Equal
+        (
+            "FirstName",
+            ex.PropertyName
+        );
+        Assert.Equal
+        (
+            10,
+            ex.FieldLength
+        );
+        Assert.True(ex.ActualLength > 10);
+    }
+
+
+
+    [ExcludeFromCodeCoverage]
+    private class WideFieldRecord
+    {
+        // Exceeds the 256-char stackalloc threshold in WriteFieldSegment so the
+        // pooled-buffer / per-WritePadding fallback path is exercised.
+        [FixedWidthField(0, 300)]
+        public string Wide { get; set; } = string.Empty;
+    }
+
+
+
+    [Fact]
+    public void WriteRecord_when_field_width_exceeds_stackalloc_threshold_uses_writepadding_fallback_left_aligned()
+    {
+        // Covers the non-stackalloc branch of WriteFieldSegment: when attr.Length
+        // is greater than the 256-char stackalloc cap, the writer falls back to
+        // direct value + WritePadding writes. This test verifies the left-aligned
+        // (default) path; pad is space, value is on the left.
+        var fieldMap = FieldMap.GetResult<WideFieldRecord>();
+        var record = new WideFieldRecord { Wide = "value" };
+        var writer = new System.IO.StringWriter();
+
+        FixedWidthLineParser.WriteRecord(writer, record, fieldMap, FixedWidthConverter.Strict, fieldDelimiter: null);
+
+        var output = writer.ToString();
+        Assert.Equal(300, output.Length);
+        Assert.StartsWith("value", output);
+        Assert.Equal(new string(' ', 295), output.Substring(5));
+    }
+
+
+
+    [ExcludeFromCodeCoverage]
+    private class WideRightAlignedRecord
+    {
+        [FixedWidthField(0, 300, Alignment = FieldAlignment.Right, Pad = '0')]
+        public string Wide { get; set; } = string.Empty;
+    }
+
+
+
+    [Fact]
+    public void WriteRecord_when_field_width_exceeds_stackalloc_threshold_uses_writepadding_fallback_right_aligned()
+    {
+        // Companion to the left-aligned variant — verifies the right-aligned
+        // branch of the non-stackalloc fallback (WritePadding fires before the
+        // value is written).
+        var fieldMap = FieldMap.GetResult<WideRightAlignedRecord>();
+        var record = new WideRightAlignedRecord { Wide = "42" };
+        var writer = new System.IO.StringWriter();
+
+        FixedWidthLineParser.WriteRecord(writer, record, fieldMap, FixedWidthConverter.Strict, fieldDelimiter: null);
+
+        var output = writer.ToString();
+        Assert.Equal(300, output.Length);
+        Assert.EndsWith("42", output);
+        Assert.Equal(new string('0', 298), output.Substring(0, 298));
+    }
+
+
+
+    [Fact]
     public void WriteSeparator_when_field_delimiter_is_set_inserts_delimiter_between_separators()
     {
         var fieldMap = FieldMap.GetResult<SimpleRecord>();
