@@ -380,10 +380,12 @@ public static class FixedWidthConverter
 
 
 
+#if !NET8_0_OR_GREATER
     /// <summary>
     /// Parses a <see cref="DateTime"/>, <see cref="DateTimeOffset"/>, or
     /// <see cref="TimeSpan"/> value from <paramref name="text"/> using the
-    /// required <paramref name="format"/> string.
+    /// required <paramref name="format"/> string. On net8+ this is replaced
+    /// by <c>ParseDateTimeValueSpan</c> which avoids the string allocation.
     /// </summary>
     /// <exception cref="InvalidOperationException">
     /// Thrown when <paramref name="format"/> is null or empty.
@@ -425,13 +427,15 @@ public static class FixedWidthConverter
             CultureInfo.InvariantCulture
         );
     }
+#endif
 
 
 
 #if NET8_0_OR_GREATER
     /// <summary>
-    /// Span-based equivalent of <see cref="ParseDateTimeValue"/> that avoids the
-    /// <see cref="string"/> allocation by parsing directly from the source span.
+    /// Span-based replacement for the older-TFM <c>ParseDateTimeValue</c> that
+    /// avoids the <see cref="string"/> allocation by parsing directly from the
+    /// source span.
     /// </summary>
     /// <exception cref="InvalidOperationException">
     /// Thrown when <paramref name="format"/> is null or empty.
