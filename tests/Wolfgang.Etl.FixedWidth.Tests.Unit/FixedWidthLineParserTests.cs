@@ -693,16 +693,63 @@ public class FixedWidthLineParserTests
 
 
 
+    /// <summary>
+    /// Minimal <see cref="System.IO.TextWriter"/> that counts Write* invocations
+    /// while delegating to an inner writer. Used to distinguish the
+    /// single-call stackalloc path of <c>WriteFieldSegment</c> from its
+    /// multi-call fallback (one Write for the value + one or more for padding).
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    private sealed class CountingTextWriter : System.IO.TextWriter
+    {
+        private readonly System.IO.TextWriter _inner = new System.IO.StringWriter();
+
+        public int WriteCallCount { get; private set; }
+
+        public override System.Text.Encoding Encoding => _inner.Encoding;
+
+        public override string ToString() => _inner.ToString()!;
+
+        public override void Write(char value)
+        {
+            WriteCallCount++;
+            _inner.Write(value);
+        }
+
+        public override void Write(string? value)
+        {
+            WriteCallCount++;
+            _inner.Write(value);
+        }
+
+        public override void Write(char[] buffer, int index, int count)
+        {
+            WriteCallCount++;
+            _inner.Write(buffer, index, count);
+        }
+
+#if NET6_0_OR_GREATER
+        public override void Write(ReadOnlySpan<char> buffer)
+        {
+            WriteCallCount++;
+            _inner.Write(buffer);
+        }
+#endif
+    }
+
+
+
     [Fact]
     public void WriteRecord_when_field_width_exceeds_stackalloc_threshold_uses_writepadding_fallback_left_aligned()
     {
         // Covers the non-stackalloc branch of WriteFieldSegment: when attr.Length
         // is greater than the 256-char stackalloc cap, the writer falls back to
-        // direct value + WritePadding writes. This test verifies the left-aligned
-        // (default) path; pad is space, value is on the left.
+        // direct value + WritePadding writes. The counting writer asserts the
+        // fallback branch executed (multiple Write* calls vs the single Write of
+        // the stackalloc path) so the test stays robust if the threshold changes.
         var fieldMap = FieldMap.GetResult<WideFieldRecord>();
         var record = new WideFieldRecord { Wide = "value" };
-        var writer = new System.IO.StringWriter();
+        var writer = new CountingTextWriter();
 
         FixedWidthLineParser.WriteRecord(writer, record, fieldMap, FixedWidthConverter.Strict, fieldDelimiter: null);
 
@@ -710,6 +757,12 @@ public class FixedWidthLineParserTests
         Assert.Equal(300, output.Length);
         Assert.StartsWith("value", output);
         Assert.Equal(new string(' ', 295), output.Substring(5));
+        // Stackalloc path: 1 Write. Fallback: value Write + WritePadding Write(s) >= 2.
+        Assert.True
+        (
+            writer.WriteCallCount >= 2,
+            $"Expected fallback path (>=2 Write calls); observed {writer.WriteCallCount}."
+        );
     }
 
 
@@ -728,10 +781,11 @@ public class FixedWidthLineParserTests
     {
         // Companion to the left-aligned variant — verifies the right-aligned
         // branch of the non-stackalloc fallback (WritePadding fires before the
-        // value is written).
+        // value is written). The counting writer asserts the fallback branch
+        // executed regardless of any future change to the stackalloc threshold.
         var fieldMap = FieldMap.GetResult<WideRightAlignedRecord>();
         var record = new WideRightAlignedRecord { Wide = "42" };
-        var writer = new System.IO.StringWriter();
+        var writer = new CountingTextWriter();
 
         FixedWidthLineParser.WriteRecord(writer, record, fieldMap, FixedWidthConverter.Strict, fieldDelimiter: null);
 
@@ -739,6 +793,12 @@ public class FixedWidthLineParserTests
         Assert.Equal(300, output.Length);
         Assert.EndsWith("42", output);
         Assert.Equal(new string('0', 298), output.Substring(0, 298));
+        // Stackalloc path: 1 Write. Fallback: WritePadding Write(s) + value Write >= 2.
+        Assert.True
+        (
+            writer.WriteCallCount >= 2,
+            $"Expected fallback path (>=2 Write calls); observed {writer.WriteCallCount}."
+        );
     }
 
 
