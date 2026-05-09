@@ -1,0 +1,84 @@
+name: Benchmarks
+
+# Runs BenchmarkDotNet after a merge to main, then publishes the results to
+# the gh-pages branch under /dev/bench/ where benchmark-action/github-action-benchmark
+# renders an interactive line chart.
+#
+# This workflow is decoupled from PR validation and release: it does NOT gate
+# merging or publishing — it just adds one data point per qualifying push.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'benchmarks/**'
+      - '.github/workflows/benchmarks.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    name: Run BenchmarkDotNet & publish chart
+    runs-on: ubuntu-latest
+
+    permissions:
+      # Required to push the rendered chart + history to the gh-pages branch.
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            10.0.x
+
+      - name: Restore
+        run: dotnet restore benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks.csproj
+
+      - name: Build (Release)
+        run: dotnet build -c Release --no-restore benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks.csproj
+
+      - name: Run benchmarks
+        working-directory: benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks
+        # ShortRun keeps total runtime small (~3-5 min). GitHub-hosted runners
+        # are noisy, so chart trends are reliable for allocations and double-digit
+        # time changes; smaller deltas are not.
+        run: dotnet run -c Release --no-build -- --filter "*" --job short --memory --exporters json
+
+      - name: Locate BDN combined report
+        id: locate
+        working-directory: benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks
+        run: |
+          # BDN writes a timestamped joined report when running multiple classes.
+          # Pick the newest *-report-full-compact.json — the action consumes one file.
+          report=$(ls -t BenchmarkDotNet.Artifacts/results/*-report-full-compact.json | head -n 1)
+          if [ -z "$report" ]; then
+            echo "::error::No BenchmarkDotNet JSON report found"
+            exit 1
+          fi
+          cp "$report" benchmarks-result.json
+          echo "report=benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/benchmarks-result.json" >> "$GITHUB_OUTPUT"
+          echo "Found: $report"
+
+      - name: Publish chart to gh-pages
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: BenchmarkDotNet
+          tool: 'benchmarkdotnet'
+          output-file-path: ${{ steps.locate.outputs.report }}
+          gh-pages-branch: gh-pages
+          benchmark-data-dir-path: dev/bench
+          auto-push: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # Don't fail the workflow if a metric regresses — this is a tracker,
+          # not a gate. Tighten later if the noise floor settles.
+          alert-threshold: '200%'
+          fail-on-alert: false
