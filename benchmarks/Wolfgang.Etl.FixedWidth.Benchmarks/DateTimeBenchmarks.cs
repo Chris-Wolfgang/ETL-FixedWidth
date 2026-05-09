@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,13 +37,13 @@ public class DateTimeBenchmarks
             {
                 FirstName = "John",
                 LastName = "Smith",
-                BirthDate = new DateTime(1980, 1, 1).AddDays(i % 10000),
+                BirthDate = new DateTime(1980, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddDays(i % 10000),
                 ZipCode = 98101,
             };
 
-            sb.Append("John                ");                                         // 20
-            sb.Append("Smith               ");                                         // 20
-            sb.Append(_records[i].BirthDate.ToString("yyyyMMdd"));                     //  8
+            sb.Append("John                ");                                                            // 20
+            sb.Append("Smith               ");                                                            // 20
+            sb.Append(_records[i].BirthDate.ToString("yyyyMMdd", CultureInfo.InvariantCulture));          //  8
             sb.Append("98101");                                                        //  5
             sb.AppendLine();
         }
