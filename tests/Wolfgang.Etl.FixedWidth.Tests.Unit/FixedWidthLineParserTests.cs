@@ -621,6 +621,193 @@ public class FixedWidthLineParserTests
 
 
     [Fact]
+    public void WriteRecord_when_custom_converter_returns_string_longer_than_field_width_throws_FieldOverflowException()
+    {
+        // Covers the safety-net throw inside WriteFieldSegment — fires when a
+        // custom value converter bypasses length validation and returns an
+        // overlong string on the direct-write path.
+        var fieldMap = FieldMap.GetResult<SimpleRecord>();
+        var record = new SimpleRecord { FirstName = "John", LastName = "Smith", Age = 1 };
+        var writer = new System.IO.StringWriter();
+
+        Func<object, FieldContext, string> badConverter = (_, _) => "This string is far too long";
+
+        var ex = Assert.Throws<FieldOverflowException>
+        (
+            () => FixedWidthLineParser.WriteRecord(writer, record, fieldMap, badConverter, fieldDelimiter: null)
+        );
+
+        Assert.Equal
+        (
+            "FirstName",
+            ex.PropertyName
+        );
+        Assert.Equal
+        (
+            10,
+            ex.FieldLength
+        );
+        Assert.True(ex.ActualLength > 10);
+    }
+
+
+
+    [Fact]
+    public void WriteHeader_when_custom_header_converter_returns_string_longer_than_field_width_throws_FieldOverflowException()
+    {
+        // Covers the overflow throw inside WriteHeaderSegmentTo — fires when a
+        // custom header converter returns an overlong label on the direct-write path.
+        var fieldMap = FieldMap.GetResult<SimpleRecord>();
+        var writer = new System.IO.StringWriter();
+
+        Func<string, FieldContext, string> badConverter = (_, _) => "This header is way too long for the field";
+
+        var ex = Assert.Throws<FieldOverflowException>
+        (
+            () => FixedWidthLineParser.WriteHeader(writer, fieldMap, badConverter, fieldDelimiter: null)
+        );
+
+        Assert.Equal
+        (
+            "FirstName",
+            ex.PropertyName
+        );
+        Assert.Equal
+        (
+            10,
+            ex.FieldLength
+        );
+        Assert.True(ex.ActualLength > 10);
+    }
+
+
+
+    [ExcludeFromCodeCoverage]
+    private class WideFieldRecord
+    {
+        // Exceeds the (currently 256-char) stackalloc threshold in
+        // WriteFieldSegment so the pooled-buffer / per-WritePadding fallback
+        // path is exercised. 1024 leaves comfortable headroom; if the
+        // stackalloc limit is ever raised above 1024, this width must grow too.
+        [FixedWidthField(0, 1024)]
+        public string Wide { get; set; } = string.Empty;
+    }
+
+
+
+    /// <summary>
+    /// Minimal <see cref="System.IO.TextWriter"/> that counts Write* invocations
+    /// while delegating to an inner writer. Used to distinguish the
+    /// single-call stackalloc path of <c>WriteFieldSegment</c> from its
+    /// multi-call fallback (one Write for the value + one or more for padding).
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    private sealed class CountingTextWriter : System.IO.TextWriter
+    {
+        private readonly System.IO.TextWriter _inner = new System.IO.StringWriter();
+
+        public int WriteCallCount { get; private set; }
+
+        public override System.Text.Encoding Encoding => _inner.Encoding;
+
+        public override string ToString() => _inner.ToString()!;
+
+        public override void Write(char value)
+        {
+            WriteCallCount++;
+            _inner.Write(value);
+        }
+
+        public override void Write(string? value)
+        {
+            WriteCallCount++;
+            _inner.Write(value);
+        }
+
+        public override void Write(char[] buffer, int index, int count)
+        {
+            WriteCallCount++;
+            _inner.Write(buffer, index, count);
+        }
+
+#if NET6_0_OR_GREATER
+        public override void Write(ReadOnlySpan<char> buffer)
+        {
+            WriteCallCount++;
+            _inner.Write(buffer);
+        }
+#endif
+    }
+
+
+
+    [Fact]
+    public void WriteRecord_when_field_width_exceeds_stackalloc_threshold_uses_writepadding_fallback_left_aligned()
+    {
+        // Covers the non-stackalloc branch of WriteFieldSegment: when attr.Length
+        // is greater than the stackalloc cap, the writer falls back to a direct
+        // value Write + WritePadding writes. The counting writer asserts the
+        // fallback branch executed (>=2 Write calls vs the single Write of the
+        // stackalloc path). The 1024 field width is well above the current
+        // 256-char threshold; if that threshold ever moves above 1024, the
+        // record's FixedWidthField length must be raised to keep this assertion
+        // meaningful.
+        var fieldMap = FieldMap.GetResult<WideFieldRecord>();
+        var record = new WideFieldRecord { Wide = "value" };
+        var writer = new CountingTextWriter();
+
+        FixedWidthLineParser.WriteRecord(writer, record, fieldMap, FixedWidthConverter.Strict, fieldDelimiter: null);
+
+        var output = writer.ToString();
+        Assert.Equal(1024, output.Length);
+        Assert.StartsWith("value", output);
+        Assert.Equal(new string(' ', 1019), output.Substring(5));
+        Assert.True
+        (
+            writer.WriteCallCount >= 2,
+            $"Expected fallback path (>=2 Write calls); observed {writer.WriteCallCount}."
+        );
+    }
+
+
+
+    [ExcludeFromCodeCoverage]
+    private class WideRightAlignedRecord
+    {
+        // See WideFieldRecord for the rationale on the 1024 width.
+        [FixedWidthField(0, 1024, Alignment = FieldAlignment.Right, Pad = '0')]
+        public string Wide { get; set; } = string.Empty;
+    }
+
+
+
+    [Fact]
+    public void WriteRecord_when_field_width_exceeds_stackalloc_threshold_uses_writepadding_fallback_right_aligned()
+    {
+        // Right-aligned companion to the left-aligned variant. WritePadding fires
+        // before the value is written; the counting writer asserts the fallback
+        // branch executed (>=2 Write calls). Same threshold caveat as the
+        // left-aligned test — keep the field width above the stackalloc cap.
+        var fieldMap = FieldMap.GetResult<WideRightAlignedRecord>();
+        var record = new WideRightAlignedRecord { Wide = "42" };
+        var writer = new CountingTextWriter();
+
+        FixedWidthLineParser.WriteRecord(writer, record, fieldMap, FixedWidthConverter.Strict, fieldDelimiter: null);
+
+        var output = writer.ToString();
+        Assert.Equal(1024, output.Length);
+        Assert.EndsWith("42", output);
+        Assert.Equal(new string('0', 1022), output.Substring(0, 1022));
+        Assert.True
+        (
+            writer.WriteCallCount >= 2,
+            $"Expected fallback path (>=2 Write calls); observed {writer.WriteCallCount}."
+        );
+    }
+
+
+
+    [Fact]
     public void WriteSeparator_when_field_delimiter_is_set_inserts_delimiter_between_separators()
     {
         var fieldMap = FieldMap.GetResult<SimpleRecord>();
@@ -1276,6 +1463,96 @@ public class FixedWidthConverterTests
             'A',
             result
         );
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // ParseValue — numeric and bool round-trip
+    //
+    // On net8+ these cases exercise the span-based fast path in
+    // ParseNumericSpan; on older TFMs they exercise the TypeDescriptor
+    // fallback. Either way, the observable behavior is the same and the
+    // tests describe parsing behavior rather than which internal branch ran.
+    // ------------------------------------------------------------------
+
+    [Theory]
+    [InlineData(typeof(long),    "9000000000",   9000000000L)]
+    [InlineData(typeof(short),   "12345",        (short)12345)]
+    [InlineData(typeof(byte),    "200",          (byte)200)]
+    [InlineData(typeof(uint),    "4000000000",   4000000000u)]
+    [InlineData(typeof(ulong),   "18000000000",  18000000000ul)]
+    [InlineData(typeof(ushort),  "60000",        (ushort)60000)]
+    [InlineData(typeof(sbyte),   "-100",         (sbyte)-100)]
+    [InlineData(typeof(bool),    "true",         true)]
+    public void ParseValue_when_targetType_is_integer_or_bool_returns_parsed_value
+    (
+        Type targetType,
+        string text,
+        object expected
+    )
+    {
+        var result = FixedWidthConverter.ParseValue(text.AsMemory(), targetType, format: null);
+
+        Assert.Equal(expected, result);
+        Assert.Equal(targetType, result.GetType());
+    }
+
+
+
+    [Fact]
+    public void ParseValue_when_targetType_is_decimal_returns_parsed_decimal()
+    {
+        var result = FixedWidthConverter.ParseValue("123.45".AsMemory(), typeof(decimal), format: null);
+
+        Assert.Equal(123.45m, result);
+        Assert.IsType<decimal>(result);
+    }
+
+
+
+    [Fact]
+    public void ParseValue_when_targetType_is_double_returns_parsed_double()
+    {
+        var result = FixedWidthConverter.ParseValue("3.14159".AsMemory(), typeof(double), format: null);
+
+        Assert.Equal(3.14159, (double)result, precision: 5);
+    }
+
+
+
+    [Fact]
+    public void ParseValue_when_targetType_is_float_returns_parsed_float()
+    {
+        var result = FixedWidthConverter.ParseValue("2.5".AsMemory(), typeof(float), format: null);
+
+        Assert.Equal(2.5f, (float)result);
+    }
+
+
+
+    [Fact]
+    public void ParseValue_when_value_type_text_is_empty_returns_default()
+    {
+        // Covers the empty-span branch for non-nullable value types — should
+        // return Activator.CreateInstance(targetType), i.e. default(int) == 0.
+        var result = FixedWidthConverter.ParseValue("".AsMemory(), typeof(int), format: null);
+
+        Assert.Equal(0, result);
+    }
+
+
+
+    [Fact]
+    public void ConvertToString_when_value_is_not_IFormattable_uses_object_ToString()
+    {
+        // Covers the non-IFormattable fallback at the bottom of ConvertToString.
+        // System.Version is not IFormattable but has a sensible ToString().
+        var version = new Version(1, 2, 3);
+
+        var result = FixedWidthConverter.ConvertToString(version, MakeContext("Version", 10));
+
+        Assert.Equal("1.2.3", result);
     }
 }
 
