@@ -9,7 +9,6 @@
     <FileVersion>1.0.0</FileVersion>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Title>Wolfgang.Etl.FixedWidth</Title>
-    <Authors>Chris Wolfgang</Authors>
     <Description>Extractor and Loader implementations for reading and writing fixed-width text files, built on Wolfgang.Etl.Abstractions.</Description>
     <Copyright>Copyright 2026 Chris Wolfgang</Copyright>
     <PackageProjectUrl>https://github.com/Chris-Wolfgang/ETL-FixedWidth</PackageProjectUrl>
