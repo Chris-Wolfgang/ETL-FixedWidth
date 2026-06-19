@@ -33,11 +33,15 @@
       {
         "files": [
           "logo.svg",
-          "images/**"
+          "apple-touch-icon.png",
+          "favicon.svg",
+          "favicon.ico",
+          "images/**",
+          "public/**",
+          "versions.json"
         ]
       }
     ],
-
     "output": "_site",
     "template": [
       "default",
@@ -47,6 +51,7 @@
       "_appName": "Wolfgang.Etl.FixedWidth",
       "_appTitle": "Wolfgang.Etl.FixedWidth Documentation",
       "_appLogoPath": "logo.svg",
+      "_appFaviconPath": "favicon.svg",
       "_enableSearch": true,
       "_appFooter": "Made with DocFX",
       "_disableSidebar": false,
@@ -58,4 +63,3 @@
     }
   }
 }
-
