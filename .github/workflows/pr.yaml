@@ -1460,3 +1460,117 @@ jobs:
           name: devskim-results
           path: devskim-results.txt
           if-no-files-found: warn
+
+  # ReSharper InspectCode — a non-Roslyn static-analysis pass (data-flow,
+  # dead-code, structural rules) that runs in PARALLEL with the test stages
+  # (no `needs:` on them). Findings upload to GitHub Code Scanning and annotate
+  # the PR diff. Runs on windows-latest because the src/test projects target
+  # net462/net481, which a Linux runner cannot build. The `.DotSettings`
+  # noise-floor profile is fetched from main alongside the other protected
+  # configs so a PR cannot silence rules via its own copy.
+  inspectcode:
+    name: "ReSharper InspectCode"
+    runs-on: windows-latest
+    needs: detect-projects
+    if: github.repository != 'Chris-Wolfgang/repo-template' && needs.detect-projects.outputs.has-projects == 'true'
+    permissions:
+      contents: read
+      security-events: write   # required for github/codeql-action/upload-sarif
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          ref: refs/pull/${{ github.event.pull_request.number }}/head
+          persist-credentials: false
+
+      - name: Fetch trusted configuration files from main branch
+        # Skip for Dependabot — its package-version bumps to protected files are
+        # legitimate and should not be overwritten by main's older versions.
+        if: github.event.pull_request.user.login != 'dependabot[bot]'
+        shell: bash
+        run: |
+          echo "Fetching configuration files from main branch to prevent malicious overrides..."
+          git fetch origin main:main-branch
+
+          # Includes *.DotSettings so a PR cannot weaken the InspectCode profile.
+          config_files=(
+            ".editorconfig"
+            "Directory.Build.props"
+            "Directory.Build.targets"
+            "BannedSymbols.txt"
+            "*.globalconfig"
+            "*.ruleset"
+            "*.DotSettings"
+            ".github/workflows/*.yml"
+            ".github/workflows/*.yaml"
+          )
+
+          for config_file in "${config_files[@]}"; do
+            if [[ "$config_file" == *"*"* ]]; then
+              while read -r file; do
+                if [ -n "$file" ]; then
+                  echo "  ✓ Copying $file from main branch"
+                  mkdir -p "$(dirname "$file")"
+                  if ! git show "main-branch:$file" > "$file"; then
+                    echo "::error::Failed to copy $file from main-branch — aborting to prevent silent fall-back to PR-supplied protected config."
+                    exit 1
+                  fi
+                fi
+              done < <(git ls-tree -r --name-only main-branch | { grep -E "${config_file//\*/.*}" || true; })
+            else
+              if git cat-file -e "main-branch:$config_file" 2>/dev/null; then
+                echo "  ✓ Copying $config_file from main branch"
+                if ! git show "main-branch:$config_file" > "$config_file"; then
+                  echo "::error::Failed to copy $config_file from main-branch — aborting to prevent silent fall-back to PR-supplied protected config."
+                  exit 1
+                fi
+              else
+                echo "  ℹ️  $config_file not found in main branch, skipping"
+              fi
+            fi
+          done
+          echo "✅ Configuration files secured - using versions from main branch"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore + Build (Release)
+        shell: bash
+        run: |
+          dotnet restore
+          dotnet build -c Release --no-restore
+
+      - name: Install JetBrains.ReSharper.GlobalTools
+        run: dotnet tool install -g JetBrains.ReSharper.GlobalTools
+
+      - name: Run InspectCode
+        shell: bash
+        run: |
+          SLN=$(ls *.slnx 2>/dev/null | head -1)
+          echo "Inspecting $SLN"
+          jb inspectcode "$SLN" \
+            --output=inspect.sarif \
+            --format=sarif \
+            --severity=WARNING \
+            --no-build
+
+      - name: Upload SARIF to Code Scanning
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: inspect.sarif
+
+      - name: Gate on error-severity findings
+        shell: bash
+        run: |
+          # Only `error`-severity findings fail the job; warnings surface in
+          # Code Scanning but do not block (tune up to error once the noise
+          # floor settles).
+          count=$(jq '[.runs[].results[] | select(.level=="error")] | length' inspect.sarif)
+          echo "InspectCode error-severity findings: $count"
+          if [ "$count" -gt 0 ]; then
+            echo "::error::$count InspectCode error(s) — see Security → Code scanning alerts"
+            exit 1
+          fi
