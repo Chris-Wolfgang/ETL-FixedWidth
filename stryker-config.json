@@ -1,6 +1,6 @@
 {
   "stryker-config": {
-    "project": "Wolfgang.Etl.FixedWidth.csproj",
+    "project": "src/Wolfgang.Etl.FixedWidth/Wolfgang.Etl.FixedWidth.csproj",
     "test-projects": [
       "tests/Wolfgang.Etl.FixedWidth.Tests.Unit/Wolfgang.Etl.FixedWidth.Tests.Unit.csproj"
     ],
@@ -11,10 +11,9 @@
       "progress"
     ],
     "thresholds": {
-      "high": 80,
-      "low": 60,
+      "high": 90,
+      "low": 75,
       "break": 0
-    },
-    "mutation-level": "Standard"
+    }
   }
 }
