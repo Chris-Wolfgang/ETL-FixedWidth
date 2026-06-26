@@ -27,12 +27,12 @@ namespace Wolfgang.Etl.FixedWidth;
 /// </para>
 /// <list type="bullet">
 ///   <item><b>TextReader constructor</b> — the caller owns the <see cref="TextReader"/>
-///   lifetime. The extractor does not dispose it. Calling <see cref="Dispose()"/> is
+///   lifetime. The extractor does not dispose it. Calling <see cref="System.IDisposable.Dispose"/> is
 ///   optional and has no effect.</item>
 ///   <item><b>Stream constructor</b> — the extractor creates an internal
 ///   <see cref="StreamReader"/> with a 64 KB buffer for improved throughput on large files.
 ///   The caller retains ownership of the <see cref="Stream"/> (it is not closed), but
-///   <see cref="Dispose()"/> must be called to release the internal reader.</item>
+///   <see cref="System.IDisposable.Dispose"/> must be called to release the internal reader.</item>
 /// </list>
 /// </remarks>
 /// <example>
@@ -45,7 +45,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;(reader);
 /// </code>
 /// </example>
-public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthReport>, IDisposable
+public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthReport>
     where TRecord : notnull, new()
 {
     // ------------------------------------------------------------------
@@ -506,32 +506,22 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
 
     /// <summary>
-    /// Disposes the internal <see cref="StreamReader"/> when this instance was
-    /// constructed from a <see cref="Stream"/>. Has no effect when constructed
-    /// from a caller-owned <see cref="TextReader"/>.
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
-
-
-    /// <summary>
-    /// Releases managed resources when <paramref name="disposing"/> is
-    /// <see langword="true"/>. Override in a derived class to add cleanup logic.
+    /// Releases the internal <see cref="StreamReader"/> when this instance was
+    /// constructed from a <see cref="Stream"/>, then defers to the base class.
+    /// Has no effect on a caller-owned <see cref="TextReader"/>.
     /// </summary>
     /// <param name="disposing">
-    /// <see langword="true"/> when called from <see cref="Dispose()"/>;
+    /// <see langword="true"/> when called from <see cref="System.IDisposable"/>;
     /// <see langword="false"/> when called from a finalizer.
     /// </param>
-    protected virtual void Dispose(bool disposing)
+    protected override void Dispose(bool disposing)
     {
         if (disposing && _ownsReader)
         {
             _reader.Dispose();
         }
+
+        base.Dispose(disposing);
     }
 
 

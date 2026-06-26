@@ -20,13 +20,13 @@ namespace Wolfgang.Etl.FixedWidth;
 /// </para>
 /// <list type="bullet">
 ///   <item><b>TextWriter constructor</b> — the caller owns the <see cref="TextWriter"/>
-///   lifetime. The loader does not dispose it, and calling <see cref="Dispose()"/> is
+///   lifetime. The loader does not dispose it, and calling <see cref="System.IDisposable.Dispose"/> is
 ///   optional (no-op). The caller is responsible for flushing the writer.</item>
 ///   <item><b>Stream constructor</b> — the loader creates an internal
 ///   <see cref="StreamWriter"/> with a 64 KB buffer for improved throughput.
 ///   The caller retains ownership of the <see cref="Stream"/> (it is not closed).
 ///   The internal writer is flushed automatically at the end of
-///   <c>LoadWorkerAsync</c>, and <see cref="Dispose()"/> must be called to release it.</item>
+///   <c>LoadWorkerAsync</c>, and <see cref="System.IDisposable.Dispose"/> must be called to release it.</item>
 /// </list>
 /// <code>
 /// // Stream-based (preferred for files — 64 KB buffer reduces syscall overhead):
@@ -45,7 +45,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// loader.FieldDelimiter = " | ";
 /// </code>
 /// </remarks>
-public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, IDisposable
+public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     where TRecord : notnull
 {
     // ------------------------------------------------------------------
@@ -408,32 +408,22 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
 
     /// <summary>
-    /// Disposes the internal <see cref="StreamWriter"/> when this instance was
-    /// constructed from a <see cref="Stream"/>. Has no effect when constructed
-    /// from a caller-owned <see cref="TextWriter"/>.
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
-
-
-    /// <summary>
-    /// Releases managed resources when <paramref name="disposing"/> is
-    /// <see langword="true"/>. Override in a derived class to add cleanup logic.
+    /// Releases the internal <see cref="StreamWriter"/> when this instance was
+    /// constructed from a <see cref="Stream"/>, then defers to the base class.
+    /// Has no effect on a caller-owned <see cref="TextWriter"/>.
     /// </summary>
     /// <param name="disposing">
-    /// <see langword="true"/> when called from <see cref="Dispose()"/>;
+    /// <see langword="true"/> when called from <see cref="System.IDisposable"/>;
     /// <see langword="false"/> when called from a finalizer.
     /// </param>
-    protected virtual void Dispose(bool disposing)
+    protected override void Dispose(bool disposing)
     {
         if (disposing && _ownsWriter)
         {
             _writer.Dispose();
         }
+
+        base.Dispose(disposing);
     }
 
 
