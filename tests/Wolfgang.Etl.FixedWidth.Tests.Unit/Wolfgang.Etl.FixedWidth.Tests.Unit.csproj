@@ -21,8 +21,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0')) And '$(TargetFramework)' != 'netcoreapp3.1' And '$(TargetFramework)' != 'net5.0'" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))" />
     <PackageReference Include="System.Linq.Async" Version="7.0.1" />
-    <PackageReference Include="Wolfgang.Etl.TestKit" Version="0.8.0" />
-    <PackageReference Include="Wolfgang.Etl.TestKit.Xunit" Version="0.8.0" />
+    <PackageReference Include="Wolfgang.Etl.TestKit" Version="0.9.0" />
+    <PackageReference Include="Wolfgang.Etl.TestKit.Xunit" Version="0.9.0" />
     <PackageReference Include="coverlet.collector" Version="10.0.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
