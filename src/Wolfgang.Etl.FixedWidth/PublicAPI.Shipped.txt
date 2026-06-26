@@ -20,20 +20,20 @@ Wolfgang.Etl.FixedWidth.Attributes.FixedWidthSkipAttribute.Length.get -> int
 Wolfgang.Etl.FixedWidth.Attributes.FixedWidthSkipAttribute.Message.get -> string?
 Wolfgang.Etl.FixedWidth.Attributes.FixedWidthSkipAttribute.Message.set -> void
 Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling
-Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling.ReturnDefault -> Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling
-Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling.Skip -> Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling
-Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling.ThrowException -> Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling
+Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling.ReturnDefault = 2 -> Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling
+Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling.Skip = 1 -> Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling
+Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling.ThrowException = 0 -> Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling
 Wolfgang.Etl.FixedWidth.Enums.FieldAlignment
-Wolfgang.Etl.FixedWidth.Enums.FieldAlignment.Left -> Wolfgang.Etl.FixedWidth.Enums.FieldAlignment
-Wolfgang.Etl.FixedWidth.Enums.FieldAlignment.Right -> Wolfgang.Etl.FixedWidth.Enums.FieldAlignment
+Wolfgang.Etl.FixedWidth.Enums.FieldAlignment.Left = 0 -> Wolfgang.Etl.FixedWidth.Enums.FieldAlignment
+Wolfgang.Etl.FixedWidth.Enums.FieldAlignment.Right = 1 -> Wolfgang.Etl.FixedWidth.Enums.FieldAlignment
 Wolfgang.Etl.FixedWidth.Enums.LineAction
-Wolfgang.Etl.FixedWidth.Enums.LineAction.Process -> Wolfgang.Etl.FixedWidth.Enums.LineAction
-Wolfgang.Etl.FixedWidth.Enums.LineAction.Skip -> Wolfgang.Etl.FixedWidth.Enums.LineAction
-Wolfgang.Etl.FixedWidth.Enums.LineAction.Stop -> Wolfgang.Etl.FixedWidth.Enums.LineAction
+Wolfgang.Etl.FixedWidth.Enums.LineAction.Process = 0 -> Wolfgang.Etl.FixedWidth.Enums.LineAction
+Wolfgang.Etl.FixedWidth.Enums.LineAction.Skip = 1 -> Wolfgang.Etl.FixedWidth.Enums.LineAction
+Wolfgang.Etl.FixedWidth.Enums.LineAction.Stop = 2 -> Wolfgang.Etl.FixedWidth.Enums.LineAction
 Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling
-Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling.ReturnDefault -> Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling
-Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling.Skip -> Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling
-Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling.ThrowException -> Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling
+Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling.ReturnDefault = 2 -> Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling
+Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling.Skip = 1 -> Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling
+Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling.ThrowException = 0 -> Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling
 Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException
 Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.ExpectedType.get -> System.Type
 Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.FieldConversionException(string message, long lineNumber, string lineContent, string fieldName, System.Type expectedType, string rawValue, System.Exception innerException) -> void
@@ -66,7 +66,6 @@ Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.BlankLineHandling.get -> Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.BlankLineHandling.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.CurrentLineNumber.get -> long
-Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.Dispose() -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FieldDelimiter.get -> string?
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FieldDelimiter.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FieldSeparator.get -> char?
@@ -87,7 +86,6 @@ Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.ValueParser.get -> Wolfgang
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.ValueParser.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.CurrentLineNumber.get -> long
-Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.Dispose() -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FieldDelimiter.get -> string?
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FieldDelimiter.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FieldSeparator.get -> char?
@@ -113,19 +111,8 @@ override Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.ExtractWorkerAsync
 override Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.CreateProgressReport() -> Wolfgang.Etl.FixedWidth.FixedWidthReport
 override Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.CreateProgressTimer(System.IProgress<Wolfgang.Etl.FixedWidth.FixedWidthReport> progress) -> Wolfgang.Etl.Abstractions.IProgressTimer
 override Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.LoadWorkerAsync(System.Collections.Generic.IAsyncEnumerable<TRecord> items, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task
-override Wolfgang.Etl.FixedWidth.FixedWidthReport.<Clone>$() -> Wolfgang.Etl.Abstractions.Report
-override Wolfgang.Etl.FixedWidth.FixedWidthReport.Equals(object? obj) -> bool
-override Wolfgang.Etl.FixedWidth.FixedWidthReport.GetHashCode() -> int
-override Wolfgang.Etl.FixedWidth.FixedWidthReport.PrintMembers(System.Text.StringBuilder builder) -> bool
-override Wolfgang.Etl.FixedWidth.FixedWidthReport.ToString() -> string
-override sealed Wolfgang.Etl.FixedWidth.FixedWidthReport.Equals(Wolfgang.Etl.Abstractions.Report? other) -> bool
-static Wolfgang.Etl.FixedWidth.FixedWidthReport.operator !=(Wolfgang.Etl.FixedWidth.FixedWidthReport? left, Wolfgang.Etl.FixedWidth.FixedWidthReport? right) -> bool
-static Wolfgang.Etl.FixedWidth.FixedWidthReport.operator ==(Wolfgang.Etl.FixedWidth.FixedWidthReport? left, Wolfgang.Etl.FixedWidth.FixedWidthReport? right) -> bool
 static readonly Wolfgang.Etl.FixedWidth.FixedWidthConverter.DefaultParser -> Wolfgang.Etl.FixedWidth.FixedWidthValueParser
 static readonly Wolfgang.Etl.FixedWidth.FixedWidthConverter.Strict -> System.Func<object, Wolfgang.Etl.FixedWidth.FieldContext, string>
 static readonly Wolfgang.Etl.FixedWidth.FixedWidthConverter.StrictHeader -> System.Func<string, Wolfgang.Etl.FixedWidth.FieldContext, string>
 static readonly Wolfgang.Etl.FixedWidth.FixedWidthConverter.Truncate -> System.Func<object, Wolfgang.Etl.FixedWidth.FieldContext, string>
 static readonly Wolfgang.Etl.FixedWidth.FixedWidthConverter.TruncateHeader -> System.Func<string, Wolfgang.Etl.FixedWidth.FieldContext, string>
-virtual Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.Dispose(bool disposing) -> void
-virtual Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.Dispose(bool disposing) -> void
-virtual Wolfgang.Etl.FixedWidth.FixedWidthReport.Equals(Wolfgang.Etl.FixedWidth.FixedWidthReport? other) -> bool
