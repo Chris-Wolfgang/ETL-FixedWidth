@@ -442,7 +442,11 @@ public class FixedWidthLoaderTests
             3,
             lines.Length
         );
-        Assert.True(lines[1].Replace('-', ' ').Trim().Length == 0 || lines[1].All(c => c == '-'));
+        Assert.Equal
+        (
+            new string('-', 23),
+            lines[1]
+        );
         Assert.Equal
         (
             "John      Smith     042",

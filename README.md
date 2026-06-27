@@ -14,7 +14,7 @@ Extractor and Loader for reading and writing fixed width files and text streams
 dotnet add package Wolfgang.Etl.FixedWidth
 ```
 
-**NuGet Package:** Coming soon to NuGet.org
+**NuGet Package:** [Wolfgang.Etl.FixedWidth on NuGet.org](https://www.nuget.org/packages/Wolfgang.Etl.FixedWidth/)
 
 ---
 

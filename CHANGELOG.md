@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-06-27
+
 ### Changed
 
 - Upgraded to `Wolfgang.Etl.Abstractions` 0.14.1. The base extractor/loader now
@@ -28,6 +30,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pinned `AssemblyVersion` to `1.0.0.0` as a binding-stability baseline so
   .NET Framework consumers do not need binding redirects on every patch bump;
   `FileVersion`/`InformationalVersion` carry the real release version.
+- Documentation corrections: package is now linked as published on NuGet.org,
+  and the target-framework references match the shipped TFMs.
+
+### Removed
+
+- Internal cleanup (no public-API or behavior change): dropped the unused
+  segment-formatting path from the line parser — superseded by the
+  allocation-free direct-write path — and removed template-scaffolding leftovers.
 
 ## [0.2.1] - 2026-05-09
 
@@ -75,7 +85,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   parsing for reduced allocations.
 - Nine runnable example console apps covering the major features.
 
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v.0.1.0...v0.2.0
 [0.1.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/releases/tag/v.0.1.0
