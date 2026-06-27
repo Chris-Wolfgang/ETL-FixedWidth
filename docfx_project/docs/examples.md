@@ -14,6 +14,12 @@ Demonstrates the simplest loading workflow: writing strongly typed records to fi
 
 [View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/BasicLoading)
 
+## CompressedStreams
+
+Demonstrates that the extractor and loader work transparently over compressed streams — a full GZip and Brotli round-trip (load records through a compression stream, then extract them back) using only the `Stream` constructors. Shows the dispose ordering that finalizes the compressed container.
+
+[View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/CompressedStreams)
+
 ## RoundTrip
 
 Shows a full round-trip pipeline: extracting records from fixed-width text, then loading them back out to produce identical output. Validates that extraction and loading are symmetric.

@@ -138,12 +138,13 @@ using var loader = new FixedWidthLoader<PersonRecord>(writeStream);
 
 **Examples:**
 
-The [examples/](examples/) folder contains 9 runnable console projects demonstrating each feature:
+The [examples/](examples/) folder contains 10 runnable console projects demonstrating each feature:
 
 | Example | Description |
 |---------|-------------|
 | [BasicExtraction](examples/BasicExtraction) | Read fixed-width data into strongly typed records |
 | [BasicLoading](examples/BasicLoading) | Write records to fixed-width output |
+| [CompressedStreams](examples/CompressedStreams) | Extract from / load to GZip and Brotli compressed streams |
 | [RoundTrip](examples/RoundTrip) | Extract, transform, and reload records end-to-end |
 | [CustomParsersConverters](examples/CustomParsersConverters) | Custom `ValueParser` and `ValueConverter` delegates |
 | [ProgressReporting](examples/ProgressReporting) | Timer-based `IProgress<FixedWidthReport>` callbacks |
@@ -151,6 +152,26 @@ The [examples/](examples/) folder contains 9 runnable console projects demonstra
 | [FieldDelimiter](examples/FieldDelimiter) | Delimited output (e.g. `" \| "`) for human-readable tables |
 | [SkipAndMax](examples/SkipAndMax) | `SkipItemCount` and `MaximumItemCount` for pagination |
 | [HeadersAndSeparators](examples/HeadersAndSeparators) | `WriteHeader`, `HasHeader`, and `FieldSeparator` |
+
+### Advanced: compressed streams
+
+The extractor and loader accept any `Stream`, so they work transparently over `GZipStream` / `BrotliStream` — no special support needed:
+
+```csharp
+// Load to a GZip-compressed file
+await using var file = File.Create("output.dat.gz");
+using var gzip = new GZipStream(file, CompressionMode.Compress);
+using var loader = new FixedWidthLoader<PersonRecord>(gzip);
+await loader.LoadAsync(records, token);
+
+// Extract from a GZip-compressed file
+await using var input = File.OpenRead("output.dat.gz");
+using var gunzip = new GZipStream(input, CompressionMode.Decompress);
+using var extractor = new FixedWidthExtractor<PersonRecord>(gunzip);
+await foreach (var record in extractor.ExtractAsync(token)) { /* ... */ }
+```
+
+See the [CompressedStreams](examples/CompressedStreams) example for a runnable GZip + Brotli round-trip.
 
 ---
 
