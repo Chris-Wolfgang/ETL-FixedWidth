@@ -90,6 +90,31 @@ Console.WriteLine($"Total loaded: {loader.CurrentItemCount}");
 
 In production, replace `StringReader` / `StringWriter` with a `FileStream` or `StreamReader` — the extractor and loader accept any `TextReader` / `TextWriter`, or a raw `Stream` directly.
 
+### Working with compressed streams
+
+Because the extractor and loader accept any `Stream`, compression works out of the box — just wrap the file stream in a `GZipStream` or `BrotliStream` (compressed mainframe exports often arrive as `.dat.gz`):
+
+```csharp
+using System.IO.Compression;
+
+// Load to a GZip-compressed file
+await using var output = File.Create("people.dat.gz");
+using var gzip = new GZipStream(output, CompressionMode.Compress);
+using var loader = new FixedWidthLoader<PersonRecord>(gzip);
+await loader.LoadAsync(records, CancellationToken.None);
+
+// Extract from a GZip-compressed file
+await using var input = File.OpenRead("people.dat.gz");
+using var gunzip = new GZipStream(input, CompressionMode.Decompress);
+using var extractor = new FixedWidthExtractor<PersonRecord>(gunzip);
+await foreach (var person in extractor.ExtractAsync(CancellationToken.None))
+{
+    // ...
+}
+```
+
+`BrotliStream` works identically — only the wrapper type changes. See the [CompressedStreams](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/CompressedStreams) example for a runnable GZip + Brotli round-trip.
+
 ## Next Steps
 
 - Browse the [Examples](examples.md) for more detailed scenarios
