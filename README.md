@@ -28,7 +28,7 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 
 - **GitHub Repository:** [https://github.com/Chris-Wolfgang/ETL-FixedWidth](https://github.com/Chris-Wolfgang/ETL-FixedWidth)
 - **API Documentation:** https://Chris-Wolfgang.github.io/ETL-FixedWidth/
-- **Formatting Guide:** [README-FORMATTING.md](README-FORMATTING.md)
+- **Formatting Guide:** [README-FORMATTING.md](docs/README-FORMATTING.md)
 - **Contributing Guide:** [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ---
@@ -89,6 +89,8 @@ await foreach (var person in extractor.ExtractAsync(CancellationToken.None))
 var writer = new StringWriter();
 var loader = new FixedWidthLoader<PersonRecord>(writer);
 
+// LoadAsync accepts an IAsyncEnumerable<PersonRecord>; `sourceItems` is any
+// async sequence of records (for example, the output of a FixedWidthExtractor).
 await loader.LoadAsync(sourceItems, CancellationToken.None);
 
 Console.WriteLine(writer.ToString());
@@ -154,11 +156,15 @@ The [examples/](examples/) folder contains 9 runnable console projects demonstra
 
 ## 🎯 Target Frameworks
 
+The package targets the following frameworks (see the project file for the authoritative list):
+
 | Framework | Versions |
 |-----------|----------|
-| .Net Framework | .net 4.6.2, .net 4.7.0, .net 4.7.1, .net 4.7.2, .net 4.8, .net 4.8.1 |
-| .Net Core | |
-| .Net | .net 5.0, .net 6.0, .net 7.0, .net 8.0, .net 9.0, .net 10.0 |
+| .NET Framework | .NET 4.6.2, .NET 4.8.1 |
+| .NET Standard | .NET Standard 2.0 |
+| .NET | .NET 8.0, .NET 10.0 |
+
+> The CI test matrix additionally exercises the library on .NET Framework 4.7.x/4.8 and .NET 5.0–9.0 via the netstandard2.0 facade; those are tested-against runtimes, not package target frameworks.
 
 ---
 
@@ -195,7 +201,7 @@ This library uses **`BannedSymbols.txt`** to prohibit synchronous APIs and enfor
 ## 🛠️ Building from Source
 
 ### Prerequisites
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download) or later
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download) or later (required for the `net10.0` target framework)
 - Optional: [PowerShell Core](https://github.com/PowerShell/PowerShell) for formatting scripts
 
 ### Build Steps
@@ -215,7 +221,7 @@ dotnet build --configuration Release
 dotnet test --configuration Release
 
 # Run code formatting (PowerShell Core)
-pwsh ./format.ps1
+pwsh ./scripts/format.ps1
 ```
 
 ### Code Formatting
@@ -230,7 +236,7 @@ dotnet format
 dotnet format --verify-no-changes
 ```
 
-See [README-FORMATTING.md](README-FORMATTING.md) for detailed formatting guidelines.
+See [README-FORMATTING.md](docs/README-FORMATTING.md) for detailed formatting guidelines.
 
 ### Building Documentation
 

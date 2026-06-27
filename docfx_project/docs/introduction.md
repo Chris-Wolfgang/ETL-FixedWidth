@@ -19,7 +19,7 @@ Wolfgang.Etl.FixedWidth provides an extractor and loader for reading and writing
 - **Zero-copy parsing with ReadOnlyMemory&lt;char&gt;** — slices line data without allocating intermediate strings where possible
 - **Span-based numeric parsing on net8.0+** — uses `ISpanParsable<T>` for allocation-free numeric conversion on modern runtimes
 - **Compiled delegates for reflection-free field access** — property getters and setters are compiled once and cached for fast field access
-- **Multi-TFM support** — targets netstandard2.0, netstandard2.1, net8.0, net9.0, and net10.0
+- **Multi-TFM support** — targets net462, net481, netstandard2.0, net8.0, and net10.0
 
 ## Getting Help
 
