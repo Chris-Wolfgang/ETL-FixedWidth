@@ -15,160 +15,6 @@ namespace Wolfgang.Etl.FixedWidth.Parsing;
 internal static class FixedWidthLineParser
 {
     // ------------------------------------------------------------------
-    // Formatting — returns one padded string per field.
-    // The loader joins them with the configured delimiter (or empty string).
-    // ------------------------------------------------------------------
-
-    /// <summary>
-    /// Formats each field of <paramref name="record"/> into a padded string segment,
-    /// one per field in column order.
-    /// </summary>
-    /// <exception cref="FieldOverflowException"></exception>
-    internal static IReadOnlyList<string> FormatSegments<T>
-    (
-        T record,
-        FieldMapResult fieldMap,
-        Func<object, FieldContext, string> converter
-    )
-    {
-        var descriptors = fieldMap.Descriptors;
-        var segments = new List<string>(descriptors.Count);
-        var currentPosition = 0;
-
-        for (var i = 0; i < descriptors.Count; i++)
-        {
-            var descriptor = descriptors[i];
-
-            // Insert placeholder for any skipped columns before this field.
-            if (descriptor.Start > currentPosition)
-            {
-                var skipWidth = descriptor.Start - currentPosition;
-                if (skipWidth > 0)
-                {
-                    segments.Add(new string(' ', skipWidth));
-                }
-            }
-
-            // Format the actual field segment.
-            segments.Add(FormatSegment(record, descriptor, converter));
-            currentPosition = descriptor.Start + descriptor.Attribute.Length;
-        }
-
-        // Pad any remaining columns at the end of the line.
-        if (fieldMap.ExpectedLineWidth > currentPosition)
-        {
-            var trailingWidth = fieldMap.ExpectedLineWidth - currentPosition;
-            if (trailingWidth > 0)
-            {
-                segments.Add(new string(' ', trailingWidth));
-            }
-        }
-
-        return segments.ToArray();
-    }
-
-
-
-    /// <summary>
-    /// Formats the header label for each field into a padded string segment,
-    /// one per field in column order. The label is either
-    /// <see cref="FixedWidthFieldAttribute.Header"/> or the property name.
-    /// The <paramref name="headerConverter"/> controls the text content and may
-    /// truncate or validate the label, but headers are always left-aligned and
-    /// space-padded regardless of the field's <see cref="FieldAlignment"/> setting.
-    /// </summary>
-    /// <exception cref="FieldOverflowException"></exception>
-    internal static IReadOnlyList<string> FormatHeaderSegments
-    (
-        FieldMapResult fieldMap,
-        Func<string, FieldContext, string> headerConverter
-    )
-    {
-        var descriptors = fieldMap.Descriptors;
-        var segments = new List<string>(descriptors.Count);
-        var currentPosition = 0;
-
-        for (var i = 0; i < descriptors.Count; i++)
-        {
-            var descriptor = descriptors[i];
-
-            // Insert placeholder for any skipped columns before this header field.
-            if (descriptor.Start > currentPosition)
-            {
-                var skipWidth = descriptor.Start - currentPosition;
-                if (skipWidth > 0)
-                {
-                    segments.Add(new string(' ', skipWidth));
-                }
-            }
-
-            // Format the header segment for the actual field.
-            segments.Add(FormatHeaderSegment(descriptor, headerConverter));
-            currentPosition = descriptor.Start + descriptor.Attribute.Length;
-        }
-
-        // Pad any remaining columns at the end of the header line.
-        if (fieldMap.ExpectedLineWidth > currentPosition)
-        {
-            var trailingWidth = fieldMap.ExpectedLineWidth - currentPosition;
-            if (trailingWidth > 0)
-            {
-                segments.Add(new string(' ', trailingWidth));
-            }
-        }
-
-        return segments.ToArray();
-    }
-
-
-
-    /// <summary>
-    /// Formats a separator segment for each field — a string of
-    /// <paramref name="separatorChar"/> repeated to the field's width.
-    /// </summary>
-    internal static IReadOnlyList<string> FormatSeparatorSegments
-    (
-        FieldMapResult fieldMap,
-        char separatorChar
-    )
-    {
-        var descriptors = fieldMap.Descriptors;
-        var segments = new List<string>(descriptors.Count);
-        var currentPosition = 0;
-
-        for (var i = 0; i < descriptors.Count; i++)
-        {
-            var descriptor = descriptors[i];
-
-            // Insert separator chars for any skipped columns before this field.
-            if (descriptor.Start > currentPosition)
-            {
-                var skipWidth = descriptor.Start - currentPosition;
-                if (skipWidth > 0)
-                {
-                    segments.Add(new string(separatorChar, skipWidth));
-                }
-            }
-
-            segments.Add(new string(separatorChar, descriptor.Attribute.Length));
-            currentPosition = descriptor.Start + descriptor.Attribute.Length;
-        }
-
-        // Pad any remaining columns at the end.
-        if (fieldMap.ExpectedLineWidth > currentPosition)
-        {
-            var trailingWidth = fieldMap.ExpectedLineWidth - currentPosition;
-            if (trailingWidth > 0)
-            {
-                segments.Add(new string(separatorChar, trailingWidth));
-            }
-        }
-
-        return segments.ToArray();
-    }
-
-
-
     // ------------------------------------------------------------------
     // Direct-write formatting — writes segments directly to a TextWriter
     // to avoid intermediate List<string> and Join allocations.
@@ -436,8 +282,8 @@ internal static class FixedWidthLineParser
     /// <summary>
     /// Writes a single data field directly to <paramref name="writer"/> as
     /// "value + padding" (or "padding + value" for right-aligned fields), avoiding
-    /// the <see cref="string.PadLeft(int,char)"/> / <see cref="string.PadRight(int,char)"/>
-    /// allocation that <see cref="FormatSegment{T}"/> produces.
+    /// the intermediate <see cref="string.PadLeft(int,char)"/> /
+    /// <see cref="string.PadRight(int,char)"/> allocation.
     /// </summary>
     /// <exception cref="FieldOverflowException"></exception>
     /// <exception cref="InvalidOperationException">
@@ -512,8 +358,8 @@ internal static class FixedWidthLineParser
 
     /// <summary>
     /// Writes a single header label directly to <paramref name="writer"/> as
-    /// "label + space-padding", avoiding the <see cref="string.PadRight(int,char)"/>
-    /// allocation that <see cref="FormatHeaderSegment"/> produces.
+    /// "label + space-padding", avoiding the intermediate
+    /// <see cref="string.PadRight(int,char)"/> allocation.
     /// </summary>
     /// <exception cref="FieldOverflowException"></exception>
     private static void WriteHeaderSegmentTo
@@ -662,79 +508,4 @@ internal static class FixedWidthLineParser
         }
     }
 
-
-
-    /// <summary>
-    /// Formats a single data field value into a padded string segment.
-    /// </summary>
-    /// <exception cref="FieldOverflowException"></exception>
-    /// <exception cref="InvalidOperationException">
-    /// Thrown when the property has no public getter.
-    /// </exception>
-    private static string FormatSegment<T>
-    (
-        T record,
-        FieldDescriptor descriptor,
-        Func<object, FieldContext, string> converter
-    )
-    {
-        var attr = descriptor.Attribute;
-        var prop = descriptor.Property;
-        var getter = descriptor.Getter
-            ?? throw new InvalidOperationException(
-                $"Property '{prop.Name}' has no public getter. " +
-                "The loader requires readable properties to format field values.");
-        var text = converter(getter(record!)!, descriptor.Context);
-
-        // Safety net — throw if the converter didn't honor the field width contract.
-        if (text.Length > attr.Length)
-        {
-            throw new FieldOverflowException
-            (
-                $"The value converter returned a string of length {text.Length} " +
-                $"for property '{prop.Name}' which exceeds the defined field " +
-                $"width of {attr.Length}. Ensure your ValueConverter honors the " +
-                $"FieldLength in FieldContext.",
-                prop.Name,
-                attr.Length,
-                text.Length
-            );
-        }
-
-        return attr.Alignment == FieldAlignment.Right
-            ? text.PadLeft(attr.Length, attr.Pad)
-            : text.PadRight(attr.Length, attr.Pad);
-    }
-
-
-
-    /// <summary>
-    /// Formats a single header label into a left-aligned, space-padded string segment.
-    /// </summary>
-    /// <exception cref="FieldOverflowException"></exception>
-    private static string FormatHeaderSegment
-    (
-        FieldDescriptor descriptor,
-        Func<string, FieldContext, string> headerConverter
-    )
-    {
-        var attr = descriptor.Attribute;
-        var prop = descriptor.Property;
-        var headerLabel = attr.Header ?? prop.Name;
-        var text = headerConverter(headerLabel, descriptor.Context);
-
-        if (text.Length > attr.Length)
-        {
-            throw new FieldOverflowException
-            (
-                $"The header converter returned a string of length {text.Length} for property " +
-                $"'{prop.Name}' which exceeds the defined field width of {attr.Length}.",
-                prop.Name,
-                attr.Length,
-                text.Length
-            );
-        }
-
-        return text.PadRight(attr.Length, ' ');
-    }
 }
