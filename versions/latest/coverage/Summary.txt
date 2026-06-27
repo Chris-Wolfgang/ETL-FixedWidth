@@ -1,25 +1,25 @@
 Summary
-  Generated on: 6/19/2026 - 12:12:36 PM
-  Coverage date: 6/19/2026 - 12:12:27 PM
+  Generated on: 6/27/2026 - 9:04:15 PM
+  Coverage date: 6/27/2026 - 9:04:11 PM
   Parser: Cobertura
   Assemblies: 1
   Classes: 16
   Files: 16
-  Line coverage: 95.2%
-  Covered lines: 1172
-  Uncovered lines: 59
-  Coverable lines: 1231
-  Total lines: 4162
-  Branch coverage: 89% (358 of 402)
-  Covered branches: 358
-  Total branches: 402
-  Method coverage: 98.7% (152 of 154)
-  Full method coverage: 91.5% (141 of 154)
-  Covered methods: 152
-  Fully covered methods: 141
-  Total methods: 154
+  Line coverage: 95%
+  Covered lines: 1087
+  Uncovered lines: 57
+  Coverable lines: 1144
+  Total lines: 3913
+  Branch coverage: 86.4% (313 of 362)
+  Covered branches: 313
+  Total branches: 362
+  Method coverage: 98.6% (145 of 147)
+  Full method coverage: 92.5% (136 of 147)
+  Covered methods: 145
+  Fully covered methods: 136
+  Total methods: 147
 
-Wolfgang.Etl.FixedWidth                                         95.2%
+Wolfgang.Etl.FixedWidth                                           95%
   Wolfgang.Etl.FixedWidth.Attributes.FixedWidthFieldAttribute    100%
   Wolfgang.Etl.FixedWidth.Attributes.FixedWidthSkipAttribute     100%
   Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException    100%
@@ -27,12 +27,12 @@ Wolfgang.Etl.FixedWidth                                         95.2%
   Wolfgang.Etl.FixedWidth.Exceptions.LineTooShortException       100%
   Wolfgang.Etl.FixedWidth.Exceptions.MalformedLineException      100%
   Wolfgang.Etl.FixedWidth.FieldContext                           100%
-  Wolfgang.Etl.FixedWidth.FixedWidthConverter                   96.5%
+  Wolfgang.Etl.FixedWidth.FixedWidthConverter                   92.4%
   Wolfgang.Etl.FixedWidth.FixedWidthExtractor<T>                90.3%
-  Wolfgang.Etl.FixedWidth.FixedWidthLoader<T>                   93.2%
+  Wolfgang.Etl.FixedWidth.FixedWidthLoader<T>                   93.1%
   Wolfgang.Etl.FixedWidth.FixedWidthReport                       100%
   Wolfgang.Etl.FixedWidth.Parsing.FieldDescriptor                100%
   Wolfgang.Etl.FixedWidth.Parsing.FieldMap                       100%
   Wolfgang.Etl.FixedWidth.Parsing.FieldMapResult                 100%
-  Wolfgang.Etl.FixedWidth.Parsing.FixedWidthLineParser          96.5%
+  Wolfgang.Etl.FixedWidth.Parsing.FixedWidthLineParser           100%
   Wolfgang.Etl.FixedWidth.Parsing.FixedWidthMemoryExtensions     100%

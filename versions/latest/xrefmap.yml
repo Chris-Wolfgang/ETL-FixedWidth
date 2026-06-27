@@ -791,14 +791,6 @@ references:
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord).CurrentLineNumber
   nameWithType: FixedWidthExtractor<TRecord>.CurrentLineNumber
   nameWithType.vb: FixedWidthExtractor(Of TRecord).CurrentLineNumber
-- uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.Dispose
-  name: Dispose()
-  href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Dispose
-  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.Dispose
-  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.Dispose()
-  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord).Dispose()
-  nameWithType: FixedWidthExtractor<TRecord>.Dispose()
-  nameWithType.vb: FixedWidthExtractor(Of TRecord).Dispose()
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.Dispose(System.Boolean)
   name: Dispose(bool)
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Dispose_System_Boolean_
@@ -1060,14 +1052,6 @@ references:
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthLoader(Of TRecord).CurrentLineNumber
   nameWithType: FixedWidthLoader<TRecord>.CurrentLineNumber
   nameWithType.vb: FixedWidthLoader(Of TRecord).CurrentLineNumber
-- uid: Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.Dispose
-  name: Dispose()
-  href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_Dispose
-  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.Dispose
-  fullName: Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.Dispose()
-  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthLoader(Of TRecord).Dispose()
-  nameWithType: FixedWidthLoader<TRecord>.Dispose()
-  nameWithType.vb: FixedWidthLoader(Of TRecord).Dispose()
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.Dispose(System.Boolean)
   name: Dispose(bool)
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_Dispose_System_Boolean_

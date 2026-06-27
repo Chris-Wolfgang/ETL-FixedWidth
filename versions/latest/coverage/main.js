@@ -297,14 +297,14 @@ var assemblies = [
       { "name": "Wolfgang.Etl.FixedWidth.Exceptions.LineTooShortException", "rp": "Wolfgang.Etl.FixedWidth_LineTooShortException.html", "cl": 11, "ucl": 0, "cal": 11, "tl": 61, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Wolfgang.Etl.FixedWidth.Exceptions.MalformedLineException", "rp": "Wolfgang.Etl.FixedWidth_MalformedLineException.html", "cl": 14, "ucl": 0, "cal": 14, "tl": 94, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Wolfgang.Etl.FixedWidth.FieldContext", "rp": "Wolfgang.Etl.FixedWidth_FieldContext.html", "cl": 25, "ucl": 0, "cal": 25, "tl": 102, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Wolfgang.Etl.FixedWidth.FixedWidthConverter", "rp": "Wolfgang.Etl.FixedWidth_FixedWidthConverter.html", "cl": 167, "ucl": 6, "cal": 173, "tl": 524, "cb": 73, "tb": 76, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Wolfgang.Etl.FixedWidth.FixedWidthExtractor\u003CT\u003E", "rp": "Wolfgang.Etl.FixedWidth_FixedWidthExtractor_1.html", "cl": 282, "ucl": 30, "cal": 312, "tl": 1003, "cb": 86, "tb": 104, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Wolfgang.Etl.FixedWidth.FixedWidthLoader\u003CT\u003E", "rp": "Wolfgang.Etl.FixedWidth_FixedWidthLoader_1.html", "cl": 192, "ucl": 14, "cal": 206, "tl": 675, "cb": 55, "tb": 68, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Wolfgang.Etl.FixedWidth.FixedWidthConverter", "rp": "Wolfgang.Etl.FixedWidth_FixedWidthConverter.html", "cl": 160, "ucl": 13, "cal": 173, "tl": 524, "cb": 70, "tb": 76, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Wolfgang.Etl.FixedWidth.FixedWidthExtractor\u003CT\u003E", "rp": "Wolfgang.Etl.FixedWidth_FixedWidthExtractor_1.html", "cl": 280, "ucl": 30, "cal": 310, "tl": 993, "cb": 82, "tb": 104, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Wolfgang.Etl.FixedWidth.FixedWidthLoader\u003CT\u003E", "rp": "Wolfgang.Etl.FixedWidth_FixedWidthLoader_1.html", "cl": 190, "ucl": 14, "cal": 204, "tl": 665, "cb": 52, "tb": 68, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Wolfgang.Etl.FixedWidth.FixedWidthReport", "rp": "Wolfgang.Etl.FixedWidth_FixedWidthReport.html", "cl": 6, "ucl": 0, "cal": 6, "tl": 73, "cb": 0, "tb": 0, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Wolfgang.Etl.FixedWidth.Parsing.FieldDescriptor", "rp": "Wolfgang.Etl.FixedWidth_FieldDescriptor.html", "cl": 50, "ucl": 0, "cal": 50, "tl": 160, "cb": 4, "tb": 6, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Wolfgang.Etl.FixedWidth.Parsing.FieldMap", "rp": "Wolfgang.Etl.FixedWidth_FieldMap.html", "cl": 67, "ucl": 0, "cal": 67, "tl": 197, "cb": 22, "tb": 22, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Wolfgang.Etl.FixedWidth.Parsing.FieldMapResult", "rp": "Wolfgang.Etl.FixedWidth_FieldMapResult.html", "cl": 29, "ucl": 0, "cal": 29, "tl": 99, "cb": 2, "tb": 2, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
-      { "name": "Wolfgang.Etl.FixedWidth.Parsing.FixedWidthLineParser", "rp": "Wolfgang.Etl.FixedWidth_FixedWidthLineParser.html", "cl": 249, "ucl": 9, "cal": 258, "tl": 740, "cb": 100, "tb": 108, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
+      { "name": "Wolfgang.Etl.FixedWidth.Parsing.FixedWidthLineParser", "rp": "Wolfgang.Etl.FixedWidth_FixedWidthLineParser.html", "cl": 175, "ucl": 0, "cal": 175, "tl": 511, "cb": 65, "tb": 68, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
       { "name": "Wolfgang.Etl.FixedWidth.Parsing.FixedWidthMemoryExtensions", "rp": "Wolfgang.Etl.FixedWidth_FixedWidthMemoryExtensions.html", "cl": 8, "ucl": 0, "cal": 8, "tl": 33, "cb": 8, "tb": 8, "cm": 0, "fcm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "mfch": [], "hc": [], "metrics": { } },
     ]},
 ];
@@ -332,7 +332,7 @@ var riskHotspots = [
       { "value": 6, "exceeded": false },
     ]},
   {
-    "assembly": "Wolfgang.Etl.FixedWidth", "class": "Wolfgang.Etl.FixedWidth.FixedWidthExtractor\u003CT\u003E", "reportPath": "Wolfgang.Etl.FixedWidth_FixedWidthExtractor_1.html", "methodName": "ExtractWorkerAsync()", "methodShortName": "ExtractWorkerAsync()", "fileIndex": 0, "line": 558,
+    "assembly": "Wolfgang.Etl.FixedWidth", "class": "Wolfgang.Etl.FixedWidth.FixedWidthExtractor\u003CT\u003E", "reportPath": "Wolfgang.Etl.FixedWidth_FixedWidthExtractor_1.html", "methodName": "ExtractWorkerAsync()", "methodShortName": "ExtractWorkerAsync()", "fileIndex": 0, "line": 548,
     "metrics": [
       { "value": 26, "exceeded": false },
       { "value": 26, "exceeded": true },

@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/main/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/f9c81f9dce2c202df428d91dbf1acf8013250686/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,7 +75,7 @@
 
 
   <h1 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1" class="text-break">
-Class FixedWidthExtractor&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L48"><i class="bi bi-code-slash"></i></a>
+Class FixedWidthExtractor&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L48"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -89,7 +89,7 @@ as an asynchronous stream.</p>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class FixedWidthExtractor&lt;TRecord&gt; : ExtractorBase&lt;TRecord, FixedWidthReport&gt;, IExtractWithProgressAndCancellationAsync&lt;TRecord, FixedWidthReport&gt;, IExtractWithCancellationAsync&lt;TRecord&gt;, IExtractWithProgressAsync&lt;TRecord, FixedWidthReport&gt;, IExtractAsync&lt;TRecord&gt;, IDisposable where TRecord : notnull, new()</code></pre>
+    <pre><code class="lang-csharp hljs">public class FixedWidthExtractor&lt;TRecord&gt; : ExtractorBase&lt;TRecord, FixedWidthReport&gt;, IExtractWithProgressAndCancellationAsync&lt;TRecord, FixedWidthReport&gt;, IExtractWithCancellationAsync&lt;TRecord&gt;, IExtractWithProgressAsync&lt;TRecord, FixedWidthReport&gt;, IExtractAsync&lt;TRecord&gt;, IAsyncDisposable, IDisposable where TRecord : notnull, new()</code></pre>
   </div>
 
 
@@ -119,6 +119,7 @@ The type must have a public parameterless constructor.</p>
       <div><span class="xref">IExtractWithCancellationAsync</span>&lt;TRecord&gt;</div>
       <div><span class="xref">IExtractWithProgressAsync</span>&lt;TRecord, <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a>&gt;</div>
       <div><span class="xref">IExtractAsync</span>&lt;TRecord&gt;</div>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iasyncdisposable">IAsyncDisposable</a></div>
       <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
     </dd>
   </dl>
@@ -153,6 +154,21 @@ The type must have a public parameterless constructor.</p>
     </div>
     <div>
       <span class="xref">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.IncrementCurrentSkippedItemCount()</span>
+    </div>
+    <div>
+      <span class="xref">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.DisposeAsync()</span>
+    </div>
+    <div>
+      <span class="xref">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.Dispose()</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.Dispose(bool)</a>
+    </div>
+    <div>
+      <span class="xref">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.StartedAt</span>
+    </div>
+    <div>
+      <span class="xref">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.Elapsed</span>
     </div>
     <div>
       <span class="xref">ExtractorBase&lt;TRecord, FixedWidthReport&gt;.ReportingInterval</span>
@@ -208,11 +224,11 @@ var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;(reader);</code></p
 Two construction modes are supported, each with different ownership semantics:
 </p>
 <ul><li><b>TextReader constructor</b> — the caller owns the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textreader">TextReader</a>
-  lifetime. The extractor does not dispose it. Calling <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Dispose">Dispose()</a> is
+  lifetime. The extractor does not dispose it. Calling <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable.dispose">Dispose()</a> is
   optional and has no effect.</li><li><b>Stream constructor</b> — the extractor creates an internal
   <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.streamreader">StreamReader</a> with a 64 KB buffer for improved throughput on large files.
   The caller retains ownership of the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> (it is not closed), but
-  <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Dispose">Dispose()</a> must be called to release the internal reader.</li></ul>
+  <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable.dispose">Dispose()</a> must be called to release the internal reader.</li></ul>
 </div>
 
 
@@ -224,7 +240,7 @@ Two construction modes are supported, each with different ownership semantics:
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_System_IO_Stream_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.Stream)">
   FixedWidthExtractor(Stream)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L164"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L164"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a> that reads
@@ -266,7 +282,7 @@ readable. The caller retains ownership — the extractor does not dispose the st
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_System_IO_Stream_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthExtractor__0___" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthExtractor{`0}})">
   FixedWidthExtractor(Stream, ILogger&lt;FixedWidthExtractor&lt;TRecord&gt;&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L188"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L188"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a> that reads
@@ -312,7 +328,7 @@ readable. The caller retains ownership — the extractor does not dispose the st
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_System_IO_TextReader_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.TextReader)">
   FixedWidthExtractor(TextReader)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L91"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L91"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a> that reads
@@ -357,7 +373,7 @@ The caller is responsible for the reader's lifetime.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_System_IO_TextReader_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthExtractor__0___" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.TextReader,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthExtractor{`0}})">
   FixedWidthExtractor(TextReader, ILogger&lt;FixedWidthExtractor&lt;TRecord&gt;&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L110"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L110"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a> that reads
@@ -404,7 +420,7 @@ from the specified <a class="xref" href="https://learn.microsoft.com/dotnet/api/
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_BlankLineHandling" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.BlankLineHandling">
   BlankLineHandling
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L279"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L279"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Specifies what happens when a truly blank line (zero length) is encountered
@@ -453,7 +469,7 @@ that will parse to a record with all whitespace-trimmed (empty/default) fields.
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_CurrentLineNumber" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.CurrentLineNumber">
   CurrentLineNumber
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L459"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L459"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The 1-based physical line number of the line most recently read from the file.
@@ -493,7 +509,7 @@ without a data race.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_FieldDelimiter" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.FieldDelimiter">
   FieldDelimiter
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L444"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L444"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The delimiter string present between fields in the source file, or
@@ -539,7 +555,7 @@ field start positions, ensuring each field is read from the correct offset.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_FieldSeparator" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.FieldSeparator">
   FieldSeparator
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L421"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L421"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>When non-null, the line immediately following the last header line is treated
@@ -580,7 +596,7 @@ extractor.FieldSeparator = null; // no separator line (default)</code></pre>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_HasHeader" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.HasHeader">
   HasHeader
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L397"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L397"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Convenience property — when set to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>, sets
@@ -624,7 +640,7 @@ extractor.FieldSeparator = '-';</code></pre>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_HeaderLineCount" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.HeaderLineCount">
   HeaderLineCount
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L376"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L376"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The number of header lines to skip at the beginning of the file before
@@ -670,7 +686,7 @@ after the last header line is additionally skipped as a separator line.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_LineFilter" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.LineFilter">
   LineFilter
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L316"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L316"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>A delegate invoked for every data line (after header and separator lines have been
@@ -730,7 +746,7 @@ Defaults to a function that always returns <a class="xref" href="Wolfgang.Etl.Fi
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_MalformedLineHandling" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.MalformedLineHandling">
   MalformedLineHandling
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L251"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L251"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Specifies what happens when a line is encountered that is too short or whose
@@ -770,7 +786,7 @@ of <code class="typeparamref">TRecord</code> is yielded for the offending line.<
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_ValueParser" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.ValueParser">
   ValueParser
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L353"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L353"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>A delegate that converts a raw string read from the file into the target property
@@ -837,7 +853,7 @@ uniformly.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_CreateProgressReport" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.CreateProgressReport">
   CreateProgressReport()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L470"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L470"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates a progress report snapshot for the current extractor state.</p>
@@ -873,7 +889,7 @@ and <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wol
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_CreateProgressTimer_System_IProgress_Wolfgang_Etl_FixedWidth_FixedWidthReport__" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.CreateProgressTimer(System.IProgress{Wolfgang.Etl.FixedWidth.FixedWidthReport})">
   CreateProgressTimer(IProgress&lt;FixedWidthReport&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L490"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L490"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the <span class="xref">Wolfgang.Etl.Abstractions.IProgressTimer</span> used to drive progress callbacks.
@@ -912,53 +928,25 @@ Override this method in a derived class to inject a custom timer
 
   <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Dispose_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.Dispose*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Dispose" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.Dispose">
-  Dispose()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L513"><i class="bi bi-code-slash"></i></a>
-  </h3>
-
-  <div class="markdown level1 summary"><p>Disposes the internal <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.streamreader">StreamReader</a> when this instance was
-constructed from a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a>. Has no effect when constructed
-from a caller-owned <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textreader">TextReader</a>.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
-  </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Dispose_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.Dispose*"></a>
-
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Dispose_System_Boolean_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.Dispose(System.Boolean)">
   Dispose(bool)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L529"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L517"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Releases managed resources when <code class="paramref">disposing</code> is
-<a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>. Override in a derived class to add cleanup logic.</p>
+  <div class="markdown level1 summary"><p>Releases the internal <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.streamreader">StreamReader</a> when this instance was
+constructed from a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a>, then defers to the base class.
+Has no effect on a caller-owned <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textreader">TextReader</a>.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected virtual void Dispose(bool disposing)</code></pre>
+    <pre><code class="lang-csharp hljs">protected override void Dispose(bool disposing)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>disposing</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
-    <dd><p><a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> when called from <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Dispose">Dispose()</a>;
+    <dd><p><a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> when called from <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>;
 <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a> when called from a finalizer.</p>
 </dd>
   </dl>
@@ -978,7 +966,7 @@ from a caller-owned <a class="xref" href="https://learn.microsoft.com/dotnet/api
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_ExtractWorkerAsync_System_Threading_CancellationToken_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.ExtractWorkerAsync(System.Threading.CancellationToken)">
   ExtractWorkerAsync(CancellationToken)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L543"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L533"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>This method is the core implementation of the extraction logic and should be
@@ -1019,7 +1007,7 @@ The result may be an empty sequence if no data is available or if the extraction
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/main/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L48" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/f9c81f9dce2c202df428d91dbf1acf8013250686/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractor.cs/#L48" class="edit-link">Edit this page</a>
         </div>
 
 
