@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<coverage version="1.0" date="2026-07-12_12-43-19" tag="">
+<coverage version="1.0" date="2026-07-12_13-03-14" tag="">
   <assembly name="Wolfgang.Etl.FixedWidth">
     <class name="Wolfgang.Etl.FixedWidth.Attributes.FixedWidthFieldAttribute" coveredlines="27" coverablelines="27" totallines="156" coveredbranches="4" totalbranches="4" coveredcodeelements="8" fullcoveredcodeelements="8" totalcodeelements="8" />
     <class name="Wolfgang.Etl.FixedWidth.Attributes.FixedWidthSkipAttribute" coveredlines="23" coverablelines="23" totallines="95" coveredbranches="4" totalbranches="4" coveredcodeelements="4" fullcoveredcodeelements="4" totalcodeelements="4" />
