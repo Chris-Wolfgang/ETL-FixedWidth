@@ -117,13 +117,13 @@ Because the `Stream` constructors accept any `Stream`, compression works out of 
 ```csharp
 // Extraction from a GZip-compressed file
 await using var readStream = File.OpenRead("people.dat.gz");
-await using var gzip = new GZipStream(readStream, CompressionMode.Decompress);
-using var extractor = new FixedWidthExtractor<PersonRecord>(gzip);
+await using var readGzip = new GZipStream(readStream, CompressionMode.Decompress);
+using var extractor = new FixedWidthExtractor<PersonRecord>(readGzip);
 
 // Loading to a GZip-compressed file
 await using var writeStream = File.Create("output.dat.gz");
-await using var gzip = new GZipStream(writeStream, CompressionLevel.Optimal);
-using var loader = new FixedWidthLoader<PersonRecord>(gzip);
+await using var writeGzip = new GZipStream(writeStream, CompressionLevel.Optimal);
+using var loader = new FixedWidthLoader<PersonRecord>(writeGzip);
 ```
 
 See the [CompressedStreams](examples/CompressedStreams) example for a complete GZip and Brotli round trip.
