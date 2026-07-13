@@ -888,7 +888,9 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// Throws <see cref="LineTooShortException"/> when the policy is
     /// <see cref="BlankLineHandling.ThrowException"/>.
     /// </summary>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when <see cref="BlankLineHandling"/> holds an unrecognized value.
+    /// </exception>
     /// <exception cref="LineTooShortException">
     /// Thrown when <see cref="BlankLineHandling"/> is
     /// <see cref="BlankLineHandling.ThrowException"/> (the default).
@@ -944,11 +946,14 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// Returns <see langword="true"/> and sets <paramref name="record"/> on success.
     /// Returns <see langword="false"/> when <see cref="MalformedLineHandling"/> is
     /// <see cref="MalformedLineHandling.Skip"/> and the line cannot be parsed.
-    /// Yields a default record and returns <see langword="false"/> when the policy
-    /// is <see cref="MalformedLineHandling.ReturnDefault"/>.
+    /// Sets a default record and returns <see langword="true"/> when the policy
+    /// is <see cref="MalformedLineHandling.ReturnDefault"/> (the caller performs
+    /// the yield).
     /// Re-throws on <see cref="MalformedLineHandling.ThrowException"/>.
     /// </summary>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when <see cref="MalformedLineHandling"/> holds an unrecognized value.
+    /// </exception>
     private bool TryParseLine(string line, FieldMapResult fieldMap, out TRecord record)
     {
         record = default!;
