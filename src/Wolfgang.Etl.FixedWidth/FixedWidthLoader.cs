@@ -243,8 +243,8 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// <remarks>
     /// The converter receives the raw boxed property value and a <see cref="FieldContext"/>
     /// describing the field. It must return a string no longer than
-    /// <see cref="FieldContext.FieldLength"/>; otherwise the safety-net inside
-    /// <c>FormatSegment</c> will throw a
+    /// <see cref="FieldContext.FieldLength"/>; otherwise the loader's field-width
+    /// safety-net will throw a
     /// <see cref="Exceptions.FieldOverflowException"/>.
     /// </remarks>
     /// <example>
