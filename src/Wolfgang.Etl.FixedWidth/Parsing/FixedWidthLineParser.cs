@@ -378,8 +378,8 @@ internal static class FixedWidthLineParser
     {
         var attr = descriptor.Attribute;
         var prop = descriptor.Property;
-        var headerLabel = attr.Header ?? prop.Name;
-        var text = headerConverter(headerLabel, descriptor.Context);
+        // Reuse the label precomputed on the context (attribute.Header ?? property.Name).
+        var text = headerConverter(descriptor.Context.HeaderLabel, descriptor.Context);
 
         if (text.Length > attr.Length)
         {
