@@ -314,7 +314,8 @@ public static class FixedWidthConverter
             (
                 text,
                 underlying,
-                format
+                format,
+                cachedConverter
             );
         }
 
