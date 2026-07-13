@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `CompressedStreams` example demonstrating GZip and Brotli round trips
+  (load to and extract from a compressed stream), plus documentation in the
+  README and the DocFX examples guide. Documentation only — no public-API or
+  runtime-behavior change ([#32](https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/32)).
+
 ### Changed
 
 ### Deprecated
