@@ -295,14 +295,24 @@ if (-not $SkipSecurity) {
             $env:PATH = "$dest;$env:PATH"
         }
         else {
-            $archive = "gitleaks_${version}_linux_x64.tar.gz"
+            # gitleaks ships per-OS, per-arch builds. Pick the matching archive
+            # for the current platform (linux/darwin x64/arm64) — hard-coding
+            # x64 would install an incompatible binary on ARM64 Linux (e.g.
+            # Graviton) or Apple Silicon.
+            $arch = if ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq 'Arm64') { 'arm64' } else { 'x64' }
+            $os = if ($IsMacOS) { 'darwin' } else { 'linux' }
+            $archive = "gitleaks_${version}_${os}_${arch}.tar.gz"
             $url = "https://github.com/gitleaks/gitleaks/releases/download/v${version}/$archive"
             # Install to a user-writable location instead of /usr/local/bin
             # (which would require sudo for most local dev shells). $HOME/.local/bin
             # is on PATH by default on most Linux distros and macOS; if not, prepend it.
             $localBin = Join-Path $HOME ".local/bin"
             New-Item -ItemType Directory -Force -Path $localBin | Out-Null
-            curl -sSfL $url | tar xz -C $localBin gitleaks
+            # Use 'tar -f -' so extraction reads the gitleaks archive from
+            # stdin. GNU tar without '-f' defaults to /dev/tape (or another
+            # default depending on the TAPE env var), which can hang silently
+            # in CI / fresh shells.
+            curl -sSfL $url | tar -xz -f - -C $localBin gitleaks
             if (-not ($env:PATH -split [IO.Path]::PathSeparator | Where-Object { $_ -eq $localBin })) {
                 $env:PATH = "$localBin$([IO.Path]::PathSeparator)$env:PATH"
             }
