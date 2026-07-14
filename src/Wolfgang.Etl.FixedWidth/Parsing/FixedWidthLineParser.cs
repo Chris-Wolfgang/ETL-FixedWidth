@@ -15,7 +15,6 @@ namespace Wolfgang.Etl.FixedWidth.Parsing;
 internal static class FixedWidthLineParser
 {
     // ------------------------------------------------------------------
-    // ------------------------------------------------------------------
     // Direct-write formatting — writes segments directly to a TextWriter
     // to avoid intermediate List<string> and Join allocations.
     // ------------------------------------------------------------------
@@ -26,7 +25,9 @@ internal static class FixedWidthLineParser
     /// is inserted between adjacent logical columns (including skip columns) to match
     /// the parser's <see cref="FieldDescriptor.AbsoluteColumnIndex"/> semantics.
     /// </summary>
-    /// <exception cref="FieldOverflowException"></exception>
+    /// <exception cref="FieldOverflowException">
+    /// Thrown when a converted value is wider than its declared field length.
+    /// </exception>
     internal static void WriteRecord<T>
     (
         TextWriter writer,
@@ -64,7 +65,9 @@ internal static class FixedWidthLineParser
     /// <summary>
     /// Writes a header line directly to <paramref name="writer"/>.
     /// </summary>
-    /// <exception cref="FieldOverflowException"></exception>
+    /// <exception cref="FieldOverflowException">
+    /// Thrown when a converted header label is wider than its declared field length.
+    /// </exception>
     internal static void WriteHeader
     (
         TextWriter writer,
@@ -285,7 +288,9 @@ internal static class FixedWidthLineParser
     /// the intermediate <see cref="string.PadLeft(int,char)"/> /
     /// <see cref="string.PadRight(int,char)"/> allocation.
     /// </summary>
-    /// <exception cref="FieldOverflowException"></exception>
+    /// <exception cref="FieldOverflowException">
+    /// Thrown when the converted value is wider than its declared field length.
+    /// </exception>
     /// <exception cref="InvalidOperationException">
     /// Thrown when the property has no public getter.
     /// </exception>
@@ -322,7 +327,7 @@ internal static class FixedWidthLineParser
         var padCount = attr.Length - text.Length;
 #if NET8_0_OR_GREATER
         // Stack-allocate the full padded field so it can be written in a single
-        // call when small enough — typical fixed-width fields are ≤128 chars.
+        // call when small enough — fields up to 256 chars use the stack path.
         const int stackFieldLimit = 256;
         if (attr.Length <= stackFieldLimit)
         {
@@ -361,7 +366,9 @@ internal static class FixedWidthLineParser
     /// "label + space-padding", avoiding the intermediate
     /// <see cref="string.PadRight(int,char)"/> allocation.
     /// </summary>
-    /// <exception cref="FieldOverflowException"></exception>
+    /// <exception cref="FieldOverflowException">
+    /// Thrown when the converted header label is wider than its declared field length.
+    /// </exception>
     private static void WriteHeaderSegmentTo
     (
         TextWriter writer,
@@ -371,8 +378,8 @@ internal static class FixedWidthLineParser
     {
         var attr = descriptor.Attribute;
         var prop = descriptor.Property;
-        var headerLabel = attr.Header ?? prop.Name;
-        var text = headerConverter(headerLabel, descriptor.Context);
+        // Reuse the label precomputed on the context (attribute.Header ?? property.Name).
+        var text = headerConverter(descriptor.Context.HeaderLabel, descriptor.Context);
 
         if (text.Length > attr.Length)
         {
@@ -401,12 +408,16 @@ internal static class FixedWidthLineParser
     /// <typeparamref name="T"/>. Validates that the line is long enough to satisfy
     /// all field and skip definitions plus any delimiter contribution before parsing.
     /// </summary>
-    /// <param name="line"></param>
-    /// <param name="lineNumber"></param>
-    /// <param name="fieldMap"></param>
-    /// <param name="fieldDelimiter"></param>
-    /// <param name="valueParser"></param>
-    /// <exception cref="LineTooShortException"></exception>
+    /// <typeparam name="T">The record type to materialize.</typeparam>
+    /// <param name="line">The raw fixed-width line to parse.</param>
+    /// <param name="lineNumber">The 1-based line number, used for diagnostics.</param>
+    /// <param name="fieldMap">The resolved field map describing the columns.</param>
+    /// <param name="fieldDelimiter">Optional delimiter inserted between columns, or <see langword="null"/>.</param>
+    /// <param name="valueParser">Optional value parser; defaults to <see cref="FixedWidthConverter.DefaultParser"/>.</param>
+    /// <returns>A new <typeparamref name="T"/> populated from <paramref name="line"/>.</returns>
+    /// <exception cref="LineTooShortException">
+    /// Thrown when <paramref name="line"/> is shorter than the columns require.
+    /// </exception>
     internal static T ParseLine<T>
     (
         string line,

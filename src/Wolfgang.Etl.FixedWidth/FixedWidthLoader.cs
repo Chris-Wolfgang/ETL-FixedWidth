@@ -162,8 +162,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
     public FixedWidthLoader(Stream stream)
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
-        _writer = new StreamWriter(stream, encoding: System.Text.Encoding.UTF8, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _writer = CreateBufferedWriter(stream);
         _ownsWriter = true;
         _logger = NullLogger.Instance;
     }
@@ -190,8 +189,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
         ILogger<FixedWidthLoader<TRecord>> logger
     )
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
-        _writer = new StreamWriter(stream, encoding: System.Text.Encoding.UTF8, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _writer = CreateBufferedWriter(stream);
         _ownsWriter = true;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -223,11 +221,24 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
-        _writer = new StreamWriter(stream, encoding: System.Text.Encoding.UTF8, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _writer = CreateBufferedWriter(stream);
         _ownsWriter = true;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
         _logger = logger ?? (ILogger)NullLogger.Instance;
+    }
+
+
+
+    /// <summary>
+    /// Creates the internal <see cref="StreamWriter"/> shared by the
+    /// <see cref="Stream"/>-based constructors: UTF-8, a 64 KB buffer, and
+    /// <c>leaveOpen: true</c> so the caller retains stream ownership.
+    /// </summary>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
+    private static StreamWriter CreateBufferedWriter(Stream stream)
+    {
+        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        return new StreamWriter(stream, encoding: System.Text.Encoding.UTF8, bufferSize: DefaultBufferSize, leaveOpen: true);
     }
 
 
@@ -243,8 +254,8 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// <remarks>
     /// The converter receives the raw boxed property value and a <see cref="FieldContext"/>
     /// describing the field. It must return a string no longer than
-    /// <see cref="FieldContext.FieldLength"/>; otherwise the safety-net inside
-    /// <c>FormatSegment</c> will throw a
+    /// <see cref="FieldContext.FieldLength"/>; otherwise the loader's field-width
+    /// safety-net will throw a
     /// <see cref="Exceptions.FieldOverflowException"/>.
     /// </remarks>
     /// <example>
@@ -645,9 +656,8 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     {
         var ex = new InvalidOperationException
         (
-            $"A null record was encountered at item " +
-            $"{CurrentItemCount + CurrentSkippedItemCount + 1}. " +
-            $"The loader writes what it is given — null records are not permitted."
+            $"A null record was encountered at item {CurrentItemCount + CurrentSkippedItemCount + 1}. " +
+            "The loader writes what it is given — null records are not permitted."
         );
 
         _logger.LogError

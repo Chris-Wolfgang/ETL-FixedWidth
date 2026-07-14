@@ -163,8 +163,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
     public FixedWidthExtractor(Stream stream)
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
-        _reader = new StreamReader(stream, encoding: System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _reader = CreateBufferedReader(stream);
         _ownsReader = true;
         _logger = NullLogger.Instance;
     }
@@ -191,8 +190,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         ILogger<FixedWidthExtractor<TRecord>> logger
     )
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
-        _reader = new StreamReader(stream, encoding: System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _reader = CreateBufferedReader(stream);
         _ownsReader = true;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -224,11 +222,24 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
-        _reader = new StreamReader(stream, encoding: System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
+        _reader = CreateBufferedReader(stream);
         _ownsReader = true;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
         _logger = logger ?? (ILogger)NullLogger.Instance;
+    }
+
+
+
+    /// <summary>
+    /// Creates the internal <see cref="StreamReader"/> shared by the
+    /// <see cref="Stream"/>-based constructors: UTF-8, BOM detection, a 64 KB
+    /// buffer, and <c>leaveOpen: true</c> so the caller retains stream ownership.
+    /// </summary>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
+    private static StreamReader CreateBufferedReader(Stream stream)
+    {
+        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        return new StreamReader(stream, encoding: System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
     }
 
 
@@ -881,6 +892,15 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
 
     /// <summary>
+    /// Creates a default <typeparamref name="TRecord"/> instance via the field map's
+    /// compiled factory. Used by the <see cref="BlankLineHandling.ReturnDefault"/> and
+    /// <see cref="MalformedLineHandling.ReturnDefault"/> paths.
+    /// </summary>
+    private static TRecord CreateDefaultRecord(FieldMapResult fieldMap) => (TRecord)fieldMap.Factory();
+
+
+
+    /// <summary>
     /// Handles a blank line according to <see cref="BlankLineHandling"/>.
     /// Returns <see langword="true"/> when a default record should be yielded,
     /// passing it back via <paramref name="defaultRecord"/>.
@@ -888,7 +908,9 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// Throws <see cref="LineTooShortException"/> when the policy is
     /// <see cref="BlankLineHandling.ThrowException"/>.
     /// </summary>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when <see cref="BlankLineHandling"/> holds an unrecognized value.
+    /// </exception>
     /// <exception cref="LineTooShortException">
     /// Thrown when <see cref="BlankLineHandling"/> is
     /// <see cref="BlankLineHandling.ThrowException"/> (the default).
@@ -903,7 +925,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
                 return false;
 
             case BlankLineHandling.ReturnDefault:
-                defaultRecord = (TRecord)fieldMap.Factory();
+                defaultRecord = CreateDefaultRecord(fieldMap);
                 return true;
 
             case BlankLineHandling.ThrowException:
@@ -944,11 +966,14 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// Returns <see langword="true"/> and sets <paramref name="record"/> on success.
     /// Returns <see langword="false"/> when <see cref="MalformedLineHandling"/> is
     /// <see cref="MalformedLineHandling.Skip"/> and the line cannot be parsed.
-    /// Yields a default record and returns <see langword="false"/> when the policy
-    /// is <see cref="MalformedLineHandling.ReturnDefault"/>.
+    /// Sets a default record and returns <see langword="true"/> when the policy
+    /// is <see cref="MalformedLineHandling.ReturnDefault"/> (the caller performs
+    /// the yield).
     /// Re-throws on <see cref="MalformedLineHandling.ThrowException"/>.
     /// </summary>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when <see cref="MalformedLineHandling"/> holds an unrecognized value.
+    /// </exception>
     private bool TryParseLine(string line, FieldMapResult fieldMap, out TRecord record)
     {
         record = default!;
@@ -976,7 +1001,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
                 case MalformedLineHandling.ReturnDefault:
                     // Cannot yield inside catch — caller handles the yield and increment.
-                    record = (TRecord)fieldMap.Factory();
+                    record = CreateDefaultRecord(fieldMap);
                     return true;
 
                 case MalformedLineHandling.ThrowException:

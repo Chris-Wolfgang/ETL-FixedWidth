@@ -19,11 +19,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.3.0] - 2026-07-13
+
+### Added
+
+- `CompressedStreams` example demonstrating GZip and Brotli round trips
+  (load to and extract from a compressed stream), plus documentation in the
+  README and the DocFX examples guide ([#32]).
+
+### Changed
+
+- Reuse the cached `TypeConverter` across the nullable-unwrap recursion in the
+  value parser, avoiding a redundant per-value `TypeDescriptor.GetConverter`
+  lookup for nullable `TypeConverter`-backed fields. Behavior is unchanged
+  ([#208]).
+- Internal maintenance (no public-API or runtime-behavior change): corrected
+  stale and empty XML-doc comments, and applied small source simplifications —
+  shared buffered reader/writer construction helpers on the `Stream`
+  constructors and reuse of the precomputed header label ([#207], [#209]).
+
 ## [0.2.3] - 2026-07-06
 
 ### Changed
 
 - Dependabot bump: dotnet-dependencies group (7 packages).
+
 ## [0.2.2] - 2026-06-27
 
 ### Changed
@@ -102,15 +122,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   parsing for reduced allocations.
 - Nine runnable example console apps covering the major features.
 
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.2.3...HEAD
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.2.3...v0.3.0
 [0.2.3]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v.0.1.0...v0.2.0
 [0.1.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/releases/tag/v.0.1.0
+[#32]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/32
 [#49]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/49
 [#60]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/60
 [#62]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/62
 [#83]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/83
 [#84]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/84
 [#86]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/86
+[#207]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/207
+[#208]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/208
+[#209]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/209

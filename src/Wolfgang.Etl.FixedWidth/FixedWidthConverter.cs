@@ -78,7 +78,7 @@ public static class FixedWidthConverter
             {
                 throw new FieldOverflowException
                 (
-                    $"Value for property '{context.PropertyName}' has length {text.Length} which " + $"exceeds the defined field width of {context.FieldLength}.",
+                    $"Value for property '{context.PropertyName}' has length {text.Length} which exceeds the defined field width of {context.FieldLength}.",
                     context.PropertyName,
                     context.FieldLength,
                     text.Length
@@ -314,7 +314,8 @@ public static class FixedWidthConverter
             (
                 text,
                 underlying,
-                format
+                format,
+                cachedConverter
             );
         }
 

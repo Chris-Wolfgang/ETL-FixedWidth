@@ -112,6 +112,22 @@ await using var writeStream = File.OpenWrite("output.dat");
 using var loader = new FixedWidthLoader<PersonRecord>(writeStream);
 ```
 
+Because the `Stream` constructors accept any `Stream`, compression works out of the box — wrap the file stream in a `GZipStream` or `BrotliStream` to read or write compressed fixed-width data (common for mainframe `.gz` exports) without a decompressed copy on disk:
+
+```csharp
+// Extraction from a GZip-compressed file
+await using var readStream = File.OpenRead("people.dat.gz");
+await using var gzip = new GZipStream(readStream, CompressionMode.Decompress);
+using var extractor = new FixedWidthExtractor<PersonRecord>(gzip);
+
+// Loading to a GZip-compressed file
+await using var writeStream = File.Create("output.dat.gz");
+await using var gzip = new GZipStream(writeStream, CompressionLevel.Optimal);
+using var loader = new FixedWidthLoader<PersonRecord>(gzip);
+```
+
+See the [CompressedStreams](examples/CompressedStreams) example for a complete GZip and Brotli round trip.
+
 ---
 
 ## ✨ Features
@@ -138,12 +154,13 @@ using var loader = new FixedWidthLoader<PersonRecord>(writeStream);
 
 **Examples:**
 
-The [examples/](examples/) folder contains 9 runnable console projects demonstrating each feature:
+The [examples/](examples/) folder contains 10 runnable console projects demonstrating each feature:
 
 | Example | Description |
 |---------|-------------|
 | [BasicExtraction](examples/BasicExtraction) | Read fixed-width data into strongly typed records |
 | [BasicLoading](examples/BasicLoading) | Write records to fixed-width output |
+| [CompressedStreams](examples/CompressedStreams) | Read and write GZip / Brotli compressed fixed-width data |
 | [RoundTrip](examples/RoundTrip) | Extract, transform, and reload records end-to-end |
 | [CustomParsersConverters](examples/CustomParsersConverters) | Custom `ValueParser` and `ValueConverter` delegates |
 | [ProgressReporting](examples/ProgressReporting) | Timer-based `IProgress<FixedWidthReport>` callbacks |
