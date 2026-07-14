@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.3/docfx_project/docs/examples.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/docfx_project/docs/examples.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -80,6 +80,9 @@
 <h2 id="basicloading">BasicLoading</h2>
 <p>Demonstrates the simplest loading workflow: writing strongly typed records to fixed-width text output using a <code>StringWriter</code>, including padding, alignment, and pad character behavior.</p>
 <p><a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/BasicLoading">View source</a></p>
+<h2 id="compressedstreams">CompressedStreams</h2>
+<p>Demonstrates loading to and extracting from compressed streams. Because the <code>Stream</code>-based constructors accept any <code>Stream</code>, GZip and Brotli compression work out of the box — you simply wrap the underlying stream in a <code>GZipStream</code> or <code>BrotliStream</code>. Highlights the disposal ordering required to flush the compressor before the compressed bytes are read back.</p>
+<p><a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/CompressedStreams">View source</a></p>
 <h2 id="roundtrip">RoundTrip</h2>
 <p>Shows a full round-trip pipeline: extracting records from fixed-width text, then loading them back out to produce identical output. Validates that extraction and loading are symmetric.</p>
 <p><a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/RoundTrip">View source</a></p>
@@ -105,7 +108,7 @@
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.2.3/docfx_project/docs/examples.md/#L1" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/docfx_project/docs/examples.md/#L1" class="edit-link">Edit this page</a>
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>
