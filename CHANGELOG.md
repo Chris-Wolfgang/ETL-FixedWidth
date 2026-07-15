@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Optional `Encoding` parameter on the `Stream`-based constructors of
+  `FixedWidthExtractor` and `FixedWidthLoader`. Defaults to `Encoding.UTF8`
+  (non-breaking); pass e.g. `new UTF8Encoding(false)` to write without a BOM,
+  or a code-page encoding for EBCDIC/mainframe data ([#16]).
+
 ### Changed
 
 ### Deprecated
@@ -146,6 +151,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#62]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/62
 [#83]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/83
 [#84]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/84
+[#16]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/16
 [#86]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/86
 [#197]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/197
 [#207]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/207

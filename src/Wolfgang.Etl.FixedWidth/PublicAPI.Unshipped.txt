@@ -1,1 +1,5 @@
 #nullable enable
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream stream, System.Text.Encoding encoding = null) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>> logger, System.Text.Encoding encoding = null) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream stream, System.Text.Encoding encoding = null) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>> logger, System.Text.Encoding encoding = null) -> void
