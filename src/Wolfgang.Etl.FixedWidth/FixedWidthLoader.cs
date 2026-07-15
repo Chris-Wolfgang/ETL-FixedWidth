@@ -45,7 +45,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// loader.FieldDelimiter = " | ";
 /// </code>
 /// </remarks>
-public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
+public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, ISupportDryRun
     where TRecord : notnull
 {
     // ------------------------------------------------------------------
@@ -318,6 +318,21 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
 
 
 
+    /// <inheritdoc />
+    /// <remarks>
+    /// When <see langword="true"/>, the loader enumerates the source and evaluates
+    /// <see cref="Abstractions.LoaderBase{TDestination,TProgress}.SkipItemCount"/> /
+    /// <see cref="Abstractions.LoaderBase{TDestination,TProgress}.MaximumItemCount"/>,
+    /// increments progress counters, fires the progress-timer callback, and logs as
+    /// usual — but writes nothing to the output fixed-width stream. Field-width
+    /// validation still runs, so a dry run surfaces
+    /// <see cref="Exceptions.FieldOverflowException"/> the same way a real run would.
+    /// Defaults to <see langword="false"/>.
+    /// </remarks>
+    public bool IsDryRun { get; set; }
+
+
+
     /// <summary>
     /// When non-null, a separator line is written after the header, consisting of
     /// the specified character repeated to each field's width.
@@ -449,9 +464,15 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
         var fieldMap = FieldMap.GetResult<TRecord>();
         LogLoadingStarted(fieldMap);
 
+        // In dry-run mode, route all formatting through a throwaway writer so the
+        // pipeline — including field-width validation — still runs, but nothing
+        // reaches the output stream. The real writer is left untouched and so
+        // flushes nothing below.
+        var target = IsDryRun ? TextWriter.Null : _writer;
+
         if (WriteHeader)
         {
-            await WriteHeaderAsync(fieldMap).ConfigureAwait(false);
+            await WriteHeaderAsync(fieldMap, target).ConfigureAwait(false);
         }
 
         await foreach (var item in items.WithCancellation(token).ConfigureAwait(false))
@@ -478,29 +499,47 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
 
             FixedWidthLineParser.WriteRecord
             (
-                _writer,
+                target,
                 item,
                 fieldMap,
                 ValueConverter,
                 FieldDelimiter
             );
             Interlocked.Increment(ref _currentLineNumber);
-            await _writer.WriteLineAsync().ConfigureAwait(false);
+            await target.WriteLineAsync().ConfigureAwait(false);
             IncrementCurrentItemCount();
             LogDebugRecordWritten();
         }
 
-        if (_ownsWriter)
-        {
-#if NET8_0_OR_GREATER
-            await _writer.FlushAsync(token).ConfigureAwait(false);
-#else
-            token.ThrowIfCancellationRequested();
-            await _writer.FlushAsync().ConfigureAwait(false);
-#endif
-        }
+        await FlushIfOwnedAsync(token).ConfigureAwait(false);
 
         LogLoadingCompleted();
+    }
+
+
+
+    /// <summary>
+    /// Flushes the internal writer when the loader owns it (the <see cref="Stream"/>
+    /// constructors). No-op for caller-supplied writers, which the caller flushes.
+    /// In dry-run mode the writer received no writes, so this flushes nothing.
+    /// </summary>
+    private async Task FlushIfOwnedAsync(CancellationToken token)
+    {
+        // In dry-run mode nothing was written to the owned writer, so there is
+        // nothing to flush. Flushing anyway would emit the StreamWriter's UTF-8
+        // preamble (BOM) to the stream on .NET Framework, which the dry-run
+        // contract treats as a side effect.
+        if (!_ownsWriter || IsDryRun)
+        {
+            return;
+        }
+
+#if NET8_0_OR_GREATER
+        await _writer.FlushAsync(token).ConfigureAwait(false);
+#else
+        token.ThrowIfCancellationRequested();
+        await _writer.FlushAsync().ConfigureAwait(false);
+#endif
     }
 
 
@@ -509,17 +548,17 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// Writes the header line and, if <see cref="FieldSeparator"/> is set, the
     /// separator line that follows it.
     /// </summary>
-    private async Task WriteHeaderAsync(FieldMapResult fieldMap)
+    private async Task WriteHeaderAsync(FieldMapResult fieldMap, TextWriter target)
     {
         FixedWidthLineParser.WriteHeader
         (
-            _writer,
+            target,
             fieldMap,
             HeaderConverter,
             FieldDelimiter
         );
         Interlocked.Increment(ref _currentLineNumber);
-        await _writer.WriteLineAsync().ConfigureAwait(false);
+        await target.WriteLineAsync().ConfigureAwait(false);
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
@@ -530,13 +569,13 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
         {
             FixedWidthLineParser.WriteSeparator
             (
-                _writer,
+                target,
                 fieldMap,
                 FieldSeparator.Value,
                 FieldDelimiter
             );
             Interlocked.Increment(ref _currentLineNumber);
-            await _writer.WriteLineAsync().ConfigureAwait(false);
+            await target.WriteLineAsync().ConfigureAwait(false);
 
             if (_logger.IsEnabled(LogLevel.Debug))
             {

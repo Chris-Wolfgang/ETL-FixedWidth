@@ -1,1 +1,3 @@
 #nullable enable
+Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.IsDryRun.get -> bool
+Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.IsDryRun.set -> void
