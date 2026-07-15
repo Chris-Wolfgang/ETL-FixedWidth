@@ -3,3 +3,10 @@ Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>> logger, System.Text.Encoding encoding = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream stream, System.Text.Encoding encoding = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>> logger, System.Text.Encoding encoding = null) -> void
+Wolfgang.Etl.FixedWidth.Enums.LineEnding
+Wolfgang.Etl.FixedWidth.Enums.LineEnding.CrLf = 2 -> Wolfgang.Etl.FixedWidth.Enums.LineEnding
+Wolfgang.Etl.FixedWidth.Enums.LineEnding.Default = 0 -> Wolfgang.Etl.FixedWidth.Enums.LineEnding
+Wolfgang.Etl.FixedWidth.Enums.LineEnding.Lf = 1 -> Wolfgang.Etl.FixedWidth.Enums.LineEnding
+Wolfgang.Etl.FixedWidth.Enums.LineEnding.None = 3 -> Wolfgang.Etl.FixedWidth.Enums.LineEnding
+Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.LineEnding.get -> Wolfgang.Etl.FixedWidth.Enums.LineEnding
+Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.LineEnding.set -> void

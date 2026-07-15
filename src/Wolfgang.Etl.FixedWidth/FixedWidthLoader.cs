@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.FixedWidth.Enums;
 using Wolfgang.Etl.FixedWidth.Parsing;
 
 namespace Wolfgang.Etl.FixedWidth;
@@ -331,6 +332,18 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
 
 
+    /// <summary>
+    /// The line ending written after each record. Defaults to
+    /// <see cref="Enums.LineEnding.Default"/> (the platform newline after every
+    /// record, preserving prior behavior). Use <see cref="Enums.LineEnding.Lf"/> or
+    /// <see cref="Enums.LineEnding.CrLf"/> to pin the ending regardless of platform,
+    /// or <see cref="Enums.LineEnding.None"/> to omit the trailing newline after the
+    /// final record.
+    /// </summary>
+    public LineEnding LineEnding { get; set; }
+
+
+
     /// <inheritdoc />
     /// <remarks>
     /// When <see langword="true"/>, the loader enumerates the source and evaluates
@@ -482,12 +495,57 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         // reaches the output stream. The real writer is left untouched and so
         // flushes nothing below.
         var target = IsDryRun ? TextWriter.Null : _writer;
+        var newLine = ResolveNewLine();
+        var linesWritten = 0;
+
+        // Emit the separating newline BEFORE every line except the first, so that
+        // LineEnding.None can suppress the trailing newline after the last line
+        // while all intermediate lines stay separated.
+        async Task SeparateAsync()
+        {
+            if (linesWritten > 0)
+            {
+                await target.WriteAsync(newLine).ConfigureAwait(false);
+            }
+            linesWritten++;
+        }
 
         if (WriteHeader)
         {
-            await WriteHeaderAsync(fieldMap, target).ConfigureAwait(false);
+            await WriteHeaderAsync(fieldMap, target, SeparateAsync).ConfigureAwait(false);
         }
 
+        await WriteRecordsAsync(items, target, fieldMap, SeparateAsync, token).ConfigureAwait(false);
+
+        if (LineEnding != LineEnding.None && linesWritten > 0)
+        {
+            await target.WriteAsync(newLine).ConfigureAwait(false);
+        }
+
+        await FlushIfOwnedAsync(token).ConfigureAwait(false);
+
+        LogLoadingCompleted();
+    }
+
+
+
+    /// <summary>
+    /// Enumerates the source, applying null/skip/max rules, and writes each record.
+    /// <paramref name="separateAsync"/> emits the inter-line newline before each
+    /// record (see <see cref="LoadWorkerAsync"/>).
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when a null record is encountered in <paramref name="items"/>.
+    /// </exception>
+    private async Task WriteRecordsAsync
+    (
+        IAsyncEnumerable<TRecord> items,
+        TextWriter target,
+        FieldMapResult fieldMap,
+        Func<Task> separateAsync,
+        CancellationToken token
+    )
+    {
         await foreach (var item in items.WithCancellation(token).ConfigureAwait(false))
         {
             token.ThrowIfCancellationRequested();
@@ -510,6 +568,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
                 break;
             }
 
+            await separateAsync().ConfigureAwait(false);
             FixedWidthLineParser.WriteRecord
             (
                 target,
@@ -519,15 +578,24 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
                 FieldDelimiter
             );
             Interlocked.Increment(ref _currentLineNumber);
-            await target.WriteLineAsync().ConfigureAwait(false);
             IncrementCurrentItemCount();
             LogDebugRecordWritten();
         }
-
-        await FlushIfOwnedAsync(token).ConfigureAwait(false);
-
-        LogLoadingCompleted();
     }
+
+
+
+    /// <summary>
+    /// Resolves the newline string used between records from <see cref="LineEnding"/>.
+    /// <see cref="Enums.LineEnding.None"/> uses <see cref="Environment.NewLine"/> as
+    /// the inter-record separator; the trailing newline is suppressed separately.
+    /// </summary>
+    private string ResolveNewLine() => LineEnding switch
+    {
+        LineEnding.Lf => "\n",
+        LineEnding.CrLf => "\r\n",
+        _ => Environment.NewLine,
+    };
 
 
 
@@ -559,10 +627,12 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
     /// <summary>
     /// Writes the header line and, if <see cref="FieldSeparator"/> is set, the
-    /// separator line that follows it.
+    /// separator line that follows it. <paramref name="separateAsync"/> emits the
+    /// inter-line newline (see <see cref="LoadWorkerAsync"/>).
     /// </summary>
-    private async Task WriteHeaderAsync(FieldMapResult fieldMap, TextWriter target)
+    private async Task WriteHeaderAsync(FieldMapResult fieldMap, TextWriter target, Func<Task> separateAsync)
     {
+        await separateAsync().ConfigureAwait(false);
         FixedWidthLineParser.WriteHeader
         (
             target,
@@ -571,7 +641,6 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
             FieldDelimiter
         );
         Interlocked.Increment(ref _currentLineNumber);
-        await target.WriteLineAsync().ConfigureAwait(false);
 
         if (_logger.IsEnabled(LogLevel.Debug))
         {
@@ -580,6 +649,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
         if (FieldSeparator.HasValue)
         {
+            await separateAsync().ConfigureAwait(false);
             FixedWidthLineParser.WriteSeparator
             (
                 target,
@@ -588,7 +658,6 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
                 FieldDelimiter
             );
             Interlocked.Increment(ref _currentLineNumber);
-            await target.WriteLineAsync().ConfigureAwait(false);
 
             if (_logger.IsEnabled(LogLevel.Debug))
             {

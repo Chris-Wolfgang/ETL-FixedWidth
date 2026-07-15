@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `FixedWidthExtractor` and `FixedWidthLoader`. Defaults to `Encoding.UTF8`
   (non-breaking); pass e.g. `new UTF8Encoding(false)` to write without a BOM,
   or a code-page encoding for EBCDIC/mainframe data ([#16]).
+- `LineEnding` property on `FixedWidthLoader` (`Default`, `Lf`, `CrLf`, `None`)
+  to control the newline written after each record regardless of platform.
+  `None` omits the trailing newline after the final record. Defaults to
+  `Default` (the platform newline, preserving prior behavior) ([#17]).
 
 ### Changed
 
@@ -152,6 +156,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#83]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/83
 [#84]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/84
 [#16]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/16
+[#17]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/17
 [#86]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/86
 [#197]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/197
 [#207]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/207
