@@ -96,6 +96,8 @@ Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Tex
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.TextWriter writer, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>> logger) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.HeaderConverter.get -> System.Func<string, Wolfgang.Etl.FixedWidth.FieldContext, string>
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.HeaderConverter.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.IsDryRun.get -> bool
+Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.IsDryRun.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.ValueConverter.get -> System.Func<object, Wolfgang.Etl.FixedWidth.FieldContext, string>
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.ValueConverter.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.WriteHeader.get -> bool

@@ -19,6 +19,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.4.0] - 2026-07-14
+
+### Added
+
+- `FixedWidthLoader<TRecord>` now implements `ISupportDryRun`. Set `IsDryRun`
+  to `true` to run the full pipeline — enumerate the source, evaluate
+  `SkipItemCount` / `MaximumItemCount`, increment progress counters, fire the
+  progress-timer callback, and validate field widths — without writing anything
+  to the output fixed-width stream ([#197]).
+
 ## [0.3.0] - 2026-07-13
 
 ### Added
@@ -122,7 +132,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   parsing for reduced allocations.
 - Nine runnable example console apps covering the major features.
 
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.2.3...v0.3.0
 [0.2.3]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.2.1...v0.2.2
@@ -136,6 +147,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#83]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/83
 [#84]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/84
 [#86]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/86
+[#197]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/197
 [#207]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/207
 [#208]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/208
 [#209]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/209
