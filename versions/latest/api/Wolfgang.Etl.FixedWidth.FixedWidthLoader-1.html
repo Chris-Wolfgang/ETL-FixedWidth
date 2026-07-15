@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.3.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthLoader_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthLoader%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.4.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthLoader_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthLoader%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,7 +75,7 @@
 
 
   <h1 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1" class="text-break">
-Class FixedWidthLoader&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L48"><i class="bi bi-code-slash"></i></a>
+Class FixedWidthLoader&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L48"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -89,7 +89,7 @@ as an asynchronous operation.</p>
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class FixedWidthLoader&lt;TRecord&gt; : LoaderBase&lt;TRecord, FixedWidthReport&gt;, ILoadWithProgressAndCancellationAsync&lt;TRecord, FixedWidthReport&gt;, ILoadWithProgressAsync&lt;TRecord, FixedWidthReport&gt;, ILoadWithCancellationAsync&lt;TRecord&gt;, ILoadAsync&lt;TRecord&gt;, IAsyncDisposable, IDisposable where TRecord : notnull</code></pre>
+    <pre><code class="lang-csharp hljs">public class FixedWidthLoader&lt;TRecord&gt; : LoaderBase&lt;TRecord, FixedWidthReport&gt;, ILoadWithProgressAndCancellationAsync&lt;TRecord, FixedWidthReport&gt;, ILoadWithProgressAsync&lt;TRecord, FixedWidthReport&gt;, ILoadWithCancellationAsync&lt;TRecord&gt;, ILoadAsync&lt;TRecord&gt;, IAsyncDisposable, IDisposable, ISupportDryRun where TRecord : notnull</code></pre>
   </div>
 
 
@@ -118,6 +118,7 @@ as an asynchronous operation.</p>
       <div><span class="xref">ILoadAsync</span>&lt;TRecord&gt;</div>
       <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iasyncdisposable">IAsyncDisposable</a></div>
       <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+      <div><span class="xref">ISupportDryRun</span></div>
     </dd>
   </dl>
 
@@ -242,7 +243,7 @@ loader.FieldDelimiter = &quot; | &quot;;</p></code></pre>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_System_IO_Stream_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.Stream)">
   FixedWidthLoader(Stream)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L163"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L163"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a> that writes
@@ -284,7 +285,7 @@ writable. The caller retains ownership — the loader does not dispose the strea
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_System_IO_Stream_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthLoader__0___" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthLoader{`0}})">
   FixedWidthLoader(Stream, ILogger&lt;FixedWidthLoader&lt;TRecord&gt;&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L186"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L186"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a> that writes
@@ -330,7 +331,7 @@ writable. The caller retains ownership — the loader does not dispose the strea
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_System_IO_TextWriter_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.TextWriter)">
   FixedWidthLoader(TextWriter)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L90"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L90"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a> that writes
@@ -374,7 +375,7 @@ The caller is responsible for the writer's lifetime — the loader does not disp
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_System_IO_TextWriter_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthLoader__0___" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.TextWriter,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthLoader{`0}})">
   FixedWidthLoader(TextWriter, ILogger&lt;FixedWidthLoader&lt;TRecord&gt;&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L109"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L109"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a> that writes
@@ -421,7 +422,7 @@ to the specified <a class="xref" href="https://learn.microsoft.com/dotnet/api/sy
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_CurrentLineNumber" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.CurrentLineNumber">
   CurrentLineNumber
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L372"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L387"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The 1-based physical line number of the line most recently written to the output.
@@ -460,7 +461,7 @@ without a data race.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_FieldDelimiter" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.FieldDelimiter">
   FieldDelimiter
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L358"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L373"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>An optional string written between fields on every line including headers,
@@ -506,7 +507,7 @@ are correctly identified during extraction.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_FieldSeparator" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.FieldSeparator">
   FieldSeparator
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L335"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L350"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>When non-null, a separator line is written after the header, consisting of
@@ -547,7 +548,7 @@ loader.FieldSeparator = null; // no separator (default)</code></pre>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_HeaderConverter" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.HeaderConverter">
   HeaderConverter
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L297"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L297"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The function used to convert a header label to its string representation.
@@ -590,11 +591,56 @@ ensure the returned string is not longer than the field width.</p>
 
 
 
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_IsDryRun_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.IsDryRun*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_IsDryRun" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.IsDryRun">
+  IsDryRun
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L332"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether the stage runs in dry-run mode.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool IsDryRun { get; set; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>When <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>, the stage runs the full pipeline but skips the
+external side effect that mutates the destination or source. Defaults to
+<a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>.</p>
+</dd>
+  </dl>
+
+
+
+
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_IsDryRun_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>When <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>, the loader enumerates the source and evaluates
+<span class="xref">Wolfgang.Etl.Abstractions.LoaderBase&lt;TDestination, TProgress&gt;.SkipItemCount</span> /
+<span class="xref">Wolfgang.Etl.Abstractions.LoaderBase&lt;TDestination, TProgress&gt;.MaximumItemCount</span>,
+increments progress counters, fires the progress-timer callback, and logs as
+usual — but writes nothing to the output fixed-width stream. Field-width
+validation still runs, so a dry run surfaces
+<a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException.html">FieldOverflowException</a> the same way a real run would.
+Defaults to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>.</p>
+</div>
+
+
+
+
   <a id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_ValueConverter_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.ValueConverter*"></a>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_ValueConverter" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.ValueConverter">
   ValueConverter
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L273"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L273"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The function used to convert a field value to its string representation
@@ -644,7 +690,7 @@ safety-net will throw a
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_WriteHeader" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.WriteHeader">
   WriteHeader
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L317"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L317"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>When <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>, a header line is written before any records.
@@ -691,7 +737,7 @@ property name otherwise. Labels are passed through
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_CreateProgressReport" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.CreateProgressReport">
   CreateProgressReport()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L383"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L398"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates a progress report snapshot for the current loader state.</p>
@@ -727,7 +773,7 @@ and <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfga
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_CreateProgressTimer_System_IProgress_Wolfgang_Etl_FixedWidth_FixedWidthReport__" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.CreateProgressTimer(System.IProgress{Wolfgang.Etl.FixedWidth.FixedWidthReport})">
   CreateProgressTimer(IProgress&lt;FixedWidthReport&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L403"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L418"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the <span class="xref">Wolfgang.Etl.Abstractions.IProgressTimer</span> used to drive progress callbacks.
@@ -768,7 +814,7 @@ Override this method in a derived class to inject a custom timer
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_Dispose_System_Boolean_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.Dispose(System.Boolean)">
   Dispose(bool)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L430"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L445"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Releases the internal <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.streamwriter">StreamWriter</a> when this instance was
@@ -804,7 +850,7 @@ Has no effect on a caller-owned <a class="xref" href="https://learn.microsoft.co
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_LoadWorkerAsync_System_Collections_Generic_IAsyncEnumerable__0__System_Threading_CancellationToken_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.LoadWorkerAsync(System.Collections.Generic.IAsyncEnumerable{`0},System.Threading.CancellationToken)">
   LoadWorkerAsync(IAsyncEnumerable&lt;TRecord&gt;, CancellationToken)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L443"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L458"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>This method is the core implementation of the loading logic and should be
@@ -856,7 +902,7 @@ overridden by derived classes.</p>
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.3.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L48" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L48" class="edit-link">Edit this page</a>
         </div>
 
 

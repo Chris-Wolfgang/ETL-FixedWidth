@@ -1121,6 +1121,23 @@ references:
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthLoader(Of TRecord).HeaderConverter
   nameWithType: FixedWidthLoader<TRecord>.HeaderConverter
   nameWithType.vb: FixedWidthLoader(Of TRecord).HeaderConverter
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.IsDryRun
+  name: IsDryRun
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_IsDryRun
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.IsDryRun
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.IsDryRun
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthLoader(Of TRecord).IsDryRun
+  nameWithType: FixedWidthLoader<TRecord>.IsDryRun
+  nameWithType.vb: FixedWidthLoader(Of TRecord).IsDryRun
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.IsDryRun*
+  name: IsDryRun
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_IsDryRun_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.IsDryRun
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.IsDryRun
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthLoader(Of TRecord).IsDryRun
+  nameWithType: FixedWidthLoader<TRecord>.IsDryRun
+  nameWithType.vb: FixedWidthLoader(Of TRecord).IsDryRun
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.LoadWorkerAsync(System.Collections.Generic.IAsyncEnumerable{`0},System.Threading.CancellationToken)
   name: LoadWorkerAsync(IAsyncEnumerable<TRecord>, CancellationToken)
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_LoadWorkerAsync_System_Collections_Generic_IAsyncEnumerable__0__System_Threading_CancellationToken_
