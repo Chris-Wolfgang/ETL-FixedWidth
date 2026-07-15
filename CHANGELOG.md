@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `FixedWidthLoader<TRecord>` now implements `ISupportDryRun`. Set `IsDryRun`
+  to `true` to run the full pipeline — enumerate the source, evaluate
+  `SkipItemCount` / `MaximumItemCount`, increment progress counters, fire the
+  progress-timer callback, and validate field widths — without writing anything
+  to the output fixed-width stream ([#197]).
+
 ### Changed
 
 ### Deprecated
@@ -136,6 +142,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#83]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/83
 [#84]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/84
 [#86]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/86
+[#197]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/197
 [#207]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/207
 [#208]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/208
 [#209]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/209
