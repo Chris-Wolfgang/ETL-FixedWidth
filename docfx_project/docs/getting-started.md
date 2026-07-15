@@ -90,6 +90,25 @@ Console.WriteLine($"Total loaded: {loader.CurrentItemCount}");
 
 In production, replace `StringReader` / `StringWriter` with a `FileStream` or `StreamReader` — the extractor and loader accept any `TextReader` / `TextWriter`, or a raw `Stream` directly.
 
+### Controlling line endings
+
+`FixedWidthExtractor` reads `\n`, `\r`, and `\r\n` automatically, so input needs no configuration.
+
+For output, the loader writes each record with its `TextWriter`'s newline. To force a specific ending regardless of platform — e.g. Unix `\n` for a downstream mainframe or FTP consumer — pass a `TextWriter` with the `NewLine` you want:
+
+```csharp
+using System.IO;
+
+// Force Unix (LF) line endings, even on Windows
+await using var stream = File.Create("output.dat");
+await using var writer = new StreamWriter(stream) { NewLine = "\n" };
+using var loader = new FixedWidthLoader<PersonRecord>(writer);
+
+await loader.LoadAsync(recordsAsyncEnumerable, CancellationToken.None);
+```
+
+`NewLine` accepts any string; the default is `Environment.NewLine`.
+
 ## Next Steps
 
 - Browse the [Examples](examples.md) for more detailed scenarios
