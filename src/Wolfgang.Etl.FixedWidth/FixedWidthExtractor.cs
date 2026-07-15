@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -160,10 +161,14 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// The <see cref="Stream"/> to read fixed-width records from. The stream must be
     /// readable. The caller retains ownership — the extractor does not dispose the stream.
     /// </param>
+    /// <param name="encoding">
+    /// The <see cref="Encoding"/> used to decode the stream. Pass <see langword="null"/>
+    /// (the default) to use <see cref="Encoding.UTF8"/>.
+    /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
-    public FixedWidthExtractor(Stream stream)
+    public FixedWidthExtractor(Stream stream, Encoding? encoding = null)
     {
-        _reader = CreateBufferedReader(stream);
+        _reader = CreateBufferedReader(stream, encoding);
         _ownsReader = true;
         _logger = NullLogger.Instance;
     }
@@ -181,16 +186,21 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// readable. The caller retains ownership — the extractor does not dispose the stream.
     /// </param>
     /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="encoding">
+    /// The <see cref="Encoding"/> used to decode the stream. Pass <see langword="null"/>
+    /// (the default) to use <see cref="Encoding.UTF8"/>.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="stream"/> or <paramref name="logger"/> is null.
     /// </exception>
     public FixedWidthExtractor
     (
         Stream stream,
-        ILogger<FixedWidthExtractor<TRecord>> logger
+        ILogger<FixedWidthExtractor<TRecord>> logger,
+        Encoding? encoding = null
     )
     {
-        _reader = CreateBufferedReader(stream);
+        _reader = CreateBufferedReader(stream, encoding);
         _ownsReader = true;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -222,7 +232,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
     {
-        _reader = CreateBufferedReader(stream);
+        _reader = CreateBufferedReader(stream, encoding: null);
         _ownsReader = true;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
         _logger = logger ?? (ILogger)NullLogger.Instance;
@@ -232,14 +242,15 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
     /// <summary>
     /// Creates the internal <see cref="StreamReader"/> shared by the
-    /// <see cref="Stream"/>-based constructors: UTF-8, BOM detection, a 64 KB
-    /// buffer, and <c>leaveOpen: true</c> so the caller retains stream ownership.
+    /// <see cref="Stream"/>-based constructors: the requested encoding (or
+    /// <see cref="Encoding.UTF8"/>), BOM detection, a 64 KB buffer, and
+    /// <c>leaveOpen: true</c> so the caller retains stream ownership.
     /// </summary>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
-    private static StreamReader CreateBufferedReader(Stream stream)
+    private static StreamReader CreateBufferedReader(Stream stream, Encoding? encoding)
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
-        return new StreamReader(stream, encoding: System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
+        return new StreamReader(stream, encoding: encoding ?? Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
     }
 
 

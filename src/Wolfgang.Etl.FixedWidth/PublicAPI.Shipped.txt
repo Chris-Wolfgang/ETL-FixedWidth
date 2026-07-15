@@ -70,8 +70,6 @@ Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FieldDelimiter.get -> strin
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FieldDelimiter.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FieldSeparator.get -> char?
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FieldSeparator.set -> void
-Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream stream) -> void
-Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>> logger) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.TextReader reader) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.TextReader reader, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>> logger) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.HasHeader.get -> bool
@@ -90,8 +88,6 @@ Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FieldDelimiter.get -> string?
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FieldDelimiter.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FieldSeparator.get -> char?
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FieldSeparator.set -> void
-Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream stream) -> void
-Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>> logger) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.TextWriter writer) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.TextWriter writer, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>> logger) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.HeaderConverter.get -> System.Func<string, Wolfgang.Etl.FixedWidth.FieldContext, string>
