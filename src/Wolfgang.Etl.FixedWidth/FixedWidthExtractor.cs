@@ -340,6 +340,26 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
 
     /// <summary>
+    /// An optional callback invoked for each fully parsed record, after
+    /// <see cref="ValueParser"/> and field assignment but before the record is
+    /// yielded. Return <see cref="ValidationResult.Accept"/> to yield it,
+    /// <see cref="ValidationResult.Skip"/> to drop it (increments
+    /// <c>CurrentSkippedItemCount</c>), or <see cref="ValidationResult.Stop"/> to
+    /// end extraction. <see langword="null"/> (the default) applies no validation.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// extractor.RecordValidator = record =>
+    ///     record.Balance &lt; 0
+    ///         ? ValidationResult.Skip("Negative balance")
+    ///         : ValidationResult.Accept();
+    /// </code>
+    /// </example>
+    public Func<TRecord, ValidationResult>? RecordValidator { get; set; }
+
+
+
+    /// <summary>
     /// A delegate that converts a raw string read from the file into the target property
     /// type. The <see cref="FieldContext"/> provides the property type, format string, and
     /// other field metadata needed to perform the conversion.
@@ -658,12 +678,70 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
                 continue;
             }
 
+            var validation = ApplyRecordValidation(record);
+            if (validation == ValidationAction.Skip)
+            {
+                continue;
+            }
+            if (validation == ValidationAction.Stop)
+            {
+                LogExtractionCompleted();
+                yield break;
+            }
+
             LogDebugRecordParsed();
             IncrementCurrentItemCount();
             yield return record;
         }
 
         LogExtractionCompleted();
+    }
+
+
+
+    /// <summary>
+    /// Runs the optional <see cref="RecordValidator"/> against a parsed record.
+    /// For <see cref="ValidationAction.Skip"/> it increments the skipped count and
+    /// logs; the caller performs the actual skip/stop control flow.
+    /// </summary>
+    private ValidationAction ApplyRecordValidation(TRecord record)
+    {
+        if (RecordValidator == null)
+        {
+            return ValidationAction.Accept;
+        }
+
+        var result = RecordValidator(record);
+        switch (result.Action)
+        {
+            case ValidationAction.Skip:
+                IncrementCurrentSkippedItemCount();
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug
+                    (
+                        "Record at line {LineNumber} skipped by validator: {Reason}",
+                        _currentLineNumber,
+                        result.Reason ?? "(no reason given)"
+                    );
+                }
+                return ValidationAction.Skip;
+
+            case ValidationAction.Stop:
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug
+                    (
+                        "Extraction stopped by validator at line {LineNumber}: {Reason}",
+                        _currentLineNumber,
+                        result.Reason ?? "(no reason given)"
+                    );
+                }
+                return ValidationAction.Stop;
+
+            default:
+                return ValidationAction.Accept;
+        }
     }
 
 
