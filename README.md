@@ -128,6 +128,23 @@ using var loader = new FixedWidthLoader<PersonRecord>(writeGzip);
 
 See the [CompressedStreams](examples/CompressedStreams) example for a complete GZip and Brotli round trip.
 
+### Controlling line endings
+
+`FixedWidthExtractor` reads any line ending automatically — `\n`, `\r`, or `\r\n` — so no configuration is needed for input.
+
+For **output**, the loader writes each record with its `TextWriter`'s newline. To force a specific ending regardless of the platform you run on — for example, a downstream mainframe or FTP consumer that requires Unix `\n` — pass a `TextWriter` with the `NewLine` you want:
+
+```csharp
+// Force Unix (LF) line endings, even on Windows
+await using var stream = File.Create("output.dat");
+await using var writer = new StreamWriter(stream) { NewLine = "\n" };
+using var loader = new FixedWidthLoader<PersonRecord>(writer);
+
+await loader.LoadAsync(records, CancellationToken.None);
+```
+
+`NewLine` accepts any string (`"\n"`, `"\r\n"`, or a custom terminator). The default is `Environment.NewLine`.
+
 ---
 
 ## ✨ Features
