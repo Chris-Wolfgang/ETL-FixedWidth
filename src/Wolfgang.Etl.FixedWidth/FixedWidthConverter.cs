@@ -237,7 +237,8 @@ public static class FixedWidthConverter
         (
             text,
             context.PropertyType,
-            context.Format
+            context.Format,
+            numberStyles: context.NumberStyles
         );
 
 
@@ -299,7 +300,8 @@ public static class FixedWidthConverter
         ReadOnlyMemory<char> text,
         Type targetType,
         string? format,
-        TypeConverter? cachedConverter = null
+        TypeConverter? cachedConverter = null,
+        NumberStyles? numberStyles = null
     )
     {
         var span = text.Span;
@@ -315,7 +317,8 @@ public static class FixedWidthConverter
                 text,
                 underlying,
                 format,
-                cachedConverter
+                cachedConverter,
+                numberStyles
             );
         }
 
@@ -341,12 +344,14 @@ public static class FixedWidthConverter
         }
 
 #if NET8_0_OR_GREATER
-        var numericResult = ParseNumericSpan(span, targetType);
+        var numericResult = ParseNumericSpan(span, targetType, numberStyles);
+#else
+        var numericResult = ParseNumericString(text.ToString(), targetType, numberStyles);
+#endif
         if (numericResult != null)
         {
             return numericResult;
         }
-#endif
 
         return ParseViaTypeConverter(text, targetType, cachedConverter);
     }
@@ -377,6 +382,27 @@ public static class FixedWidthConverter
             targetType,
             CultureInfo.InvariantCulture
         );
+    }
+
+
+
+    /// <summary>
+    /// Resolves the effective <see cref="NumberStyles"/> for a numeric parse: the
+    /// explicitly requested style when set, otherwise the target type's natural
+    /// style — <see cref="NumberStyles.Number"/> for decimal / floating-point types
+    /// and <see cref="NumberStyles.Integer"/> for integral types (matching
+    /// <c>decimal.Parse</c> / <c>int.Parse</c>).
+    /// </summary>
+    private static NumberStyles ResolveNumberStyles(NumberStyles? requestedStyle, TypeCode typeCode)
+    {
+        if (requestedStyle.HasValue)
+        {
+            return requestedStyle.Value;
+        }
+
+        return typeCode is TypeCode.Decimal or TypeCode.Double or TypeCode.Single
+            ? NumberStyles.Number
+            : NumberStyles.Integer;
     }
 
 
@@ -427,6 +453,51 @@ public static class FixedWidthConverter
             format,
             CultureInfo.InvariantCulture
         );
+    }
+
+
+
+    /// <summary>
+    /// Parses a numeric value from <paramref name="text"/> using
+    /// <paramref name="requestedStyle"/> (or the type's natural style when null) and
+    /// <see cref="CultureInfo.InvariantCulture"/>. The net8+ build uses the
+    /// allocation-free span overloads instead
+    /// (<c>ParseNumericSpan</c>). Returns <see langword="null"/> when
+    /// <paramref name="targetType"/> is not a supported numeric type.
+    /// </summary>
+    private static object? ParseNumericString(string text, Type targetType, NumberStyles? requestedStyle)
+    {
+        var culture = CultureInfo.InvariantCulture;
+
+        // Enums share a TypeCode with their underlying integral type; exclude them
+        // so the TypeConverter fallback (which parses enum member names) is used.
+        if (targetType.IsEnum)
+        {
+            return null;
+        }
+
+        var typeCode = Type.GetTypeCode(targetType);
+        var style = ResolveNumberStyles(requestedStyle, typeCode);
+
+        // Switch on TypeCode (a dense enum) so the JIT emits a jump table rather
+        // than the sequential type comparisons an if-ladder or a Dictionary lookup
+        // would produce.
+        return typeCode switch
+        {
+            TypeCode.Int32 => int.Parse(text, style, culture),
+            TypeCode.Int64 => long.Parse(text, style, culture),
+            TypeCode.Decimal => decimal.Parse(text, style, culture),
+            TypeCode.Double => double.Parse(text, style, culture),
+            TypeCode.Single => float.Parse(text, style, culture),
+            TypeCode.Int16 => short.Parse(text, style, culture),
+            TypeCode.Byte => byte.Parse(text, style, culture),
+            TypeCode.Boolean => bool.Parse(text),
+            TypeCode.UInt32 => uint.Parse(text, style, culture),
+            TypeCode.UInt64 => ulong.Parse(text, style, culture),
+            TypeCode.UInt16 => ushort.Parse(text, style, culture),
+            TypeCode.SByte => sbyte.Parse(text, style, culture),
+            _ => (object?)null,
+        };
     }
 #endif
 
@@ -489,37 +560,39 @@ public static class FixedWidthConverter
     /// recognized type, signalling the caller to fall back to the
     /// <see cref="TypeDescriptor"/> path.
     /// </summary>
-    private static object? ParseNumericSpan(ReadOnlySpan<char> span, Type targetType)
+    private static object? ParseNumericSpan(ReadOnlySpan<char> span, Type targetType, NumberStyles? requestedStyle)
     {
-        var style = NumberStyles.Any;
         var culture = CultureInfo.InvariantCulture;
 
-        if (targetType == typeof(int))
-            return int.Parse(span, style, culture);
-        if (targetType == typeof(long))
-            return long.Parse(span, style, culture);
-        if (targetType == typeof(decimal))
-            return decimal.Parse(span, style, culture);
-        if (targetType == typeof(double))
-            return double.Parse(span, style, culture);
-        if (targetType == typeof(float))
-            return float.Parse(span, style, culture);
-        if (targetType == typeof(short))
-            return short.Parse(span, style, culture);
-        if (targetType == typeof(byte))
-            return byte.Parse(span, style, culture);
-        if (targetType == typeof(bool))
-            return bool.Parse(span);
-        if (targetType == typeof(uint))
-            return uint.Parse(span, style, culture);
-        if (targetType == typeof(ulong))
-            return ulong.Parse(span, style, culture);
-        if (targetType == typeof(ushort))
-            return ushort.Parse(span, style, culture);
-        if (targetType == typeof(sbyte))
-            return sbyte.Parse(span, style, culture);
+        // Enums share a TypeCode with their underlying integral type; exclude them
+        // so the TypeConverter fallback (which parses enum member names) is used.
+        if (targetType.IsEnum)
+        {
+            return null;
+        }
 
-        return null;
+        var typeCode = Type.GetTypeCode(targetType);
+        var style = ResolveNumberStyles(requestedStyle, typeCode);
+
+        // Switch on TypeCode (a dense enum) so the JIT emits a jump table rather
+        // than the sequential type comparisons an if-ladder or a Dictionary lookup
+        // would produce. Keeps the allocation-free span overloads.
+        return typeCode switch
+        {
+            TypeCode.Int32 => int.Parse(span, style, culture),
+            TypeCode.Int64 => long.Parse(span, style, culture),
+            TypeCode.Decimal => decimal.Parse(span, style, culture),
+            TypeCode.Double => double.Parse(span, style, culture),
+            TypeCode.Single => float.Parse(span, style, culture),
+            TypeCode.Int16 => short.Parse(span, style, culture),
+            TypeCode.Byte => byte.Parse(span, style, culture),
+            TypeCode.Boolean => bool.Parse(span),
+            TypeCode.UInt32 => uint.Parse(span, style, culture),
+            TypeCode.UInt64 => ulong.Parse(span, style, culture),
+            TypeCode.UInt16 => ushort.Parse(span, style, culture),
+            TypeCode.SByte => sbyte.Parse(span, style, culture),
+            _ => (object?)null,
+        };
     }
 #endif
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Wolfgang.Etl.FixedWidth.Enums;
 
 namespace Wolfgang.Etl.FixedWidth;
@@ -30,7 +31,8 @@ public sealed class FieldContext
         char pad,
         FieldAlignment alignment,
         string? format,
-        string headerLabel
+        string headerLabel,
+        NumberStyles? numberStyles = null
     )
     {
         PropertyName = propertyName;
@@ -40,6 +42,7 @@ public sealed class FieldContext
         Alignment = alignment;
         Format = format;
         HeaderLabel = headerLabel;
+        NumberStyles = numberStyles;
     }
 
 
@@ -99,4 +102,13 @@ public sealed class FieldContext
     /// <see langword="null"/> if none was specified.
     /// </summary>
     public string? Format { get; }
+
+
+
+    /// <summary>
+    /// The <see cref="System.Globalization.NumberStyles"/> permitted when parsing a
+    /// numeric field, from the field attribute, or <see langword="null"/> to use the
+    /// target type's natural style.
+    /// </summary>
+    public NumberStyles? NumberStyles { get; }
 }

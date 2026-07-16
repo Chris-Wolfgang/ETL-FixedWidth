@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `FixedWidthExtractor` and `FixedWidthLoader`. Defaults to `Encoding.UTF8`
   (non-breaking); pass e.g. `new UTF8Encoding(false)` to write without a BOM,
   or a code-page encoding for EBCDIC/mainframe data ([#16]).
+- `NumberStyles` property on `[FixedWidthField]` controlling how a numeric field
+  is parsed during extraction. Defaults to `null`, using the target type's
+  natural style — `Integer` for integral types, `Number` for
+  `decimal`/`double`/`float` (matching `int.Parse` / `decimal.Parse`, parsed with
+  `InvariantCulture`). Set it explicitly — e.g. `NumberStyles.Currency` — to
+  accept currency symbols, scientific notation, or parenthesized negatives ([#9]).
 - `RecordValidator` callback on `FixedWidthExtractor` (`Func<TRecord,
   ValidationResult>?`) invoked after a record is parsed but before it is
   yielded. Return `ValidationResult.Accept()`, `.Skip(reason)` (rejects the
@@ -33,6 +39,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `SkipItemCount` budget. Records discarded by `MalformedLineHandling.Skip`
   now increment the new `CurrentRejectedItemCount` instead — a behavior change
   from 0.4.0, where they counted toward `CurrentSkippedItemCount` ([#18]).
+- Numeric fields are now parsed with the target type's natural `NumberStyles`
+  (`Integer` / `Number`) by default, consistently across every target framework,
+  configurable via `[FixedWidthField(NumberStyles = …)]`. Previously net8.0+
+  parsed with `NumberStyles.Any` and .NET Framework / netstandard used
+  `TypeConverter.ConvertFromInvariantString`. As a result, currency symbols,
+  scientific notation, and parenthesized negatives no longer parse by default —
+  opt in per field with an explicit `NumberStyles` ([#9]).
 
 ### Deprecated
 
@@ -169,6 +182,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#62]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/62
 [#83]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/83
 [#84]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/84
+[#9]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/9
 [#16]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/16
 [#18]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/18
 [#86]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/86

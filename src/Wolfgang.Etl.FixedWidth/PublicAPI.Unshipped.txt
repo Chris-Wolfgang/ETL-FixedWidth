@@ -1,4 +1,7 @@
 #nullable enable
+Wolfgang.Etl.FixedWidth.Attributes.FixedWidthFieldAttribute.NumberStyles.get -> System.Globalization.NumberStyles
+Wolfgang.Etl.FixedWidth.Attributes.FixedWidthFieldAttribute.NumberStyles.set -> void
+Wolfgang.Etl.FixedWidth.FieldContext.NumberStyles.get -> System.Globalization.NumberStyles?
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream stream, System.Text.Encoding encoding = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>> logger, System.Text.Encoding encoding = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream stream, System.Text.Encoding encoding = null) -> void
