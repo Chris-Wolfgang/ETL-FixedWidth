@@ -15,11 +15,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   or a code-page encoding for EBCDIC/mainframe data ([#16]).
 - `RecordValidator` callback on `FixedWidthExtractor` (`Func<TRecord,
   ValidationResult>?`) invoked after a record is parsed but before it is
-  yielded. Return `ValidationResult.Accept()`, `.Skip(reason)` (drops the
-  record and increments `CurrentSkippedItemCount`), or `.Stop(reason)` (ends
-  extraction). Defaults to `null` (no validation) ([#18]).
+  yielded. Return `ValidationResult.Accept()`, `.Skip(reason)` (rejects the
+  record), or `.Stop(reason)` (ends extraction). Defaults to `null` (no
+  validation) ([#18]).
+- Line-accounting counters on `FixedWidthExtractor` (surfaced on
+  `FixedWidthReport`): `CurrentRejectedItemCount` (records dropped by
+  `MalformedLineHandling.Skip` or `RecordValidator.Skip`) and
+  `CurrentFilteredLineCount` (non-record lines: headers, the separator, blank
+  lines dropped per `BlankLineHandling`, `LineFilter`-skipped lines, and the
+  early-termination trigger line). Together they close the line accounting:
+  `CurrentLineNumber = CurrentItemCount + CurrentSkippedItemCount +
+  CurrentRejectedItemCount + CurrentFilteredLineCount` ([#18]).
 
 ### Changed
+
+- `CurrentSkippedItemCount` now counts **only** records skipped by the
+  `SkipItemCount` budget. Records discarded by `MalformedLineHandling.Skip`
+  now increment the new `CurrentRejectedItemCount` instead — a behavior change
+  from 0.4.0, where they counted toward `CurrentSkippedItemCount` ([#18]).
 
 ### Deprecated
 

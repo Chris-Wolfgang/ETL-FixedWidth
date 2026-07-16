@@ -66,6 +66,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
     private long _currentLineNumber;
+    private int _currentRejectedItemCount;
+    private int _currentFilteredLineCount;
 
     // _currentLineNumber is read by CreateProgressReport on a Timer threadpool thread
     // and written by ExtractWorkerAsync on the async continuation thread.
@@ -500,6 +502,40 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// </remarks>
     public long CurrentLineNumber => Interlocked.Read(ref _currentLineNumber);
 
+
+
+    /// <summary>
+    /// The number of parsed records rejected so far: records discarded via
+    /// <see cref="Enums.MalformedLineHandling.Skip"/> and records rejected by
+    /// <see cref="RecordValidator"/>. Distinct from
+    /// <see cref="ExtractorBase{TRecord,FixedWidthReport}.CurrentSkippedItemCount"/>
+    /// (the <c>SkipItemCount</c> pagination budget).
+    /// </summary>
+    public int CurrentRejectedItemCount => Volatile.Read(ref _currentRejectedItemCount);
+
+
+
+    /// <summary>
+    /// The number of physical lines read that did not produce a record and were
+    /// neither skipped by the budget nor rejected: header lines, the separator line,
+    /// blank lines dropped per <see cref="BlankLineHandling"/>, lines dropped by
+    /// <see cref="LineFilter"/>, and the line that triggered early termination. With
+    /// <see cref="CurrentLineNumber"/> this closes the line accounting:
+    /// <c>CurrentLineNumber = CurrentItemCount + CurrentSkippedItemCount +
+    /// CurrentRejectedItemCount + CurrentFilteredLineCount</c>.
+    /// </summary>
+    public int CurrentFilteredLineCount => Volatile.Read(ref _currentFilteredLineCount);
+
+
+
+    private void IncrementRejectedItemCount() => Interlocked.Increment(ref _currentRejectedItemCount);
+
+
+
+    private void IncrementFilteredLineCount() => Interlocked.Increment(ref _currentFilteredLineCount);
+
+
+
     /// <summary>
     /// Creates a progress report snapshot for the current extractor state.
     /// </summary>
@@ -507,6 +543,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// A <see cref="FixedWidthReport"/> snapshot containing
     /// <see cref="ExtractorBase{TRecord,FixedWidthReport}.CurrentItemCount"/>,
     /// <see cref="ExtractorBase{TRecord,FixedWidthReport}.CurrentSkippedItemCount"/>,
+    /// <see cref="CurrentRejectedItemCount"/>, <see cref="CurrentFilteredLineCount"/>,
     /// and <see cref="CurrentLineNumber"/> at the moment of the call.
     /// </returns>
     protected override FixedWidthReport CreateProgressReport()
@@ -515,6 +552,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         (
             CurrentItemCount,
             CurrentSkippedItemCount,
+            CurrentRejectedItemCount,
+            CurrentFilteredLineCount,
             Interlocked.Read(ref _currentLineNumber)
         );
     }
@@ -610,6 +649,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
             if (IsStructuralLine(separatorLineNo))
             {
+                IncrementFilteredLineCount();
                 LogDebugStructuralLineSkipped();
                 continue;
             }
@@ -618,6 +658,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             {
                 if (!HandleBlankLine(fieldMap, out var defaultRecord))
                 {
+                    IncrementFilteredLineCount();
                     LogDebugBlankLineSkipped();
                     continue;
                 }
@@ -634,6 +675,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
                 if (CurrentItemCount >= MaximumItemCount)
                 {
+                    IncrementFilteredLineCount();
                     LogDebugMaxReached();
                     LogExtractionCompleted();
                     yield break;
@@ -648,12 +690,14 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             var filterAction = LineFilter(line);
             if (filterAction == LineAction.Stop)
             {
+                IncrementFilteredLineCount();
                 LogDebugLineFilterStop();
                 LogExtractionCompleted();
                 yield break;
             }
             if (filterAction == LineAction.Skip)
             {
+                IncrementFilteredLineCount();
                 LogDebugLineFilterSkip();
                 continue;
             }
@@ -668,6 +712,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
             if (CurrentItemCount >= MaximumItemCount)
             {
+                IncrementFilteredLineCount();
                 LogDebugMaxReached();
                 LogExtractionCompleted();
                 yield break;
@@ -685,6 +730,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             }
             if (validation == ValidationAction.Stop)
             {
+                IncrementFilteredLineCount();
                 LogExtractionCompleted();
                 yield break;
             }
@@ -701,7 +747,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
     /// <summary>
     /// Runs the optional <see cref="RecordValidator"/> against a parsed record.
-    /// For <see cref="ValidationAction.Skip"/> it increments the skipped count and
+    /// For <see cref="ValidationAction.Skip"/> it increments the rejected count and
     /// logs; the caller performs the actual skip/stop control flow.
     /// </summary>
     private ValidationAction ApplyRecordValidation(TRecord record)
@@ -715,7 +761,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         switch (result.Action)
         {
             case ValidationAction.Skip:
-                IncrementCurrentSkippedItemCount();
+                IncrementRejectedItemCount();
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
                     _logger.LogDebug
@@ -1085,7 +1131,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             switch (MalformedLineHandling)
             {
                 case MalformedLineHandling.Skip:
-                    IncrementCurrentSkippedItemCount();
+                    IncrementRejectedItemCount();
                     return false;
 
                 case MalformedLineHandling.ReturnDefault:

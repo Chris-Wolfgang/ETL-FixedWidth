@@ -28,10 +28,12 @@ public record FixedWidthReport : Report
     // ------------------------------------------------------------------
 
     /// <summary>
-    /// Initializes a new instance of <see cref="FixedWidthReport"/>.
+    /// Initializes a new instance of <see cref="FixedWidthReport"/> with the
+    /// rejected and filtered counts defaulted to zero. Retained for backward
+    /// compatibility; prefer the five-parameter overload.
     /// </summary>
     /// <param name="currentCount">The number of data records processed so far.</param>
-    /// <param name="currentSkippedItemCount">The number of records skipped so far.</param>
+    /// <param name="currentSkippedItemCount">The number of records skipped by the skip budget so far.</param>
     /// <param name="currentLineNumber">
     /// The 1-based physical line number currently being processed in the file.
     /// </param>
@@ -41,9 +43,35 @@ public record FixedWidthReport : Report
         int currentSkippedItemCount,
         long currentLineNumber
     )
+        : this(currentCount, currentSkippedItemCount, 0, 0, currentLineNumber)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="FixedWidthReport"/>.
+    /// </summary>
+    /// <param name="currentCount">The number of data records processed so far.</param>
+    /// <param name="currentSkippedItemCount">The number of records skipped by the skip budget so far.</param>
+    /// <param name="currentRejectedItemCount">The number of records rejected so far (extractor only).</param>
+    /// <param name="currentFilteredLineCount">The number of non-record lines read so far (extractor only).</param>
+    /// <param name="currentLineNumber">
+    /// The 1-based physical line number currently being processed in the file.
+    /// </param>
+    public FixedWidthReport
+    (
+        int currentCount,
+        int currentSkippedItemCount,
+        int currentRejectedItemCount,
+        int currentFilteredLineCount,
+        long currentLineNumber
+    )
         : base(currentCount)
     {
         CurrentSkippedItemCount = currentSkippedItemCount;
+        CurrentRejectedItemCount = currentRejectedItemCount;
+        CurrentFilteredLineCount = currentFilteredLineCount;
         CurrentLineNumber = currentLineNumber;
     }
 
@@ -54,12 +82,35 @@ public record FixedWidthReport : Report
     // ------------------------------------------------------------------
 
     /// <summary>
-    /// The number of records skipped so far. For the extractor, includes records
-    /// skipped by the skip budget and records silently discarded due to
-    /// <see cref="MalformedLineHandling.Skip"/>. For the loader, includes records
+    /// The number of records skipped by the <c>SkipItemCount</c> budget (pagination)
+    /// so far. This does <em>not</em> include records rejected for content or data
+    /// quality — see <see cref="CurrentRejectedItemCount"/> — nor non-record lines —
+    /// see <see cref="CurrentFilteredLineCount"/>. For the loader, includes records
     /// skipped by the skip budget.
     /// </summary>
     public int CurrentSkippedItemCount { get; }
+
+
+
+    /// <summary>
+    /// (Extractor only.) The number of parsed records rejected so far: records
+    /// discarded via <see cref="MalformedLineHandling.Skip"/> and records rejected
+    /// by <c>RecordValidator</c>. Always <c>0</c> for the loader.
+    /// </summary>
+    public int CurrentRejectedItemCount { get; }
+
+
+
+    /// <summary>
+    /// (Extractor only.) The number of physical lines read that did not produce a
+    /// record and were neither skipped by the budget nor rejected: header lines, the
+    /// separator line, blank lines dropped per <see cref="BlankLineHandling"/>, lines
+    /// dropped by <c>LineFilter</c>, and the line that triggered early termination.
+    /// With <see cref="CurrentLineNumber"/> this closes the line accounting:
+    /// <c>CurrentLineNumber = CurrentItemCount + CurrentSkippedItemCount +
+    /// CurrentRejectedItemCount + CurrentFilteredLineCount</c>. Always <c>0</c> for the loader.
+    /// </summary>
+    public int CurrentFilteredLineCount { get; }
 
 
 

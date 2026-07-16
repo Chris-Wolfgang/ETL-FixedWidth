@@ -60,7 +60,8 @@ public class FixedWidthRecordValidatorTests
         var results = await ExtractAsync(extractor);
 
         Assert.Equal(new[] { "Alice", "Carol" }, results.Select(r => r.FirstName));
-        Assert.Equal(1, extractor.CurrentSkippedItemCount);
+        Assert.Equal(1, extractor.CurrentRejectedItemCount);
+        Assert.Equal(0, extractor.CurrentSkippedItemCount);
         Assert.Equal(2, extractor.CurrentItemCount);
     }
 
@@ -93,6 +94,7 @@ public class FixedWidthRecordValidatorTests
 
         Assert.Equal(3, results.Count);
         Assert.Equal(0, extractor.CurrentSkippedItemCount);
+        Assert.Equal(0, extractor.CurrentRejectedItemCount);
     }
 
 
