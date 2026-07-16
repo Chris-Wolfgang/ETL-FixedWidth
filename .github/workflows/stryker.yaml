@@ -10,6 +10,14 @@
 # - schedule (weekly Sunday 06:00 UTC): catch quality regressions between
 #   releases without burning CI time on every PR (mutation testing is slow)
 #
+# Quality gate (#145): stryker-config.json sets thresholds.break, so a run whose
+# mutation score falls below the floor exits non-zero and fails this workflow —
+# turning the score into an enforced release-gate quality bar rather than an
+# advisory number. The floor starts at 70% (current score ~74.7%, with headroom
+# for run-to-run variance) and is ratcheted up as surviving mutants are killed.
+# A per-PR gate is intentionally NOT added — full mutation testing is too slow to
+# run on every PR (see the scheduled-run rationale above).
+#
 # Stryker discovers each test project's mutation targets via the standard
 # project-reference graph. Two configuration modes are supported:
 # - Root stryker-config.json (umbrella): if present, runs Stryker once with
