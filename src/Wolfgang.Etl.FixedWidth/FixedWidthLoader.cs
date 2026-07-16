@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -159,10 +160,15 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     /// The <see cref="Stream"/> to write fixed-width records to. The stream must be
     /// writable. The caller retains ownership — the loader does not dispose the stream.
     /// </param>
+    /// <param name="encoding">
+    /// The <see cref="Encoding"/> used to encode the output. Pass <see langword="null"/>
+    /// (the default) to use <see cref="Encoding.UTF8"/>. Use <c>new UTF8Encoding(false)</c>
+    /// to write UTF-8 without a byte-order mark.
+    /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
-    public FixedWidthLoader(Stream stream)
+    public FixedWidthLoader(Stream stream, Encoding? encoding = null)
     {
-        _writer = CreateBufferedWriter(stream);
+        _writer = CreateBufferedWriter(stream, encoding);
         _ownsWriter = true;
         _logger = NullLogger.Instance;
     }
@@ -180,16 +186,22 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     /// writable. The caller retains ownership — the loader does not dispose the stream.
     /// </param>
     /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="encoding">
+    /// The <see cref="Encoding"/> used to encode the output. Pass <see langword="null"/>
+    /// (the default) to use <see cref="Encoding.UTF8"/>. Use <c>new UTF8Encoding(false)</c>
+    /// to write UTF-8 without a byte-order mark.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="stream"/> or <paramref name="logger"/> is null.
     /// </exception>
     public FixedWidthLoader
     (
         Stream stream,
-        ILogger<FixedWidthLoader<TRecord>> logger
+        ILogger<FixedWidthLoader<TRecord>> logger,
+        Encoding? encoding = null
     )
     {
-        _writer = CreateBufferedWriter(stream);
+        _writer = CreateBufferedWriter(stream, encoding);
         _ownsWriter = true;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -221,7 +233,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
     {
-        _writer = CreateBufferedWriter(stream);
+        _writer = CreateBufferedWriter(stream, encoding: null);
         _ownsWriter = true;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
         _logger = logger ?? (ILogger)NullLogger.Instance;
@@ -231,14 +243,15 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
     /// <summary>
     /// Creates the internal <see cref="StreamWriter"/> shared by the
-    /// <see cref="Stream"/>-based constructors: UTF-8, a 64 KB buffer, and
-    /// <c>leaveOpen: true</c> so the caller retains stream ownership.
+    /// <see cref="Stream"/>-based constructors: the requested encoding (or
+    /// <see cref="Encoding.UTF8"/>), a 64 KB buffer, and <c>leaveOpen: true</c>
+    /// so the caller retains stream ownership.
     /// </summary>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
-    private static StreamWriter CreateBufferedWriter(Stream stream)
+    private static StreamWriter CreateBufferedWriter(Stream stream, Encoding? encoding)
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
-        return new StreamWriter(stream, encoding: System.Text.Encoding.UTF8, bufferSize: DefaultBufferSize, leaveOpen: true);
+        return new StreamWriter(stream, encoding: encoding ?? Encoding.UTF8, bufferSize: DefaultBufferSize, leaveOpen: true);
     }
 
 
@@ -401,6 +414,8 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         (
             CurrentItemCount,
             CurrentSkippedItemCount,
+            currentRejectedItemCount: 0,
+            currentFilteredLineCount: 0,
             Interlocked.Read(ref _currentLineNumber)
         );
     }

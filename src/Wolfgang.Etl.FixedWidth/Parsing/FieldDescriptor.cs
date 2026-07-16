@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using Wolfgang.Etl.FixedWidth.Attributes;
@@ -36,7 +37,10 @@ internal sealed class FieldDescriptor
             attribute.Pad,
             attribute.Alignment,
             attribute.Format,
-            attribute.Header ?? property.Name
+            attribute.Header ?? property.Name,
+            attribute.NumberStyles == FixedWidthFieldAttribute.UnspecifiedNumberStyles
+                ? (NumberStyles?)null
+                : attribute.NumberStyles
         );
         Getter = property.GetMethod != null && property.GetMethod.IsPublic
             ? CompileGetter(property)
