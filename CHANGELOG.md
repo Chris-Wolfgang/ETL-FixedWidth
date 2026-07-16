@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [0.5.0] - 2026-07-16
+
+### Added
+
 - Optional `Encoding` parameter on the `Stream`-based constructors of
   `FixedWidthExtractor` and `FixedWidthLoader`. Defaults to `Encoding.UTF8`
   (non-breaking); pass e.g. `new UTF8Encoding(false)` to write without a BOM,
@@ -46,14 +60,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `TypeConverter.ConvertFromInvariantString`. As a result, currency symbols,
   scientific notation, and parenthesized negatives no longer parse by default —
   opt in per field with an explicit `NumberStyles` ([#9]).
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## [0.4.0] - 2026-07-14
 
@@ -168,7 +174,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   parsing for reduced allocations.
 - Nine runnable example console apps covering the major features.
 
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.2.3...v0.3.0
 [0.2.3]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.2.2...v0.2.3
