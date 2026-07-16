@@ -31,3 +31,13 @@ Facts a maintainer would need at 2am if the release identity is compromised. Gen
 - **Owner**: @Chris-Wolfgang.
 - **Downstream consumers**: no known `Wolfgang.*` fleet dependents (ETL-FixedWidth is a leaf library); unknown external consumers may exist on nuget.org.
 - **Package coordinates for unlisting**: `Wolfgang.Etl.FixedWidth` on nuget.org — <https://www.nuget.org/packages/Wolfgang.Etl.FixedWidth/>.
+
+## Verifying package provenance
+
+Each release attaches a signed [SLSA build-provenance](https://slsa.dev/) attestation binding the published `.nupkg` (by SHA-256 digest) to the exact repository, commit, and workflow run that produced it — generated keylessly via the release workflow's OIDC identity (`actions/attest-build-provenance`). To verify a downloaded package was built from this repo:
+
+```sh
+gh attestation verify Wolfgang.Etl.FixedWidth.<version>.nupkg --owner Chris-Wolfgang
+```
+
+Package *signing* (an author signature via a code-signing certificate) is intentionally out of scope; provenance attestation provides the build-integrity guarantee without a signing key to manage.
