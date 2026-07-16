@@ -120,6 +120,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.Enums.ValidationAction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.Enums.ValidationAction.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.Enums.ValidationAction",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.Enums.ValidationAction.yml\" sourcestartlinenumber=\"1\">The action a record validator asks the extractor to take for a parsed record.\nReturned via <xref href=\"Wolfgang.Etl.FixedWidth.ValidationResult\" data-throw-if-not-resolved=\"false\"></xref> from\n<xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601.RecordValidator\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Wolfgang.Etl.FixedWidth.Enums.yml",
       "output": {
         ".html": {
@@ -285,6 +299,20 @@
       "IsMRef": true,
       "Title": "Wolfgang.Etl.FixedWidth.FixedWidthValueParser",
       "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthValueParser.yml\" sourcestartlinenumber=\"1\">Converts a raw field value read from the file into the target property type.\nThe <code class=\"paramref\">text</code> is a zero-copy slice of the source line — call\n<xref href=\"System.ReadOnlyMemory%601.ToString\" data-throw-if-not-resolved=\"false\"></xref> only if you need a <xref href=\"System.String\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.ValidationResult.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.ValidationResult.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.ValidationResult",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.ValidationResult.yml\" sourcestartlinenumber=\"1\">The result returned by a <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601.RecordValidator\" data-throw-if-not-resolved=\"false\"></xref>\ndelegate: the <xref href=\"Wolfgang.Etl.FixedWidth.Enums.ValidationAction\" data-throw-if-not-resolved=\"false\"></xref> to take for a parsed record and an\noptional human-readable reason (surfaced in debug logs).</p>\n"
     },
     {
       "type": "ManagedReference",

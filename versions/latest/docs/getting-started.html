@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/docfx_project/docs/getting-started.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.5.0/docfx_project/docs/getting-started.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -143,6 +143,19 @@ Console.WriteLine(writer.ToString());
 Console.WriteLine($&quot;Total loaded: {loader.CurrentItemCount}&quot;);
 </code></pre>
 <p>In production, replace <code>StringReader</code> / <code>StringWriter</code> with a <code>FileStream</code> or <code>StreamReader</code> — the extractor and loader accept any <code>TextReader</code> / <code>TextWriter</code>, or a raw <code>Stream</code> directly.</p>
+<h3 id="controlling-line-endings">Controlling line endings</h3>
+<p><code>FixedWidthExtractor</code> reads <code>\n</code>, <code>\r</code>, and <code>\r\n</code> automatically, so input needs no configuration.</p>
+<p>For output, the loader writes each record with its <code>TextWriter</code>'s newline. To force a specific ending regardless of platform — e.g. Unix <code>\n</code> for a downstream mainframe or FTP consumer — pass a <code>TextWriter</code> with the <code>NewLine</code> you want:</p>
+<pre><code class="lang-csharp">using System.IO;
+
+// Force Unix (LF) line endings, even on Windows
+await using var stream = File.Create(&quot;output.dat&quot;);
+await using var writer = new StreamWriter(stream) { NewLine = &quot;\n&quot; };
+using var loader = new FixedWidthLoader&lt;PersonRecord&gt;(writer);
+
+await loader.LoadAsync(recordsAsyncEnumerable, CancellationToken.None);
+</code></pre>
+<p><code>NewLine</code> accepts any string; the default is <code>Environment.NewLine</code>.</p>
 <h2 id="next-steps">Next Steps</h2>
 <ul>
 <li>Browse the <a href="examples.html">Examples</a> for more detailed scenarios</li>
@@ -164,7 +177,7 @@ Console.WriteLine($&quot;Total loaded: {loader.CurrentItemCount}&quot;);
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.4.0/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.5.0/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>
