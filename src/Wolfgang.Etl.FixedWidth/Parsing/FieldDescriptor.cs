@@ -36,7 +36,8 @@ internal sealed class FieldDescriptor
             attribute.Pad,
             attribute.Alignment,
             attribute.Format,
-            attribute.Header ?? property.Name
+            attribute.Header ?? property.Name,
+            attribute.NumberStyles
         );
         Getter = property.GetMethod != null && property.GetMethod.IsPublic
             ? CompileGetter(property)

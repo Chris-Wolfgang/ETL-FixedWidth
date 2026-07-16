@@ -237,7 +237,8 @@ public static class FixedWidthConverter
         (
             text,
             context.PropertyType,
-            context.Format
+            context.Format,
+            numberStyles: context.NumberStyles
         );
 
 
@@ -299,7 +300,8 @@ public static class FixedWidthConverter
         ReadOnlyMemory<char> text,
         Type targetType,
         string? format,
-        TypeConverter? cachedConverter = null
+        TypeConverter? cachedConverter = null,
+        NumberStyles numberStyles = NumberStyles.Any
     )
     {
         var span = text.Span;
@@ -315,7 +317,8 @@ public static class FixedWidthConverter
                 text,
                 underlying,
                 format,
-                cachedConverter
+                cachedConverter,
+                numberStyles
             );
         }
 
@@ -341,12 +344,14 @@ public static class FixedWidthConverter
         }
 
 #if NET8_0_OR_GREATER
-        var numericResult = ParseNumericSpan(span, targetType);
+        var numericResult = ParseNumericSpan(span, targetType, numberStyles);
+#else
+        var numericResult = ParseNumericString(text.ToString(), targetType, numberStyles);
+#endif
         if (numericResult != null)
         {
             return numericResult;
         }
-#endif
 
         return ParseViaTypeConverter(text, targetType, cachedConverter);
     }
@@ -428,6 +433,47 @@ public static class FixedWidthConverter
             CultureInfo.InvariantCulture
         );
     }
+
+
+
+    /// <summary>
+    /// Parses a numeric value from <paramref name="text"/> using the supplied
+    /// <paramref name="style"/> and <see cref="CultureInfo.InvariantCulture"/>.
+    /// The net8+ build uses the allocation-free span overloads instead
+    /// (<c>ParseNumericSpan</c>). Returns <see langword="null"/> when
+    /// <paramref name="targetType"/> is not a supported numeric type.
+    /// </summary>
+    private static object? ParseNumericString(string text, Type targetType, NumberStyles style)
+    {
+        var culture = CultureInfo.InvariantCulture;
+
+        if (targetType == typeof(int))
+            return int.Parse(text, style, culture);
+        if (targetType == typeof(long))
+            return long.Parse(text, style, culture);
+        if (targetType == typeof(decimal))
+            return decimal.Parse(text, style, culture);
+        if (targetType == typeof(double))
+            return double.Parse(text, style, culture);
+        if (targetType == typeof(float))
+            return float.Parse(text, style, culture);
+        if (targetType == typeof(short))
+            return short.Parse(text, style, culture);
+        if (targetType == typeof(byte))
+            return byte.Parse(text, style, culture);
+        if (targetType == typeof(bool))
+            return bool.Parse(text);
+        if (targetType == typeof(uint))
+            return uint.Parse(text, style, culture);
+        if (targetType == typeof(ulong))
+            return ulong.Parse(text, style, culture);
+        if (targetType == typeof(ushort))
+            return ushort.Parse(text, style, culture);
+        if (targetType == typeof(sbyte))
+            return sbyte.Parse(text, style, culture);
+
+        return null;
+    }
 #endif
 
 
@@ -489,9 +535,8 @@ public static class FixedWidthConverter
     /// recognized type, signalling the caller to fall back to the
     /// <see cref="TypeDescriptor"/> path.
     /// </summary>
-    private static object? ParseNumericSpan(ReadOnlySpan<char> span, Type targetType)
+    private static object? ParseNumericSpan(ReadOnlySpan<char> span, Type targetType, NumberStyles style)
     {
-        var style = NumberStyles.Any;
         var culture = CultureInfo.InvariantCulture;
 
         if (targetType == typeof(int))

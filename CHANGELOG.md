@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `FixedWidthExtractor` and `FixedWidthLoader`. Defaults to `Encoding.UTF8`
   (non-breaking); pass e.g. `new UTF8Encoding(false)` to write without a BOM,
   or a code-page encoding for EBCDIC/mainframe data ([#16]).
+- `NumberStyles` property on `[FixedWidthField]` controlling how a numeric field
+  is parsed during extraction. Defaults to `NumberStyles.Any` (parsed with
+  `InvariantCulture`); restrict it — e.g. `NumberStyles.Integer` — to reject
+  decimals or thousands separators ([#9]).
 - `RecordValidator` callback on `FixedWidthExtractor` (`Func<TRecord,
   ValidationResult>?`) invoked after a record is parsed but before it is
   yielded. Return `ValidationResult.Accept()`, `.Skip(reason)` (rejects the
@@ -33,6 +37,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `SkipItemCount` budget. Records discarded by `MalformedLineHandling.Skip`
   now increment the new `CurrentRejectedItemCount` instead — a behavior change
   from 0.4.0, where they counted toward `CurrentSkippedItemCount` ([#18]).
+- On .NET Framework / netstandard targets, numeric fields are now parsed with an
+  explicit `NumberStyles` (defaulting to `NumberStyles.Any`) rather than
+  `TypeConverter.ConvertFromInvariantString`, matching net8.0+ behavior — so
+  values with thousands separators, currency symbols, or parenthesized negatives
+  parse identically on every target framework ([#9]).
 
 ### Deprecated
 
@@ -169,6 +178,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#62]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/62
 [#83]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/83
 [#84]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/84
+[#9]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/9
 [#16]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/16
 [#18]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/18
 [#86]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/86

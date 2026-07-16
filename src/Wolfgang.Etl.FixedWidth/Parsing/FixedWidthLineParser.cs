@@ -499,7 +499,7 @@ internal static class FixedWidthLineParser
             // Fast path: when using the default parser, pass the cached TypeConverter
             // to avoid TypeDescriptor.GetConverter on every field of every record.
             var converted = ReferenceEquals(valueParser, FixedWidthConverter.DefaultParser)
-                ? FixedWidthConverter.ParseValue(value, descriptor.Context.PropertyType, descriptor.Context.Format, descriptor.TypeConverter)
+                ? FixedWidthConverter.ParseValue(value, descriptor.Context.PropertyType, descriptor.Context.Format, descriptor.TypeConverter, descriptor.Context.NumberStyles)
                 : valueParser(value, descriptor.Context);
             descriptor.Setter(record!, converted);
         }

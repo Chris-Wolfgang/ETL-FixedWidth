@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Wolfgang.Etl.FixedWidth.Enums;
 
 namespace Wolfgang.Etl.FixedWidth.Attributes;
@@ -144,6 +145,19 @@ public sealed class FixedWidthFieldAttribute : Attribute
     /// <c>"D5"</c> for a zero-padded integer.
     /// </summary>
     public string? Format { get; set; }
+
+
+
+    /// <summary>
+    /// The <see cref="System.Globalization.NumberStyles"/> permitted when parsing a
+    /// numeric property during a read (extract) operation. Defaults to
+    /// <see cref="System.Globalization.NumberStyles.Any"/>. Restrict it to reject
+    /// unwanted forms — for example
+    /// <see cref="System.Globalization.NumberStyles.Integer"/> to disallow decimals
+    /// and thousands separators. Parsing always uses
+    /// <see cref="System.Globalization.CultureInfo.InvariantCulture"/>.
+    /// </summary>
+    public NumberStyles NumberStyles { get; set; } = NumberStyles.Any;
 
 
 
