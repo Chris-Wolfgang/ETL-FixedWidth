@@ -66,6 +66,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
     private long _currentLineNumber;
+    private int _currentRejectedItemCount;
+    private int _currentFilteredLineCount;
 
     // _currentLineNumber is read by CreateProgressReport on a Timer threadpool thread
     // and written by ExtractWorkerAsync on the async continuation thread.
@@ -340,6 +342,26 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
 
     /// <summary>
+    /// An optional callback invoked for each fully parsed record, after
+    /// <see cref="ValueParser"/> and field assignment but before the record is
+    /// yielded. Return <see cref="ValidationResult.Accept"/> to yield it,
+    /// <see cref="ValidationResult.Skip"/> to drop it (increments
+    /// <c>CurrentSkippedItemCount</c>), or <see cref="ValidationResult.Stop"/> to
+    /// end extraction. <see langword="null"/> (the default) applies no validation.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// extractor.RecordValidator = record =>
+    ///     record.Balance &lt; 0
+    ///         ? ValidationResult.Skip("Negative balance")
+    ///         : ValidationResult.Accept();
+    /// </code>
+    /// </example>
+    public Func<TRecord, ValidationResult>? RecordValidator { get; set; }
+
+
+
+    /// <summary>
     /// A delegate that converts a raw string read from the file into the target property
     /// type. The <see cref="FieldContext"/> provides the property type, format string, and
     /// other field metadata needed to perform the conversion.
@@ -480,6 +502,40 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// </remarks>
     public long CurrentLineNumber => Interlocked.Read(ref _currentLineNumber);
 
+
+
+    /// <summary>
+    /// The number of parsed records rejected so far: records discarded via
+    /// <see cref="Enums.MalformedLineHandling.Skip"/> and records rejected by
+    /// <see cref="RecordValidator"/>. Distinct from
+    /// <see cref="ExtractorBase{TRecord,FixedWidthReport}.CurrentSkippedItemCount"/>
+    /// (the <c>SkipItemCount</c> pagination budget).
+    /// </summary>
+    public int CurrentRejectedItemCount => Volatile.Read(ref _currentRejectedItemCount);
+
+
+
+    /// <summary>
+    /// The number of physical lines read that did not produce a record and were
+    /// neither skipped by the budget nor rejected: header lines, the separator line,
+    /// blank lines dropped per <see cref="BlankLineHandling"/>, lines dropped by
+    /// <see cref="LineFilter"/>, and the line that triggered early termination. With
+    /// <see cref="CurrentLineNumber"/> this closes the line accounting:
+    /// <c>CurrentLineNumber = CurrentItemCount + CurrentSkippedItemCount +
+    /// CurrentRejectedItemCount + CurrentFilteredLineCount</c>.
+    /// </summary>
+    public int CurrentFilteredLineCount => Volatile.Read(ref _currentFilteredLineCount);
+
+
+
+    private void IncrementRejectedItemCount() => Interlocked.Increment(ref _currentRejectedItemCount);
+
+
+
+    private void IncrementFilteredLineCount() => Interlocked.Increment(ref _currentFilteredLineCount);
+
+
+
     /// <summary>
     /// Creates a progress report snapshot for the current extractor state.
     /// </summary>
@@ -487,6 +543,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// A <see cref="FixedWidthReport"/> snapshot containing
     /// <see cref="ExtractorBase{TRecord,FixedWidthReport}.CurrentItemCount"/>,
     /// <see cref="ExtractorBase{TRecord,FixedWidthReport}.CurrentSkippedItemCount"/>,
+    /// <see cref="CurrentRejectedItemCount"/>, <see cref="CurrentFilteredLineCount"/>,
     /// and <see cref="CurrentLineNumber"/> at the moment of the call.
     /// </returns>
     protected override FixedWidthReport CreateProgressReport()
@@ -495,6 +552,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         (
             CurrentItemCount,
             CurrentSkippedItemCount,
+            CurrentRejectedItemCount,
+            CurrentFilteredLineCount,
             Interlocked.Read(ref _currentLineNumber)
         );
     }
@@ -590,6 +649,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
             if (IsStructuralLine(separatorLineNo))
             {
+                IncrementFilteredLineCount();
                 LogDebugStructuralLineSkipped();
                 continue;
             }
@@ -598,6 +658,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             {
                 if (!HandleBlankLine(fieldMap, out var defaultRecord))
                 {
+                    IncrementFilteredLineCount();
                     LogDebugBlankLineSkipped();
                     continue;
                 }
@@ -614,6 +675,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
                 if (CurrentItemCount >= MaximumItemCount)
                 {
+                    IncrementFilteredLineCount();
                     LogDebugMaxReached();
                     LogExtractionCompleted();
                     yield break;
@@ -628,12 +690,14 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             var filterAction = LineFilter(line);
             if (filterAction == LineAction.Stop)
             {
+                IncrementFilteredLineCount();
                 LogDebugLineFilterStop();
                 LogExtractionCompleted();
                 yield break;
             }
             if (filterAction == LineAction.Skip)
             {
+                IncrementFilteredLineCount();
                 LogDebugLineFilterSkip();
                 continue;
             }
@@ -648,6 +712,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
             if (CurrentItemCount >= MaximumItemCount)
             {
+                IncrementFilteredLineCount();
                 LogDebugMaxReached();
                 LogExtractionCompleted();
                 yield break;
@@ -658,12 +723,71 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
                 continue;
             }
 
+            var validation = ApplyRecordValidation(record);
+            if (validation == ValidationAction.Skip)
+            {
+                continue;
+            }
+            if (validation == ValidationAction.Stop)
+            {
+                IncrementFilteredLineCount();
+                LogExtractionCompleted();
+                yield break;
+            }
+
             LogDebugRecordParsed();
             IncrementCurrentItemCount();
             yield return record;
         }
 
         LogExtractionCompleted();
+    }
+
+
+
+    /// <summary>
+    /// Runs the optional <see cref="RecordValidator"/> against a parsed record.
+    /// For <see cref="ValidationAction.Skip"/> it increments the rejected count and
+    /// logs; the caller performs the actual skip/stop control flow.
+    /// </summary>
+    private ValidationAction ApplyRecordValidation(TRecord record)
+    {
+        if (RecordValidator == null)
+        {
+            return ValidationAction.Accept;
+        }
+
+        var result = RecordValidator(record);
+        switch (result.Action)
+        {
+            case ValidationAction.Skip:
+                IncrementRejectedItemCount();
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug
+                    (
+                        "Record at line {LineNumber} skipped by validator: {Reason}",
+                        _currentLineNumber,
+                        result.Reason ?? "(no reason given)"
+                    );
+                }
+                return ValidationAction.Skip;
+
+            case ValidationAction.Stop:
+                if (_logger.IsEnabled(LogLevel.Debug))
+                {
+                    _logger.LogDebug
+                    (
+                        "Extraction stopped by validator at line {LineNumber}: {Reason}",
+                        _currentLineNumber,
+                        result.Reason ?? "(no reason given)"
+                    );
+                }
+                return ValidationAction.Stop;
+
+            default:
+                return ValidationAction.Accept;
+        }
     }
 
 
@@ -1007,7 +1131,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             switch (MalformedLineHandling)
             {
                 case MalformedLineHandling.Skip:
-                    IncrementCurrentSkippedItemCount();
+                    IncrementRejectedItemCount();
                     return false;
 
                 case MalformedLineHandling.ReturnDefault:

@@ -893,10 +893,10 @@ public class FixedWidthExtractorTests
 
 
     [Fact]
-    public async Task ExtractAsync_when_using_FixedWidthReport_and_MalformedLineHandling_is_Skip_CurrentSkippedItemCount_reflects_skipped_malformed_lines()
+    public async Task ExtractAsync_when_MalformedLineHandling_is_Skip_CurrentRejectedItemCount_reflects_rejected_malformed_lines()
     {
         const string content = "John      Smith     042\n" +
-                               "Bad       Line     \n" + // too short — skipped
+                               "Bad       Line     \n" + // too short — rejected
                                "Jane      Doe       030";
 
         var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
@@ -911,9 +911,16 @@ public class FixedWidthExtractorTests
             2,
             extractor.CurrentItemCount
         );
+        // Malformed-line skips now count as rejections, not skips (the
+        // SkipItemCount pagination budget owns CurrentSkippedItemCount).
         Assert.Equal
         (
             1,
+            extractor.CurrentRejectedItemCount
+        );
+        Assert.Equal
+        (
+            0,
             extractor.CurrentSkippedItemCount
         );
     }

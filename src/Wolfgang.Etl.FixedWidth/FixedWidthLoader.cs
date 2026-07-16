@@ -414,6 +414,8 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         (
             CurrentItemCount,
             CurrentSkippedItemCount,
+            currentRejectedItemCount: 0,
+            currentFilteredLineCount: 0,
             Interlocked.Read(ref _currentLineNumber)
         );
     }
