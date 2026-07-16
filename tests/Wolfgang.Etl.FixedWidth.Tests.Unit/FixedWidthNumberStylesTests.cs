@@ -12,13 +12,16 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 
 /// <summary>
 /// Covers the <see cref="FixedWidthFieldAttribute.NumberStyles"/> property (#9).
+/// The default (<see langword="null"/>) uses the target type's natural style —
+/// <c>Integer</c> for integral types, <c>Number</c> for decimal / floating-point —
+/// so the permissive forms (currency, exponent, parentheses) must be opted into.
 /// </summary>
 public class FixedWidthNumberStylesTests
 {
     [ExcludeFromCodeCoverage]
     private class MoneyRecord
     {
-        // Default NumberStyles.Any — permissive.
+        // Default (null) -> Number for decimal: allows sign, decimal, thousands.
         [FixedWidthField(0, 12)]
         public decimal Amount { get; set; }
     }
@@ -26,11 +29,21 @@ public class FixedWidthNumberStylesTests
 
 
     [ExcludeFromCodeCoverage]
-    private class StrictIntRecord
+    private class PlainIntRecord
     {
-        // Integer only — no decimals, no thousands separators.
-        [FixedWidthField(0, 12, NumberStyles = NumberStyles.Integer)]
+        // Default (null) -> Integer for int: no decimals, no thousands.
+        [FixedWidthField(0, 12)]
         public int Value { get; set; }
+    }
+
+
+
+    [ExcludeFromCodeCoverage]
+    private class AnyMoneyRecord
+    {
+        // Explicit opt-in to the permissive forms (currency, parentheses, ...).
+        [FixedWidthField(0, 12, NumberStyles = NumberStyles.Any)]
+        public decimal Amount { get; set; }
     }
 
 
@@ -73,7 +86,7 @@ public class FixedWidthNumberStylesTests
 
 
     [Fact]
-    public async Task Default_Any_parses_thousands_and_decimal()
+    public async Task Default_for_decimal_allows_thousands_and_decimal_point()
     {
         var records = await ExtractAsync<MoneyRecord>("1,234.56    ");
 
@@ -83,31 +96,10 @@ public class FixedWidthNumberStylesTests
 
 
     [Fact]
-    public async Task Default_Any_parses_parenthesized_negative()
+    public async Task Default_for_decimal_rejects_a_parenthesized_negative()
     {
-        var records = await ExtractAsync<MoneyRecord>("(500)       ");
-
-        Assert.Equal(-500m, Assert.Single(records).Amount);
-    }
-
-
-
-    [Fact]
-    public async Task NumberStyles_Integer_parses_a_plain_integer()
-    {
-        var records = await ExtractAsync<StrictIntRecord>("1234        ");
-
-        Assert.Equal(1234, Assert.Single(records).Value);
-    }
-
-
-
-    [Fact]
-    public async Task NumberStyles_Integer_rejects_a_decimal_value()
-    {
-        // The Integer style disallows the decimal point, so parsing fails and the
-        // malformed line is skipped (rejected) rather than yielded.
-        var extractor = new FixedWidthExtractor<StrictIntRecord>(new StringReader("12.5        "))
+        // Parentheses are not part of the natural (Number) style — rejected.
+        var extractor = new FixedWidthExtractor<MoneyRecord>(new StringReader("(500)       "))
         {
             MalformedLineHandling = MalformedLineHandling.Skip,
         };
@@ -116,6 +108,43 @@ public class FixedWidthNumberStylesTests
 
         Assert.Empty(results);
         Assert.Equal(1, extractor.CurrentRejectedItemCount);
+    }
+
+
+
+    [Fact]
+    public async Task Default_for_int_parses_a_plain_integer()
+    {
+        var records = await ExtractAsync<PlainIntRecord>("1234        ");
+
+        Assert.Equal(1234, Assert.Single(records).Value);
+    }
+
+
+
+    [Fact]
+    public async Task Default_for_int_rejects_a_decimal_point()
+    {
+        // Integer (the natural style for int) disallows the decimal point.
+        var extractor = new FixedWidthExtractor<PlainIntRecord>(new StringReader("12.5        "))
+        {
+            MalformedLineHandling = MalformedLineHandling.Skip,
+        };
+
+        var results = await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
+
+        Assert.Empty(results);
+        Assert.Equal(1, extractor.CurrentRejectedItemCount);
+    }
+
+
+
+    [Fact]
+    public async Task Explicit_NumberStyles_Any_allows_a_parenthesized_negative()
+    {
+        var records = await ExtractAsync<AnyMoneyRecord>("(500)       ");
+
+        Assert.Equal(-500m, Assert.Single(records).Amount);
     }
 
 

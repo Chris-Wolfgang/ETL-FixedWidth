@@ -32,7 +32,7 @@ public sealed class FieldContext
         FieldAlignment alignment,
         string? format,
         string headerLabel,
-        NumberStyles numberStyles = NumberStyles.Any
+        NumberStyles? numberStyles = null
     )
     {
         PropertyName = propertyName;
@@ -107,8 +107,8 @@ public sealed class FieldContext
 
     /// <summary>
     /// The <see cref="System.Globalization.NumberStyles"/> permitted when parsing a
-    /// numeric field, from the field attribute. Defaults to
-    /// <see cref="System.Globalization.NumberStyles.Any"/>.
+    /// numeric field, from the field attribute, or <see langword="null"/> to use the
+    /// target type's natural style.
     /// </summary>
-    public NumberStyles NumberStyles { get; }
+    public NumberStyles? NumberStyles { get; }
 }

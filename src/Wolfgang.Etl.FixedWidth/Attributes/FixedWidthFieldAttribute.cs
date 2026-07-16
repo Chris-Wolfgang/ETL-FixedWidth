@@ -149,15 +149,27 @@ public sealed class FixedWidthFieldAttribute : Attribute
 
 
     /// <summary>
+    /// Sentinel for <see cref="NumberStyles"/> meaning "not specified" — resolved to
+    /// the target type's natural style. Nullable enums cannot be attribute arguments,
+    /// so an out-of-range value stands in for "unset".
+    /// </summary>
+    internal const NumberStyles UnspecifiedNumberStyles = (NumberStyles)(-1);
+
+
+
+    /// <summary>
     /// The <see cref="System.Globalization.NumberStyles"/> permitted when parsing a
-    /// numeric property during a read (extract) operation. Defaults to
-    /// <see cref="System.Globalization.NumberStyles.Any"/>. Restrict it to reject
-    /// unwanted forms — for example
-    /// <see cref="System.Globalization.NumberStyles.Integer"/> to disallow decimals
-    /// and thousands separators. Parsing always uses
+    /// numeric property during a read (extract) operation. Leave unset to use the
+    /// target type's natural style —
+    /// <see cref="System.Globalization.NumberStyles.Integer"/> for integral types and
+    /// <see cref="System.Globalization.NumberStyles.Number"/> for
+    /// <see cref="decimal"/>/<see cref="double"/>/<see cref="float"/> — matching
+    /// <c>int.Parse</c> / <c>decimal.Parse</c>. Set it explicitly to opt into other
+    /// forms, e.g. <see cref="System.Globalization.NumberStyles.Currency"/> to accept
+    /// currency symbols or parenthesized negatives. Parsing always uses
     /// <see cref="System.Globalization.CultureInfo.InvariantCulture"/>.
     /// </summary>
-    public NumberStyles NumberStyles { get; set; } = NumberStyles.Any;
+    public NumberStyles NumberStyles { get; set; } = UnspecifiedNumberStyles;
 
 
 

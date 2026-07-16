@@ -301,7 +301,7 @@ public static class FixedWidthConverter
         Type targetType,
         string? format,
         TypeConverter? cachedConverter = null,
-        NumberStyles numberStyles = NumberStyles.Any
+        NumberStyles? numberStyles = null
     )
     {
         var span = text.Span;
@@ -386,6 +386,27 @@ public static class FixedWidthConverter
 
 
 
+    /// <summary>
+    /// Resolves the effective <see cref="NumberStyles"/> for a numeric parse: the
+    /// explicitly requested style when set, otherwise the target type's natural
+    /// style — <see cref="NumberStyles.Number"/> for decimal / floating-point types
+    /// and <see cref="NumberStyles.Integer"/> for integral types (matching
+    /// <c>decimal.Parse</c> / <c>int.Parse</c>).
+    /// </summary>
+    private static NumberStyles ResolveNumberStyles(NumberStyles? requestedStyle, TypeCode typeCode)
+    {
+        if (requestedStyle.HasValue)
+        {
+            return requestedStyle.Value;
+        }
+
+        return typeCode is TypeCode.Decimal or TypeCode.Double or TypeCode.Single
+            ? NumberStyles.Number
+            : NumberStyles.Integer;
+    }
+
+
+
 #if !NET8_0_OR_GREATER
     /// <summary>
     /// Parses a <see cref="DateTime"/>, <see cref="DateTimeOffset"/>, or
@@ -437,13 +458,14 @@ public static class FixedWidthConverter
 
 
     /// <summary>
-    /// Parses a numeric value from <paramref name="text"/> using the supplied
-    /// <paramref name="style"/> and <see cref="CultureInfo.InvariantCulture"/>.
-    /// The net8+ build uses the allocation-free span overloads instead
+    /// Parses a numeric value from <paramref name="text"/> using
+    /// <paramref name="requestedStyle"/> (or the type's natural style when null) and
+    /// <see cref="CultureInfo.InvariantCulture"/>. The net8+ build uses the
+    /// allocation-free span overloads instead
     /// (<c>ParseNumericSpan</c>). Returns <see langword="null"/> when
     /// <paramref name="targetType"/> is not a supported numeric type.
     /// </summary>
-    private static object? ParseNumericString(string text, Type targetType, NumberStyles style)
+    private static object? ParseNumericString(string text, Type targetType, NumberStyles? requestedStyle)
     {
         var culture = CultureInfo.InvariantCulture;
 
@@ -454,10 +476,13 @@ public static class FixedWidthConverter
             return null;
         }
 
+        var typeCode = Type.GetTypeCode(targetType);
+        var style = ResolveNumberStyles(requestedStyle, typeCode);
+
         // Switch on TypeCode (a dense enum) so the JIT emits a jump table rather
         // than the sequential type comparisons an if-ladder or a Dictionary lookup
         // would produce.
-        return Type.GetTypeCode(targetType) switch
+        return typeCode switch
         {
             TypeCode.Int32 => int.Parse(text, style, culture),
             TypeCode.Int64 => long.Parse(text, style, culture),
@@ -535,7 +560,7 @@ public static class FixedWidthConverter
     /// recognized type, signalling the caller to fall back to the
     /// <see cref="TypeDescriptor"/> path.
     /// </summary>
-    private static object? ParseNumericSpan(ReadOnlySpan<char> span, Type targetType, NumberStyles style)
+    private static object? ParseNumericSpan(ReadOnlySpan<char> span, Type targetType, NumberStyles? requestedStyle)
     {
         var culture = CultureInfo.InvariantCulture;
 
@@ -546,10 +571,13 @@ public static class FixedWidthConverter
             return null;
         }
 
+        var typeCode = Type.GetTypeCode(targetType);
+        var style = ResolveNumberStyles(requestedStyle, typeCode);
+
         // Switch on TypeCode (a dense enum) so the JIT emits a jump table rather
         // than the sequential type comparisons an if-ladder or a Dictionary lookup
         // would produce. Keeps the allocation-free span overloads.
-        return Type.GetTypeCode(targetType) switch
+        return typeCode switch
         {
             TypeCode.Int32 => int.Parse(span, style, culture),
             TypeCode.Int64 => long.Parse(span, style, culture),

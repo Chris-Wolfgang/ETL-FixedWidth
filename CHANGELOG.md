@@ -14,9 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (non-breaking); pass e.g. `new UTF8Encoding(false)` to write without a BOM,
   or a code-page encoding for EBCDIC/mainframe data ([#16]).
 - `NumberStyles` property on `[FixedWidthField]` controlling how a numeric field
-  is parsed during extraction. Defaults to `NumberStyles.Any` (parsed with
-  `InvariantCulture`); restrict it — e.g. `NumberStyles.Integer` — to reject
-  decimals or thousands separators ([#9]).
+  is parsed during extraction. Defaults to `null`, using the target type's
+  natural style — `Integer` for integral types, `Number` for
+  `decimal`/`double`/`float` (matching `int.Parse` / `decimal.Parse`, parsed with
+  `InvariantCulture`). Set it explicitly — e.g. `NumberStyles.Currency` — to
+  accept currency symbols, scientific notation, or parenthesized negatives ([#9]).
 - `RecordValidator` callback on `FixedWidthExtractor` (`Func<TRecord,
   ValidationResult>?`) invoked after a record is parsed but before it is
   yielded. Return `ValidationResult.Accept()`, `.Skip(reason)` (rejects the
@@ -37,11 +39,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `SkipItemCount` budget. Records discarded by `MalformedLineHandling.Skip`
   now increment the new `CurrentRejectedItemCount` instead — a behavior change
   from 0.4.0, where they counted toward `CurrentSkippedItemCount` ([#18]).
-- On .NET Framework / netstandard targets, numeric fields are now parsed with an
-  explicit `NumberStyles` (defaulting to `NumberStyles.Any`) rather than
-  `TypeConverter.ConvertFromInvariantString`, matching net8.0+ behavior — so
-  values with thousands separators, currency symbols, or parenthesized negatives
-  parse identically on every target framework ([#9]).
+- Numeric fields are now parsed with the target type's natural `NumberStyles`
+  (`Integer` / `Number`) by default, consistently across every target framework,
+  configurable via `[FixedWidthField(NumberStyles = …)]`. Previously net8.0+
+  parsed with `NumberStyles.Any` and .NET Framework / netstandard used
+  `TypeConverter.ConvertFromInvariantString`. As a result, currency symbols,
+  scientific notation, and parenthesized negatives no longer parse by default —
+  opt in per field with an explicit `NumberStyles` ([#9]).
 
 ### Deprecated
 
