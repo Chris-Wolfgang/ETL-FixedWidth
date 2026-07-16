@@ -35,6 +35,24 @@ public class FixedWidthNumberStylesTests
 
 
 
+    private enum Priority
+    {
+        Low,
+        Medium,
+        High,
+    }
+
+
+
+    [ExcludeFromCodeCoverage]
+    private class TicketRecord
+    {
+        [FixedWidthField(0, 8)]
+        public Priority Priority { get; set; }
+    }
+
+
+
     private static async Task<T[]> ExtractAsync<T>(string line, MalformedLineHandling malformed = MalformedLineHandling.ThrowException)
         where T : notnull, new()
     {
@@ -98,5 +116,18 @@ public class FixedWidthNumberStylesTests
 
         Assert.Empty(results);
         Assert.Equal(1, extractor.CurrentRejectedItemCount);
+    }
+
+
+
+    [Fact]
+    public async Task Enum_field_parses_by_member_name_not_its_underlying_integer()
+    {
+        // Enums share a TypeCode with their underlying integral type; the parser
+        // must route them to the TypeConverter (which parses "High"), not to
+        // int.Parse.
+        var records = await ExtractAsync<TicketRecord>("High    ");
+
+        Assert.Equal(Priority.High, Assert.Single(records).Priority);
     }
 }

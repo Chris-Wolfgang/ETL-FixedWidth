@@ -447,32 +447,32 @@ public static class FixedWidthConverter
     {
         var culture = CultureInfo.InvariantCulture;
 
-        if (targetType == typeof(int))
-            return int.Parse(text, style, culture);
-        if (targetType == typeof(long))
-            return long.Parse(text, style, culture);
-        if (targetType == typeof(decimal))
-            return decimal.Parse(text, style, culture);
-        if (targetType == typeof(double))
-            return double.Parse(text, style, culture);
-        if (targetType == typeof(float))
-            return float.Parse(text, style, culture);
-        if (targetType == typeof(short))
-            return short.Parse(text, style, culture);
-        if (targetType == typeof(byte))
-            return byte.Parse(text, style, culture);
-        if (targetType == typeof(bool))
-            return bool.Parse(text);
-        if (targetType == typeof(uint))
-            return uint.Parse(text, style, culture);
-        if (targetType == typeof(ulong))
-            return ulong.Parse(text, style, culture);
-        if (targetType == typeof(ushort))
-            return ushort.Parse(text, style, culture);
-        if (targetType == typeof(sbyte))
-            return sbyte.Parse(text, style, culture);
+        // Enums share a TypeCode with their underlying integral type; exclude them
+        // so the TypeConverter fallback (which parses enum member names) is used.
+        if (targetType.IsEnum)
+        {
+            return null;
+        }
 
-        return null;
+        // Switch on TypeCode (a dense enum) so the JIT emits a jump table rather
+        // than the sequential type comparisons an if-ladder or a Dictionary lookup
+        // would produce.
+        return Type.GetTypeCode(targetType) switch
+        {
+            TypeCode.Int32 => int.Parse(text, style, culture),
+            TypeCode.Int64 => long.Parse(text, style, culture),
+            TypeCode.Decimal => decimal.Parse(text, style, culture),
+            TypeCode.Double => double.Parse(text, style, culture),
+            TypeCode.Single => float.Parse(text, style, culture),
+            TypeCode.Int16 => short.Parse(text, style, culture),
+            TypeCode.Byte => byte.Parse(text, style, culture),
+            TypeCode.Boolean => bool.Parse(text),
+            TypeCode.UInt32 => uint.Parse(text, style, culture),
+            TypeCode.UInt64 => ulong.Parse(text, style, culture),
+            TypeCode.UInt16 => ushort.Parse(text, style, culture),
+            TypeCode.SByte => sbyte.Parse(text, style, culture),
+            _ => (object?)null,
+        };
     }
 #endif
 
@@ -539,32 +539,32 @@ public static class FixedWidthConverter
     {
         var culture = CultureInfo.InvariantCulture;
 
-        if (targetType == typeof(int))
-            return int.Parse(span, style, culture);
-        if (targetType == typeof(long))
-            return long.Parse(span, style, culture);
-        if (targetType == typeof(decimal))
-            return decimal.Parse(span, style, culture);
-        if (targetType == typeof(double))
-            return double.Parse(span, style, culture);
-        if (targetType == typeof(float))
-            return float.Parse(span, style, culture);
-        if (targetType == typeof(short))
-            return short.Parse(span, style, culture);
-        if (targetType == typeof(byte))
-            return byte.Parse(span, style, culture);
-        if (targetType == typeof(bool))
-            return bool.Parse(span);
-        if (targetType == typeof(uint))
-            return uint.Parse(span, style, culture);
-        if (targetType == typeof(ulong))
-            return ulong.Parse(span, style, culture);
-        if (targetType == typeof(ushort))
-            return ushort.Parse(span, style, culture);
-        if (targetType == typeof(sbyte))
-            return sbyte.Parse(span, style, culture);
+        // Enums share a TypeCode with their underlying integral type; exclude them
+        // so the TypeConverter fallback (which parses enum member names) is used.
+        if (targetType.IsEnum)
+        {
+            return null;
+        }
 
-        return null;
+        // Switch on TypeCode (a dense enum) so the JIT emits a jump table rather
+        // than the sequential type comparisons an if-ladder or a Dictionary lookup
+        // would produce. Keeps the allocation-free span overloads.
+        return Type.GetTypeCode(targetType) switch
+        {
+            TypeCode.Int32 => int.Parse(span, style, culture),
+            TypeCode.Int64 => long.Parse(span, style, culture),
+            TypeCode.Decimal => decimal.Parse(span, style, culture),
+            TypeCode.Double => double.Parse(span, style, culture),
+            TypeCode.Single => float.Parse(span, style, culture),
+            TypeCode.Int16 => short.Parse(span, style, culture),
+            TypeCode.Byte => byte.Parse(span, style, culture),
+            TypeCode.Boolean => bool.Parse(span),
+            TypeCode.UInt32 => uint.Parse(span, style, culture),
+            TypeCode.UInt64 => ulong.Parse(span, style, culture),
+            TypeCode.UInt16 => ushort.Parse(span, style, culture),
+            TypeCode.SByte => sbyte.Parse(span, style, culture),
+            _ => (object?)null,
+        };
     }
 #endif
 }
