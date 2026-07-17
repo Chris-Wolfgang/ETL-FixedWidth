@@ -1553,7 +1553,7 @@ jobs:
       - name: Run InspectCode
         shell: bash
         run: |
-          SLN=$(ls *.slnx 2>/dev/null | head -1)
+          SLN=$(find . -maxdepth 1 -name '*.slnx' | head -1)
           echo "Inspecting $SLN"
           jb inspectcode "$SLN" \
             --output=inspect.sarif \
