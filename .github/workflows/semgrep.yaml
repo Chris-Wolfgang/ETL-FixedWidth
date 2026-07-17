@@ -9,7 +9,11 @@ name: SAST (Semgrep)
 # version can't block merges — the current baseline is clean (0 findings), so this
 # can be promoted to a gate later.
 #
-# Uses the public Semgrep registry packs, which need no account/login.
+# Uses the public Semgrep registry packs, which need no account/login. The scan
+# is scoped to src/ (the shipped library) — SAST belongs on shipped code, and
+# scanning test/CI-helper scripts only produces false positives (e.g. stdlib xml
+# use in a CI trx parser that reads trusted, self-generated input). Repo-wide
+# secret scanning is already covered by gitleaks in pr.yaml.
 
 on:
   pull_request:
@@ -57,7 +61,7 @@ jobs:
             --config p/security-audit \
             --config p/secrets \
             --sarif --output semgrep.sarif \
-            --error || true
+            --error src/ || true
 
       - name: Upload Semgrep SARIF
         uses: github/codeql-action/upload-sarif@v4
