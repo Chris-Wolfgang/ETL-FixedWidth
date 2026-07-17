@@ -84,6 +84,14 @@ jobs:
           }' "${reports[@]}" > benchmarks-result.json
           echo "report=benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/benchmarks-result.json" >> "$GITHUB_OUTPUT"
 
+      - name: Reset working-tree churn before baseline checkout
+        # github-action-benchmark switches to the gh-pages branch to read the
+        # baseline; tracked working-tree churn aborts the switch with "local
+        # changes would be overwritten" (docfx.json is re-normalized on the Linux
+        # runner). Discard tracked changes first — the untracked
+        # benchmarks-result.json survives a branch switch and is read afterwards.
+        run: git checkout -- .
+
       - name: Compare against baseline & comment
         # Same action + SHA pin as benchmarks.yaml. Compares the PR result against
         # the gh-pages baseline (latest main data point) WITHOUT pushing:
