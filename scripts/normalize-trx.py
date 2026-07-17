@@ -11,7 +11,12 @@ when behaviour is identical.
 import glob
 import os
 import sys
-import xml.etree.ElementTree as ET
+
+# The .trx parsed here is produced by this repo's own `dotnet test` run in the
+# same CI job — it is not attacker-controlled input, so the stdlib parser's XXE /
+# entity-expansion exposure does not apply. Suppress semgrep's defusedxml rule
+# rather than add a dependency for a trusted, self-generated file.
+import xml.etree.ElementTree as ET  # nosemgrep: python.lang.security.use-defused-xml.use-defused-xml
 
 NS = "{http://microsoft.com/schemas/VisualStudio/TeamTest/2010}"
 
