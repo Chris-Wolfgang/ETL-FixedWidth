@@ -16,8 +16,10 @@ on:
       - main
       - vNext
     paths:
-      - 'src/**'
-      - 'benchmarks/**'
+      # Only run on actual code changes — a version/csproj/docs-only PR can't move
+      # the numbers, so it should not spend ~5 min on benchmarks.
+      - 'src/**/*.cs'
+      - 'benchmarks/**/*.cs'
       - '.github/workflows/pr-benchmarks.yaml'
   workflow_dispatch:
 
@@ -83,15 +85,6 @@ jobs:
             Benchmarks: [.[].Benchmarks[]]
           }' "${reports[@]}" > benchmarks-result.json
           echo "report=benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/benchmarks-result.json" >> "$GITHUB_OUTPUT"
-
-      - name: Ignore docfx.json churn before baseline checkout
-        # github-action-benchmark switches to gh-pages to read the baseline, which
-        # aborts if the tree is dirty. autocrlf on the Linux runner perpetually
-        # re-normalizes docfx_project/docfx.json (a plain `git checkout` just
-        # re-smudges it back to "modified"), so take it out of git's change
-        # tracking for the switch. The untracked benchmarks-result.json is
-        # unaffected and is still read afterwards.
-        run: git update-index --assume-unchanged docfx_project/docfx.json || true
 
       - name: Compare against baseline & comment
         # Same action + SHA pin as benchmarks.yaml. Compares the PR result against
