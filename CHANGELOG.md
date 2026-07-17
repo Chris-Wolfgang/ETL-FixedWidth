@@ -19,6 +19,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.5.1] - 2026-07-17
+
+Quality, supply-chain, and CI hardening. **No public API or runtime behaviour
+changes** — the shipped library is unchanged from 0.5.0.
+
+### Security
+
+- Release packages now carry a keyless **SLSA build-provenance attestation**
+  (via `actions/attest-build-provenance`), verifiable with
+  `gh attestation verify <package> --owner Chris-Wolfgang`. `SECURITY.md` gains a
+  "Release path & compromise scope" appendix and documents the verification
+  procedure ([#148], [#161]).
+- Added **PackageValidation** as a release gate that diffs each pack against the
+  previously published version and fails on an ABI break ([#146]).
+
+### Changed
+
+- Internal quality and CI hardening only, with no change to shipped code:
+  `CultureInfo` invariance test matrix ([#155]), CsCheck property-based fuzz
+  suite ([#139]), Verify snapshot tests ([#150]), and an XML-doc `<example>`
+  API-rot guard ([#151]); CI additions — workflow-security via actionlint +
+  zizmor ([#163]), OSSF Scorecard ([#162]), transitive-dependency license audit
+  ([#158]), Semgrep SAST ([#141]), build-reproducibility verification ([#156]),
+  and a cross-platform / ARM64 differential ([#149]); and new documentation —
+  Architecture Decision Records ([#160]), a major-version migration-guide
+  convention ([#159]), and an allocation-profile snapshot ([#157]).
+
 ## [0.5.0] - 2026-07-16
 
 ### Added
@@ -174,7 +201,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   parsing for reduced allocations.
 - Nine runnable example console apps covering the major features.
 
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.5.0...HEAD
+[#139]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/139
+[#141]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/141
+[#146]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/146
+[#148]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/148
+[#149]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/149
+[#150]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/150
+[#151]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/151
+[#155]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/155
+[#156]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/156
+[#157]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/157
+[#158]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/158
+[#159]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/159
+[#160]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/160
+[#161]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/161
+[#162]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/162
+[#163]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/163
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.2.3...v0.3.0
