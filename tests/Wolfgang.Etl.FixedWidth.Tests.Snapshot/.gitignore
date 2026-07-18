@@ -1,0 +1,2 @@
+# Verify received snapshots (local iteration only)
+*.received.*

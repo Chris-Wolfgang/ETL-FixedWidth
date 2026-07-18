@@ -53,6 +53,8 @@
     <Project Path="src/Wolfgang.Etl.FixedWidth/Wolfgang.Etl.FixedWidth.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Wolfgang.Etl.FixedWidth.Tests.Fuzz/Wolfgang.Etl.FixedWidth.Tests.Fuzz.csproj" />
+    <Project Path="tests/Wolfgang.Etl.FixedWidth.Tests.Snapshot/Wolfgang.Etl.FixedWidth.Tests.Snapshot.csproj" />
     <Project Path="tests/Wolfgang.Etl.FixedWidth.Tests.Unit/Wolfgang.Etl.FixedWidth.Tests.Unit.csproj" />
   </Folder>
 </Solution>
