@@ -182,6 +182,33 @@ Position  Field           Type    Length  Align  Pad  Format
 Total width: 24  |  Columns: 3 (2 fields + 1 skip)  |  Delimiter: none
 ```
 
+### Transforming between layouts
+
+To reformat a fixed-width file from one layout to another — reordering, adding/removing, or format-converting fields (a common mainframe-migration task) — `FixedWidthTransformer<TSource, TDestination>` is the projection stage between an extractor and a loader:
+
+```csharp
+using var extractor   = new FixedWidthExtractor<LegacyRecord>(sourceReader);
+using var transformer = new FixedWidthTransformer<LegacyRecord, ModernRecord>(
+    legacy => new ModernRecord
+    {
+        Id   = legacy.OldId,
+        Name = legacy.FullName.Trim(),
+    });
+using var loader      = new FixedWidthLoader<ModernRecord>(destinationWriter);
+
+// Extract → transform → load in a single streaming pass.
+var modern = transformer.TransformAsync(extractor.ExtractAsync(token), token);
+await loader.LoadAsync(modern, token);
+```
+
+The projection delegate handles every reformatting case. When source and destination differ only in layout — the same property names and compatible types — use the auto-mapping factory instead of writing the copy by hand:
+
+```csharp
+using var transformer = FixedWidthTransformer<LegacyRecord, ModernRecord>.ByMatchingProperties();
+```
+
+`ByMatchingProperties()` copies every source property to the destination property of the same name and an assignable type, and requires a public parameterless constructor on the destination.
+
 ---
 
 ## ✨ Features
@@ -205,6 +232,7 @@ Total width: 24  |  Columns: 3 (2 fields + 1 skip)  |  Delimiter: none
 | **Span-based numerics** | `Span<char>`-based numeric parsing on net8.0+ for reduced allocation |
 | **Compiled delegates** | Field accessors use compiled delegates instead of reflection for fast property get/set |
 | **Schema introspection** | `FixedWidthSchema.For<T>()` exposes the resolved layout (positions, widths, types, skips); `ToDiagram()` renders it as a text table |
+| **Format transformation** | `FixedWidthTransformer<TSource, TDestination>` projects one layout to another in a single streaming pass, with optional `ByMatchingProperties()` auto-mapping |
 | **Multi-TFM support** | net462, net481, netstandard2.0, net8.0, net10.0 |
 
 **Examples:**
