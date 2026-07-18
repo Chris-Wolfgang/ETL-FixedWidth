@@ -4,7 +4,7 @@
     <TargetFrameworks>net462;net481;netstandard2.0;net8.0;net10.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
-    <Version>0.5.0</Version>
+    <Version>0.5.1</Version>
     <!-- Pin AssemblyVersion to a fixed binding-stability baseline so consumers
          do not need to recompile / add binding redirects on every minor/patch
          bump. Bump only on a deliberate breaking API change. FileVersion +
@@ -13,6 +13,16 @@
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>$([System.Text.RegularExpressions.Regex]::Replace("$(Version)", "[-+].*$", "")).0</FileVersion>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <!-- Package validation (#146): diff each pack against the last published
+         version on NuGet and fail on an ABI break (removed/changed member,
+         nullability flip, dropped TFM) that a non-major bump forbids. This
+         catches behavioural / binary breaks that the PublicAPI.Shipped.txt diff
+         does not. Keep the baseline at the last PUBLISHED version; bump it only
+         after a new release is live on NuGet (otherwise pack fails NU1102).
+         Intentional breaks in a MAJOR bump are recorded via a generated
+         CompatibilitySuppressions.xml. -->
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageValidationBaselineVersion>0.5.0</PackageValidationBaselineVersion>
     <Title>Wolfgang.Etl.FixedWidth</Title>
     <Description>Extractor and Loader implementations for reading and writing fixed-width text files, built on Wolfgang.Etl.Abstractions.</Description>
     <PackageProjectUrl>https://github.com/Chris-Wolfgang/ETL-FixedWidth</PackageProjectUrl>
