@@ -1,0 +1,14 @@
+# zizmor configuration (#163).
+#
+# Pinning policy: first-party GitHub-owned actions (actions/*, github/*) may be
+# pinned to a tag ref; every third-party action must be pinned to a full commit
+# hash. This matches the repo's existing convention — the third-party actions
+# (NuGet/login, benchmark-action/*, peaceiris/*, softprops/*) are already
+# hash-pinned; the first-party actions/* and github/codeql-action/* are tag-pinned.
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        actions/*: ref-pin
+        github/*: ref-pin
+        "*": hash-pin
