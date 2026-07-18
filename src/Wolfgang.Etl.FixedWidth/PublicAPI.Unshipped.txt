@@ -1,1 +1,24 @@
 #nullable enable
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.Alignment.get -> Wolfgang.Etl.FixedWidth.Enums.FieldAlignment
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.ColumnIndex.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.EndPosition.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.Format.get -> string?
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.Header.get -> string?
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.IsSkip.get -> bool
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.Length.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.Name.get -> string?
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.NumberStyles.get -> System.Globalization.NumberStyles?
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.Pad.get -> char
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.PropertyType.get -> System.Type?
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.SkipMessage.get -> string?
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.StartPosition.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthSchema
+Wolfgang.Etl.FixedWidth.FixedWidthSchema.ExpectedLineWidth.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthSchema.FieldCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthSchema.Fields.get -> System.Collections.Generic.IReadOnlyList<Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo>
+Wolfgang.Etl.FixedWidth.FixedWidthSchema.RecordType.get -> System.Type
+Wolfgang.Etl.FixedWidth.FixedWidthSchema.SkipCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthSchema.TotalColumnCount.get -> int
+static Wolfgang.Etl.FixedWidth.FixedWidthSchema.For(System.Type recordType) -> Wolfgang.Etl.FixedWidth.FixedWidthSchema
+static Wolfgang.Etl.FixedWidth.FixedWidthSchema.For<T>() -> Wolfgang.Etl.FixedWidth.FixedWidthSchema
