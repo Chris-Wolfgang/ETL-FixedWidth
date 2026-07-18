@@ -117,8 +117,11 @@ public class CultureInvarianceTests
 
 
     // The invariant baseline: what the loader emits with no culture swap in effect.
-    private static readonly Lazy<string> InvariantBaseline =
-        new(() => SerializeAsync(Records).GetAwaiter().GetResult());
+    // Computed once at type initialization. A plain field (not Lazy<T>) avoids
+    // VSTHRD011 — wrapping a blocking-async factory in Lazy risks deadlock in real
+    // code; here the one-time synchronous init at type load is safe.
+    private static readonly string InvariantBaseline =
+        SerializeAsync(Records).GetAwaiter().GetResult();
 
 
 
@@ -130,7 +133,7 @@ public class CultureInvarianceTests
 
         var text = await SerializeAsync(Records);
 
-        Assert.Equal(InvariantBaseline.Value, text);
+        Assert.Equal(InvariantBaseline, text);
     }
 
 
