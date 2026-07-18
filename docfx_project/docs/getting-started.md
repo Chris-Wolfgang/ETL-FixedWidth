@@ -109,6 +109,52 @@ await loader.LoadAsync(recordsAsyncEnumerable, CancellationToken.None);
 
 `NewLine` accepts any string; the default is `Environment.NewLine`.
 
+### Inspecting the layout
+
+`FixedWidthSchema.For<T>()` exposes the resolved field layout as a read-only view — handy for generating documentation, building validation tooling, or debugging a mapping. It runs the same validation as extraction, so an invalid layout throws here too.
+
+```csharp
+var schema = FixedWidthSchema.For<PersonRecord>();
+
+foreach (var field in schema.Fields)   // includes skip columns (field.IsSkip)
+{
+    Console.WriteLine($"{field.StartPosition}-{field.EndPosition}  {field.Name}  ({field.Length})");
+}
+
+Console.WriteLine($"Line width: {schema.ExpectedLineWidth}, fields: {schema.FieldCount}, skips: {schema.SkipCount}");
+```
+
+Each `FixedWidthFieldInfo` carries `Name`, `StartPosition`/`EndPosition`, `Length`, `ColumnIndex`, `PropertyType`, `Alignment`, `Pad`, `Format`, `Header`, and `NumberStyles`. Skipped columns have `IsSkip == true` and a `SkipMessage`.
+
+`ToDiagram()` renders the layout as a text table for logs, tickets, or docs:
+
+```csharp
+Console.WriteLine(FixedWidthSchema.For<EmployeeRecord>().ToDiagram());
+// Position  Field           Type    Length  Align  Pad  Format
+// --------  --------------  ------  ------  -----  ---  ------
+// 0-9       FirstName       String  10      Left   ' '
+// 10-17     [skip]                  8
+// 18-23     EmployeeNumber  String  6       Left   ' '
+//
+// Total width: 24  |  Columns: 3 (2 fields + 1 skip)  |  Delimiter: none
+```
+
+### Transforming between layouts
+
+`FixedWidthTransformer<TSource, TDestination>` reformats records from one layout to another (reorder, add/remove, or format-convert fields) as the projection stage between an extractor and a loader:
+
+```csharp
+using var extractor   = new FixedWidthExtractor<LegacyRecord>(sourceReader);
+using var transformer = new FixedWidthTransformer<LegacyRecord, ModernRecord>(
+    legacy => new ModernRecord { Id = legacy.OldId, Name = legacy.FullName.Trim() });
+using var loader      = new FixedWidthLoader<ModernRecord>(destinationWriter);
+
+var modern = transformer.TransformAsync(extractor.ExtractAsync(token), token);
+await loader.LoadAsync(modern, token);
+```
+
+When source and destination share property names and compatible types, `FixedWidthTransformer<LegacyRecord, ModernRecord>.ByMatchingProperties()` builds the copy automatically (the destination needs a public parameterless constructor).
+
 ## Next Steps
 
 - Browse the [Examples](examples.md) for more detailed scenarios
