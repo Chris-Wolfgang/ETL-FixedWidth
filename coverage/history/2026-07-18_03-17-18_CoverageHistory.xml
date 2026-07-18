@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<coverage version="1.0" date="2026-07-18_03-17-18" tag="">
+  <assembly name="Wolfgang.Etl.FixedWidth">
+    <class name="Wolfgang.Etl.FixedWidth.Attributes.FixedWidthFieldAttribute" coveredlines="28" coverablelines="28" totallines="182" coveredbranches="4" totalbranches="4" coveredcodeelements="9" fullcoveredcodeelements="9" totalcodeelements="9" />
+    <class name="Wolfgang.Etl.FixedWidth.Attributes.FixedWidthSkipAttribute" coveredlines="23" coverablelines="23" totallines="95" coveredbranches="4" totalbranches="4" coveredcodeelements="4" fullcoveredcodeelements="4" totalcodeelements="4" />
+    <class name="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException" coveredlines="14" coverablelines="14" totallines="75" coveredbranches="0" totalbranches="0" coveredcodeelements="4" fullcoveredcodeelements="4" totalcodeelements="4" />
+    <class name="Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException" coveredlines="8" coverablelines="8" totallines="75" coveredbranches="0" totalbranches="0" coveredcodeelements="4" fullcoveredcodeelements="4" totalcodeelements="4" />
+    <class name="Wolfgang.Etl.FixedWidth.Exceptions.LineTooShortException" coveredlines="11" coverablelines="11" totallines="61" coveredbranches="0" totalbranches="0" coveredcodeelements="3" fullcoveredcodeelements="3" totalcodeelements="3" />
+    <class name="Wolfgang.Etl.FixedWidth.Exceptions.MalformedLineException" coveredlines="14" coverablelines="14" totallines="94" coveredbranches="0" totalbranches="0" coveredcodeelements="4" fullcoveredcodeelements="4" totalcodeelements="4" />
+    <class name="Wolfgang.Etl.FixedWidth.FieldContext" coveredlines="28" coverablelines="28" totallines="114" coveredbranches="0" totalbranches="0" coveredcodeelements="9" fullcoveredcodeelements="9" totalcodeelements="9" />
+    <class name="Wolfgang.Etl.FixedWidth.FixedWidthConverter" coveredlines="162" coverablelines="175" totallines="598" coveredbranches="69" totalbranches="74" coveredcodeelements="7" fullcoveredcodeelements="5" totalcodeelements="7" />
+    <class name="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1" coveredlines="324" coverablelines="352" totallines="1153" coveredbranches="100" totalbranches="120" coveredcodeelements="43" fullcoveredcodeelements="39" totalcodeelements="44" />
+    <class name="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1" coveredlines="197" coverablelines="210" totallines="729" coveredbranches="57" totalbranches="70" coveredcodeelements="26" fullcoveredcodeelements="24" totalcodeelements="27" />
+    <class name="Wolfgang.Etl.FixedWidth.FixedWidthReport" coveredlines="12" coverablelines="12" totallines="124" coveredbranches="0" totalbranches="0" coveredcodeelements="6" fullcoveredcodeelements="6" totalcodeelements="6" />
+    <class name="Wolfgang.Etl.FixedWidth.Parsing.FieldDescriptor" coveredlines="53" coverablelines="53" totallines="164" coveredbranches="6" totalbranches="8" coveredcodeelements="11" fullcoveredcodeelements="11" totalcodeelements="11" />
+    <class name="Wolfgang.Etl.FixedWidth.Parsing.FieldMap" coveredlines="67" coverablelines="67" totallines="197" coveredbranches="22" totalbranches="22" coveredcodeelements="14" fullcoveredcodeelements="14" totalcodeelements="14" />
+    <class name="Wolfgang.Etl.FixedWidth.Parsing.FieldMapResult" coveredlines="29" coverablelines="29" totallines="99" coveredbranches="2" totalbranches="2" coveredcodeelements="6" fullcoveredcodeelements="6" totalcodeelements="6" />
+    <class name="Wolfgang.Etl.FixedWidth.Parsing.FixedWidthLineParser" coveredlines="174" coverablelines="174" totallines="522" coveredbranches="63" totalbranches="66" coveredcodeelements="11" fullcoveredcodeelements="11" totalcodeelements="11" />
+    <class name="Wolfgang.Etl.FixedWidth.Parsing.FixedWidthMemoryExtensions" coveredlines="8" coverablelines="8" totallines="33" coveredbranches="8" totalbranches="8" coveredcodeelements="1" fullcoveredcodeelements="1" totalcodeelements="1" />
+    <class name="Wolfgang.Etl.FixedWidth.ValidationResult" coveredlines="9" coverablelines="9" totallines="53" coveredbranches="0" totalbranches="0" coveredcodeelements="6" fullcoveredcodeelements="6" totalcodeelements="6" />
+  </assembly>
+</coverage>
