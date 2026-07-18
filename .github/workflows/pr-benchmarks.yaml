@@ -16,8 +16,10 @@ on:
       - main
       - vNext
     paths:
-      - 'src/**'
-      - 'benchmarks/**'
+      # Only run on actual code changes — a version/csproj/docs-only PR can't move
+      # the numbers, so it should not spend ~5 min on benchmarks.
+      - 'src/**/*.cs'
+      - 'benchmarks/**/*.cs'
       - '.github/workflows/pr-benchmarks.yaml'
   workflow_dispatch:
 
