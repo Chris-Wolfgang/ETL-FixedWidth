@@ -24,6 +24,10 @@ env:
   CODECOV_MINIMUM: 90
   
 on:
+  # zizmor: ignore[dangerous-triggers] pull_request_target is deliberate here: the
+  # protected-file / secret-scan guard must run trusted workflow code from main, not
+  # from the PR head. The workflow never checks out or executes PR-head code with the
+  # elevated token — it fetches only trusted refs (origin/main) for its guard inputs.
   pull_request_target:  # Runs from the main branch, not from PR branch
     branches:
       - main
@@ -1549,7 +1553,7 @@ jobs:
       - name: Run InspectCode
         shell: bash
         run: |
-          SLN=$(ls *.slnx 2>/dev/null | head -1)
+          SLN=$(find . -maxdepth 1 -name '*.slnx' | head -1)
           echo "Inspecting $SLN"
           jb inspectcode "$SLN" \
             --output=inspect.sarif \
