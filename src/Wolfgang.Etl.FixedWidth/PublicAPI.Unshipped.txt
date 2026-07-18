@@ -19,6 +19,7 @@ Wolfgang.Etl.FixedWidth.FixedWidthSchema.FieldCount.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthSchema.Fields.get -> System.Collections.Generic.IReadOnlyList<Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo>
 Wolfgang.Etl.FixedWidth.FixedWidthSchema.RecordType.get -> System.Type
 Wolfgang.Etl.FixedWidth.FixedWidthSchema.SkipCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthSchema.ToDiagram() -> string
 Wolfgang.Etl.FixedWidth.FixedWidthSchema.TotalColumnCount.get -> int
 static Wolfgang.Etl.FixedWidth.FixedWidthSchema.For(System.Type recordType) -> Wolfgang.Etl.FixedWidth.FixedWidthSchema
 static Wolfgang.Etl.FixedWidth.FixedWidthSchema.For<T>() -> Wolfgang.Etl.FixedWidth.FixedWidthSchema

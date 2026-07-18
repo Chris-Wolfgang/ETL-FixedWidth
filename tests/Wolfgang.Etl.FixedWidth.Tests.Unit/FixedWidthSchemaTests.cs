@@ -133,4 +133,33 @@ public class FixedWidthSchemaTests
     {
         Assert.Throws<ArgumentNullException>(() => FixedWidthSchema.For(null!));
     }
+
+
+
+    [Fact]
+    public void ToDiagram_renders_layout_table_with_skips_and_footer()
+    {
+        var diagram = FixedWidthSchema.For<SkipLayoutRecord>().ToDiagram();
+
+        Assert.StartsWith("Position  Field", diagram, StringComparison.Ordinal);
+        Assert.Contains("[skip]", diagram, StringComparison.Ordinal);
+        Assert.Contains("EmployeeNumber", diagram, StringComparison.Ordinal);
+        Assert.Contains("Total width: 24  |  Columns: 3 (2 fields + 1 skip)  |  Delimiter: none", diagram, StringComparison.Ordinal);
+        Assert.DoesNotContain(" \n", diagram, StringComparison.Ordinal);   // no trailing whitespace
+    }
+
+
+
+    [Fact]
+    public void ToDiagram_shows_alignment_pad_and_format_for_fields()
+    {
+        var diagram = FixedWidthSchema.For<TypedRecord>().ToDiagram();
+
+        Assert.Contains("Id", diagram, StringComparison.Ordinal);
+        Assert.Contains("Int32", diagram, StringComparison.Ordinal);
+        Assert.Contains("Right", diagram, StringComparison.Ordinal);
+        Assert.Contains("'0'", diagram, StringComparison.Ordinal);
+        Assert.Contains("yyyyMMdd", diagram, StringComparison.Ordinal);   // Date format
+        Assert.Contains("3 fields + 0 skips", diagram, StringComparison.Ordinal);
+    }
 }
