@@ -21,5 +21,8 @@ Wolfgang.Etl.FixedWidth.FixedWidthSchema.RecordType.get -> System.Type
 Wolfgang.Etl.FixedWidth.FixedWidthSchema.SkipCount.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthSchema.ToDiagram() -> string
 Wolfgang.Etl.FixedWidth.FixedWidthSchema.TotalColumnCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>
+Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination> transform) -> void
 static Wolfgang.Etl.FixedWidth.FixedWidthSchema.For(System.Type recordType) -> Wolfgang.Etl.FixedWidth.FixedWidthSchema
 static Wolfgang.Etl.FixedWidth.FixedWidthSchema.For<T>() -> Wolfgang.Etl.FixedWidth.FixedWidthSchema
+static Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.ByMatchingProperties() -> Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>
