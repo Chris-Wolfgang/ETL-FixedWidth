@@ -109,6 +109,36 @@ await loader.LoadAsync(recordsAsyncEnumerable, CancellationToken.None);
 
 `NewLine` accepts any string; the default is `Environment.NewLine`.
 
+### Inspecting the layout
+
+`FixedWidthSchema.For<T>()` exposes the resolved field layout as a read-only view — handy for generating documentation, building validation tooling, or debugging a mapping. It runs the same validation as extraction, so an invalid layout throws here too.
+
+```csharp
+var schema = FixedWidthSchema.For<PersonRecord>();
+
+foreach (var field in schema.Fields)   // includes skip columns (field.IsSkip)
+{
+    Console.WriteLine($"{field.StartPosition}-{field.EndPosition}  {field.Name}  ({field.Length})");
+}
+
+Console.WriteLine($"Line width: {schema.ExpectedLineWidth}, fields: {schema.FieldCount}, skips: {schema.SkipCount}");
+```
+
+Each `FixedWidthFieldInfo` carries `Name`, `StartPosition`/`EndPosition`, `Length`, `ColumnIndex`, `PropertyType`, `Alignment`, `Pad`, `Format`, `Header`, and `NumberStyles`. Skipped columns have `IsSkip == true` and a `SkipMessage`.
+
+`ToDiagram()` renders the layout as a text table for logs, tickets, or docs:
+
+```csharp
+Console.WriteLine(FixedWidthSchema.For<EmployeeRecord>().ToDiagram());
+// Position  Field           Type    Length  Align  Pad  Format
+// --------  --------------  ------  ------  -----  ---  ------
+// 0-9       FirstName       String  10      Left   ' '
+// 10-17     [skip]                  8
+// 18-23     EmployeeNumber  String  6       Left   ' '
+//
+// Total width: 24  |  Columns: 3 (2 fields + 1 skip)  |  Delimiter: none
+```
+
 ## Next Steps
 
 - Browse the [Examples](examples.md) for more detailed scenarios

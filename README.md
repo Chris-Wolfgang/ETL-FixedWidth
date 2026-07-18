@@ -146,6 +146,42 @@ await loader.LoadAsync(records, CancellationToken.None);
 
 `NewLine` accepts any string (`"\n"`, `"\r\n"`, or a custom terminator). The default is `Environment.NewLine`.
 
+### Inspecting the layout
+
+`FixedWidthSchema.For<T>()` exposes the resolved field layout as a read-only view — useful for generating documentation, building validation tooling, or debugging a mapping. It applies the same validation as extraction, so an invalid layout (duplicate column index, a mapped field with no public setter) throws here too.
+
+```csharp
+var schema = FixedWidthSchema.For<PersonRecord>();
+
+foreach (var field in schema.Fields)   // includes skip columns (field.IsSkip)
+{
+    Console.WriteLine($"{field.StartPosition}-{field.EndPosition}  {field.Name}  ({field.Length})");
+}
+
+schema.ExpectedLineWidth;   // total line width, including skipped columns
+schema.TotalColumnCount;    // columns including skips
+schema.FieldCount;          // mapped fields only
+schema.SkipCount;           // skipped columns
+```
+
+Each `FixedWidthFieldInfo` carries `Name`, `StartPosition`/`EndPosition`, `Length`, `ColumnIndex`, `PropertyType`, `Alignment`, `Pad`, `Format`, `Header`, and `NumberStyles`. Skipped columns have `IsSkip == true` and expose a `SkipMessage` instead of a name.
+
+`ToDiagram()` renders the layout as a text table — drop it into a log line at startup or paste it into a ticket:
+
+```csharp
+Console.WriteLine(FixedWidthSchema.For<EmployeeRecord>().ToDiagram());
+```
+
+```text
+Position  Field           Type    Length  Align  Pad  Format
+--------  --------------  ------  ------  -----  ---  ------
+0-9       FirstName       String  10      Left   ' '
+10-17     [skip]                  8
+18-23     EmployeeNumber  String  6       Left   ' '
+
+Total width: 24  |  Columns: 3 (2 fields + 1 skip)  |  Delimiter: none
+```
+
 ---
 
 ## ✨ Features
@@ -168,6 +204,7 @@ await loader.LoadAsync(records, CancellationToken.None);
 | **Zero-copy parsing** | `ReadOnlyMemory<char>` slicing avoids string allocations during field extraction |
 | **Span-based numerics** | `Span<char>`-based numeric parsing on net8.0+ for reduced allocation |
 | **Compiled delegates** | Field accessors use compiled delegates instead of reflection for fast property get/set |
+| **Schema introspection** | `FixedWidthSchema.For<T>()` exposes the resolved layout (positions, widths, types, skips); `ToDiagram()` renders it as a text table |
 | **Multi-TFM support** | net462, net481, netstandard2.0, net8.0, net10.0 |
 
 **Examples:**
