@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.5.1/docfx_project/docs/getting-started.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.6.0/docfx_project/docs/getting-started.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -156,6 +156,39 @@ using var loader = new FixedWidthLoader&lt;PersonRecord&gt;(writer);
 await loader.LoadAsync(recordsAsyncEnumerable, CancellationToken.None);
 </code></pre>
 <p><code>NewLine</code> accepts any string; the default is <code>Environment.NewLine</code>.</p>
+<h3 id="inspecting-the-layout">Inspecting the layout</h3>
+<p><code>FixedWidthSchema.For&lt;T&gt;()</code> exposes the resolved field layout as a read-only view — handy for generating documentation, building validation tooling, or debugging a mapping. It runs the same validation as extraction, so an invalid layout throws here too.</p>
+<pre><code class="lang-csharp">var schema = FixedWidthSchema.For&lt;PersonRecord&gt;();
+
+foreach (var field in schema.Fields)   // includes skip columns (field.IsSkip)
+{
+    Console.WriteLine($&quot;{field.StartPosition}-{field.EndPosition}  {field.Name}  ({field.Length})&quot;);
+}
+
+Console.WriteLine($&quot;Line width: {schema.ExpectedLineWidth}, fields: {schema.FieldCount}, skips: {schema.SkipCount}&quot;);
+</code></pre>
+<p>Each <code>FixedWidthFieldInfo</code> carries <code>Name</code>, <code>StartPosition</code>/<code>EndPosition</code>, <code>Length</code>, <code>ColumnIndex</code>, <code>PropertyType</code>, <code>Alignment</code>, <code>Pad</code>, <code>Format</code>, <code>Header</code>, and <code>NumberStyles</code>. Skipped columns have <code>IsSkip == true</code> and a <code>SkipMessage</code>.</p>
+<p><code>ToDiagram()</code> renders the layout as a text table for logs, tickets, or docs:</p>
+<pre><code class="lang-csharp">Console.WriteLine(FixedWidthSchema.For&lt;EmployeeRecord&gt;().ToDiagram());
+// Position  Field           Type    Length  Align  Pad  Format
+// --------  --------------  ------  ------  -----  ---  ------
+// 0-9       FirstName       String  10      Left   ' '
+// 10-17     [skip]                  8
+// 18-23     EmployeeNumber  String  6       Left   ' '
+//
+// Total width: 24  |  Columns: 3 (2 fields + 1 skip)  |  Delimiter: none
+</code></pre>
+<h3 id="transforming-between-layouts">Transforming between layouts</h3>
+<p><code>FixedWidthTransformer&lt;TSource, TDestination&gt;</code> reformats records from one layout to another (reorder, add/remove, or format-convert fields) as the projection stage between an extractor and a loader:</p>
+<pre><code class="lang-csharp">using var extractor   = new FixedWidthExtractor&lt;LegacyRecord&gt;(sourceReader);
+using var transformer = new FixedWidthTransformer&lt;LegacyRecord, ModernRecord&gt;(
+    legacy =&gt; new ModernRecord { Id = legacy.OldId, Name = legacy.FullName.Trim() });
+using var loader      = new FixedWidthLoader&lt;ModernRecord&gt;(destinationWriter);
+
+var modern = transformer.TransformAsync(extractor.ExtractAsync(token), token);
+await loader.LoadAsync(modern, token);
+</code></pre>
+<p>When source and destination share property names and compatible types, <code>FixedWidthTransformer&lt;LegacyRecord, ModernRecord&gt;.ByMatchingProperties()</code> builds the copy automatically (the destination needs a public parameterless constructor).</p>
 <h2 id="next-steps">Next Steps</h2>
 <ul>
 <li>Browse the <a href="examples.html">Examples</a> for more detailed scenarios</li>
@@ -177,7 +210,7 @@ await loader.LoadAsync(recordsAsyncEnumerable, CancellationToken.None);
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.5.1/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.6.0/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>

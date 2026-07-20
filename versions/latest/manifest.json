@@ -260,6 +260,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.yml\" sourcestartlinenumber=\"1\">Read-only metadata for a single resolved column in a fixed-width record layout —\neither a mapped field or a skipped column — exposed by\n<xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthSchema\" data-throw-if-not-resolved=\"false\"></xref> (#22).</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.yml",
       "output": {
         ".html": {
@@ -285,6 +299,34 @@
       "IsMRef": true,
       "Title": "Wolfgang.Etl.FixedWidth.FixedWidthReport",
       "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthReport.yml\" sourcestartlinenumber=\"1\">A progress report for fixed-width extract and load operations. Extends\n<xref href=\"Wolfgang.Etl.Abstractions.Report\" data-throw-if-not-resolved=\"false\"></xref> with additional diagnostic properties specific to\nfixed-width file processing.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthSchema.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthSchema.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthSchema",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthSchema.yml\" sourcestartlinenumber=\"1\">A read-only view over the resolved fixed-width field layout for a record type\n(#22). Exposes the field/skip columns, positions, widths, types, and formatting\nthat <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601\" data-throw-if-not-resolved=\"false\"></xref> / <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthLoader%601\" data-throw-if-not-resolved=\"false\"></xref>\nderive from <code>[FixedWidthField]</code> / <code>[FixedWidthSkip]</code> attributes — useful\nfor generating documentation, building validation tooling, or debugging a layout.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthTransformer-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthTransformer-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthTransformer-2.yml\" sourcestartlinenumber=\"1\">Transforms a stream of <code class=\"typeparamref\">TSource</code> records into\n<code class=\"typeparamref\">TDestination</code> records in a single streaming pass (#14) —\nthe middle stage of an extract → transform → load pipeline. Compose it between\na <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601\" data-throw-if-not-resolved=\"false\"></xref> reading one fixed-width layout and\na <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthLoader%601\" data-throw-if-not-resolved=\"false\"></xref> writing another to reformat a file\n(reorder, add/remove, or reformat fields).</p>\n"
     },
     {
       "type": "ManagedReference",

@@ -101,6 +101,13 @@ as an asynchronous stream.</p>
 </dd>
     </dl>
     <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.html">FixedWidthFieldInfo</a></dt>
+      <dd><p>Read-only metadata for a single resolved column in a fixed-width record layout —
+either a mapped field or a skipped column — exposed by
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchema.html">FixedWidthSchema</a> (#22).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a></dt>
       <dd><p>Writes records of type <code class="typeparamref">TRecord</code> to a fixed-width text stream
 as an asynchronous operation.</p>
@@ -111,6 +118,25 @@ as an asynchronous operation.</p>
       <dd><p>A progress report for fixed-width extract and load operations. Extends
 <span class="xref">Wolfgang.Etl.Abstractions.Report</span> with additional diagnostic properties specific to
 fixed-width file processing.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchema.html">FixedWidthSchema</a></dt>
+      <dd><p>A read-only view over the resolved fixed-width field layout for a record type
+(#22). Exposes the field/skip columns, positions, widths, types, and formatting
+that <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a> / <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a>
+derive from <code>[FixedWidthField]</code> / <code>[FixedWidthSkip]</code> attributes — useful
+for generating documentation, building validation tooling, or debugging a layout.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthTransformer-2.html">FixedWidthTransformer&lt;TSource, TDestination&gt;</a></dt>
+      <dd><p>Transforms a stream of <code class="typeparamref">TSource</code> records into
+<code class="typeparamref">TDestination</code> records in a single streaming pass (#14) —
+the middle stage of an extract → transform → load pipeline. Compose it between
+a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a> reading one fixed-width layout and
+a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a> writing another to reformat a file
+(reorder, add/remove, or reformat fields).</p>
 </dd>
     </dl>
     <dl class="jumplist">
