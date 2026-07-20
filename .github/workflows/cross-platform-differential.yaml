@@ -91,6 +91,22 @@ jobs:
 
       - name: Compare against linux-x64
         run: |
+          # A zero-outcome leg means its `dotnet test` produced no .trx — the run
+          # step's `|| true` masks a failed/empty test run. Report that as its own
+          # failure, not a misleading "all outcomes diverge" against an empty
+          # reference. This is almost always a transient runner flake: re-run first.
+          empty=0
+          for file in outcomes/outcomes-*/outcomes-*.txt; do
+            label=$(basename "$file" .txt | sed 's/^outcomes-//')
+            if [ ! -s "$file" ]; then
+              echo "::error::Leg '$label' produced no test outcomes — its test run failed to emit a .trx. Re-run the workflow; if it persists, investigate that leg."
+              empty=1
+            fi
+          done
+          if [ "$empty" = "1" ]; then
+            exit 1
+          fi
+
           ref="outcomes/outcomes-linux-x64/outcomes-linux-x64.txt"
           if [ ! -f "$ref" ]; then
             echo "::error::reference outcomes (linux-x64) missing"
