@@ -1,1 +1,28 @@
 #nullable enable
+Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions
+Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.BlankLineHandling(Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling handling) -> Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.Encoding(System.Text.Encoding encoding) -> Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.FieldDelimiter(string delimiter) -> Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.FieldSeparator(char? separator) -> Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.HasHeader(bool hasHeader) -> Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.HeaderLineCount(int count) -> Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.LineFilter(System.Func<string, Wolfgang.Etl.FixedWidth.Enums.LineAction> filter) -> Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.MalformedLineHandling(Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling handling) -> Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.RecordValidator(System.Func<T, Wolfgang.Etl.FixedWidth.ValidationResult> validator) -> Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.ValueParser(Wolfgang.Etl.FixedWidth.FixedWidthValueParser parser) -> Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.Encoding(System.Text.Encoding encoding) -> Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.FieldDelimiter(string delimiter) -> Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.FieldSeparator(char? separator) -> Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.HeaderConverter(System.Func<string, Wolfgang.Etl.FixedWidth.FieldContext, string> converter) -> Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.IsDryRun(bool isDryRun) -> Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.ValueConverter(System.Func<object, Wolfgang.Etl.FixedWidth.FieldContext, string> converter) -> Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>
+Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.WriteHeader(bool writeHeader) -> Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>
+static Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor<T>(this Wolfgang.Etl.Abstractions.EtlPipeline pipeline, System.IO.Stream stream) -> Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
+static Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor<T>(this Wolfgang.Etl.Abstractions.EtlPipeline pipeline, System.IO.TextReader reader) -> Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
+static Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor<T>(this Wolfgang.Etl.Abstractions.EtlPipeline pipeline, Wolfgang.Etl.FixedWidth.FixedWidthExtractor<T> extractor) -> Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
+static Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor<T>(this Wolfgang.Etl.Abstractions.EtlPipeline pipeline, string path) -> Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
+static Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader<T>(this Wolfgang.Etl.Abstractions.IEtlPipeline<T> pipeline, System.IO.Stream stream) -> Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>
+static Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader<T>(this Wolfgang.Etl.Abstractions.IEtlPipeline<T> pipeline, System.IO.TextWriter writer) -> Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>
+static Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader<T>(this Wolfgang.Etl.Abstractions.IEtlPipeline<T> pipeline, string path) -> Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>
