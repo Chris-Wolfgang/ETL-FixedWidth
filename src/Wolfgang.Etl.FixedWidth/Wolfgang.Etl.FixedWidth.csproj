@@ -22,7 +22,7 @@
          Intentional breaks in a MAJOR bump are recorded via a generated
          CompatibilitySuppressions.xml. -->
     <EnablePackageValidation>true</EnablePackageValidation>
-    <PackageValidationBaselineVersion>0.5.1</PackageValidationBaselineVersion>
+    <PackageValidationBaselineVersion>0.6.0</PackageValidationBaselineVersion>
     <Title>Wolfgang.Etl.FixedWidth</Title>
     <Description>Extractor and Loader implementations for reading and writing fixed-width text files, built on Wolfgang.Etl.Abstractions.</Description>
     <PackageProjectUrl>https://github.com/Chris-Wolfgang/ETL-FixedWidth</PackageProjectUrl>
