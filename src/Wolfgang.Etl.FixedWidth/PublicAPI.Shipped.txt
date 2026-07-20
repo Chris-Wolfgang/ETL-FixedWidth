@@ -95,6 +95,20 @@ Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.RecordValidator.get -> Syst
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.RecordValidator.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.ValueParser.get -> Wolfgang.Etl.FixedWidth.FixedWidthValueParser
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.ValueParser.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.Alignment.get -> Wolfgang.Etl.FixedWidth.Enums.FieldAlignment
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.ColumnIndex.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.EndPosition.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.Format.get -> string?
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.Header.get -> string?
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.IsSkip.get -> bool
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.Length.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.Name.get -> string?
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.NumberStyles.get -> System.Globalization.NumberStyles?
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.Pad.get -> char
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.PropertyType.get -> System.Type?
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.SkipMessage.get -> string?
+Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.StartPosition.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.CurrentLineNumber.get -> long
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FieldDelimiter.get -> string?
@@ -120,6 +134,16 @@ Wolfgang.Etl.FixedWidth.FixedWidthReport.CurrentRejectedItemCount.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthReport.CurrentSkippedItemCount.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthReport.FixedWidthReport(int currentCount, int currentSkippedItemCount, int currentRejectedItemCount, int currentFilteredLineCount, long currentLineNumber) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthReport.FixedWidthReport(int currentCount, int currentSkippedItemCount, long currentLineNumber) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthSchema
+Wolfgang.Etl.FixedWidth.FixedWidthSchema.ExpectedLineWidth.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthSchema.FieldCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthSchema.Fields.get -> System.Collections.Generic.IReadOnlyList<Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo>
+Wolfgang.Etl.FixedWidth.FixedWidthSchema.RecordType.get -> System.Type
+Wolfgang.Etl.FixedWidth.FixedWidthSchema.SkipCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthSchema.ToDiagram() -> string
+Wolfgang.Etl.FixedWidth.FixedWidthSchema.TotalColumnCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>
+Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination> transform) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthValueParser
 Wolfgang.Etl.FixedWidth.ValidationResult
 Wolfgang.Etl.FixedWidth.ValidationResult.Action.get -> Wolfgang.Etl.FixedWidth.Enums.ValidationAction
@@ -130,6 +154,9 @@ override Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.ExtractWorkerAsync
 override Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.CreateProgressReport() -> Wolfgang.Etl.FixedWidth.FixedWidthReport
 override Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.CreateProgressTimer(System.IProgress<Wolfgang.Etl.FixedWidth.FixedWidthReport> progress) -> Wolfgang.Etl.Abstractions.IProgressTimer
 override Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.LoadWorkerAsync(System.Collections.Generic.IAsyncEnumerable<TRecord> items, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task
+static Wolfgang.Etl.FixedWidth.FixedWidthSchema.For(System.Type recordType) -> Wolfgang.Etl.FixedWidth.FixedWidthSchema
+static Wolfgang.Etl.FixedWidth.FixedWidthSchema.For<T>() -> Wolfgang.Etl.FixedWidth.FixedWidthSchema
+static Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.ByMatchingProperties() -> Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>
 static Wolfgang.Etl.FixedWidth.ValidationResult.Accept() -> Wolfgang.Etl.FixedWidth.ValidationResult
 static Wolfgang.Etl.FixedWidth.ValidationResult.Skip(string reason = null) -> Wolfgang.Etl.FixedWidth.ValidationResult
 static Wolfgang.Etl.FixedWidth.ValidationResult.Stop(string reason = null) -> Wolfgang.Etl.FixedWidth.ValidationResult
