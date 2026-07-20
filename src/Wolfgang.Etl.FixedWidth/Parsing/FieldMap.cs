@@ -194,4 +194,84 @@ internal static class FieldMap
             factory: FieldMapResult.CompileFactory(type)
         );
     }
+
+
+
+    // ------------------------------------------------------------------
+    // Layout introspection (public FixedWidthSchema, #22)
+    // ------------------------------------------------------------------
+
+    /// <summary>
+    /// A single resolved column in position order — either a mapped field or a
+    /// skipped column — with its computed start position and absolute column index.
+    /// Unlike <see cref="FieldMapResult.Descriptors"/> (fields only), this retains
+    /// skipped columns so the layout can be presented in full.
+    /// </summary>
+#pragma warning disable S3898 // value type only used for internal layout iteration — equality is never needed
+    internal readonly struct ColumnLayout
+#pragma warning restore S3898
+    {
+        internal ColumnLayout
+        (
+            int columnIndex,
+            int start,
+            PropertyInfo? property,
+            FixedWidthFieldAttribute? field,
+            FixedWidthSkipAttribute? skip
+        )
+        {
+            ColumnIndex = columnIndex;
+            Start = start;
+            Property = property;
+            Field = field;
+            Skip = skip;
+        }
+
+        internal int ColumnIndex { get; }
+
+        internal int Start { get; }
+
+        internal PropertyInfo? Property { get; }
+
+        internal FixedWidthFieldAttribute? Field { get; }
+
+        internal FixedWidthSkipAttribute? Skip { get; }
+
+        internal bool IsSkip => Skip != null;
+
+        internal int Length => Skip != null ? Skip.Length : Field!.Length;
+    }
+
+
+
+    /// <summary>
+    /// Returns the resolved column layout — every <see cref="FixedWidthFieldAttribute"/>
+    /// and <see cref="FixedWidthSkipAttribute"/> column in <c>Index</c> order, with
+    /// computed start positions. Reuses the same collection, validation, and sort as
+    /// extraction, so it surfaces identical errors (duplicate indexes, a mapped field
+    /// with no public setter).
+    /// </summary>
+    internal static IReadOnlyList<ColumnLayout> GetColumnLayout(Type type)
+    {
+        var entries = CollectEntries(type);
+        if (entries.Count == 0)
+        {
+            return Array.AsReadOnly(Array.Empty<ColumnLayout>());
+        }
+
+        ValidateNoDuplicateIndexes(type, entries);
+        entries.Sort((a, b) => a.Index.CompareTo(b.Index));
+
+        var columns = new List<ColumnLayout>(entries.Count);
+        var position = 0;
+        var columnIndex = 0;
+        foreach (var entry in entries)
+        {
+            columns.Add(new ColumnLayout(columnIndex, position, entry.Property, entry.Field, entry.Skip));
+            position += entry.Length;
+            columnIndex++;
+        }
+
+        return columns.AsReadOnly();
+    }
 }

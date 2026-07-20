@@ -19,6 +19,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.6.0] - 2026-07-18
+
+Layout introspection and format transformation. Additive — no breaking changes.
+
+### Added
+
+- `FixedWidthSchema.For<T>()` / `For(Type)` — a read-only view over the resolved
+  field layout: `Fields`, `ExpectedLineWidth`, `TotalColumnCount`, `FieldCount`,
+  `SkipCount`. Each `FixedWidthFieldInfo` exposes the name, position range, length,
+  column index, type, alignment, pad, format, header, and `NumberStyles`; skipped
+  columns carry `IsSkip` and `SkipMessage`. Useful for generating documentation,
+  building validation tooling, or debugging a mapping ([#22]).
+- `FixedWidthSchema.ToDiagram()` — renders the resolved layout as a human-readable
+  text table for logging, tickets, and documentation ([#24]).
+- `FixedWidthTransformer<TSource, TDestination>` — projects one fixed-width layout
+  to another in a single streaming pass (the transform stage of an
+  extract → transform → load pipeline), via a projection constructor or the
+  `ByMatchingProperties()` same-name auto-mapping factory ([#14]).
+
 ## [0.5.1] - 2026-07-17
 
 Quality, supply-chain, and CI hardening. **No public API or runtime behaviour
@@ -217,7 +236,11 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#161]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/161
 [#162]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/162
 [#163]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/163
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.5.1...HEAD
+[#14]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/14
+[#22]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/22
+[#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.3.0...v0.4.0
