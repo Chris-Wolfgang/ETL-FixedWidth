@@ -13,10 +13,6 @@
 # Claude Code
 .claude/
 
-# Local-only NuGet feed override (bridges Abstractions 0.16.0 pre-publish; machine path, never commit)
-nuget.config
-NuGet.config
-
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
