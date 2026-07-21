@@ -155,6 +155,26 @@ await loader.LoadAsync(modern, token);
 
 When source and destination share property names and compatible types, `FixedWidthTransformer<LegacyRecord, ModernRecord>.ByMatchingProperties()` builds the copy automatically (the destination needs a public parameterless constructor).
 
+### Composing an ETL pipeline
+
+The whole extract → transform → load flow can be written as one fluent chain on the generic `EtlPipeline` (from `Wolfgang.Etl.Abstractions` 0.16.0). `FixedWidthExtractor<T>` source factories hang off `EtlPipeline.Create()` and `FixedWidthLoader<T>` sink terminators hang off the pipeline, with the extractor/loader configuration exposed as inline setters:
+
+```csharp
+using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.FixedWidth;
+
+await EtlPipeline
+    .Create()
+    .FixedWidthExtractor<PersonRecord>("people.dat")
+    .Through(KeepAdults)                 // optional stream-to-stream transform delegate
+    .FixedWidthLoader<PersonRecord>("people.txt")
+    .WriteHeader(true)
+    .FieldDelimiter(" | ")
+    .RunAsync();
+```
+
+Every source and sink has **path**, `Stream`, and `TextReader`/`TextWriter` overloads (plus an existing-`FixedWidthExtractor<T>` overload). Path factories own the file stream they open and dispose it when the run finishes, on success or failure; caller-supplied streams, readers, and writers are left open. See the [PipelineExtensions example](examples.md#pipelineextensions) for a runnable walk-through.
+
 ## Next Steps
 
 - Browse the [Examples](examples.md) for more detailed scenarios
