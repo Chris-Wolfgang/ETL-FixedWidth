@@ -61,3 +61,9 @@ Demonstrates `SkipItemCount` and `MaximumItemCount` for pagination — skipping 
 Shows how to enable header row output and separator lines when loading, including custom header text via the `Header` property on `[FixedWidthField]`.
 
 [View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/HeadersAndSeparators)
+
+## PipelineExtensions
+
+Composes an extract → transform → load flow as a single `EtlPipeline` fluent chain: `EtlPipeline.Create().FixedWidthExtractor<T>(…)` source factories and `FixedWidthLoader<T>(…)` sink terminators, with inline `Through` transform stages and 1:1 fluent configuration. Also shows the resource-ownership contract — path factories own and dispose the files they open, while caller-supplied readers/writers are left open. Requires `Wolfgang.Etl.Abstractions` 0.16.0.
+
+[View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/PipelineExtensions)
