@@ -30,6 +30,16 @@ internal static class FieldMap
 
 
 
+    /// <summary>
+    /// Non-generic overload of <see cref="GetResult{T}"/> for callers that hold a
+    /// <see cref="Type"/> rather than a compile-time type argument (for example
+    /// <see cref="FixedWidthSchema.For(Type)"/>).
+    /// </summary>
+    internal static FieldMapResult GetResult(Type type)
+        => Cache.GetOrAdd(type, Resolve);
+
+
+
     // ------------------------------------------------------------------
     // Private helpers
     // ------------------------------------------------------------------

@@ -139,6 +139,23 @@ Console.WriteLine(FixedWidthSchema.For<EmployeeRecord>().ToDiagram());
 // Total width: 24  |  Columns: 3 (2 fields + 1 skip)  |  Delimiter: none
 ```
 
+### Defining the layout in code
+
+When you can't decorate the record type, or the layout is chosen at runtime, build the schema with `FixedWidthSchemaBuilder<T>` and assign it to the extractor/loader `Schema` property instead of using attributes:
+
+```csharp
+var schema = new FixedWidthSchemaBuilder<CustomerRecord>()
+    .Field(r => r.CustomerId, index: 0, length: 8)
+    .Field(r => r.Name, index: 1, length: 30)
+    .Skip(index: 2, length: 5)
+    .Field(r => r.Balance, index: 3, length: 9, alignment: FieldAlignment.Right, format: "0000000.00")
+    .Build();
+
+using var extractor = new FixedWidthExtractor<CustomerRecord>(reader) { Schema = schema };
+```
+
+The lambda selectors are type-safe (no magic strings) and `index` is the zero-based column ordinal, matching `[FixedWidthField(index, length)]`. A built schema is equivalent to an attribute-resolved one — same validation and the same `Fields` / `ToDiagram()` introspection — and overrides any attributes on the type when set. See the [SchemaBuilder example](examples.md#schemabuilder).
+
 ### Transforming between layouts
 
 `FixedWidthTransformer<TSource, TDestination>` reformats records from one layout to another (reorder, add/remove, or format-convert fields) as the projection stage between an extractor and a loader:

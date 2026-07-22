@@ -19,6 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   open and dispose it after the run (success or failure); caller-supplied
   streams/readers/writers are left open. Requires `Wolfgang.Etl.Abstractions`
   0.16.0 ([#253]).
+- `FixedWidthSchemaBuilder<T>` — define a fixed-width layout with a fluent,
+  type-safe code API (`.Field(r => r.Name, index, length, …)` / `.Skip(index, length)`
+  / `.Build()`) instead of `[FixedWidthField]` attributes, for record types you
+  cannot decorate or layouts built at runtime. Assign the resulting
+  `FixedWidthSchema` to the new `FixedWidthExtractor<T>.Schema` /
+  `FixedWidthLoader<T>.Schema` property to override attribute resolution; a
+  built schema is equivalent to (and introspectable like) an attribute-resolved
+  one ([#23]).
 
 ### Changed
 
@@ -250,6 +258,7 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#14]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/14
 [#22]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/22
 [#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
+[#23]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/23
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
 [Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.6.0...HEAD
 [0.6.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.5.1...v0.6.0
