@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 using Wolfgang.Etl.FixedWidth.Parsing;
 
 namespace Wolfgang.Etl.FixedWidth;
@@ -479,6 +480,10 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         var fieldMap = FieldMap.GetResult<TRecord>();
         LogLoadingStarted(fieldMap);
 
+        // Metrics (#30): duration recorded on completion/throw; counters are no-ops without a listener.
+        var metricTags = FixedWidthMetrics.CreateTags(FixedWidthMetrics.LoadOperation, typeof(TRecord));
+        using var operationScope = FixedWidthMetrics.MeasureDuration(metricTags);
+
         // In dry-run mode, route all formatting through a throwaway writer so the
         // pipeline — including field-width validation — still runs, but nothing
         // reaches the output stream. The real writer is left untouched and so
@@ -502,6 +507,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
             if (CurrentSkippedItemCount < SkipItemCount)
             {
                 IncrementCurrentSkippedItemCount();
+                FixedWidthMetrics.ItemsSkipped.Add(1, metricTags);
                 LogDebugItemSkipped();
                 continue;
             }
@@ -523,6 +529,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
             Interlocked.Increment(ref _currentLineNumber);
             await target.WriteLineAsync().ConfigureAwait(false);
             IncrementCurrentItemCount();
+            FixedWidthMetrics.ItemsLoaded.Add(1, metricTags);
             LogDebugRecordWritten();
         }
 
