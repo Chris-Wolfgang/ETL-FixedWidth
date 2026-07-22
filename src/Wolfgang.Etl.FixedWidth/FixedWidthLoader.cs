@@ -507,7 +507,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
             if (CurrentSkippedItemCount < SkipItemCount)
             {
                 IncrementCurrentSkippedItemCount();
-                FixedWidthMetrics.ItemsSkipped.Add(1, metricTags);
+                FixedWidthMetrics.RecordSkipped(metricTags);
                 LogDebugItemSkipped();
                 continue;
             }
@@ -529,7 +529,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
             Interlocked.Increment(ref _currentLineNumber);
             await target.WriteLineAsync().ConfigureAwait(false);
             IncrementCurrentItemCount();
-            FixedWidthMetrics.ItemsLoaded.Add(1, metricTags);
+            FixedWidthMetrics.RecordLoaded(metricTags);
             LogDebugRecordWritten();
         }
 

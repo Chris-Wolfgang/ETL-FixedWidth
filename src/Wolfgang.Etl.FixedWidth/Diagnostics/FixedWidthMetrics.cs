@@ -87,6 +87,52 @@ internal static class FixedWidthMetrics
         };
 
 
+    // The per-line / per-record helpers below are called inside the extract and load hot loops. Each
+    // guards its instrument with Instrument.Enabled so that, when no MeterListener is subscribed (the
+    // default), the JIT skips the Add call and its argument marshalling entirely — the measurement
+    // machinery is only touched once a consumer opts in by subscribing. Instrument.Enabled is a cheap
+    // volatile field read; an unguarded Counter.Add would otherwise run a non-inlined call per item.
+
+    /// <summary>Records one successfully extracted item, if a listener is subscribed.</summary>
+    internal static void RecordExtracted(in TagList tags)
+    {
+        if (ItemsExtracted.Enabled)
+        {
+            ItemsExtracted.Add(1, tags);
+        }
+    }
+
+
+    /// <summary>Records one successfully loaded item, if a listener is subscribed.</summary>
+    internal static void RecordLoaded(in TagList tags)
+    {
+        if (ItemsLoaded.Enabled)
+        {
+            ItemsLoaded.Add(1, tags);
+        }
+    }
+
+
+    /// <summary>Records one skipped item, if a listener is subscribed.</summary>
+    internal static void RecordSkipped(in TagList tags)
+    {
+        if (ItemsSkipped.Enabled)
+        {
+            ItemsSkipped.Add(1, tags);
+        }
+    }
+
+
+    /// <summary>Records one physical line read, if a listener is subscribed.</summary>
+    internal static void RecordLineRead(in TagList tags)
+    {
+        if (LinesRead.Enabled)
+        {
+            LinesRead.Add(1, tags);
+        }
+    }
+
+
     /// <summary>
     /// Begins timing an operation. Dispose the returned scope — the <c>using</c> the extractor and loader
     /// wrap it in records <see cref="OperationDuration"/> when the operation completes, ends early, or
@@ -121,6 +167,11 @@ internal static class FixedWidthMetrics
             }
 
             _disposed = true;
+            if (!OperationDuration.Enabled)
+            {
+                return;
+            }
+
             var elapsedMs = (Stopwatch.GetTimestamp() - _startTimestamp) * 1000.0 / Stopwatch.Frequency;
             OperationDuration.Record(elapsedMs, _tags);
         }

@@ -652,7 +652,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             // Update before any processing so that if an exception is thrown,
             // CurrentLineNumber points to the offending line in the file.
             Interlocked.Increment(ref _currentLineNumber);
-            FixedWidthMetrics.LinesRead.Add(1, metricTags);
+            FixedWidthMetrics.RecordLineRead(metricTags);
 
             if (IsStructuralLine(separatorLineNo))
             {
@@ -676,7 +676,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
                 {
                     dataLinesSkipped++;
                     IncrementCurrentSkippedItemCount();
-                    FixedWidthMetrics.ItemsSkipped.Add(1, metricTags);
+                    FixedWidthMetrics.RecordSkipped(metricTags);
                     LogDebugBlankLineInSkipBudget(dataLinesSkipped);
                     continue;
                 }
@@ -691,7 +691,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
                 LogDebugBlankLineYieldedAsDefault();
                 IncrementCurrentItemCount();
-                FixedWidthMetrics.ItemsExtracted.Add(1, metricTags);
+                FixedWidthMetrics.RecordExtracted(metricTags);
                 yield return defaultRecord;
                 continue;
             }
@@ -715,7 +715,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             {
                 dataLinesSkipped++;
                 IncrementCurrentSkippedItemCount();
-                FixedWidthMetrics.ItemsSkipped.Add(1, metricTags);
+                FixedWidthMetrics.RecordSkipped(metricTags);
                 LogDebugDataLineSkipped(dataLinesSkipped);
                 continue;
             }
@@ -747,7 +747,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
             LogDebugRecordParsed();
             IncrementCurrentItemCount();
-            FixedWidthMetrics.ItemsExtracted.Add(1, metricTags);
+            FixedWidthMetrics.RecordExtracted(metricTags);
             yield return record;
         }
 
