@@ -1,5 +1,14 @@
 #nullable enable
 Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.Schema.get -> Wolfgang.Etl.FixedWidth.FixedWidthSchema?
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.Schema.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.Schema.get -> Wolfgang.Etl.FixedWidth.FixedWidthSchema?
+Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.Schema.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>
+Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.Build() -> Wolfgang.Etl.FixedWidth.FixedWidthSchema
+Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.Field<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>> selector, int index, int length, Wolfgang.Etl.FixedWidth.Enums.FieldAlignment alignment = Wolfgang.Etl.FixedWidth.Enums.FieldAlignment.Left, char pad = ' ', string format = null, string header = null, System.Globalization.NumberStyles? numberStyles = null, bool trimValue = true) -> Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>
+Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.FixedWidthSchemaBuilder() -> void
+Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.Skip(int index, int length, string message = null) -> Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>
 Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
 Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.BlankLineHandling(Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling handling) -> Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
 Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.Encoding(System.Text.Encoding encoding) -> Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>

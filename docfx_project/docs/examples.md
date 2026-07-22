@@ -67,3 +67,9 @@ Shows how to enable header row output and separator lines when loading, includin
 Composes an extract → transform → load flow as a single `EtlPipeline` fluent chain: `EtlPipeline.Create().FixedWidthExtractor<T>(…)` source factories and `FixedWidthLoader<T>(…)` sink terminators, with inline `Through` transform stages and 1:1 fluent configuration. Also shows the resource-ownership contract — path factories own and dispose the files they open, while caller-supplied readers/writers are left open. Requires `Wolfgang.Etl.Abstractions` 0.16.0.
 
 [View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/PipelineExtensions)
+
+## SchemaBuilder
+
+Defines a fixed-width layout in code with `FixedWidthSchemaBuilder<T>` for a record type that carries no `[FixedWidthField]` attributes, then uses it — via the extractor/loader `Schema` property — to load and re-extract records. Also shows that a code-built schema is fully introspectable (`ToDiagram` / `Fields`), exactly like an attribute-resolved one.
+
+[View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/SchemaBuilder)

@@ -182,6 +182,25 @@ Position  Field           Type    Length  Align  Pad  Format
 Total width: 24  |  Columns: 3 (2 fields + 1 skip)  |  Delimiter: none
 ```
 
+### Defining the layout in code
+
+When you can't decorate the record type — a third-party POCO, or a layout chosen at runtime — build the schema with `FixedWidthSchemaBuilder<T>` instead of attributes, then hand it to the extractor or loader via its `Schema` property:
+
+```csharp
+var schema = new FixedWidthSchemaBuilder<CustomerRecord>()
+    .Field(r => r.CustomerId, index: 0, length: 8)
+    .Field(r => r.Name, index: 1, length: 30)
+    .Skip(index: 2, length: 5)
+    .Field(r => r.Balance, index: 3, length: 9, alignment: FieldAlignment.Right, format: "0000000.00")
+    .Build();
+
+using var extractor = new FixedWidthExtractor<CustomerRecord>(reader) { Schema = schema };
+```
+
+The builder uses lambda expressions for type-safe, refactor-proof property references — no magic strings. `index` is the zero-based column ordinal (the same value as `[FixedWidthField(index, length)]`); start positions are computed from the column lengths. A schema built this way is **equivalent** to one resolved from attributes: it validates the same way (duplicate index, no public setter) and is fully introspectable via `Fields` / `ToDiagram()`. Setting `Schema` overrides any attributes on the type.
+
+See the [SchemaBuilder](examples/SchemaBuilder) example for a runnable walk-through.
+
 ### Transforming between layouts
 
 To reformat a fixed-width file from one layout to another — reordering, adding/removing, or format-converting fields (a common mainframe-migration task) — `FixedWidthTransformer<TSource, TDestination>` is the projection stage between an extractor and a loader:
@@ -266,13 +285,14 @@ See the [PipelineExtensions](examples/PipelineExtensions) example for a complete
 | **Span-based numerics** | `Span<char>`-based numeric parsing on net8.0+ for reduced allocation |
 | **Compiled delegates** | Field accessors use compiled delegates instead of reflection for fast property get/set |
 | **Schema introspection** | `FixedWidthSchema.For<T>()` exposes the resolved layout (positions, widths, types, skips); `ToDiagram()` renders it as a text table |
+| **Code-defined layout** | `FixedWidthSchemaBuilder<T>` defines a layout in fluent, type-safe code (no attributes required); assign it to the extractor/loader `Schema` property |
 | **Format transformation** | `FixedWidthTransformer<TSource, TDestination>` projects one layout to another in a single streaming pass, with optional `ByMatchingProperties()` auto-mapping |
 | **Pipeline composition** | `EtlPipeline.Create().FixedWidthExtractor<T>(…).FixedWidthLoader<T>(…).RunAsync()` — fluent source factories and sink terminators over the generic `EtlPipeline` (requires `Wolfgang.Etl.Abstractions` 0.16.0) |
 | **Multi-TFM support** | net462, net481, netstandard2.0, net8.0, net10.0 |
 
 **Examples:**
 
-The [examples/](examples/) folder contains 11 runnable console projects demonstrating each feature:
+The [examples/](examples/) folder contains 12 runnable console projects demonstrating each feature:
 
 | Example | Description |
 |---------|-------------|
@@ -287,6 +307,7 @@ The [examples/](examples/) folder contains 11 runnable console projects demonstr
 | [SkipAndMax](examples/SkipAndMax) | `SkipItemCount` and `MaximumItemCount` for pagination |
 | [HeadersAndSeparators](examples/HeadersAndSeparators) | `WriteHeader`, `HasHeader`, and `FieldSeparator` |
 | [PipelineExtensions](examples/PipelineExtensions) | Compose extract → transform → load as one `EtlPipeline` fluent chain |
+| [SchemaBuilder](examples/SchemaBuilder) | Define a layout in code with `FixedWidthSchemaBuilder<T>` instead of attributes |
 
 ---
 
