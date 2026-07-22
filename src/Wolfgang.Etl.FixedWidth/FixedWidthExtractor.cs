@@ -7,6 +7,7 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Wolfgang.Etl.FixedWidth.Exceptions;
 using Wolfgang.Etl.FixedWidth.Parsing;
@@ -632,6 +633,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             ? HeaderLineCount + 1
             : -1;
 
+        // Metrics (#30): records the operation duration when the enumerator completes, ends early, or
+        // throws; the per-item/line counters below are no-ops unless a MeterListener is subscribed.
+        var metricTags = FixedWidthMetrics.CreateTags(FixedWidthMetrics.ExtractOperation, typeof(TRecord));
+        using var operationScope = FixedWidthMetrics.MeasureDuration(metricTags);
+
         LogExtractionStarted(fieldMap);
 
         token.ThrowIfCancellationRequested();
@@ -646,6 +652,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             // Update before any processing so that if an exception is thrown,
             // CurrentLineNumber points to the offending line in the file.
             Interlocked.Increment(ref _currentLineNumber);
+            FixedWidthMetrics.RecordLineRead(metricTags);
 
             if (IsStructuralLine(separatorLineNo))
             {
@@ -669,6 +676,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
                 {
                     dataLinesSkipped++;
                     IncrementCurrentSkippedItemCount();
+                    FixedWidthMetrics.RecordSkipped(metricTags);
                     LogDebugBlankLineInSkipBudget(dataLinesSkipped);
                     continue;
                 }
@@ -683,6 +691,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
                 LogDebugBlankLineYieldedAsDefault();
                 IncrementCurrentItemCount();
+                FixedWidthMetrics.RecordExtracted(metricTags);
                 yield return defaultRecord;
                 continue;
             }
@@ -706,6 +715,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             {
                 dataLinesSkipped++;
                 IncrementCurrentSkippedItemCount();
+                FixedWidthMetrics.RecordSkipped(metricTags);
                 LogDebugDataLineSkipped(dataLinesSkipped);
                 continue;
             }
@@ -737,6 +747,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
             LogDebugRecordParsed();
             IncrementCurrentItemCount();
+            FixedWidthMetrics.RecordExtracted(metricTags);
             yield return record;
         }
 

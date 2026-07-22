@@ -67,3 +67,9 @@ Shows how to enable header row output and separator lines when loading, includin
 Composes an extract → transform → load flow as a single `EtlPipeline` fluent chain: `EtlPipeline.Create().FixedWidthExtractor<T>(…)` source factories and `FixedWidthLoader<T>(…)` sink terminators, with inline `Through` transform stages and 1:1 fluent configuration. Also shows the resource-ownership contract — path factories own and dispose the files they open, while caller-supplied readers/writers are left open. Requires `Wolfgang.Etl.Abstractions` 0.16.0.
 
 [View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/PipelineExtensions)
+
+## Metrics
+
+Subscribes to the `Wolfgang.Etl.FixedWidth` meter with a `MeterListener` and prints the counters and duration histogram the extractor and loader emit during an extract → load round trip (`items.extracted`, `items.loaded`, `items.skipped`, `lines.read`, `operation.duration`, each tagged with `etl.operation` and `etl.record_type`). In production you would subscribe with `AddMeter("Wolfgang.Etl.FixedWidth")` via OpenTelemetry instead.
+
+[View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/Metrics)
