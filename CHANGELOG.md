@@ -19,6 +19,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.7.0] - 2026-07-25
+
+Minor release: adopts the `Wolfgang.Etl.Abstractions` #84 per-item error-handling mechanism.
+Additive — no breaking change to the FixedWidth surface.
+
+### Added
+
+- Malformed-line handling now flows through the Abstractions #84 policy. `FixedWidthExtractor`
+  overrides `OnItemError` to translate the existing `MalformedLineHandling` knob (`Skip` → skip,
+  `ThrowException` → abort) and calls the base `HandleItemError`, so a genuine parse failure is
+  counted in `CurrentErrorItemCount` and surfaced in the pipeline's `ErrorItemCount` — kept
+  distinct from `RecordValidator` business rejects (which `CurrentRejectedItemCount` counts).
+  `MalformedLineHandling.ReturnDefault` recovers before the give-up decision, so it never enters
+  the error policy. Closes #29.
+
+### Changed
+
+- Bumped `Wolfgang.Etl.Abstractions` 0.15.0 → 0.18.0.
+
 ## [0.6.0] - 2026-07-18
 
 Layout introspection and format transformation. Additive — no breaking changes.
