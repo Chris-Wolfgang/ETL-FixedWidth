@@ -45,6 +45,7 @@
     <Project Path="examples/ErrorHandling/ErrorHandling.csproj" />
     <Project Path="examples/FieldDelimiter/FieldDelimiter.csproj" />
     <Project Path="examples/HeadersAndSeparators/HeadersAndSeparators.csproj" />
+    <Project Path="examples/Metrics/Metrics.csproj" />
     <Project Path="examples/PipelineExtensions/PipelineExtensions.csproj" />
     <Project Path="examples/ProgressReporting/ProgressReporting.csproj" />
     <Project Path="examples/RoundTrip/RoundTrip.csproj" />

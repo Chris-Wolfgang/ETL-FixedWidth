@@ -68,6 +68,12 @@ Composes an extract → transform → load flow as a single `EtlPipeline` fluent
 
 [View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/PipelineExtensions)
 
+## Metrics
+
+Subscribes to the `Wolfgang.Etl.FixedWidth` meter with a `MeterListener` and prints the counters and duration histogram the extractor and loader emit during an extract → load round trip (`items.extracted`, `items.loaded`, `items.skipped`, `lines.read`, `operation.duration`, each tagged with `etl.operation` and `etl.record_type`). In production you would subscribe with `AddMeter("Wolfgang.Etl.FixedWidth")` via OpenTelemetry instead.
+
+[View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/Metrics)
+
 ## SchemaBuilder
 
 Defines a fixed-width layout in code with `FixedWidthSchemaBuilder<T>` for a record type that carries no `[FixedWidthField]` attributes, then uses it — via the extractor/loader `Schema` property — to load and re-extract records. Also shows that a code-built schema is fully introspectable (`ToDiagram` / `Fields`), exactly like an attribute-resolved one.

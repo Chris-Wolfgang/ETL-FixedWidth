@@ -27,6 +27,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `FixedWidthLoader<T>.Schema` property to override attribute resolution; a
   built schema is equivalent to (and introspectable like) an attribute-resolved
   one ([#23]).
+- Built-in `System.Diagnostics.Metrics` instrumentation on the extractor and
+  loader, emitted from the meter **`Wolfgang.Etl.FixedWidth`**: counters
+  `wolfgang.etl.fixedwidth.items.extracted` / `.items.loaded` / `.items.skipped`
+  / `.lines.read` and the histogram `wolfgang.etl.fixedwidth.operation.duration`
+  (ms). Every measurement is tagged `etl.operation` (`extract`/`load`) and
+  `etl.record_type`. Zero-config — subscribe with OpenTelemetry
+  (`AddMeter("Wolfgang.Etl.FixedWidth")`) or a `MeterListener`; a no-op with no
+  listener registered ([#30]).
 
 ### Changed
 
@@ -259,6 +267,7 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#22]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/22
 [#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
 [#23]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/23
+[#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
 [Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.6.0...HEAD
 [0.6.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.5.1...v0.6.0
