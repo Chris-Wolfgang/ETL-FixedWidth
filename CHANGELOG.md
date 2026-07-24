@@ -9,7 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `EnableMetrics` property on `FixedWidthExtractor<T>` and `FixedWidthLoader<T>`
+  (default `false`) that turns the #30 metrics on. Metrics are now **opt-in**:
+  when off — the default — the extract/load hot loop executes no metric code at
+  all, restoring the pre-metrics throughput. Set `EnableMetrics = true` (and
+  subscribe via `AddMeter("Wolfgang.Etl.FixedWidth")` or a `MeterListener`) to
+  collect the counters and duration histogram ([#275]).
+
 ### Changed
+
+- The metrics added in 0.7.0 (#30) no longer emit unless `EnableMetrics` is set.
+  This removes the always-on per-line/per-record overhead that made extraction
+  ~1.5–1.95× slower in 0.7.0 regardless of whether a listener was attached
+  ([#275]).
 
 ### Deprecated
 
@@ -265,6 +277,7 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#22]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/22
 [#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
 [#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
+[#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
 [Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.7.0...HEAD
 [0.7.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.6.0...v0.7.0
