@@ -1,1 +1,2 @@
 #nullable enable
+override Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.OnItemError(Wolfgang.Etl.Abstractions.ItemErrorContext context) -> Wolfgang.Etl.Abstractions.ItemErrorAction

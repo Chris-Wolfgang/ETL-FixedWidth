@@ -1011,6 +1011,39 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
 
 
+    /// <summary>
+    /// Translates this extractor's <see cref="MalformedLineHandling"/> knob into the base
+    /// per-item error policy. <see cref="MalformedLineHandling.Skip"/> maps to
+    /// <see cref="ItemErrorAction.Skip"/>; <see cref="MalformedLineHandling.ThrowException"/>
+    /// maps to <see cref="ItemErrorAction.Abort"/>. <see cref="MalformedLineHandling.ReturnDefault"/>
+    /// recovers with a substitute record before the give-up decision, so it never reaches this
+    /// hook.
+    /// </summary>
+    /// <param name="context">The failure context supplied by the extract worker.</param>
+    /// <returns>The action the base class should apply to the failed line.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when <see cref="MalformedLineHandling"/> holds an unrecognized value.
+    /// </exception>
+    protected override ItemErrorAction OnItemError(ItemErrorContext context)
+    {
+        switch (MalformedLineHandling)
+        {
+            case MalformedLineHandling.Skip:
+                return ItemErrorAction.Skip;
+
+            case MalformedLineHandling.ThrowException:
+                return ItemErrorAction.Abort;
+
+            default:
+                throw new InvalidOperationException
+                (
+                    $"Unexpected {nameof(MalformedLineHandling)} value: {MalformedLineHandling}"
+                );
+        }
+    }
+
+
+
     // ------------------------------------------------------------------
     // Private helpers
     // ------------------------------------------------------------------
@@ -1128,26 +1161,26 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         {
             LogMalformedLine(ex);
 
-            switch (MalformedLineHandling)
+            // ReturnDefault recovers with a substitute record — it never reaches the
+            // "give up on this item" decision, so it does not go through the base error
+            // policy. The caller performs the yield and item-count increment.
+            if (MalformedLineHandling == MalformedLineHandling.ReturnDefault)
             {
-                case MalformedLineHandling.Skip:
-                    IncrementRejectedItemCount();
-                    return false;
-
-                case MalformedLineHandling.ReturnDefault:
-                    // Cannot yield inside catch — caller handles the yield and increment.
-                    record = CreateDefaultRecord(fieldMap);
-                    return true;
-
-                case MalformedLineHandling.ThrowException:
-                    throw;
-
-                default:
-                    throw new InvalidOperationException
-                    (
-                        $"Unexpected {nameof(MalformedLineHandling)} value: {MalformedLineHandling}"
-                    );
+                record = CreateDefaultRecord(fieldMap);
+                return true;
             }
+
+            // Throw / Skip are the give-up decisions. Route them through the base
+            // per-item error policy (OnItemError, translated from MalformedLineHandling)
+            // so the failure is counted (CurrentErrorItemCount) and surfaced in the
+            // pipeline (RecordsErrored) rather than being silent.
+            if (HandleItemError(new ItemErrorContext(_currentLineNumber, ex, () => line)) == ItemErrorAction.Abort)
+            {
+                throw;
+            }
+
+            IncrementRejectedItemCount();
+            return false;
         }
     }
 }
