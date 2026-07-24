@@ -213,6 +213,62 @@ using var transformer = FixedWidthTransformer<LegacyRecord, ModernRecord>.ByMatc
 
 `ByMatchingProperties()` copies every source property to the destination property of the same name and an assignable type, and requires a public parameterless constructor on the destination.
 
+### Composing an ETL pipeline
+
+Rather than wiring an extractor, transformer, and loader together by hand, the whole extract → transform → load flow can be expressed as one fluent chain on the generic `EtlPipeline` (from `Wolfgang.Etl.Abstractions` 0.16.0). `FixedWidthExtractor<T>` source factories hang off `EtlPipeline.Create()` and `FixedWidthLoader<T>` sink terminators hang off the pipeline, with the extractor/loader configuration exposed as inline setters:
+
+```csharp
+using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.FixedWidth;
+
+// Fixed-width in, human-readable table out — path factories own the files they open.
+await EtlPipeline
+    .Create()
+    .FixedWidthExtractor<PersonRecord>("people.dat")
+    .FixedWidthLoader<PersonRecord>("people.txt")
+    .WriteHeader(true)
+    .FieldSeparator('-')
+    .FieldDelimiter(" | ")
+    .RunAsync();
+```
+
+Insert transform stages with `Through` — an inline `Func<IAsyncEnumerable<T>, IAsyncEnumerable<TOut>>` stage needs no reference to the operators package:
+
+```csharp
+await EtlPipeline
+    .Create()
+    .FixedWidthExtractor<PersonRecord>(sourceReader)
+    .Through(KeepAdults)                 // a stream-to-stream transform delegate
+    .FixedWidthLoader<PersonRecord>(destinationWriter)
+    .RunAsync();
+```
+
+Every source and sink has **path**, `Stream`, and `TextReader`/`TextWriter` overloads (plus an existing-`FixedWidthExtractor<T>` overload). **Path** factories own the file stream they open and dispose it when the run finishes, on success or failure; caller-supplied streams, readers, and writers are always left open. The builder methods (`HeaderLineCount`, `MalformedLineHandling`, `FieldDelimiter`, `Encoding`, `WriteHeader`, `ValueConverter`, `IsDryRun`, …) map 1:1 to the `FixedWidthExtractor<T>` / `FixedWidthLoader<T>` properties.
+
+See the [PipelineExtensions](examples/PipelineExtensions) example for a complete, runnable walk-through.
+
+### Metrics and observability
+
+The extractor and loader emit standard [`System.Diagnostics.Metrics`](https://learn.microsoft.com/dotnet/core/diagnostics/metrics) instruments from the meter **`Wolfgang.Etl.FixedWidth`**, so throughput and error rates flow to OpenTelemetry, Prometheus, Grafana, Application Insights, or any `MeterListener` with no code changes. Metrics are a no-op when nothing is listening, so there is no overhead in the default case.
+
+| Instrument | Type | Description |
+|---|---|---|
+| `wolfgang.etl.fixedwidth.items.extracted` | Counter | Items successfully extracted |
+| `wolfgang.etl.fixedwidth.items.loaded` | Counter | Items successfully loaded |
+| `wolfgang.etl.fixedwidth.items.skipped` | Counter | Items skipped via the skip budget |
+| `wolfgang.etl.fixedwidth.lines.read` | Counter | Physical lines read (including blank/skipped) |
+| `wolfgang.etl.fixedwidth.operation.duration` | Histogram (ms) | Duration of an extract/load operation |
+
+Every measurement is tagged `etl.operation` (`extract` or `load`) and `etl.record_type` (`typeof(TRecord).Name`).
+
+```csharp
+// OpenTelemetry — one line, zero library changes:
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(m => m.AddMeter("Wolfgang.Etl.FixedWidth"));
+```
+
+See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-through.
+
 ---
 
 ## ✨ Features
@@ -237,11 +293,13 @@ using var transformer = FixedWidthTransformer<LegacyRecord, ModernRecord>.ByMatc
 | **Compiled delegates** | Field accessors use compiled delegates instead of reflection for fast property get/set |
 | **Schema introspection** | `FixedWidthSchema.For<T>()` exposes the resolved layout (positions, widths, types, skips); `ToDiagram()` renders it as a text table |
 | **Format transformation** | `FixedWidthTransformer<TSource, TDestination>` projects one layout to another in a single streaming pass, with optional `ByMatchingProperties()` auto-mapping |
+| **Pipeline composition** | `EtlPipeline.Create().FixedWidthExtractor<T>(…).FixedWidthLoader<T>(…).RunAsync()` — fluent source factories and sink terminators over the generic `EtlPipeline` (requires `Wolfgang.Etl.Abstractions` 0.16.0) |
+| **Metrics** | Zero-config `System.Diagnostics.Metrics` instruments (throughput, skips, duration) from the `Wolfgang.Etl.FixedWidth` meter — OpenTelemetry / Prometheus / any `MeterListener` |
 | **Multi-TFM support** | net462, net481, netstandard2.0, net8.0, net10.0 |
 
 **Examples:**
 
-The [examples/](examples/) folder contains 10 runnable console projects demonstrating each feature:
+The [examples/](examples/) folder contains 12 runnable console projects demonstrating each feature:
 
 | Example | Description |
 |---------|-------------|
@@ -255,6 +313,8 @@ The [examples/](examples/) folder contains 10 runnable console projects demonstr
 | [FieldDelimiter](examples/FieldDelimiter) | Delimited output (e.g. `" \| "`) for human-readable tables |
 | [SkipAndMax](examples/SkipAndMax) | `SkipItemCount` and `MaximumItemCount` for pagination |
 | [HeadersAndSeparators](examples/HeadersAndSeparators) | `WriteHeader`, `HasHeader`, and `FieldSeparator` |
+| [PipelineExtensions](examples/PipelineExtensions) | Compose extract → transform → load as one `EtlPipeline` fluent chain |
+| [Metrics](examples/Metrics) | Subscribe to the `Wolfgang.Etl.FixedWidth` meter and read throughput/duration metrics |
 
 ---
 
