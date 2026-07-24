@@ -1173,7 +1173,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             // Throw / Skip are the give-up decisions. Route them through the base
             // per-item error policy (OnItemError, translated from MalformedLineHandling)
             // so the failure is counted (CurrentErrorItemCount) and surfaced in the
-            // pipeline (RecordsErrored) rather than being silent.
+            // pipeline (ErrorItemCount) rather than being silent.
             if (HandleItemError(new ItemErrorContext(_currentLineNumber, ex, () => line)) == ItemErrorAction.Abort)
             {
                 throw;

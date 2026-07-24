@@ -14,7 +14,7 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 /// line routed through <c>MalformedLineHandling</c> now flows through the base
 /// <c>OnItemError</c>/<c>HandleItemError</c> policy, so a genuine parse failure is counted in the
 /// base <see cref="Wolfgang.Etl.Abstractions.ExtractorBase{TSource,TProgress}.CurrentErrorItemCount"/>
-/// and surfaced as <see cref="EtlPipelineProgress.RecordsErrored"/> — distinct from the broader
+/// and surfaced as <see cref="EtlPipelineProgress.ErrorItemCount"/> — distinct from the broader
 /// <c>CurrentRejectedItemCount</c>, which also counts validator rejects. <c>ReturnDefault</c>
 /// recovers before the give-up decision and is therefore never an error.
 /// </summary>
@@ -96,7 +96,7 @@ public class FixedWidthItemErrorHandlingTests
 
 
     [Fact]
-    public async Task Pipeline_RecordsErrored_surfaces_the_malformed_skips()
+    public async Task Pipeline_ErrorItemCount_surfaces_the_malformed_skips()
     {
         var reports = new List<EtlPipelineProgress>();
         var progress = new SyncProgress(reports.Add);
@@ -113,9 +113,9 @@ public class FixedWidthItemErrorHandlingTests
             .RunAsync(progress);
 
         var final = reports[^1];
-        Assert.Equal(2, final.RecordsExtracted);
-        Assert.Equal(2, final.RecordsLoaded);
-        Assert.Equal(2, final.RecordsErrored);
+        Assert.Equal(2, final.ExtractedItemCount);
+        Assert.Equal(2, final.LoadedItemCount);
+        Assert.Equal(2, final.ErrorItemCount);
         Assert.Equal(2, loader.Loaded.Count);
     }
 
