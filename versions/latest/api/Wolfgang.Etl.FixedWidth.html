@@ -81,6 +81,15 @@
 Classes
 </h3>
     <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.html">EtlPipelineFixedWidthExtensions</a></dt>
+      <dd><p>Class-named fixed-width source factories and sink terminators for the fluent <span class="xref">Wolfgang.Etl.Abstractions.EtlPipeline</span>
+chain (issue #253). Source factories hang off <span class="xref">Wolfgang.Etl.Abstractions.EtlPipeline</span> so a pipeline reads
+<code>EtlPipeline.Create().FixedWidthExtractor&lt;Person&gt;(&quot;people.txt&quot;)</code>; sink terminators hang off
+<span class="xref">Wolfgang.Etl.Abstractions.IEtlPipeline&lt;T&gt;</span> so it ends
+<code>… .FixedWidthLoader&lt;Person&gt;(&quot;out.txt&quot;).RunAsync()</code>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html">FieldContext</a></dt>
       <dd><p>Provides contextual information about a fixed-width field to a
 <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_ValueConverter">ValueConverter</a> or
@@ -144,6 +153,22 @@ a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWi
       <dd><p>The result returned by a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_RecordValidator">RecordValidator</a>
 delegate: the <a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.ValidationAction.html">ValidationAction</a> to take for a parsed record and an
 optional human-readable reason (surfaced in debug logs).</p>
+</dd>
+    </dl>
+    <h3 id="interfaces">
+Interfaces
+</h3>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html">IFixedWidthExtractorBuilder&lt;T&gt;</a></dt>
+      <dd><p>A fluent builder for a fixed-width extraction stage of a generic <span class="xref">Wolfgang.Etl.Abstractions.EtlPipeline</span>. Returned
+by the <code>FixedWidthExtractor</code> source factories in <a class="xref" href="Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.html">EtlPipelineFixedWidthExtensions</a>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html">IFixedWidthLoaderBuilder&lt;T&gt;</a></dt>
+      <dd><p>A fluent builder for a fixed-width loader that terminates a generic <span class="xref">Wolfgang.Etl.Abstractions.EtlPipeline</span>.
+Returned by the <code>FixedWidthLoader</code> sink terminators in
+<a class="xref" href="Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.html">EtlPipelineFixedWidthExtensions</a>.</p>
 </dd>
     </dl>
     <h3 id="delegates">

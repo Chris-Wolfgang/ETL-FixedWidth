@@ -326,6 +326,89 @@ references:
   commentId: F:Wolfgang.Etl.FixedWidth.Enums.ValidationAction.Stop
   fullName: Wolfgang.Etl.FixedWidth.Enums.ValidationAction.Stop
   nameWithType: ValidationAction.Stop
+- uid: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions
+  name: EtlPipelineFixedWidthExtensions
+  href: api/Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.html
+  commentId: T:Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions
+  fullName: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions
+  nameWithType: EtlPipelineFixedWidthExtensions
+- uid: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor*
+  name: FixedWidthExtractor
+  href: api/Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.html#Wolfgang_Etl_FixedWidth_EtlPipelineFixedWidthExtensions_FixedWidthExtractor_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor
+  nameWithType: EtlPipelineFixedWidthExtensions.FixedWidthExtractor
+- uid: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.IO.Stream)
+  name: FixedWidthExtractor<T>(EtlPipeline, Stream)
+  href: api/Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.html#Wolfgang_Etl_FixedWidth_EtlPipelineFixedWidthExtensions_FixedWidthExtractor__1_Wolfgang_Etl_Abstractions_EtlPipeline_System_IO_Stream_
+  commentId: M:Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.IO.Stream)
+  name.vb: FixedWidthExtractor(Of T)(EtlPipeline, Stream)
+  fullName: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor<T>(Wolfgang.Etl.Abstractions.EtlPipeline, System.IO.Stream)
+  fullName.vb: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor(Of T)(Wolfgang.Etl.Abstractions.EtlPipeline, System.IO.Stream)
+  nameWithType: EtlPipelineFixedWidthExtensions.FixedWidthExtractor<T>(EtlPipeline, Stream)
+  nameWithType.vb: EtlPipelineFixedWidthExtensions.FixedWidthExtractor(Of T)(EtlPipeline, Stream)
+- uid: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.IO.TextReader)
+  name: FixedWidthExtractor<T>(EtlPipeline, TextReader)
+  href: api/Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.html#Wolfgang_Etl_FixedWidth_EtlPipelineFixedWidthExtensions_FixedWidthExtractor__1_Wolfgang_Etl_Abstractions_EtlPipeline_System_IO_TextReader_
+  commentId: M:Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.IO.TextReader)
+  name.vb: FixedWidthExtractor(Of T)(EtlPipeline, TextReader)
+  fullName: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor<T>(Wolfgang.Etl.Abstractions.EtlPipeline, System.IO.TextReader)
+  fullName.vb: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor(Of T)(Wolfgang.Etl.Abstractions.EtlPipeline, System.IO.TextReader)
+  nameWithType: EtlPipelineFixedWidthExtensions.FixedWidthExtractor<T>(EtlPipeline, TextReader)
+  nameWithType.vb: EtlPipelineFixedWidthExtensions.FixedWidthExtractor(Of T)(EtlPipeline, TextReader)
+- uid: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.String)
+  name: FixedWidthExtractor<T>(EtlPipeline, string)
+  href: api/Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.html#Wolfgang_Etl_FixedWidth_EtlPipelineFixedWidthExtensions_FixedWidthExtractor__1_Wolfgang_Etl_Abstractions_EtlPipeline_System_String_
+  commentId: M:Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,System.String)
+  name.vb: FixedWidthExtractor(Of T)(EtlPipeline, String)
+  fullName: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor<T>(Wolfgang.Etl.Abstractions.EtlPipeline, string)
+  fullName.vb: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor(Of T)(Wolfgang.Etl.Abstractions.EtlPipeline, String)
+  nameWithType: EtlPipelineFixedWidthExtensions.FixedWidthExtractor<T>(EtlPipeline, string)
+  nameWithType.vb: EtlPipelineFixedWidthExtensions.FixedWidthExtractor(Of T)(EtlPipeline, String)
+- uid: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,Wolfgang.Etl.FixedWidth.FixedWidthExtractor{``0})
+  name: FixedWidthExtractor<T>(EtlPipeline, FixedWidthExtractor<T>)
+  href: api/Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.html#Wolfgang_Etl_FixedWidth_EtlPipelineFixedWidthExtensions_FixedWidthExtractor__1_Wolfgang_Etl_Abstractions_EtlPipeline_Wolfgang_Etl_FixedWidth_FixedWidthExtractor___0__
+  commentId: M:Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor``1(Wolfgang.Etl.Abstractions.EtlPipeline,Wolfgang.Etl.FixedWidth.FixedWidthExtractor{``0})
+  name.vb: FixedWidthExtractor(Of T)(EtlPipeline, FixedWidthExtractor(Of T))
+  fullName: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor<T>(Wolfgang.Etl.Abstractions.EtlPipeline, Wolfgang.Etl.FixedWidth.FixedWidthExtractor<T>)
+  fullName.vb: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthExtractor(Of T)(Wolfgang.Etl.Abstractions.EtlPipeline, Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of T))
+  nameWithType: EtlPipelineFixedWidthExtensions.FixedWidthExtractor<T>(EtlPipeline, FixedWidthExtractor<T>)
+  nameWithType.vb: EtlPipelineFixedWidthExtensions.FixedWidthExtractor(Of T)(EtlPipeline, FixedWidthExtractor(Of T))
+- uid: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader*
+  name: FixedWidthLoader
+  href: api/Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.html#Wolfgang_Etl_FixedWidth_EtlPipelineFixedWidthExtensions_FixedWidthLoader_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader
+  nameWithType: EtlPipelineFixedWidthExtensions.FixedWidthLoader
+- uid: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.IO.Stream)
+  name: FixedWidthLoader<T>(IEtlPipeline<T>, Stream)
+  href: api/Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.html#Wolfgang_Etl_FixedWidth_EtlPipelineFixedWidthExtensions_FixedWidthLoader__1_Wolfgang_Etl_Abstractions_IEtlPipeline___0__System_IO_Stream_
+  commentId: M:Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.IO.Stream)
+  name.vb: FixedWidthLoader(Of T)(IEtlPipeline(Of T), Stream)
+  fullName: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader<T>(Wolfgang.Etl.Abstractions.IEtlPipeline<T>, System.IO.Stream)
+  fullName.vb: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader(Of T)(Wolfgang.Etl.Abstractions.IEtlPipeline(Of T), System.IO.Stream)
+  nameWithType: EtlPipelineFixedWidthExtensions.FixedWidthLoader<T>(IEtlPipeline<T>, Stream)
+  nameWithType.vb: EtlPipelineFixedWidthExtensions.FixedWidthLoader(Of T)(IEtlPipeline(Of T), Stream)
+- uid: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.IO.TextWriter)
+  name: FixedWidthLoader<T>(IEtlPipeline<T>, TextWriter)
+  href: api/Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.html#Wolfgang_Etl_FixedWidth_EtlPipelineFixedWidthExtensions_FixedWidthLoader__1_Wolfgang_Etl_Abstractions_IEtlPipeline___0__System_IO_TextWriter_
+  commentId: M:Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.IO.TextWriter)
+  name.vb: FixedWidthLoader(Of T)(IEtlPipeline(Of T), TextWriter)
+  fullName: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader<T>(Wolfgang.Etl.Abstractions.IEtlPipeline<T>, System.IO.TextWriter)
+  fullName.vb: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader(Of T)(Wolfgang.Etl.Abstractions.IEtlPipeline(Of T), System.IO.TextWriter)
+  nameWithType: EtlPipelineFixedWidthExtensions.FixedWidthLoader<T>(IEtlPipeline<T>, TextWriter)
+  nameWithType.vb: EtlPipelineFixedWidthExtensions.FixedWidthLoader(Of T)(IEtlPipeline(Of T), TextWriter)
+- uid: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.String)
+  name: FixedWidthLoader<T>(IEtlPipeline<T>, string)
+  href: api/Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.html#Wolfgang_Etl_FixedWidth_EtlPipelineFixedWidthExtensions_FixedWidthLoader__1_Wolfgang_Etl_Abstractions_IEtlPipeline___0__System_String_
+  commentId: M:Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader``1(Wolfgang.Etl.Abstractions.IEtlPipeline{``0},System.String)
+  name.vb: FixedWidthLoader(Of T)(IEtlPipeline(Of T), String)
+  fullName: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader<T>(Wolfgang.Etl.Abstractions.IEtlPipeline<T>, string)
+  fullName.vb: Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.FixedWidthLoader(Of T)(Wolfgang.Etl.Abstractions.IEtlPipeline(Of T), String)
+  nameWithType: EtlPipelineFixedWidthExtensions.FixedWidthLoader<T>(IEtlPipeline<T>, string)
+  nameWithType.vb: EtlPipelineFixedWidthExtensions.FixedWidthLoader(Of T)(IEtlPipeline(Of T), String)
 - uid: Wolfgang.Etl.FixedWidth.Exceptions
   name: Wolfgang.Etl.FixedWidth.Exceptions
   href: api/Wolfgang.Etl.FixedWidth.Exceptions.html
@@ -1775,6 +1858,325 @@ references:
   commentId: T:Wolfgang.Etl.FixedWidth.FixedWidthValueParser
   fullName: Wolfgang.Etl.FixedWidth.FixedWidthValueParser
   nameWithType: FixedWidthValueParser
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1
+  name: IFixedWidthExtractorBuilder<T>
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html
+  commentId: T:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1
+  name.vb: IFixedWidthExtractorBuilder(Of T)
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T)
+  nameWithType: IFixedWidthExtractorBuilder<T>
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T)
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.BlankLineHandling(Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling)
+  name: BlankLineHandling(BlankLineHandling)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_BlankLineHandling_Wolfgang_Etl_FixedWidth_Enums_BlankLineHandling_
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.BlankLineHandling(Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling)
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.BlankLineHandling(Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).BlankLineHandling(Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling)
+  nameWithType: IFixedWidthExtractorBuilder<T>.BlankLineHandling(BlankLineHandling)
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).BlankLineHandling(BlankLineHandling)
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.BlankLineHandling*
+  name: BlankLineHandling
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_BlankLineHandling_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.BlankLineHandling
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.BlankLineHandling
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).BlankLineHandling
+  nameWithType: IFixedWidthExtractorBuilder<T>.BlankLineHandling
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).BlankLineHandling
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.Encoding(System.Text.Encoding)
+  name: Encoding(Encoding)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_Encoding_System_Text_Encoding_
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.Encoding(System.Text.Encoding)
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.Encoding(System.Text.Encoding)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).Encoding(System.Text.Encoding)
+  nameWithType: IFixedWidthExtractorBuilder<T>.Encoding(Encoding)
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).Encoding(Encoding)
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.Encoding*
+  name: Encoding
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_Encoding_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.Encoding
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.Encoding
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).Encoding
+  nameWithType: IFixedWidthExtractorBuilder<T>.Encoding
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).Encoding
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.FieldDelimiter(System.String)
+  name: FieldDelimiter(string?)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_FieldDelimiter_System_String_
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.FieldDelimiter(System.String)
+  name.vb: FieldDelimiter(String)
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.FieldDelimiter(string?)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).FieldDelimiter(String)
+  nameWithType: IFixedWidthExtractorBuilder<T>.FieldDelimiter(string?)
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).FieldDelimiter(String)
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.FieldDelimiter*
+  name: FieldDelimiter
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_FieldDelimiter_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.FieldDelimiter
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.FieldDelimiter
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).FieldDelimiter
+  nameWithType: IFixedWidthExtractorBuilder<T>.FieldDelimiter
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).FieldDelimiter
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.FieldSeparator(System.Nullable{System.Char})
+  name: FieldSeparator(char?)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_FieldSeparator_System_Nullable_System_Char__
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.FieldSeparator(System.Nullable{System.Char})
+  name.vb: FieldSeparator(Char?)
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.FieldSeparator(char?)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).FieldSeparator(Char?)
+  nameWithType: IFixedWidthExtractorBuilder<T>.FieldSeparator(char?)
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).FieldSeparator(Char?)
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.FieldSeparator*
+  name: FieldSeparator
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_FieldSeparator_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.FieldSeparator
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.FieldSeparator
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).FieldSeparator
+  nameWithType: IFixedWidthExtractorBuilder<T>.FieldSeparator
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).FieldSeparator
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.HasHeader(System.Boolean)
+  name: HasHeader(bool)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_HasHeader_System_Boolean_
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.HasHeader(System.Boolean)
+  name.vb: HasHeader(Boolean)
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.HasHeader(bool)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).HasHeader(Boolean)
+  nameWithType: IFixedWidthExtractorBuilder<T>.HasHeader(bool)
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).HasHeader(Boolean)
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.HasHeader*
+  name: HasHeader
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_HasHeader_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.HasHeader
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.HasHeader
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).HasHeader
+  nameWithType: IFixedWidthExtractorBuilder<T>.HasHeader
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).HasHeader
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.HeaderLineCount(System.Int32)
+  name: HeaderLineCount(int)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_HeaderLineCount_System_Int32_
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.HeaderLineCount(System.Int32)
+  name.vb: HeaderLineCount(Integer)
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.HeaderLineCount(int)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).HeaderLineCount(Integer)
+  nameWithType: IFixedWidthExtractorBuilder<T>.HeaderLineCount(int)
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).HeaderLineCount(Integer)
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.HeaderLineCount*
+  name: HeaderLineCount
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_HeaderLineCount_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.HeaderLineCount
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.HeaderLineCount
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).HeaderLineCount
+  nameWithType: IFixedWidthExtractorBuilder<T>.HeaderLineCount
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).HeaderLineCount
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.LineFilter(System.Func{System.String,Wolfgang.Etl.FixedWidth.Enums.LineAction})
+  name: LineFilter(Func<string, LineAction>)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_LineFilter_System_Func_System_String_Wolfgang_Etl_FixedWidth_Enums_LineAction__
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.LineFilter(System.Func{System.String,Wolfgang.Etl.FixedWidth.Enums.LineAction})
+  name.vb: LineFilter(Func(Of String, LineAction))
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.LineFilter(System.Func<string, Wolfgang.Etl.FixedWidth.Enums.LineAction>)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).LineFilter(System.Func(Of String, Wolfgang.Etl.FixedWidth.Enums.LineAction))
+  nameWithType: IFixedWidthExtractorBuilder<T>.LineFilter(Func<string, LineAction>)
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).LineFilter(Func(Of String, LineAction))
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.LineFilter*
+  name: LineFilter
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_LineFilter_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.LineFilter
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.LineFilter
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).LineFilter
+  nameWithType: IFixedWidthExtractorBuilder<T>.LineFilter
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).LineFilter
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.MalformedLineHandling(Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling)
+  name: MalformedLineHandling(MalformedLineHandling)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_MalformedLineHandling_Wolfgang_Etl_FixedWidth_Enums_MalformedLineHandling_
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.MalformedLineHandling(Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling)
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.MalformedLineHandling(Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).MalformedLineHandling(Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling)
+  nameWithType: IFixedWidthExtractorBuilder<T>.MalformedLineHandling(MalformedLineHandling)
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).MalformedLineHandling(MalformedLineHandling)
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.MalformedLineHandling*
+  name: MalformedLineHandling
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_MalformedLineHandling_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.MalformedLineHandling
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.MalformedLineHandling
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).MalformedLineHandling
+  nameWithType: IFixedWidthExtractorBuilder<T>.MalformedLineHandling
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).MalformedLineHandling
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.RecordValidator(System.Func{`0,Wolfgang.Etl.FixedWidth.ValidationResult})
+  name: RecordValidator(Func<T, ValidationResult>)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_RecordValidator_System_Func__0_Wolfgang_Etl_FixedWidth_ValidationResult__
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.RecordValidator(System.Func{`0,Wolfgang.Etl.FixedWidth.ValidationResult})
+  name.vb: RecordValidator(Func(Of T, ValidationResult))
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.RecordValidator(System.Func<T, Wolfgang.Etl.FixedWidth.ValidationResult>)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).RecordValidator(System.Func(Of T, Wolfgang.Etl.FixedWidth.ValidationResult))
+  nameWithType: IFixedWidthExtractorBuilder<T>.RecordValidator(Func<T, ValidationResult>)
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).RecordValidator(Func(Of T, ValidationResult))
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.RecordValidator*
+  name: RecordValidator
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_RecordValidator_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.RecordValidator
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.RecordValidator
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).RecordValidator
+  nameWithType: IFixedWidthExtractorBuilder<T>.RecordValidator
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).RecordValidator
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.ValueParser(Wolfgang.Etl.FixedWidth.FixedWidthValueParser)
+  name: ValueParser(FixedWidthValueParser)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_ValueParser_Wolfgang_Etl_FixedWidth_FixedWidthValueParser_
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.ValueParser(Wolfgang.Etl.FixedWidth.FixedWidthValueParser)
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.ValueParser(Wolfgang.Etl.FixedWidth.FixedWidthValueParser)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).ValueParser(Wolfgang.Etl.FixedWidth.FixedWidthValueParser)
+  nameWithType: IFixedWidthExtractorBuilder<T>.ValueParser(FixedWidthValueParser)
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).ValueParser(FixedWidthValueParser)
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.ValueParser*
+  name: ValueParser
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthExtractorBuilder_1_ValueParser_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder`1.ValueParser
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>.ValueParser
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder(Of T).ValueParser
+  nameWithType: IFixedWidthExtractorBuilder<T>.ValueParser
+  nameWithType.vb: IFixedWidthExtractorBuilder(Of T).ValueParser
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1
+  name: IFixedWidthLoaderBuilder<T>
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html
+  commentId: T:Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1
+  name.vb: IFixedWidthLoaderBuilder(Of T)
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder(Of T)
+  nameWithType: IFixedWidthLoaderBuilder<T>
+  nameWithType.vb: IFixedWidthLoaderBuilder(Of T)
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.Encoding(System.Text.Encoding)
+  name: Encoding(Encoding)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_Encoding_System_Text_Encoding_
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.Encoding(System.Text.Encoding)
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.Encoding(System.Text.Encoding)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder(Of T).Encoding(System.Text.Encoding)
+  nameWithType: IFixedWidthLoaderBuilder<T>.Encoding(Encoding)
+  nameWithType.vb: IFixedWidthLoaderBuilder(Of T).Encoding(Encoding)
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.Encoding*
+  name: Encoding
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_Encoding_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.Encoding
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.Encoding
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder(Of T).Encoding
+  nameWithType: IFixedWidthLoaderBuilder<T>.Encoding
+  nameWithType.vb: IFixedWidthLoaderBuilder(Of T).Encoding
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.FieldDelimiter(System.String)
+  name: FieldDelimiter(string?)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_FieldDelimiter_System_String_
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.FieldDelimiter(System.String)
+  name.vb: FieldDelimiter(String)
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.FieldDelimiter(string?)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder(Of T).FieldDelimiter(String)
+  nameWithType: IFixedWidthLoaderBuilder<T>.FieldDelimiter(string?)
+  nameWithType.vb: IFixedWidthLoaderBuilder(Of T).FieldDelimiter(String)
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.FieldDelimiter*
+  name: FieldDelimiter
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_FieldDelimiter_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.FieldDelimiter
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.FieldDelimiter
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder(Of T).FieldDelimiter
+  nameWithType: IFixedWidthLoaderBuilder<T>.FieldDelimiter
+  nameWithType.vb: IFixedWidthLoaderBuilder(Of T).FieldDelimiter
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.FieldSeparator(System.Nullable{System.Char})
+  name: FieldSeparator(char?)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_FieldSeparator_System_Nullable_System_Char__
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.FieldSeparator(System.Nullable{System.Char})
+  name.vb: FieldSeparator(Char?)
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.FieldSeparator(char?)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder(Of T).FieldSeparator(Char?)
+  nameWithType: IFixedWidthLoaderBuilder<T>.FieldSeparator(char?)
+  nameWithType.vb: IFixedWidthLoaderBuilder(Of T).FieldSeparator(Char?)
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.FieldSeparator*
+  name: FieldSeparator
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_FieldSeparator_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.FieldSeparator
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.FieldSeparator
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder(Of T).FieldSeparator
+  nameWithType: IFixedWidthLoaderBuilder<T>.FieldSeparator
+  nameWithType.vb: IFixedWidthLoaderBuilder(Of T).FieldSeparator
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.HeaderConverter(System.Func{System.String,Wolfgang.Etl.FixedWidth.FieldContext,System.String})
+  name: HeaderConverter(Func<string, FieldContext, string>)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_HeaderConverter_System_Func_System_String_Wolfgang_Etl_FixedWidth_FieldContext_System_String__
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.HeaderConverter(System.Func{System.String,Wolfgang.Etl.FixedWidth.FieldContext,System.String})
+  name.vb: HeaderConverter(Func(Of String, FieldContext, String))
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.HeaderConverter(System.Func<string, Wolfgang.Etl.FixedWidth.FieldContext, string>)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder(Of T).HeaderConverter(System.Func(Of String, Wolfgang.Etl.FixedWidth.FieldContext, String))
+  nameWithType: IFixedWidthLoaderBuilder<T>.HeaderConverter(Func<string, FieldContext, string>)
+  nameWithType.vb: IFixedWidthLoaderBuilder(Of T).HeaderConverter(Func(Of String, FieldContext, String))
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.HeaderConverter*
+  name: HeaderConverter
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_HeaderConverter_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.HeaderConverter
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.HeaderConverter
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder(Of T).HeaderConverter
+  nameWithType: IFixedWidthLoaderBuilder<T>.HeaderConverter
+  nameWithType.vb: IFixedWidthLoaderBuilder(Of T).HeaderConverter
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.IsDryRun(System.Boolean)
+  name: IsDryRun(bool)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_IsDryRun_System_Boolean_
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.IsDryRun(System.Boolean)
+  name.vb: IsDryRun(Boolean)
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.IsDryRun(bool)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder(Of T).IsDryRun(Boolean)
+  nameWithType: IFixedWidthLoaderBuilder<T>.IsDryRun(bool)
+  nameWithType.vb: IFixedWidthLoaderBuilder(Of T).IsDryRun(Boolean)
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.IsDryRun*
+  name: IsDryRun
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_IsDryRun_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.IsDryRun
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.IsDryRun
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder(Of T).IsDryRun
+  nameWithType: IFixedWidthLoaderBuilder<T>.IsDryRun
+  nameWithType.vb: IFixedWidthLoaderBuilder(Of T).IsDryRun
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.ValueConverter(System.Func{System.Object,Wolfgang.Etl.FixedWidth.FieldContext,System.String})
+  name: ValueConverter(Func<object, FieldContext, string>)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_ValueConverter_System_Func_System_Object_Wolfgang_Etl_FixedWidth_FieldContext_System_String__
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.ValueConverter(System.Func{System.Object,Wolfgang.Etl.FixedWidth.FieldContext,System.String})
+  name.vb: ValueConverter(Func(Of Object, FieldContext, String))
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.ValueConverter(System.Func<object, Wolfgang.Etl.FixedWidth.FieldContext, string>)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder(Of T).ValueConverter(System.Func(Of Object, Wolfgang.Etl.FixedWidth.FieldContext, String))
+  nameWithType: IFixedWidthLoaderBuilder<T>.ValueConverter(Func<object, FieldContext, string>)
+  nameWithType.vb: IFixedWidthLoaderBuilder(Of T).ValueConverter(Func(Of Object, FieldContext, String))
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.ValueConverter*
+  name: ValueConverter
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_ValueConverter_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.ValueConverter
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.ValueConverter
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder(Of T).ValueConverter
+  nameWithType: IFixedWidthLoaderBuilder<T>.ValueConverter
+  nameWithType.vb: IFixedWidthLoaderBuilder(Of T).ValueConverter
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.WriteHeader(System.Boolean)
+  name: WriteHeader(bool)
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_WriteHeader_System_Boolean_
+  commentId: M:Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.WriteHeader(System.Boolean)
+  name.vb: WriteHeader(Boolean)
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.WriteHeader(bool)
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder(Of T).WriteHeader(Boolean)
+  nameWithType: IFixedWidthLoaderBuilder<T>.WriteHeader(bool)
+  nameWithType.vb: IFixedWidthLoaderBuilder(Of T).WriteHeader(Boolean)
+- uid: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.WriteHeader*
+  name: WriteHeader
+  href: api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_WriteHeader_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.WriteHeader
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>.WriteHeader
+  fullName.vb: Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder(Of T).WriteHeader
+  nameWithType: IFixedWidthLoaderBuilder<T>.WriteHeader
+  nameWithType.vb: IFixedWidthLoaderBuilder(Of T).WriteHeader
 - uid: Wolfgang.Etl.FixedWidth.ValidationResult
   name: ValidationResult
   href: api/Wolfgang.Etl.FixedWidth.ValidationResult.html

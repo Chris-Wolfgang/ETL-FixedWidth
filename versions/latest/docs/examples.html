@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.6.0/docfx_project/docs/examples.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/docfx_project/docs/examples.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -104,11 +104,17 @@
 <h2 id="headersandseparators">HeadersAndSeparators</h2>
 <p>Shows how to enable header row output and separator lines when loading, including custom header text via the <code>Header</code> property on <code>[FixedWidthField]</code>.</p>
 <p><a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/HeadersAndSeparators">View source</a></p>
+<h2 id="pipelineextensions">PipelineExtensions</h2>
+<p>Composes an extract → transform → load flow as a single <code>EtlPipeline</code> fluent chain: <code>EtlPipeline.Create().FixedWidthExtractor&lt;T&gt;(…)</code> source factories and <code>FixedWidthLoader&lt;T&gt;(…)</code> sink terminators, with inline <code>Through</code> transform stages and 1:1 fluent configuration. Also shows the resource-ownership contract — path factories own and dispose the files they open, while caller-supplied readers/writers are left open. Requires <code>Wolfgang.Etl.Abstractions</code> 0.16.0.</p>
+<p><a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/PipelineExtensions">View source</a></p>
+<h2 id="metrics">Metrics</h2>
+<p>Subscribes to the <code>Wolfgang.Etl.FixedWidth</code> meter with a <code>MeterListener</code> and prints the counters and duration histogram the extractor and loader emit during an extract → load round trip (<code>items.extracted</code>, <code>items.loaded</code>, <code>items.skipped</code>, <code>lines.read</code>, <code>operation.duration</code>, each tagged with <code>etl.operation</code> and <code>etl.record_type</code>). In production you would subscribe with <code>AddMeter(&quot;Wolfgang.Etl.FixedWidth&quot;)</code> via OpenTelemetry instead.</p>
+<p><a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/Metrics">View source</a></p>
 
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.6.0/docfx_project/docs/examples.md/#L1" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/docfx_project/docs/examples.md/#L1" class="edit-link">Edit this page</a>
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>

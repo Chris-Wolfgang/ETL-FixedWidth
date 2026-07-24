@@ -1,36 +1,40 @@
 Summary
-  Generated on: 7/20/2026 - 1:32:42 PM
-  Coverage date: 7/20/2026 - 1:32:38 PM
+  Generated on: 7/24/2026 - 11:49:53 PM
+  Coverage date: 7/24/2026 - 11:49:49 PM
   Parser: Cobertura
   Assemblies: 1
-  Classes: 20
-  Files: 20
-  Line coverage: 96.1%
-  Covered lines: 1399
-  Uncovered lines: 56
-  Coverable lines: 1455
-  Total lines: 5013
-  Branch coverage: 88.3% (403 of 456)
-  Covered branches: 403
-  Total branches: 456
-  Method coverage: 99% (211 of 213)
-  Full method coverage: 94.3% (201 of 213)
-  Covered methods: 211
-  Fully covered methods: 201
-  Total methods: 213
+  Classes: 24
+  Files: 24
+  Line coverage: 96.5%
+  Covered lines: 1629
+  Uncovered lines: 59
+  Coverable lines: 1688
+  Total lines: 5820
+  Branch coverage: 89.7% (483 of 538)
+  Covered branches: 483
+  Total branches: 538
+  Method coverage: 98.1% (263 of 268)
+  Full method coverage: 94.4% (253 of 268)
+  Covered methods: 263
+  Fully covered methods: 253
+  Total methods: 268
 
-Wolfgang.Etl.FixedWidth                                         96.1%
+Wolfgang.Etl.FixedWidth                                         96.5%
   Wolfgang.Etl.FixedWidth.Attributes.FixedWidthFieldAttribute    100%
   Wolfgang.Etl.FixedWidth.Attributes.FixedWidthSkipAttribute     100%
+  Wolfgang.Etl.FixedWidth.Diagnostics.FixedWidthMetrics          100%
+  Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions        100%
   Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException    100%
   Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException      100%
   Wolfgang.Etl.FixedWidth.Exceptions.LineTooShortException       100%
   Wolfgang.Etl.FixedWidth.Exceptions.MalformedLineException      100%
   Wolfgang.Etl.FixedWidth.FieldContext                           100%
   Wolfgang.Etl.FixedWidth.FixedWidthConverter                   92.5%
-  Wolfgang.Etl.FixedWidth.FixedWidthExtractor<T>                  92%
+  Wolfgang.Etl.FixedWidth.FixedWidthExtractor<T>                92.2%
+  Wolfgang.Etl.FixedWidth.FixedWidthExtractorBuilder<T>         96.1%
   Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo                    100%
-  Wolfgang.Etl.FixedWidth.FixedWidthLoader<T>                   93.8%
+  Wolfgang.Etl.FixedWidth.FixedWidthLoader<T>                   93.9%
+  Wolfgang.Etl.FixedWidth.FixedWidthLoaderBuilder<T>             100%
   Wolfgang.Etl.FixedWidth.FixedWidthReport                       100%
   Wolfgang.Etl.FixedWidth.FixedWidthSchema                       100%
   Wolfgang.Etl.FixedWidth.FixedWidthTransformer<T1, T2>         98.3%

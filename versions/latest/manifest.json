@@ -148,6 +148,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.yml\" sourcestartlinenumber=\"1\">Class-named fixed-width source factories and sink terminators for the fluent <xref href=\"Wolfgang.Etl.Abstractions.EtlPipeline\" data-throw-if-not-resolved=\"false\"></xref>\nchain (issue #253). Source factories hang off <xref href=\"Wolfgang.Etl.Abstractions.EtlPipeline\" data-throw-if-not-resolved=\"false\"></xref> so a pipeline reads\n<code>EtlPipeline.Create().FixedWidthExtractor&lt;Person&gt;(&quot;people.txt&quot;)</code>; sink terminators hang off\n<xref href=\"Wolfgang.Etl.Abstractions.IEtlPipeline%601\" data-throw-if-not-resolved=\"false\"></xref> so it ends\n<code>… .FixedWidthLoader&lt;Person&gt;(&quot;out.txt&quot;).RunAsync()</code>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.yml",
       "output": {
         ".html": {
@@ -341,6 +355,34 @@
       "IsMRef": true,
       "Title": "Wolfgang.Etl.FixedWidth.FixedWidthValueParser",
       "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthValueParser.yml\" sourcestartlinenumber=\"1\">Converts a raw field value read from the file into the target property type.\nThe <code class=\"paramref\">text</code> is a zero-copy slice of the source line — call\n<xref href=\"System.ReadOnlyMemory%601.ToString\" data-throw-if-not-resolved=\"false\"></xref> only if you need a <xref href=\"System.String\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder-1.yml\" sourcestartlinenumber=\"1\">A fluent builder for a fixed-width extraction stage of a generic <xref href=\"Wolfgang.Etl.Abstractions.EtlPipeline\" data-throw-if-not-resolved=\"false\"></xref>. Returned\nby the <code>FixedWidthExtractor</code> source factories in <xref href=\"Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder<T>",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.yml\" sourcestartlinenumber=\"1\">A fluent builder for a fixed-width loader that terminates a generic <xref href=\"Wolfgang.Etl.Abstractions.EtlPipeline\" data-throw-if-not-resolved=\"false\"></xref>.\nReturned by the <code>FixedWidthLoader</code> sink terminators in\n<xref href=\"Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
     },
     {
       "type": "ManagedReference",

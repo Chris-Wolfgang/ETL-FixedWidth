@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Interface IFixedWidthLoaderBuilder&lt;T&gt; | Wolfgang.Etl.FixedWidth Documentation </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Interface IFixedWidthLoaderBuilder&lt;T&gt; | Wolfgang.Etl.FixedWidth Documentation ">
+      
+      <meta name="description" content="A fluent builder for a fixed-width loader that terminates a generic . Returned by the FixedWidthLoader sink terminators in .">
+      <link rel="icon" href="../favicon.svg">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.7.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="Wolfgang.Etl.FixedWidth">
+            Wolfgang.Etl.FixedWidth
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+
+      <div class="content">
+        <div class="actionbar">
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1">
+
+
+
+  <h1 id="Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1" data-uid="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1" class="text-break">
+Interface IFixedWidthLoaderBuilder&lt;T&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/src/Wolfgang.Etl.FixedWidth/Pipeline/IFixedWidthLoaderBuilder.cs/#L21"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Wolfgang.html">Wolfgang</a>.<a class="xref" href="Wolfgang.Etl.html">Etl</a>.<a class="xref" href="Wolfgang.Etl.FixedWidth.html">FixedWidth</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Wolfgang.Etl.FixedWidth.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>A fluent builder for a fixed-width loader that terminates a generic <span class="xref">Wolfgang.Etl.Abstractions.EtlPipeline</span>.
+Returned by the <code>FixedWidthLoader</code> sink terminators in
+<a class="xref" href="Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions.html">EtlPipelineFixedWidthExtensions</a>.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public interface IFixedWidthLoaderBuilder&lt;T&gt; : IEtlPipelineSink where T : notnull</code></pre>
+  </div>
+
+
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>The record type consumed by the loader.</p>
+</dd>
+  </dl>
+
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iprogress-1">IEtlPipelineSink.RunAsync(IProgress&lt;EtlPipelineProgress&gt;, CancellationToken)</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Each configuration method maps one-to-one to a settable property on
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a> and returns the same builder so calls
+chain. Because the builder <em>is</em> an <span class="xref">Wolfgang.Etl.Abstractions.IEtlPipelineSink</span>, the loader is materialized
+and the pipeline runs when
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iprogress-1">RunAsync(IProgress&lt;EtlPipelineProgress&gt;, CancellationToken)</a>
+is called.</p>
+</div>
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_Encoding_" data-uid="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.Encoding*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_Encoding_System_Text_Encoding_" data-uid="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.Encoding(System.Text.Encoding)">
+  Encoding(Encoding)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/src/Wolfgang.Etl.FixedWidth/Pipeline/IFixedWidthLoaderBuilder.cs/#L31"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets the text encoding used to encode the output. Applies only to the path- and stream-based
+terminators; a caller-supplied writer already carries its own encoding. Defaults to
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.encoding.utf8">UTF8</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IFixedWidthLoaderBuilder&lt;T&gt; Encoding(Encoding encoding)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>encoding</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.encoding">Encoding</a></dt>
+    <dd><p>The encoding to write with.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html">IFixedWidthLoaderBuilder</a>&lt;T&gt;</dt>
+    <dd><p>The same builder, for chaining.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_FieldDelimiter_" data-uid="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.FieldDelimiter*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_FieldDelimiter_System_String_" data-uid="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.FieldDelimiter(System.String)">
+  FieldDelimiter(string?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/src/Wolfgang.Etl.FixedWidth/Pipeline/IFixedWidthLoaderBuilder.cs/#L77"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_FieldDelimiter">FieldDelimiter</a> — a string written between adjacent fields on
+every line, or <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> for pure fixed-width output.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IFixedWidthLoaderBuilder&lt;T&gt; FieldDelimiter(string? delimiter)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>delimiter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The field delimiter, or <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> for none.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html">IFixedWidthLoaderBuilder</a>&lt;T&gt;</dt>
+    <dd><p>The same builder, for chaining.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_FieldSeparator_" data-uid="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.FieldSeparator*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_FieldSeparator_System_Nullable_System_Char__" data-uid="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.FieldSeparator(System.Nullable{System.Char})">
+  FieldSeparator(char?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/src/Wolfgang.Etl.FixedWidth/Pipeline/IFixedWidthLoaderBuilder.cs/#L68"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_FieldSeparator">FieldSeparator</a> — when non-null (and a header is written), a
+separator line of the given character is written after the header.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IFixedWidthLoaderBuilder&lt;T&gt; FieldSeparator(char? separator)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>separator</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a>?</dt>
+    <dd><p>The separator character, or <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> for none.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html">IFixedWidthLoaderBuilder</a>&lt;T&gt;</dt>
+    <dd><p>The same builder, for chaining.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_HeaderConverter_" data-uid="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.HeaderConverter*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_HeaderConverter_System_Func_System_String_Wolfgang_Etl_FixedWidth_FieldContext_System_String__" data-uid="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.HeaderConverter(System.Func{System.String,Wolfgang.Etl.FixedWidth.FieldContext,System.String})">
+  HeaderConverter(Func&lt;string, FieldContext, string&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/src/Wolfgang.Etl.FixedWidth/Pipeline/IFixedWidthLoaderBuilder.cs/#L59"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_HeaderConverter">HeaderConverter</a> — the delegate that renders a header label
+to its string form. Only used when <a class="xref" href="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html#Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_WriteHeader_System_Boolean_">WriteHeader(bool)</a> is enabled.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IFixedWidthLoaderBuilder&lt;T&gt; HeaderConverter(Func&lt;string, FieldContext, string&gt; converter)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>converter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html">FieldContext</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd><p>The header converter.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html">IFixedWidthLoaderBuilder</a>&lt;T&gt;</dt>
+    <dd><p>The same builder, for chaining.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_IsDryRun_" data-uid="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.IsDryRun*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_IsDryRun_System_Boolean_" data-uid="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.IsDryRun(System.Boolean)">
+  IsDryRun(bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/src/Wolfgang.Etl.FixedWidth/Pipeline/IFixedWidthLoaderBuilder.cs/#L86"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_IsDryRun">IsDryRun</a> — when enabled the pipeline runs and validates but
+writes nothing to the output.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IFixedWidthLoaderBuilder&lt;T&gt; IsDryRun(bool isDryRun)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>isDryRun</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p><a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> to run without writing output.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html">IFixedWidthLoaderBuilder</a>&lt;T&gt;</dt>
+    <dd><p>The same builder, for chaining.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_ValueConverter_" data-uid="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.ValueConverter*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_ValueConverter_System_Func_System_Object_Wolfgang_Etl_FixedWidth_FieldContext_System_String__" data-uid="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.ValueConverter(System.Func{System.Object,Wolfgang.Etl.FixedWidth.FieldContext,System.String})">
+  ValueConverter(Func&lt;object, FieldContext, string&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/src/Wolfgang.Etl.FixedWidth/Pipeline/IFixedWidthLoaderBuilder.cs/#L50"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_ValueConverter">ValueConverter</a> — the delegate that renders a field value to
+its string form before padding.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IFixedWidthLoaderBuilder&lt;T&gt; ValueConverter(Func&lt;object, FieldContext, string&gt; converter)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>converter</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>, <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html">FieldContext</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</dt>
+    <dd><p>The value converter.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html">IFixedWidthLoaderBuilder</a>&lt;T&gt;</dt>
+    <dd><p>The same builder, for chaining.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_WriteHeader_" data-uid="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.WriteHeader*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_IFixedWidthLoaderBuilder_1_WriteHeader_System_Boolean_" data-uid="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder`1.WriteHeader(System.Boolean)">
+  WriteHeader(bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/src/Wolfgang.Etl.FixedWidth/Pipeline/IFixedWidthLoaderBuilder.cs/#L41"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Sets <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_WriteHeader">WriteHeader</a> — whether a header line is written before the
+records.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IFixedWidthLoaderBuilder&lt;T&gt; WriteHeader(bool writeHeader)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>writeHeader</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p><a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> to write a header line.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.IFixedWidthLoaderBuilder-1.html">IFixedWidthLoaderBuilder</a>&lt;T&gt;</dt>
+    <dd><p>The same builder, for chaining.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/src/Wolfgang.Etl.FixedWidth/Pipeline/IFixedWidthLoaderBuilder.cs/#L21" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Made with DocFX <script>(function(){var r='/';if(window.location.hostname.endsWith('.github.io')){var s=window.location.pathname.split('/').filter(Boolean);if(s.length)r='/'+s[0]+'/';}var t=document.createElement('script');t.src=r+'public/version-picker.js';t.async=true;document.head.appendChild(t);})();</script>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

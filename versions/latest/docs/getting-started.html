@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.6.0/docfx_project/docs/getting-started.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/docfx_project/docs/getting-started.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -189,6 +189,27 @@ var modern = transformer.TransformAsync(extractor.ExtractAsync(token), token);
 await loader.LoadAsync(modern, token);
 </code></pre>
 <p>When source and destination share property names and compatible types, <code>FixedWidthTransformer&lt;LegacyRecord, ModernRecord&gt;.ByMatchingProperties()</code> builds the copy automatically (the destination needs a public parameterless constructor).</p>
+<h3 id="composing-an-etl-pipeline">Composing an ETL pipeline</h3>
+<p>The whole extract → transform → load flow can be written as one fluent chain on the generic <code>EtlPipeline</code> (from <code>Wolfgang.Etl.Abstractions</code> 0.16.0). <code>FixedWidthExtractor&lt;T&gt;</code> source factories hang off <code>EtlPipeline.Create()</code> and <code>FixedWidthLoader&lt;T&gt;</code> sink terminators hang off the pipeline, with the extractor/loader configuration exposed as inline setters:</p>
+<pre><code class="lang-csharp">using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.FixedWidth;
+
+await EtlPipeline
+    .Create()
+    .FixedWidthExtractor&lt;PersonRecord&gt;(&quot;people.dat&quot;)
+    .Through(KeepAdults)                 // optional stream-to-stream transform delegate
+    .FixedWidthLoader&lt;PersonRecord&gt;(&quot;people.txt&quot;)
+    .WriteHeader(true)
+    .FieldDelimiter(&quot; | &quot;)
+    .RunAsync();
+</code></pre>
+<p>Every source and sink has <strong>path</strong>, <code>Stream</code>, and <code>TextReader</code>/<code>TextWriter</code> overloads (plus an existing-<code>FixedWidthExtractor&lt;T&gt;</code> overload). Path factories own the file stream they open and dispose it when the run finishes, on success or failure; caller-supplied streams, readers, and writers are left open. See the <a href="examples.html#pipelineextensions">PipelineExtensions example</a> for a runnable walk-through.</p>
+<h3 id="metrics-and-observability">Metrics and observability</h3>
+<p>The extractor and loader emit <code>System.Diagnostics.Metrics</code> instruments from the meter <code>Wolfgang.Etl.FixedWidth</code> — counters (<code>items.extracted</code>, <code>items.loaded</code>, <code>items.skipped</code>, <code>lines.read</code>) and a duration histogram (<code>operation.duration</code>), each tagged with <code>etl.operation</code> and <code>etl.record_type</code>. Subscribe with OpenTelemetry and the telemetry flows to Prometheus, Grafana, Application Insights, and so on, with no changes to your extraction/loading code:</p>
+<pre><code class="lang-csharp">builder.Services.AddOpenTelemetry()
+    .WithMetrics(m =&gt; m.AddMeter(&quot;Wolfgang.Etl.FixedWidth&quot;));
+</code></pre>
+<p>Metrics are a no-op when nothing is listening. See the <a href="examples.html#metrics">Metrics example</a> for a raw <code>MeterListener</code> walk-through.</p>
 <h2 id="next-steps">Next Steps</h2>
 <ul>
 <li>Browse the <a href="examples.html">Examples</a> for more detailed scenarios</li>
@@ -210,7 +231,7 @@ await loader.LoadAsync(modern, token);
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.6.0/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>
