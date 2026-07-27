@@ -70,7 +70,8 @@ var input =
     "Bob       Jones     025\n" +
     "Carol     White     035\n";
 
-var extractor = new FixedWidthExtractor<Person>(new StringReader(input)) { SkipItemCount = 1 };
+// Metrics are opt-in (default off) — set EnableMetrics to emit them.
+var extractor = new FixedWidthExtractor<Person>(new StringReader(input)) { EnableMetrics = true, SkipItemCount = 1 };
 
 var people = new List<Person>();
 await foreach (var person in extractor.ExtractAsync(CancellationToken.None))
@@ -79,7 +80,7 @@ await foreach (var person in extractor.ExtractAsync(CancellationToken.None))
 }
 
 var writer = new StringWriter();
-var loader = new FixedWidthLoader<Person>(writer);
+var loader = new FixedWidthLoader<Person>(writer) { EnableMetrics = true };
 await loader.LoadAsync(ToAsyncEnumerable(people), CancellationToken.None);
 
 // ---------------------------------------------------------------------------
