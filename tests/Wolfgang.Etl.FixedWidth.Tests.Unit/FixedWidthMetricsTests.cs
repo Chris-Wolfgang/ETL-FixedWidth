@@ -48,7 +48,10 @@ public sealed class FixedWidthMetricsTests
         var extractor = new FixedWidthExtractor<MetricsSample>
         (
             new StringReader(Content(("Alice", "Smith", 30), ("Bob", "Jones", 25), ("Carol", "White", 35)))
-        );
+        )
+        {
+            EnableMetrics = true,
+        };
 
         await DrainAsync(extractor);
 
@@ -75,6 +78,7 @@ public sealed class FixedWidthMetricsTests
             new StringReader(Content(("Alice", "Smith", 30), ("Bob", "Jones", 25), ("Carol", "White", 35)))
         )
         {
+            EnableMetrics = true,
             SkipItemCount = 2,
         };
 
@@ -91,7 +95,7 @@ public sealed class FixedWidthMetricsTests
         using var capture = new MetricCapture();
 
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<MetricsSample>(writer);
+        var loader = new FixedWidthLoader<MetricsSample>(writer) { EnableMetrics = true };
 
         await loader.LoadAsync(SampleAsync(), CancellationToken.None);
 
@@ -103,6 +107,27 @@ public sealed class FixedWidthMetricsTests
 
         Assert.All(capture.All, m => Assert.Equal("load", m.Tags["etl.operation"]));
         Assert.All(capture.All, m => Assert.Equal(RecordTypeName, m.Tags["etl.record_type"]));
+    }
+
+
+    [Fact]
+    public async Task Metrics_are_off_by_default_even_with_a_subscribed_listener()
+    {
+        using var capture = new MetricCapture();
+
+        // EnableMetrics defaults to false — metrics are opt-in (#275), so nothing is emitted even
+        // though a MeterListener is active.
+        var extractor = new FixedWidthExtractor<MetricsSample>
+        (
+            new StringReader(Content(("Alice", "Smith", 30), ("Bob", "Jones", 25)))
+        );
+        await DrainAsync(extractor);
+
+        var writer = new StringWriter();
+        var loader = new FixedWidthLoader<MetricsSample>(writer);
+        await loader.LoadAsync(SampleAsync(), CancellationToken.None);
+
+        Assert.Empty(capture.All);
     }
 
 

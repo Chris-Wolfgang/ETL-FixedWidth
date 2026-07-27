@@ -194,14 +194,17 @@ Every source and sink has **path**, `Stream`, and `TextReader`/`TextWriter` over
 
 ### Metrics and observability
 
-The extractor and loader emit `System.Diagnostics.Metrics` instruments from the meter `Wolfgang.Etl.FixedWidth` — counters (`items.extracted`, `items.loaded`, `items.skipped`, `lines.read`) and a duration histogram (`operation.duration`), each tagged with `etl.operation` and `etl.record_type`. Subscribe with OpenTelemetry and the telemetry flows to Prometheus, Grafana, Application Insights, and so on, with no changes to your extraction/loading code:
+The extractor and loader can emit `System.Diagnostics.Metrics` instruments from the meter `Wolfgang.Etl.FixedWidth` — counters (`items.extracted`, `items.loaded`, `items.skipped`, `lines.read`) and a duration histogram (`operation.duration`), each tagged with `etl.operation` and `etl.record_type`. Metrics are **opt-in**: set `EnableMetrics = true` on the extractor/loader, then subscribe with OpenTelemetry so the telemetry flows to Prometheus, Grafana, Application Insights, and so on:
 
 ```csharp
+var extractor = new FixedWidthExtractor<PersonRecord>(reader) { EnableMetrics = true };
+
+
 builder.Services.AddOpenTelemetry()
     .WithMetrics(m => m.AddMeter("Wolfgang.Etl.FixedWidth"));
 ```
 
-Metrics are a no-op when nothing is listening. See the [Metrics example](examples.md#metrics) for a raw `MeterListener` walk-through.
+When `EnableMetrics` is left off (the default), the extract/load loop runs no metric code, so there is no overhead. See the [Metrics example](examples.md#metrics) for a raw `MeterListener` walk-through.
 
 ## Next Steps
 

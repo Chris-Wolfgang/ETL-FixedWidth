@@ -400,6 +400,19 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
 
     /// <summary>
+    /// When <see langword="true"/>, the loader emits the <c>Wolfgang.Etl.FixedWidth</c> metrics (#30)
+    /// as it runs. Defaults to <see langword="false"/> — metrics are <b>opt-in</b>. When off, the load
+    /// loop executes no metric code at all (no per-record calls, no tag or duration allocation), so
+    /// telemetry adds no measurable overhead for callers that do not use it. Set to
+    /// <see langword="true"/> — and subscribe with OpenTelemetry (<c>AddMeter("Wolfgang.Etl.FixedWidth")</c>)
+    /// or a <see cref="System.Diagnostics.Metrics.MeterListener"/> — to collect the counters and the
+    /// duration histogram.
+    /// </summary>
+    public bool EnableMetrics { get; set; }
+
+
+
+    /// <summary>
     /// The 1-based physical line number of the line most recently written to the output.
     /// Updated after each line is written. Includes the header line and separator line
     /// if written. Matches the line number shown in a text editor.
@@ -510,6 +523,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
 
     /// <inheritdoc/>
+#pragma warning disable MA0051 // hot-path load loop; the metric guards (#275) are inlined intentionally so the default metrics-off path calls and allocates nothing
     protected override async Task LoadWorkerAsync
     (
         IAsyncEnumerable<TRecord> items,
@@ -519,9 +533,16 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         var fieldMap = ResolveFieldMap();
         LogLoadingStarted(fieldMap);
 
-        // Metrics (#30): duration recorded on completion/throw; counters are no-ops without a listener.
-        var metricTags = FixedWidthMetrics.CreateTags(FixedWidthMetrics.LoadOperation, typeof(TRecord));
-        using var operationScope = FixedWidthMetrics.MeasureDuration(metricTags);
+        // Metrics (#30, #275): opt-in via EnableMetrics. When off (the default) the load loop runs no
+        // metric code — the per-record calls below are skipped and neither the tag set nor the duration
+        // scope is allocated — so telemetry adds no measurable overhead unless the caller opts in.
+        var metricsEnabled = EnableMetrics;
+        var metricTags = metricsEnabled
+            ? FixedWidthMetrics.CreateTags(FixedWidthMetrics.LoadOperation, typeof(TRecord))
+            : default;
+        using var operationScope = metricsEnabled
+            ? FixedWidthMetrics.MeasureDuration(metricTags)
+            : null;
 
         // In dry-run mode, route all formatting through a throwaway writer so the
         // pipeline — including field-width validation — still runs, but nothing
@@ -546,7 +567,10 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
             if (CurrentSkippedItemCount < SkipItemCount)
             {
                 IncrementCurrentSkippedItemCount();
-                FixedWidthMetrics.RecordSkipped(metricTags);
+                if (metricsEnabled)
+                {
+                    FixedWidthMetrics.RecordSkipped(metricTags);
+                }
                 LogDebugItemSkipped();
                 continue;
             }
@@ -568,7 +592,10 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
             Interlocked.Increment(ref _currentLineNumber);
             await target.WriteLineAsync().ConfigureAwait(false);
             IncrementCurrentItemCount();
-            FixedWidthMetrics.RecordLoaded(metricTags);
+            if (metricsEnabled)
+            {
+                FixedWidthMetrics.RecordLoaded(metricTags);
+            }
             LogDebugRecordWritten();
         }
 
@@ -576,6 +603,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
         LogLoadingCompleted();
     }
+#pragma warning restore MA0051
 
 
 

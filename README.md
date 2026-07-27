@@ -2,6 +2,10 @@
 
 Extractor and Loader for reading and writing fixed width files and text streams
 
+[![NuGet](https://img.shields.io/nuget/v/Wolfgang.Etl.FixedWidth.svg?logo=nuget&label=NuGet)](https://www.nuget.org/packages/Wolfgang.Etl.FixedWidth/)
+[![Downloads](https://img.shields.io/nuget/dt/Wolfgang.Etl.FixedWidth.svg?logo=nuget&label=downloads)](https://www.nuget.org/packages/Wolfgang.Etl.FixedWidth/)
+[![PR build](https://img.shields.io/github/actions/workflow/status/Chris-Wolfgang/ETL-FixedWidth/pr.yaml?event=pull_request_target&label=PR%20build&logo=github)](https://github.com/Chris-Wolfgang/ETL-FixedWidth/actions/workflows/pr.yaml)
+[![release](https://img.shields.io/github/actions/workflow/status/Chris-Wolfgang/ETL-FixedWidth/release.yaml?event=release&label=release&logo=github)](https://github.com/Chris-Wolfgang/ETL-FixedWidth/actions/workflows/release.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-Multi--Targeted-purple.svg)](https://dotnet.microsoft.com/)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/Chris-Wolfgang/ETL-FixedWidth)
@@ -264,7 +268,7 @@ See the [PipelineExtensions](examples/PipelineExtensions) example for a complete
 
 ### Metrics and observability
 
-The extractor and loader emit standard [`System.Diagnostics.Metrics`](https://learn.microsoft.com/dotnet/core/diagnostics/metrics) instruments from the meter **`Wolfgang.Etl.FixedWidth`**, so throughput and error rates flow to OpenTelemetry, Prometheus, Grafana, Application Insights, or any `MeterListener` with no code changes. Metrics are a no-op when nothing is listening, so there is no overhead in the default case.
+The extractor and loader can emit standard [`System.Diagnostics.Metrics`](https://learn.microsoft.com/dotnet/core/diagnostics/metrics) instruments from the meter **`Wolfgang.Etl.FixedWidth`**, so throughput and error rates flow to OpenTelemetry, Prometheus, Grafana, Application Insights, or any `MeterListener`. Metrics are **opt-in**: set `EnableMetrics = true` on the extractor/loader to turn them on. When left off (the default), the extract/load loop runs **no** metric code at all, so telemetry adds zero overhead for callers that don't use it.
 
 | Instrument | Type | Description |
 |---|---|---|
@@ -277,7 +281,10 @@ The extractor and loader emit standard [`System.Diagnostics.Metrics`](https://le
 Every measurement is tagged `etl.operation` (`extract` or `load`) and `etl.record_type` (`typeof(TRecord).Name`).
 
 ```csharp
-// OpenTelemetry — one line, zero library changes:
+// 1. Opt in on the extractor/loader (default is off):
+var extractor = new FixedWidthExtractor<Order>(reader) { EnableMetrics = true };
+
+// 2. Subscribe once at startup — OpenTelemetry, zero per-call code:
 builder.Services.AddOpenTelemetry()
     .WithMetrics(m => m.AddMeter("Wolfgang.Etl.FixedWidth"));
 ```
@@ -335,19 +342,17 @@ The [examples/](examples/) folder contains 13 runnable console projects demonstr
 
 ---
 
-## 🎯 Target Frameworks
+## 🎯 Supported Frameworks
 
-The package targets the following frameworks (see the project file for the authoritative list):
+This library targets:
 
-| Framework | Versions |
-|-----------|----------|
-| .NET Framework | .NET 4.6.2, .NET 4.8.1 |
-| .NET Standard | .NET Standard 2.0 |
-| .NET | .NET 8.0, .NET 10.0 |
+- **.NET Framework:** 4.6.2, 4.8.1
+- **.NET Standard:** 2.0
+- **.NET:** 8.0, 10.0
 
-> The CI test matrix additionally exercises the library on .NET Framework 4.7.x/4.8 and .NET 5.0–9.0 via the netstandard2.0 facade; those are tested-against runtimes, not package target frameworks.
+> The CI test matrix additionally exercises the library on .NET Framework 4.7.x/4.8 and .NET 5.0–9.0 via the `netstandard2.0` facade; those are tested-against runtimes, not package target frameworks.
 
----
+See the [NuGet package page](https://www.nuget.org/packages/Wolfgang.Etl.FixedWidth/) for the authoritative per-TFM compatibility matrix.
 
 ## 🔍 Code Quality & Static Analysis
 
