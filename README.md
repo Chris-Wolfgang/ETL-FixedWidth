@@ -2,6 +2,10 @@
 
 Extractor and Loader for reading and writing fixed width files and text streams
 
+[![NuGet](https://img.shields.io/nuget/v/Wolfgang.Etl.FixedWidth.svg?logo=nuget&label=NuGet)](https://www.nuget.org/packages/Wolfgang.Etl.FixedWidth/)
+[![Downloads](https://img.shields.io/nuget/dt/Wolfgang.Etl.FixedWidth.svg?logo=nuget&label=downloads)](https://www.nuget.org/packages/Wolfgang.Etl.FixedWidth/)
+[![PR build](https://img.shields.io/github/actions/workflow/status/Chris-Wolfgang/ETL-FixedWidth/pr.yaml?event=pull_request_target&label=PR%20build&logo=github)](https://github.com/Chris-Wolfgang/ETL-FixedWidth/actions/workflows/pr.yaml)
+[![release](https://img.shields.io/github/actions/workflow/status/Chris-Wolfgang/ETL-FixedWidth/release.yaml?event=release&label=release&logo=github)](https://github.com/Chris-Wolfgang/ETL-FixedWidth/actions/workflows/release.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-Multi--Targeted-purple.svg)](https://dotnet.microsoft.com/)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/Chris-Wolfgang/ETL-FixedWidth)
@@ -209,6 +213,65 @@ using var transformer = FixedWidthTransformer<LegacyRecord, ModernRecord>.ByMatc
 
 `ByMatchingProperties()` copies every source property to the destination property of the same name and an assignable type, and requires a public parameterless constructor on the destination.
 
+### Composing an ETL pipeline
+
+Rather than wiring an extractor, transformer, and loader together by hand, the whole extract → transform → load flow can be expressed as one fluent chain on the generic `EtlPipeline` (from `Wolfgang.Etl.Abstractions` 0.16.0). `FixedWidthExtractor<T>` source factories hang off `EtlPipeline.Create()` and `FixedWidthLoader<T>` sink terminators hang off the pipeline, with the extractor/loader configuration exposed as inline setters:
+
+```csharp
+using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.FixedWidth;
+
+// Fixed-width in, human-readable table out — path factories own the files they open.
+await EtlPipeline
+    .Create()
+    .FixedWidthExtractor<PersonRecord>("people.dat")
+    .FixedWidthLoader<PersonRecord>("people.txt")
+    .WriteHeader(true)
+    .FieldSeparator('-')
+    .FieldDelimiter(" | ")
+    .RunAsync();
+```
+
+Insert transform stages with `Through` — an inline `Func<IAsyncEnumerable<T>, IAsyncEnumerable<TOut>>` stage needs no reference to the operators package:
+
+```csharp
+await EtlPipeline
+    .Create()
+    .FixedWidthExtractor<PersonRecord>(sourceReader)
+    .Through(KeepAdults)                 // a stream-to-stream transform delegate
+    .FixedWidthLoader<PersonRecord>(destinationWriter)
+    .RunAsync();
+```
+
+Every source and sink has **path**, `Stream`, and `TextReader`/`TextWriter` overloads (plus an existing-`FixedWidthExtractor<T>` overload). **Path** factories own the file stream they open and dispose it when the run finishes, on success or failure; caller-supplied streams, readers, and writers are always left open. The builder methods (`HeaderLineCount`, `MalformedLineHandling`, `FieldDelimiter`, `Encoding`, `WriteHeader`, `ValueConverter`, `IsDryRun`, …) map 1:1 to the `FixedWidthExtractor<T>` / `FixedWidthLoader<T>` properties.
+
+See the [PipelineExtensions](examples/PipelineExtensions) example for a complete, runnable walk-through.
+
+### Metrics and observability
+
+The extractor and loader can emit standard [`System.Diagnostics.Metrics`](https://learn.microsoft.com/dotnet/core/diagnostics/metrics) instruments from the meter **`Wolfgang.Etl.FixedWidth`**, so throughput and error rates flow to OpenTelemetry, Prometheus, Grafana, Application Insights, or any `MeterListener`. Metrics are **opt-in**: set `EnableMetrics = true` on the extractor/loader to turn them on. When left off (the default), the extract/load loop runs **no** metric code at all, so telemetry adds zero overhead for callers that don't use it.
+
+| Instrument | Type | Description |
+|---|---|---|
+| `wolfgang.etl.fixedwidth.items.extracted` | Counter | Items successfully extracted |
+| `wolfgang.etl.fixedwidth.items.loaded` | Counter | Items successfully loaded |
+| `wolfgang.etl.fixedwidth.items.skipped` | Counter | Items skipped via the skip budget |
+| `wolfgang.etl.fixedwidth.lines.read` | Counter | Physical lines read (including blank/skipped) |
+| `wolfgang.etl.fixedwidth.operation.duration` | Histogram (ms) | Duration of an extract/load operation |
+
+Every measurement is tagged `etl.operation` (`extract` or `load`) and `etl.record_type` (`typeof(TRecord).Name`).
+
+```csharp
+// 1. Opt in on the extractor/loader (default is off):
+var extractor = new FixedWidthExtractor<Order>(reader) { EnableMetrics = true };
+
+// 2. Subscribe once at startup — OpenTelemetry, zero per-call code:
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(m => m.AddMeter("Wolfgang.Etl.FixedWidth"));
+```
+
+See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-through.
+
 ---
 
 ## ✨ Features
@@ -233,11 +296,13 @@ using var transformer = FixedWidthTransformer<LegacyRecord, ModernRecord>.ByMatc
 | **Compiled delegates** | Field accessors use compiled delegates instead of reflection for fast property get/set |
 | **Schema introspection** | `FixedWidthSchema.For<T>()` exposes the resolved layout (positions, widths, types, skips); `ToDiagram()` renders it as a text table |
 | **Format transformation** | `FixedWidthTransformer<TSource, TDestination>` projects one layout to another in a single streaming pass, with optional `ByMatchingProperties()` auto-mapping |
+| **Pipeline composition** | `EtlPipeline.Create().FixedWidthExtractor<T>(…).FixedWidthLoader<T>(…).RunAsync()` — fluent source factories and sink terminators over the generic `EtlPipeline` (requires `Wolfgang.Etl.Abstractions` 0.16.0) |
+| **Metrics** | Zero-config `System.Diagnostics.Metrics` instruments (throughput, skips, duration) from the `Wolfgang.Etl.FixedWidth` meter — OpenTelemetry / Prometheus / any `MeterListener` |
 | **Multi-TFM support** | net462, net481, netstandard2.0, net8.0, net10.0 |
 
 **Examples:**
 
-The [examples/](examples/) folder contains 10 runnable console projects demonstrating each feature:
+The [examples/](examples/) folder contains 12 runnable console projects demonstrating each feature:
 
 | Example | Description |
 |---------|-------------|
@@ -251,22 +316,22 @@ The [examples/](examples/) folder contains 10 runnable console projects demonstr
 | [FieldDelimiter](examples/FieldDelimiter) | Delimited output (e.g. `" \| "`) for human-readable tables |
 | [SkipAndMax](examples/SkipAndMax) | `SkipItemCount` and `MaximumItemCount` for pagination |
 | [HeadersAndSeparators](examples/HeadersAndSeparators) | `WriteHeader`, `HasHeader`, and `FieldSeparator` |
+| [PipelineExtensions](examples/PipelineExtensions) | Compose extract → transform → load as one `EtlPipeline` fluent chain |
+| [Metrics](examples/Metrics) | Subscribe to the `Wolfgang.Etl.FixedWidth` meter and read throughput/duration metrics |
 
 ---
 
-## 🎯 Target Frameworks
+## 🎯 Supported Frameworks
 
-The package targets the following frameworks (see the project file for the authoritative list):
+This library targets:
 
-| Framework | Versions |
-|-----------|----------|
-| .NET Framework | .NET 4.6.2, .NET 4.8.1 |
-| .NET Standard | .NET Standard 2.0 |
-| .NET | .NET 8.0, .NET 10.0 |
+- **.NET Framework:** 4.6.2, 4.8.1
+- **.NET Standard:** 2.0
+- **.NET:** 8.0, 10.0
 
-> The CI test matrix additionally exercises the library on .NET Framework 4.7.x/4.8 and .NET 5.0–9.0 via the netstandard2.0 facade; those are tested-against runtimes, not package target frameworks.
+> The CI test matrix additionally exercises the library on .NET Framework 4.7.x/4.8 and .NET 5.0–9.0 via the `netstandard2.0` facade; those are tested-against runtimes, not package target frameworks.
 
----
+See the [NuGet package page](https://www.nuget.org/packages/Wolfgang.Etl.FixedWidth/) for the authoritative per-TFM compatibility matrix.
 
 ## 🔍 Code Quality & Static Analysis
 

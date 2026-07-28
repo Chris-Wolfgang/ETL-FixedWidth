@@ -9,23 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
-
-## [0.7.0] - 2026-07-25
-
-Minor release: adopts the `Wolfgang.Etl.Abstractions` #84 per-item error-handling mechanism.
-Additive — no breaking change to the FixedWidth surface.
-
-### Added
-
+- `EnableMetrics` property on `FixedWidthExtractor<T>` and `FixedWidthLoader<T>`
+  (default `false`) that turns the #30 metrics on. Metrics are now **opt-in**:
+  when off — the default — the extract/load hot loop executes no metric code at
+  all, restoring the pre-metrics throughput. Set `EnableMetrics = true` (and
+  subscribe via `AddMeter("Wolfgang.Etl.FixedWidth")` or a `MeterListener`) to
+  collect the counters and duration histogram ([#275]).
 - Malformed-line handling now flows through the Abstractions #84 policy. `FixedWidthExtractor`
   overrides `OnItemError` to translate the existing `MalformedLineHandling` knob (`Skip` → skip,
   `ThrowException` → abort) and calls the base `HandleItemError`, so a genuine parse failure is
@@ -36,7 +25,46 @@ Additive — no breaking change to the FixedWidth surface.
 
 ### Changed
 
-- Bumped `Wolfgang.Etl.Abstractions` 0.15.0 → 0.18.0.
+- The metrics added in 0.7.0 (#30) no longer emit unless `EnableMetrics` is set.
+  This removes the always-on per-line/per-record overhead that made extraction
+  ~1.5–1.95× slower in 0.7.0 regardless of whether a listener was attached
+  ([#275]).
+- Bumped `Wolfgang.Etl.Abstractions` 0.17.0 → 0.18.0, adopting the renamed
+  `EtlPipelineProgress.{Extracted,Loaded,Error}ItemCount` counters (formerly
+  `Records{Extracted,Loaded,Errored}`).
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [0.7.0] - 2026-07-24
+
+Pipeline composition and observability. Additive — no breaking changes.
+
+### Added
+
+- Fixed-width source factories and sink terminators for the generic `EtlPipeline`
+  fluent chain: `EtlPipeline.Create().FixedWidthExtractor<T>(path | stream | reader | extractor)`
+  and `… .FixedWidthLoader<T>(path | stream | writer)`. The returned
+  `IFixedWidthExtractorBuilder<T>` / `IFixedWidthLoaderBuilder<T>` expose every
+  extractor/loader setting as inline fluent methods (`HeaderLineCount`,
+  `MalformedLineHandling`, `FieldDelimiter`, `Encoding`, `WriteHeader`,
+  `ValueConverter`, `IsDryRun`, …). Path-based factories own the file stream they
+  open and dispose it after the run (success or failure); caller-supplied
+  streams/readers/writers are left open. Requires `Wolfgang.Etl.Abstractions`
+  0.16.0 ([#253]).
+- Built-in `System.Diagnostics.Metrics` instrumentation on the extractor and
+  loader, emitted from the meter **`Wolfgang.Etl.FixedWidth`**: counters
+  `wolfgang.etl.fixedwidth.items.extracted` / `.items.loaded` / `.items.skipped`
+  / `.lines.read` and the histogram `wolfgang.etl.fixedwidth.operation.duration`
+  (ms). Every measurement is tagged `etl.operation` (`extract`/`load`) and
+  `etl.record_type`. Zero-config — subscribe with OpenTelemetry
+  (`AddMeter("Wolfgang.Etl.FixedWidth")`) or a `MeterListener`; a no-op with no
+  listener registered ([#30]).
 
 ## [0.6.0] - 2026-07-18
 
@@ -258,7 +286,11 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#14]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/14
 [#22]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/22
 [#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.6.0...HEAD
+[#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
+[#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
+[#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.4.0...v0.5.0
