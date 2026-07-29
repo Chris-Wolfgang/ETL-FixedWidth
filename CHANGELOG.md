@@ -15,6 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   all, restoring the pre-metrics throughput. Set `EnableMetrics = true` (and
   subscribe via `AddMeter("Wolfgang.Etl.FixedWidth")` or a `MeterListener`) to
   collect the counters and duration histogram ([#275]).
+- Sustained-load GC / allocation profiling ([#152]): `tools/GcProfile` runs
+  extract → transform → load in a tight loop for a configurable duration and
+  reports allocated bytes per record and gen2 collections per million records.
+  A monthly `gc-profile.yaml` sweep gates the run against `docs/gc-baseline.json`
+  — a per-record allocation jump (hot-path regression) or gen2 promotion
+  (retention leak) fails the job. Complements the per-call allocation snapshot in
+  `docs/ALLOCATION-PROFILE.md` (#157).
 
 ### Changed
 
@@ -277,6 +284,7 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#22]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/22
 [#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
 [#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
+[#152]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/152
 [#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
 [Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.7.0...HEAD
