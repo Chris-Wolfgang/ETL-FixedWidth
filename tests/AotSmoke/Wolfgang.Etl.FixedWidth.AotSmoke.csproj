@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Native-AOT / trim smoke consumer (#153). Deliberately NOT listed in
+    "ETL Fixed Width.slnx": a normal Release solution build treats warnings as
+    errors, and the trim/AOT analyzers (IL2xxx / IL3050) would fail that build.
+    The AOT job in pr.yaml publishes this project explicitly with
+    `-p:PublishAot=true` on Linux and then RUNS the native binary — the run
+    (exit 0 + assertions) is the gate, catching a trimmer that removes the
+    record property metadata FixedWidth reflects over.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PublishAot>true</PublishAot>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <IsAotCompatible>true</IsAotCompatible>
+    <!-- The run is the gate. Expression.Compile emits IL3050 but falls back to
+         the interpreter under AOT (it does not throw), so warnings must not fail
+         the publish; the assertions below prove correctness. -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Wolfgang.Etl.FixedWidth\Wolfgang.Etl.FixedWidth.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -155,6 +155,10 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
 
 
 
+#if NET8_0_OR_GREATER
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050",
+        Justification = "Expression.Compile is RequiresDynamicCode but falls back to the interpreter when RuntimeFeature.IsDynamicCodeSupported is false, so the compiled property mapper still runs correctly under Native AOT (without JIT speed). See #153.")]
+#endif
     private static Func<TSource, TDestination> BuildPropertyMapper()
     {
         var constructor = typeof(TDestination).GetConstructor(Type.EmptyTypes)
