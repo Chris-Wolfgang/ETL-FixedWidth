@@ -561,6 +561,60 @@ jobs:
           }
 
 
+      - name: Generate reproducible-build manifest
+        if: steps.check-packages.outputs.has-packages == 'true'
+        shell: pwsh
+        # Consumer-side reproducibility (#165): record the expected SHA-256 of each
+        # per-framework assembly (the byte-reproducible artifact) plus the toolchain
+        # that produced them, so a third party can rebuild the tag and compare. The
+        # .nupkg hashes are reference only — a .nupkg is a ZIP with per-entry
+        # timestamps and is not byte-reproducible. See docs/REPRODUCIBLE-BUILD.md.
+        run: |
+          $dir = Join-Path $PWD 'nuget-packages'
+
+          # Hash our per-TFM assembly (the byte-reproducible artifact). Skip the
+          # reference assemblies under each <tfm>/ref/ folder.
+          $binRoot = 'src/Wolfgang.Etl.FixedWidth/bin/Release'
+          $assemblies = Get-ChildItem -Path $binRoot -Recurse -Filter 'Wolfgang.Etl.FixedWidth.dll' |
+            Where-Object { $_.Directory.Name -ne 'ref' } |
+            ForEach-Object {
+              [ordered]@{
+                tfm    = $_.Directory.Name
+                file   = $_.Name
+                sha256 = (Get-FileHash -Algorithm SHA256 -Path $_.FullName).Hash.ToLowerInvariant()
+                bytes  = $_.Length
+              }
+            } | Sort-Object { $_.tfm }
+
+          $packages = Get-ChildItem -Path $dir -File |
+            Where-Object { $_.Extension -in '.nupkg', '.snupkg' } |
+            ForEach-Object {
+              [ordered]@{
+                file   = $_.Name
+                sha256 = (Get-FileHash -Algorithm SHA256 -Path $_.FullName).Hash.ToLowerInvariant()
+                bytes  = $_.Length
+              }
+            }
+
+          $manifest = [ordered]@{
+            repository         = "https://github.com/$env:GITHUB_REPOSITORY"
+            tag                = $env:GITHUB_REF_NAME
+            commit             = $env:GITHUB_SHA
+            dotnetSdk          = (dotnet --version)
+            runnerOs           = $env:RUNNER_OS
+            buildConfiguration = 'Release'
+            deterministic      = $true
+            buildCommand       = 'dotnet build -c Release -p:ContinuousIntegrationBuild=true'
+            note               = 'Verify the per-framework assembly hashes; .nupkg files embed timestamps and are not byte-reproducible. See docs/REPRODUCIBLE-BUILD.md.'
+            assemblies         = @($assemblies)
+            packages           = @($packages)
+          }
+
+          $path = Join-Path $dir 'reproducible-build-manifest.json'
+          $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $path -Encoding utf8
+          Write-Host "Wrote $path"
+          Get-Content $path
+
       - name: Upload NuGet packages
         uses: actions/upload-artifact@v7
         with:
@@ -795,5 +849,6 @@ jobs:
             ./nuget-packages/*.nupkg
             ./nuget-packages/*.snupkg
             ./nuget-packages/*.bom.json
+            ./nuget-packages/reproducible-build-manifest.json
             release-coverage.zip
 

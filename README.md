@@ -439,6 +439,28 @@ docfx build --serve
 
 ---
 
+## 🔐 Verify the build
+
+The library is built **deterministically**, so you can rebuild the exact
+assemblies from the tagged source and confirm a NuGet release was built from that
+source and nothing else. Every GitHub release attaches a
+`reproducible-build-manifest.json` with the expected per-framework assembly
+hashes and the toolchain that produced them.
+
+```bash
+# Download the manifest for a release, rebuild at the tag, and compare hashes.
+gh release download v0.8.0 --repo Chris-Wolfgang/ETL-FixedWidth --pattern reproducible-build-manifest.json
+git clone --depth 1 --branch v0.8.0 https://github.com/Chris-Wolfgang/ETL-FixedWidth
+dotnet build ETL-FixedWidth/src/Wolfgang.Etl.FixedWidth/Wolfgang.Etl.FixedWidth.csproj -c Release -p:ContinuousIntegrationBuild=true
+find ETL-FixedWidth/src/Wolfgang.Etl.FixedWidth/bin/Release -name 'Wolfgang.Etl.FixedWidth.dll' -exec sha256sum {} \;
+```
+
+See **[docs/REPRODUCIBLE-BUILD.md](docs/REPRODUCIBLE-BUILD.md)** for the full
+procedure — which SDK version to use, how to file a discrepancy, and how to
+publish a third-party verification attestation.
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
