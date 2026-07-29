@@ -15,6 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   all, restoring the pre-metrics throughput. Set `EnableMetrics = true` (and
   subscribe via `AddMeter("Wolfgang.Etl.FixedWidth")` or a `MeterListener`) to
   collect the counters and duration histogram ([#275]).
+- Shadow-testing sample workloads ([#140]): `samples/ShadowWorkloads` runs
+  realistic end-to-end scenarios (streaming round trip, reformat transform,
+  pipeline composition) that double as usage documentation. A nightly
+  `shadow.yaml` measures per-scenario latency + allocation and gates the result
+  against `docs/shadow-baseline.json` — allocation is the hard gate (a >50% jump
+  fails); latency is advisory (reported, not gated, since shared-runner wall-clock
+  is too noisy to fail on reliably).
 
 ### Changed
 
@@ -277,6 +284,7 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#22]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/22
 [#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
 [#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
+[#140]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/140
 [#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
 [Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.7.0...HEAD
