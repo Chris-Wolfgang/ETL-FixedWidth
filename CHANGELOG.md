@@ -21,7 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   publishes it on Linux and runs the native binary so an AOT/trim regression
   fails before merge. The `Expression.Compile` accessor sites carry documented
   `IL3050` suppressions — under Native AOT they fall back to the interpreter, so
-  the library runs correctly (without JIT speed).
+  the library runs correctly (without JIT speed). **Known limitation surfaced by
+  the smoke:** attribute-based mapping reads `[FixedWidthField]` by reflection,
+  and Native-AOT trimming strips those attribute instances unless the record's
+  assembly is rooted (`TrimmerRootAssembly`) — a consumer using attribute mapping
+  under AOT must root its record types today; removing that need is the
+  source-generated-accessors follow-up.
 
 ### Changed
 

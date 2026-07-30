@@ -29,4 +29,19 @@
     <ProjectReference Include="..\..\src\Wolfgang.Etl.FixedWidth\Wolfgang.Etl.FixedWidth.csproj" />
   </ItemGroup>
 
+  <!--
+    The AOT smoke caught a real trim hazard: Native-AOT trimming strips the
+    [FixedWidthField] custom-attribute *instances* that the mapper reads by
+    reflection, zeroing the field map (FieldCount -> 0, a silent empty result).
+    Root the record assembly (keeps its attribute instances) and the library
+    (keeps the attribute types) so the smoke verifies AOT *execution* correctly —
+    this is the configuration a real AOT consumer of the attribute-based mapper
+    must supply today. Removing the need for it is the source-generated-accessors
+    follow-up on #153 (pilot: ETL-SqlBulkCopy).
+  -->
+  <ItemGroup>
+    <TrimmerRootAssembly Include="Wolfgang.Etl.FixedWidth.AotSmoke" />
+    <TrimmerRootAssembly Include="Wolfgang.Etl.FixedWidth" />
+  </ItemGroup>
+
 </Project>
