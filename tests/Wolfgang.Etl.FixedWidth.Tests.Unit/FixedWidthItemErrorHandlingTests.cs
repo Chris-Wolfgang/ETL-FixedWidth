@@ -86,6 +86,39 @@ public class FixedWidthItemErrorHandlingTests
 
 
     [Fact]
+    public async Task Mixed_stream_keeps_ReturnDefault_recovery_and_validator_reject_off_the_error_policy()
+    {
+        // One stream interleaves all three per-item outcomes to lock in the invariant that neither a
+        // ReturnDefault recovery nor a validator reject is ever counted as a parse error:
+        //   Carol — parses and passes the validator                 -> yielded
+        //   Eve   — malformed, MalformedLineHandling.ReturnDefault   -> a default substitute, yielded
+        //   Bob   — parses but the validator rejects it (business)   -> dropped
+        var input = string.Join
+        (
+            "\n",
+            Line("Carol", "Clark", "35"),
+            Line("Eve", "Evans", BadAge),
+            Line("Bob", "Brown", "30")
+        );
+
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(input))
+        {
+            MalformedLineHandling = MalformedLineHandling.ReturnDefault,
+            RecordValidator = record =>
+                (record.FirstName ?? string.Empty).IndexOf("Bob", System.StringComparison.Ordinal) >= 0
+                    ? ValidationResult.Skip("no bobs")
+                    : ValidationResult.Accept(),
+        };
+
+        var yielded = await Drain(extractor);
+
+        Assert.Equal(2, yielded.Count);                      // Carol + Eve's default substitute; Bob dropped
+        Assert.Equal(0, extractor.CurrentErrorItemCount);    // ReturnDefault recovery and a validator reject are both non-errors
+        Assert.Equal(1, extractor.CurrentRejectedItemCount); // only the validator reject (Bob)
+    }
+
+
+    [Fact]
     public async Task Malformed_ThrowException_aborts_the_run()
     {
         var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad));
