@@ -39,7 +39,7 @@ internal static class Program
 
             // 2. Extract — compiled property setters (FieldDescriptor.CompileSetter).
             var people = new List<PersonRecord>();
-            using (var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(Source)) { EnableMetrics = true })
+            using (var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(Source)))
             {
                 await foreach (var p in extractor.ExtractAsync(CancellationToken.None).ConfigureAwait(false))
                 {
@@ -63,7 +63,7 @@ internal static class Program
 
             // 4. Load — compiled property getters (FieldDescriptor.CompileGetter).
             var loaded = new StringWriter();
-            using (var loader = new FixedWidthLoader<PersonRecord>(loaded) { EnableMetrics = true })
+            using (var loader = new FixedWidthLoader<PersonRecord>(loaded))
             {
                 await loader.LoadAsync(ToAsync(people), CancellationToken.None).ConfigureAwait(false);
             }
