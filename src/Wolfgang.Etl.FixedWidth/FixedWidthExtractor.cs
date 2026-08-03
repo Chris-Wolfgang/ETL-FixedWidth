@@ -491,19 +491,6 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
 
     /// <summary>
-    /// When <see langword="true"/>, the extractor emits the <c>Wolfgang.Etl.FixedWidth</c> metrics
-    /// (#30) as it runs. Defaults to <see langword="false"/> — metrics are <b>opt-in</b>. When off, the
-    /// extract loop executes no metric code at all (no per-line/record calls, no tag or duration
-    /// allocation), so telemetry adds no measurable overhead for callers that do not use it. Set to
-    /// <see langword="true"/> — and subscribe with OpenTelemetry (<c>AddMeter("Wolfgang.Etl.FixedWidth")</c>)
-    /// or a <see cref="System.Diagnostics.Metrics.MeterListener"/> — to collect the counters and the
-    /// duration histogram.
-    /// </summary>
-    public bool EnableMetrics { get; set; }
-
-
-
-    /// <summary>
     /// The 1-based physical line number of the line most recently read from the file.
     /// Updated before each line is parsed so that if an exception is thrown,
     /// this value points to the offending line. Matches the line number shown
@@ -646,12 +633,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             ? HeaderLineCount + 1
             : -1;
 
-        // Metrics (#30, #275): opt-in via EnableMetrics. When off (the default) the extract loop runs
-        // no metric code — the per-line/record calls below are skipped and neither the tag set nor the
-        // duration scope is allocated — so telemetry adds no measurable overhead unless the caller opts
-        // in. When on, RecordLineRead / RecordExtracted / RecordSkipped fire but are themselves no-ops
-        // unless a MeterListener is subscribed.
-        var metricsEnabled = EnableMetrics;
+        // Metrics (#30, #275): sampled once per operation from the instruments. When no MeterListener
+        // is subscribed the extract loop runs no metric code — the per-line/record calls below are
+        // skipped and neither the tag set nor the duration scope is allocated — so telemetry is
+        // zero-cost and zero-config: it activates automatically when a listener subscribes.
+        var metricsEnabled = FixedWidthMetrics.AnyEnabled;
         var metricTags = metricsEnabled
             ? FixedWidthMetrics.CreateTags(FixedWidthMetrics.ExtractOperation, typeof(TRecord))
             : default;

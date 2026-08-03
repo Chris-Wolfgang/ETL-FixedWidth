@@ -77,6 +77,18 @@ internal static class FixedWidthMetrics
 
 
     /// <summary>
+    /// <see langword="true"/> when any fixed-width instrument currently has a subscribed listener.
+    /// The extract/load hot loop samples this once per operation to gate all metric work: when it is
+    /// <see langword="false"/> the loop touches no metric code, so instrumentation is zero-cost and
+    /// zero-config — it activates automatically when a <c>MeterListener</c> / OpenTelemetry subscribes
+    /// to the <c>Wolfgang.Etl.FixedWidth</c> meter, with no opt-in flag (#275).
+    /// </summary>
+    internal static bool AnyEnabled =>
+        ItemsExtracted.Enabled || ItemsLoaded.Enabled || ItemsSkipped.Enabled
+            || LinesRead.Enabled || OperationDuration.Enabled;
+
+
+    /// <summary>
     /// Builds the tag set shared by every measurement of a single operation.
     /// </summary>
     internal static TagList CreateTags(string operation, Type recordType)
