@@ -22,7 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   This removes the always-on per-line/per-record overhead that made extraction
   ~1.5–1.95× slower in 0.7.0 regardless of whether a listener was attached
   ([#275]).
-- Bumped `Wolfgang.Etl.Abstractions` 0.17.0 → 0.20.0. The loader and transformer
+- Bumped `Wolfgang.Etl.Abstractions` 0.17.0 → 0.22.0 (and `Wolfgang.Etl.TestKit`
+  0.10.0 → 0.22.0). The loader and transformer
   now honor an already-cancelled `CancellationToken` before consuming their
   source — a pre-cancelled `LoadAsync` / `TransformAsync` reads nothing — matching
   the extractor and the TestKit base cancellation contract.
