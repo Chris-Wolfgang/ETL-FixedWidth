@@ -491,6 +491,10 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         CancellationToken token
     )
     {
+        // Honor an already-cancelled token before consuming the source or writing a header, so a
+        // pre-cancelled load reads nothing (TestKit LoaderBase cancellation contract).
+        token.ThrowIfCancellationRequested();
+
         var fieldMap = FieldMap.GetResult<TRecord>();
         LogLoadingStarted(fieldMap);
 
