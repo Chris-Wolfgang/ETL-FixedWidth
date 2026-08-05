@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   is listening — removing the always-on per-line/per-record overhead that made
   extraction ~1.5–1.95× slower in 0.7.0 — with **no public API and no opt-in
   flag** (zero-config, consistent with the rest of the ETL family) ([#275]).
+- Bumped `Wolfgang.Etl.Abstractions` 0.17.0 → 0.22.0 (and `Wolfgang.Etl.TestKit`
+  0.10.0 → 0.22.0). The loader and transformer
+  now honor an already-cancelled `CancellationToken` before consuming their
+  source — a pre-cancelled `LoadAsync` / `TransformAsync` reads nothing — matching
+  the extractor and the TestKit base cancellation contract.
 
 ### Deprecated
 

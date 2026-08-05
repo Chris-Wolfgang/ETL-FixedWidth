@@ -478,6 +478,10 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         CancellationToken token
     )
     {
+        // Honor an already-cancelled token before consuming the source or writing a header, so a
+        // pre-cancelled load reads nothing (TestKit LoaderBase cancellation contract).
+        token.ThrowIfCancellationRequested();
+
         var fieldMap = FieldMap.GetResult<TRecord>();
         LogLoadingStarted(fieldMap);
 
@@ -489,7 +493,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         var metricTags = metricsEnabled
             ? FixedWidthMetrics.CreateTags(FixedWidthMetrics.LoadOperation, typeof(TRecord))
             : default;
-        using var operationScope = metricsEnabled
+        using var operationScope = FixedWidthMetrics.DurationEnabled
             ? FixedWidthMetrics.MeasureDuration(metricTags)
             : null;
 

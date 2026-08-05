@@ -641,7 +641,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         var metricTags = metricsEnabled
             ? FixedWidthMetrics.CreateTags(FixedWidthMetrics.ExtractOperation, typeof(TRecord))
             : default;
-        using var operationScope = metricsEnabled
+        using var operationScope = FixedWidthMetrics.DurationEnabled
             ? FixedWidthMetrics.MeasureDuration(metricTags)
             : null;
 
