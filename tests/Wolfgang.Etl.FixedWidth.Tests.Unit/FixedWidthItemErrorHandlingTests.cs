@@ -153,6 +153,44 @@ public class FixedWidthItemErrorHandlingTests
     }
 
 
+    [Fact]
+    public async Task OnError_captures_the_failed_lines_as_dead_letters()
+    {
+        var captured = new List<FixedWidthError>();
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad))
+        {
+            MalformedLineHandling = MalformedLineHandling.Skip,
+            OnError = captured.Add,
+        };
+
+        var yielded = await Drain(extractor);
+
+        Assert.Equal(2, yielded.Count);                        // Carol, Dan yielded
+        Assert.Equal(2, captured.Count);                       // Eve, Foo captured
+        Assert.Equal(2, extractor.CurrentErrorItemCount);      // capture doesn't change the counters
+        Assert.All(captured, e => Assert.NotNull(e.Exception));
+        Assert.Contains(captured, e => e.RawContent != null && e.RawContent.Contains("Eve"));
+        Assert.All(captured, e => Assert.True(e.ItemNumber > 0));
+    }
+
+
+    [Fact]
+    public async Task OnError_reports_the_failure_even_when_the_run_aborts()
+    {
+        // Decision: OnError fires on Abort too — the failing record is always observable, then the run
+        // stops (default MalformedLineHandling == ThrowException).
+        var captured = new List<FixedWidthError>();
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad))
+        {
+            OnError = captured.Add,
+        };
+
+        await Assert.ThrowsAnyAsync<MalformedLineException>(() => Drain(extractor));
+
+        Assert.Single(captured);                               // the first bad line, reported before the throw
+    }
+
+
     // ---- helpers / doubles ----
 
     private static async Task<List<PersonRecord>> Drain(FixedWidthExtractor<PersonRecord> extractor)
