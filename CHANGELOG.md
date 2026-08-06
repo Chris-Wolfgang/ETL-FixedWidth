@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `FixedWidthSchemaBuilder<T>` — define a fixed-width layout with a fluent,
+  type-safe code API (`.Field(r => r.Name, index, length, …)` / `.Skip(index, length)`
+  / `.Build()`) instead of `[FixedWidthField]` attributes, for record types you
+  cannot decorate or layouts built at runtime. Assign the resulting
+  `FixedWidthSchema` to the new `FixedWidthExtractor<T>.Schema` /
+  `FixedWidthLoader<T>.Schema` property to override attribute resolution; a
+  built schema is equivalent to (and introspectable like) an attribute-resolved
+  one ([#23]).
 - Malformed-line handling now flows through the Abstractions #84 policy. `FixedWidthExtractor`
   overrides `OnItemError` to translate the existing `MalformedLineHandling` knob (`Skip` → skip,
   `ThrowException` → abort) and calls the base `HandleItemError`, so a genuine parse failure is
@@ -291,9 +299,10 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#14]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/14
 [#22]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/22
 [#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
+[#23]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/23
 [#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
-[#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
+[#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
 [Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.7.0...HEAD
 [0.7.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.5.1...v0.6.0
