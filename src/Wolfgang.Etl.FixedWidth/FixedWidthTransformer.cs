@@ -93,6 +93,10 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
             throw new ArgumentNullException(nameof(source));
         }
 
+        // Honor an already-cancelled token before consuming the source, so a pre-cancelled transform
+        // reads nothing (TestKit TransformerBase cancellation contract).
+        cancellationToken.ThrowIfCancellationRequested();
+
         await foreach (var item in source.WithCancellation(cancellationToken).ConfigureAwait(false))
         {
             cancellationToken.ThrowIfCancellationRequested();
