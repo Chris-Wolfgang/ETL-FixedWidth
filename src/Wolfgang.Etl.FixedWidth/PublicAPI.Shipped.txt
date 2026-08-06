@@ -171,6 +171,7 @@ Wolfgang.Etl.FixedWidth.ValidationResult.Reason.get -> string?
 override Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.CreateProgressReport() -> Wolfgang.Etl.FixedWidth.FixedWidthReport
 override Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.CreateProgressTimer(System.IProgress<Wolfgang.Etl.FixedWidth.FixedWidthReport> progress) -> Wolfgang.Etl.Abstractions.IProgressTimer
 override Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.ExtractWorkerAsync(System.Threading.CancellationToken token) -> System.Collections.Generic.IAsyncEnumerable<TRecord>
+override Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.OnItemError(Wolfgang.Etl.Abstractions.ItemErrorContext context) -> Wolfgang.Etl.Abstractions.ItemErrorAction
 override Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.CreateProgressReport() -> Wolfgang.Etl.FixedWidth.FixedWidthReport
 override Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.CreateProgressTimer(System.IProgress<Wolfgang.Etl.FixedWidth.FixedWidthReport> progress) -> Wolfgang.Etl.Abstractions.IProgressTimer
 override Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.LoadWorkerAsync(System.Collections.Generic.IAsyncEnumerable<TRecord> items, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task
