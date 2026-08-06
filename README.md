@@ -268,7 +268,7 @@ See the [PipelineExtensions](examples/PipelineExtensions) example for a complete
 
 ### Metrics and observability
 
-The extractor and loader can emit standard [`System.Diagnostics.Metrics`](https://learn.microsoft.com/dotnet/core/diagnostics/metrics) instruments from the meter **`Wolfgang.Etl.FixedWidth`**, so throughput and error rates flow to OpenTelemetry, Prometheus, Grafana, Application Insights, or any `MeterListener`. Metrics are **opt-in**: set `EnableMetrics = true` on the extractor/loader to turn them on. When left off (the default), the extract/load loop runs **no** metric code at all, so telemetry adds zero overhead for callers that don't use it.
+The extractor and loader can emit standard [`System.Diagnostics.Metrics`](https://learn.microsoft.com/dotnet/core/diagnostics/metrics) instruments from the meter **`Wolfgang.Etl.FixedWidth`**, so throughput and error rates flow to OpenTelemetry, Prometheus, Grafana, Application Insights, or any `MeterListener`. Metrics are **zero-config**: they activate automatically when a listener subscribes to the `Wolfgang.Etl.FixedWidth` meter — there's no flag to set. When nothing is listening, the extract/load loop (sampling once per operation) runs **no** metric code at all, so telemetry adds zero overhead for callers that don't use it.
 
 | Instrument | Type | Description |
 |---|---|---|
@@ -281,10 +281,7 @@ The extractor and loader can emit standard [`System.Diagnostics.Metrics`](https:
 Every measurement is tagged `etl.operation` (`extract` or `load`) and `etl.record_type` (`typeof(TRecord).Name`).
 
 ```csharp
-// 1. Opt in on the extractor/loader (default is off):
-var extractor = new FixedWidthExtractor<Order>(reader) { EnableMetrics = true };
-
-// 2. Subscribe once at startup — OpenTelemetry, zero per-call code:
+// Subscribe once at startup — OpenTelemetry, zero per-call code; metrics turn on automatically:
 builder.Services.AddOpenTelemetry()
     .WithMetrics(m => m.AddMeter("Wolfgang.Etl.FixedWidth"));
 ```

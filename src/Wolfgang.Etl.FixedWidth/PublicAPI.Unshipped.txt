@@ -1,10 +1,6 @@
 #nullable enable
-Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.EnableMetrics.get -> bool
-Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.EnableMetrics.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.Schema.get -> Wolfgang.Etl.FixedWidth.FixedWidthSchema?
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.Schema.set -> void
-Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.EnableMetrics.get -> bool
-Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.EnableMetrics.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.Schema.get -> Wolfgang.Etl.FixedWidth.FixedWidthSchema?
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.Schema.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>
