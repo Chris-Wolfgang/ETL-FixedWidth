@@ -389,15 +389,13 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
 
     /// <summary>
-    /// When <see langword="true"/>, the loader emits the <c>Wolfgang.Etl.FixedWidth</c> metrics (#30)
-    /// as it runs. Defaults to <see langword="false"/> — metrics are <b>opt-in</b>. When off, the load
-    /// loop executes no metric code at all (no per-record calls, no tag or duration allocation), so
-    /// telemetry adds no measurable overhead for callers that do not use it. Set to
-    /// <see langword="true"/> — and subscribe with OpenTelemetry (<c>AddMeter("Wolfgang.Etl.FixedWidth")</c>)
-    /// or a <see cref="System.Diagnostics.Metrics.MeterListener"/> — to collect the counters and the
-    /// duration histogram.
+    /// An optional layout that overrides the <c>[FixedWidthField]</c> / <c>[FixedWidthSkip]</c> attributes
+    /// on <typeparamref name="TRecord"/> (#23). Build one with <see cref="FixedWidthSchemaBuilder{T}"/> to
+    /// map a type you cannot decorate, or to define the layout in code. When <see langword="null"/> (the
+    /// default) the attribute-based layout is used. The schema's <see cref="FixedWidthSchema.RecordType"/>
+    /// must be <typeparamref name="TRecord"/>.
     /// </summary>
-    public bool EnableMetrics { get; set; }
+    public FixedWidthSchema? Schema { get; set; }
 
 
 
@@ -483,6 +481,34 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
 
 
+    /// <summary>
+    /// Resolves the field map to use: the caller-supplied <see cref="Schema"/> when set, otherwise the
+    /// attribute-derived layout for <typeparamref name="TRecord"/>.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// <see cref="Schema"/> is set but describes a different record type.
+    /// </exception>
+    private FieldMapResult ResolveFieldMap()
+    {
+        if (Schema is null)
+        {
+            return FieldMap.GetResult<TRecord>();
+        }
+
+        if (Schema.RecordType != typeof(TRecord))
+        {
+            throw new InvalidOperationException
+            (
+                $"The supplied Schema describes '{Schema.RecordType.FullName}' but this loader is " +
+                $"typed for '{typeof(TRecord).FullName}'."
+            );
+        }
+
+        return Schema.MapResult;
+    }
+
+
+
     /// <inheritdoc/>
 #pragma warning disable MA0051 // hot-path load loop; the metric guards (#275) are inlined intentionally so the default metrics-off path calls and allocates nothing
     protected override async Task LoadWorkerAsync
@@ -491,17 +517,22 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         CancellationToken token
     )
     {
-        var fieldMap = FieldMap.GetResult<TRecord>();
+        // Honor an already-cancelled token before consuming the source or writing a header, so a
+        // pre-cancelled load reads nothing (TestKit LoaderBase cancellation contract).
+        token.ThrowIfCancellationRequested();
+
+        var fieldMap = ResolveFieldMap();
         LogLoadingStarted(fieldMap);
 
-        // Metrics (#30, #275): opt-in via EnableMetrics. When off (the default) the load loop runs no
-        // metric code — the per-record calls below are skipped and neither the tag set nor the duration
-        // scope is allocated — so telemetry adds no measurable overhead unless the caller opts in.
-        var metricsEnabled = EnableMetrics;
+        // Metrics (#30, #275): sampled once per operation from the instruments. When no MeterListener
+        // is subscribed the load loop runs no metric code — the per-record calls below are skipped and
+        // neither the tag set nor the duration scope is allocated — so telemetry is zero-cost and
+        // zero-config: it activates automatically when a listener subscribes.
+        var metricsEnabled = FixedWidthMetrics.AnyEnabled;
         var metricTags = metricsEnabled
             ? FixedWidthMetrics.CreateTags(FixedWidthMetrics.LoadOperation, typeof(TRecord))
             : default;
-        using var operationScope = metricsEnabled
+        using var operationScope = FixedWidthMetrics.DurationEnabled
             ? FixedWidthMetrics.MeasureDuration(metricTags)
             : null;
 

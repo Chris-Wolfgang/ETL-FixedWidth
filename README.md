@@ -186,6 +186,25 @@ Position  Field           Type    Length  Align  Pad  Format
 Total width: 24  |  Columns: 3 (2 fields + 1 skip)  |  Delimiter: none
 ```
 
+### Defining the layout in code
+
+When you can't decorate the record type — a third-party POCO, or a layout chosen at runtime — build the schema with `FixedWidthSchemaBuilder<T>` instead of attributes, then hand it to the extractor or loader via its `Schema` property:
+
+```csharp
+var schema = new FixedWidthSchemaBuilder<CustomerRecord>()
+    .Field(r => r.CustomerId, index: 0, length: 8)
+    .Field(r => r.Name, index: 1, length: 30)
+    .Skip(index: 2, length: 5)
+    .Field(r => r.Balance, index: 3, length: 9, alignment: FieldAlignment.Right, format: "0000000.00")
+    .Build();
+
+using var extractor = new FixedWidthExtractor<CustomerRecord>(reader) { Schema = schema };
+```
+
+The builder uses lambda expressions for type-safe, refactor-proof property references — no magic strings. `index` is the zero-based column ordinal (the same value as `[FixedWidthField(index, length)]`); start positions are computed from the column lengths. A schema built this way is **equivalent** to one resolved from attributes: it validates the same way (duplicate index, no public setter) and is fully introspectable via `Fields` / `ToDiagram()`. Setting `Schema` overrides any attributes on the type.
+
+See the [SchemaBuilder](examples/SchemaBuilder) example for a runnable walk-through.
+
 ### Transforming between layouts
 
 To reformat a fixed-width file from one layout to another — reordering, adding/removing, or format-converting fields (a common mainframe-migration task) — `FixedWidthTransformer<TSource, TDestination>` is the projection stage between an extractor and a loader:
@@ -249,7 +268,7 @@ See the [PipelineExtensions](examples/PipelineExtensions) example for a complete
 
 ### Metrics and observability
 
-The extractor and loader can emit standard [`System.Diagnostics.Metrics`](https://learn.microsoft.com/dotnet/core/diagnostics/metrics) instruments from the meter **`Wolfgang.Etl.FixedWidth`**, so throughput and error rates flow to OpenTelemetry, Prometheus, Grafana, Application Insights, or any `MeterListener`. Metrics are **opt-in**: set `EnableMetrics = true` on the extractor/loader to turn them on. When left off (the default), the extract/load loop runs **no** metric code at all, so telemetry adds zero overhead for callers that don't use it.
+The extractor and loader can emit standard [`System.Diagnostics.Metrics`](https://learn.microsoft.com/dotnet/core/diagnostics/metrics) instruments from the meter **`Wolfgang.Etl.FixedWidth`**, so throughput and error rates flow to OpenTelemetry, Prometheus, Grafana, Application Insights, or any `MeterListener`. Metrics are **zero-config**: they activate automatically when a listener subscribes to the `Wolfgang.Etl.FixedWidth` meter — there's no flag to set. When nothing is listening, the extract/load loop (sampling once per operation) runs **no** metric code at all, so telemetry adds zero overhead for callers that don't use it.
 
 | Instrument | Type | Description |
 |---|---|---|
@@ -262,10 +281,7 @@ The extractor and loader can emit standard [`System.Diagnostics.Metrics`](https:
 Every measurement is tagged `etl.operation` (`extract` or `load`) and `etl.record_type` (`typeof(TRecord).Name`).
 
 ```csharp
-// 1. Opt in on the extractor/loader (default is off):
-var extractor = new FixedWidthExtractor<Order>(reader) { EnableMetrics = true };
-
-// 2. Subscribe once at startup — OpenTelemetry, zero per-call code:
+// Subscribe once at startup — OpenTelemetry, zero per-call code; metrics turn on automatically:
 builder.Services.AddOpenTelemetry()
     .WithMetrics(m => m.AddMeter("Wolfgang.Etl.FixedWidth"));
 ```
@@ -295,6 +311,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 | **Span-based numerics** | `Span<char>`-based numeric parsing on net8.0+ for reduced allocation |
 | **Compiled delegates** | Field accessors use compiled delegates instead of reflection for fast property get/set |
 | **Schema introspection** | `FixedWidthSchema.For<T>()` exposes the resolved layout (positions, widths, types, skips); `ToDiagram()` renders it as a text table |
+| **Code-defined layout** | `FixedWidthSchemaBuilder<T>` defines a layout in fluent, type-safe code (no attributes required); assign it to the extractor/loader `Schema` property |
 | **Format transformation** | `FixedWidthTransformer<TSource, TDestination>` projects one layout to another in a single streaming pass, with optional `ByMatchingProperties()` auto-mapping |
 | **Pipeline composition** | `EtlPipeline.Create().FixedWidthExtractor<T>(…).FixedWidthLoader<T>(…).RunAsync()` — fluent source factories and sink terminators over the generic `EtlPipeline` (requires `Wolfgang.Etl.Abstractions` 0.16.0) |
 | **Metrics** | Zero-config `System.Diagnostics.Metrics` instruments (throughput, skips, duration) from the `Wolfgang.Etl.FixedWidth` meter — OpenTelemetry / Prometheus / any `MeterListener` |
@@ -302,7 +319,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 
 **Examples:**
 
-The [examples/](examples/) folder contains 12 runnable console projects demonstrating each feature:
+The [examples/](examples/) folder contains 13 runnable console projects demonstrating each feature:
 
 | Example | Description |
 |---------|-------------|
@@ -318,6 +335,7 @@ The [examples/](examples/) folder contains 12 runnable console projects demonstr
 | [HeadersAndSeparators](examples/HeadersAndSeparators) | `WriteHeader`, `HasHeader`, and `FieldSeparator` |
 | [PipelineExtensions](examples/PipelineExtensions) | Compose extract → transform → load as one `EtlPipeline` fluent chain |
 | [Metrics](examples/Metrics) | Subscribe to the `Wolfgang.Etl.FixedWidth` meter and read throughput/duration metrics |
+| [SchemaBuilder](examples/SchemaBuilder) | Define a layout in code with `FixedWidthSchemaBuilder<T>` instead of attributes |
 
 ---
 

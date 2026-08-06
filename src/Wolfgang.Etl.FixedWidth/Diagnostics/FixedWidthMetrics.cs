@@ -77,6 +77,28 @@ internal static class FixedWidthMetrics
 
 
     /// <summary>
+    /// <see langword="true"/> when any fixed-width instrument is currently <b>enabled</b> — i.e. a
+    /// subscribed <c>MeterListener</c> has called <c>EnableMeasurementEvents</c> on at least one of them
+    /// (as OpenTelemetry's <c>AddMeter("Wolfgang.Etl.FixedWidth")</c> does). The extract/load hot loop
+    /// samples this once per operation to gate all metric work: when it is <see langword="false"/> the
+    /// loop touches no metric code, so instrumentation is zero-cost and zero-config, with no opt-in flag
+    /// (#275).
+    /// </summary>
+    internal static bool AnyEnabled =>
+        ItemsExtracted.Enabled || ItemsLoaded.Enabled || ItemsSkipped.Enabled
+            || LinesRead.Enabled || OperationDuration.Enabled;
+
+
+    /// <summary>
+    /// <see langword="true"/> when the <see cref="OperationDuration"/> histogram specifically is enabled.
+    /// The extract/load loop gates its per-operation <see cref="DurationScope"/> on this so a listener
+    /// enabling only the counters does not pay the scope allocation and the <c>Stopwatch</c> timestamp
+    /// read for a duration that will never be recorded.
+    /// </summary>
+    internal static bool DurationEnabled => OperationDuration.Enabled;
+
+
+    /// <summary>
     /// Builds the tag set shared by every measurement of a single operation.
     /// </summary>
     internal static TagList CreateTags(string operation, Type recordType)

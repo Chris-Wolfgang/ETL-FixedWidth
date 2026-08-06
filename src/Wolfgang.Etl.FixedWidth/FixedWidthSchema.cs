@@ -26,17 +26,29 @@ namespace Wolfgang.Etl.FixedWidth;
 /// </example>
 public sealed class FixedWidthSchema
 {
-    private FixedWidthSchema
+    internal FixedWidthSchema
     (
         Type recordType,
         IReadOnlyList<FixedWidthFieldInfo> fields,
-        int expectedLineWidth
+        int expectedLineWidth,
+        FieldMapResult mapResult
     )
     {
         RecordType = recordType;
         Fields = fields;
         ExpectedLineWidth = expectedLineWidth;
+        MapResult = mapResult;
     }
+
+
+
+    /// <summary>
+    /// The resolved, executable field map (compiled accessors, factory, positions) the extractor and
+    /// loader use when this schema is supplied via their <c>Schema</c> property (#23). Whether the schema
+    /// was resolved from attributes (<see cref="For(Type)"/>) or built with
+    /// <see cref="FixedWidthSchemaBuilder{T}"/>, this is the same shape as the attribute-derived map.
+    /// </summary>
+    internal FieldMapResult MapResult { get; }
 
 
 
@@ -71,7 +83,7 @@ public sealed class FixedWidthSchema
             width += column.Length;
         }
 
-        return new FixedWidthSchema(recordType, fields.AsReadOnly(), width);
+        return new FixedWidthSchema(recordType, fields.AsReadOnly(), width, FieldMap.GetResult(recordType));
     }
 
 
