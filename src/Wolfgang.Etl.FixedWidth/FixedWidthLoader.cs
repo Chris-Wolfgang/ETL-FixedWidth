@@ -389,6 +389,17 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
 
     /// <summary>
+    /// An optional layout that overrides the <c>[FixedWidthField]</c> / <c>[FixedWidthSkip]</c> attributes
+    /// on <typeparamref name="TRecord"/> (#23). Build one with <see cref="FixedWidthSchemaBuilder{T}"/> to
+    /// map a type you cannot decorate, or to define the layout in code. When <see langword="null"/> (the
+    /// default) the attribute-based layout is used. The schema's <see cref="FixedWidthSchema.RecordType"/>
+    /// must be <typeparamref name="TRecord"/>.
+    /// </summary>
+    public FixedWidthSchema? Schema { get; set; }
+
+
+
+    /// <summary>
     /// The 1-based physical line number of the line most recently written to the output.
     /// Updated after each line is written. Includes the header line and separator line
     /// if written. Matches the line number shown in a text editor.
@@ -470,6 +481,34 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
 
 
+    /// <summary>
+    /// Resolves the field map to use: the caller-supplied <see cref="Schema"/> when set, otherwise the
+    /// attribute-derived layout for <typeparamref name="TRecord"/>.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// <see cref="Schema"/> is set but describes a different record type.
+    /// </exception>
+    private FieldMapResult ResolveFieldMap()
+    {
+        if (Schema is null)
+        {
+            return FieldMap.GetResult<TRecord>();
+        }
+
+        if (Schema.RecordType != typeof(TRecord))
+        {
+            throw new InvalidOperationException
+            (
+                $"The supplied Schema describes '{Schema.RecordType.FullName}' but this loader is " +
+                $"typed for '{typeof(TRecord).FullName}'."
+            );
+        }
+
+        return Schema.MapResult;
+    }
+
+
+
     /// <inheritdoc/>
 #pragma warning disable MA0051 // hot-path load loop; the metric guards (#275) are inlined intentionally so the default metrics-off path calls and allocates nothing
     protected override async Task LoadWorkerAsync
@@ -482,7 +521,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         // pre-cancelled load reads nothing (TestKit LoaderBase cancellation contract).
         token.ThrowIfCancellationRequested();
 
-        var fieldMap = FieldMap.GetResult<TRecord>();
+        var fieldMap = ResolveFieldMap();
         LogLoadingStarted(fieldMap);
 
         // Metrics (#30, #275): sampled once per operation from the instruments. When no MeterListener
