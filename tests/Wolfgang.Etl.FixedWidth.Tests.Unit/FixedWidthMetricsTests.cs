@@ -48,10 +48,7 @@ public sealed class FixedWidthMetricsTests
         var extractor = new FixedWidthExtractor<MetricsSample>
         (
             new StringReader(Content(("Alice", "Smith", 30), ("Bob", "Jones", 25), ("Carol", "White", 35)))
-        )
-        {
-            EnableMetrics = true,
-        };
+        );
 
         await DrainAsync(extractor);
 
@@ -78,7 +75,6 @@ public sealed class FixedWidthMetricsTests
             new StringReader(Content(("Alice", "Smith", 30), ("Bob", "Jones", 25), ("Carol", "White", 35)))
         )
         {
-            EnableMetrics = true,
             SkipItemCount = 2,
         };
 
@@ -95,7 +91,7 @@ public sealed class FixedWidthMetricsTests
         using var capture = new MetricCapture();
 
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<MetricsSample>(writer) { EnableMetrics = true };
+        var loader = new FixedWidthLoader<MetricsSample>(writer);
 
         await loader.LoadAsync(SampleAsync(), CancellationToken.None);
 
@@ -111,12 +107,13 @@ public sealed class FixedWidthMetricsTests
 
 
     [Fact]
-    public async Task Metrics_are_off_by_default_even_with_a_subscribed_listener()
+    public async Task Metrics_activate_with_no_opt_in_when_a_listener_is_subscribed()
     {
         using var capture = new MetricCapture();
 
-        // EnableMetrics defaults to false — metrics are opt-in (#275), so nothing is emitted even
-        // though a MeterListener is active.
+        // Zero-config (#275): there is no opt-in flag — a subscribed MeterListener alone turns metrics
+        // on. When nothing is listening the hot loop runs no metric code (that path is the pre-metrics
+        // throughput restored), but the moment a listener subscribes, both stages emit.
         var extractor = new FixedWidthExtractor<MetricsSample>
         (
             new StringReader(Content(("Alice", "Smith", 30), ("Bob", "Jones", 25)))
@@ -127,7 +124,9 @@ public sealed class FixedWidthMetricsTests
         var loader = new FixedWidthLoader<MetricsSample>(writer);
         await loader.LoadAsync(SampleAsync(), CancellationToken.None);
 
-        Assert.Empty(capture.All);
+        Assert.NotEmpty(capture.All);
+        Assert.Equal(2, capture.Sum("wolfgang.etl.fixedwidth.items.extracted"));
+        Assert.Equal(2, capture.Sum("wolfgang.etl.fixedwidth.items.loaded"));
     }
 
 

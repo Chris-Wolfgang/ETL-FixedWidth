@@ -9,12 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `EnableMetrics` property on `FixedWidthExtractor<T>` and `FixedWidthLoader<T>`
-  (default `false`) that turns the #30 metrics on. Metrics are now **opt-in**:
-  when off — the default — the extract/load hot loop executes no metric code at
-  all, restoring the pre-metrics throughput. Set `EnableMetrics = true` (and
-  subscribe via `AddMeter("Wolfgang.Etl.FixedWidth")` or a `MeterListener`) to
-  collect the counters and duration histogram ([#275]).
 - Concurrency / race-condition stress suite ([#147]):
   `tests/Wolfgang.Etl.FixedWidth.Tests.Concurrency` asserts correctness under
   contention — concurrent first-use of the process-global caches (`FieldMap`
@@ -26,10 +20,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The metrics added in 0.7.0 (#30) no longer emit unless `EnableMetrics` is set.
-  This removes the always-on per-line/per-record overhead that made extraction
-  ~1.5–1.95× slower in 0.7.0 regardless of whether a listener was attached
-  ([#275]).
+- The #30 metrics no longer run unless a listener is subscribed to the
+  `Wolfgang.Etl.FixedWidth` meter. The extract/load loop samples the instruments'
+  `Enabled` state **once per operation** and executes no metric code when nothing
+  is listening — removing the always-on per-line/per-record overhead that made
+  extraction ~1.5–1.95× slower in 0.7.0 — with **no public API and no opt-in
+  flag** (zero-config, consistent with the rest of the ETL family) ([#275]).
+- Bumped `Wolfgang.Etl.Abstractions` 0.17.0 → 0.22.0 (and `Wolfgang.Etl.TestKit`
+  0.10.0 → 0.22.0). The loader and transformer
+  now honor an already-cancelled `CancellationToken` before consuming their
+  source — a pre-cancelled `LoadAsync` / `TransformAsync` reads nothing — matching
+  the extractor and the TestKit base cancellation contract.
 
 ### Deprecated
 
