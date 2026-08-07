@@ -24,6 +24,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   distinct from `RecordValidator` business rejects (which `CurrentRejectedItemCount` counts).
   `MalformedLineHandling.ReturnDefault` recovers before the give-up decision, so it never enters
   the error policy. Closes #29.
+- Native-AOT / trim-compatibility smoke test ([#153]): a `PublishAot` console
+  consumer (`tests/AotSmoke`) exercises every public path against a concrete
+  record type and asserts the results, and the `aot-smoke.yaml` workflow
+  publishes it on Linux and runs the native binary so an AOT/trim regression
+  fails before merge. The `Expression.Compile` accessor sites carry documented
+  `IL3050` suppressions — under Native AOT they fall back to the interpreter, so
+  the library runs correctly (without JIT speed). **Known limitation surfaced by
+  the smoke:** attribute-based mapping reads `[FixedWidthField]` by reflection,
+  and Native-AOT trimming strips those attribute instances unless the record's
+  assembly is rooted (`TrimmerRootAssembly`) — a consumer using attribute mapping
+  under AOT must root its record types today; removing that need is the
+  source-generated-accessors follow-up.
 
 ### Changed
 
@@ -296,6 +308,7 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
 [#23]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/23
 [#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
+[#153]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/153
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
 [#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
 [Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.7.0...HEAD
