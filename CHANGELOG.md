@@ -17,6 +17,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `FixedWidthLoader<T>.Schema` property to override attribute resolution; a
   built schema is equivalent to (and introspectable like) an attribute-resolved
   one ([#23]).
+- Malformed-line handling now flows through the Abstractions #84 policy. `FixedWidthExtractor`
+  overrides `OnItemError` to translate the existing `MalformedLineHandling` knob (`Skip` → skip,
+  `ThrowException` → abort) and calls the base `HandleItemError`, so a genuine parse failure is
+  counted in `CurrentErrorItemCount` and surfaced in the pipeline's `ErrorItemCount` — kept
+  distinct from `RecordValidator` business rejects (which `CurrentRejectedItemCount` counts).
+  `MalformedLineHandling.ReturnDefault` recovers before the give-up decision, so it never enters
+  the error policy. Closes #29.
+- Native-AOT / trim-compatibility smoke test ([#153]): a `PublishAot` console
+  consumer (`tests/AotSmoke`) exercises every public path against a concrete
+  record type and asserts the results, and the `aot-smoke.yaml` workflow
+  publishes it on Linux and runs the native binary so an AOT/trim regression
+  fails before merge. The `Expression.Compile` accessor sites carry documented
+  `IL3050` suppressions — under Native AOT they fall back to the interpreter, so
+  the library runs correctly (without JIT speed). **Known limitation surfaced by
+  the smoke:** attribute-based mapping reads `[FixedWidthField]` by reflection,
+  and Native-AOT trimming strips those attribute instances unless the record's
+  assembly is rooted (`TrimmerRootAssembly`) — a consumer using attribute mapping
+  under AOT must root its record types today; removing that need is the
+  source-generated-accessors follow-up.
+
 ### Changed
 
 - The #30 metrics no longer run unless a listener is subscribed to the
@@ -26,7 +46,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   extraction ~1.5–1.95× slower in 0.7.0 — with **no public API and no opt-in
   flag** (zero-config, consistent with the rest of the ETL family) ([#275]).
 - Bumped `Wolfgang.Etl.Abstractions` 0.17.0 → 0.22.0 (and `Wolfgang.Etl.TestKit`
-  0.10.0 → 0.22.0). The loader and transformer
+  0.10.0 → 0.22.0), adopting the renamed
+  `EtlPipelineProgress.{Extracted,Loaded,Error}ItemCount` counters (formerly
+  `Records{Extracted,Loaded,Errored}`). The loader and transformer
   now honor an already-cancelled `CancellationToken` before consuming their
   source — a pre-cancelled `LoadAsync` / `TransformAsync` reads nothing — matching
   the extractor and the TestKit base cancellation contract.
@@ -293,6 +315,7 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
 [#23]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/23
 [#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
+[#153]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/153
 [#165]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/165
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
 [#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
