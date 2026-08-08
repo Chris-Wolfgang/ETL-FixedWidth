@@ -54,7 +54,7 @@ jobs:
         run: |
           echo '### Sustained-load GC profile' >> "$GITHUB_STEP_SUMMARY"
           echo '```json' >> "$GITHUB_STEP_SUMMARY"
-          cat gc-run.json >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || echo '(no run produced)' >> "$GITHUB_STEP_SUMMARY"
+          cat "$GC_PROFILE_OUT" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || echo '(no run produced)' >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload GC run
@@ -62,8 +62,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: gc-run
-          path: gc-run.json
+          path: ${{ env.GC_PROFILE_OUT }}
           if-no-files-found: warn
 
       - name: Compare against baseline
-        run: python3 tools/GcProfile/compare.py gc-run.json docs/gc-baseline.json
+        run: python3 tools/GcProfile/compare.py "$GC_PROFILE_OUT" docs/gc-baseline.json

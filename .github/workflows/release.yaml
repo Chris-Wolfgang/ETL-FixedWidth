@@ -586,6 +586,13 @@ jobs:
               }
             } | Sort-Object { $_.tfm }
 
+          # Fail fast rather than publish a misleading manifest with an empty assemblies list if the
+          # expected Release build output isn't where we looked (e.g. a path/layout change upstream).
+          if (@($assemblies).Count -eq 0) {
+            Write-Error "Reproducible-build manifest: no 'Wolfgang.Etl.FixedWidth.dll' found under '$binRoot'. Expected the Release build output — failing instead of writing an empty manifest."
+            exit 1
+          }
+
           $packages = Get-ChildItem -Path $dir -File |
             Where-Object { $_.Extension -in '.nupkg', '.snupkg' } |
             ForEach-Object {

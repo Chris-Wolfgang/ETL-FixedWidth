@@ -49,7 +49,7 @@ jobs:
         run: |
           echo '### Shadow workloads' >> "$GITHUB_STEP_SUMMARY"
           echo '```json' >> "$GITHUB_STEP_SUMMARY"
-          cat shadow-run.json >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || echo '(no run produced)' >> "$GITHUB_STEP_SUMMARY"
+          cat "$SHADOW_OUT" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || echo '(no run produced)' >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload shadow run
@@ -57,8 +57,8 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: shadow-run
-          path: shadow-run.json
+          path: ${{ env.SHADOW_OUT }}
           if-no-files-found: warn
 
       - name: Compare against baseline
-        run: python3 samples/ShadowWorkloads/compare.py shadow-run.json docs/shadow-baseline.json
+        run: python3 samples/ShadowWorkloads/compare.py "$SHADOW_OUT" docs/shadow-baseline.json
