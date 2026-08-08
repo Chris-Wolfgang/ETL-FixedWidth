@@ -44,6 +44,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   cranks the iteration budget up via `STRESS_ITERATIONS`. (Coyote is not used —
   its `IAsyncEnumerable` support is rough and its CLI is net8-only; the xunit
   stress suite is the gate.)
+- Sustained-load GC / allocation profiling ([#152]): `tools/GcProfile` runs
+  extract → transform → load in a tight loop for a configurable duration and
+  reports allocated bytes per record and gen2 collections per million records.
+  A monthly `gc-profile.yaml` sweep gates the run against `docs/gc-baseline.json`
+  — a per-record allocation jump (hot-path regression) or gen2 promotion
+  (retention leak) fails the job. Complements the per-call allocation snapshot in
+  `docs/ALLOCATION-PROFILE.md` (#157).
 
 ### Changed
 
@@ -324,6 +331,7 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#23]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/23
 [#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
 [#147]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/147
+[#152]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/152
 [#153]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/153
 [#165]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/165
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
