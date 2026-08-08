@@ -36,6 +36,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   assembly is rooted (`TrimmerRootAssembly`) — a consumer using attribute mapping
   under AOT must root its record types today; removing that need is the
   source-generated-accessors follow-up.
+- Concurrency / race-condition stress suite ([#147]):
+  `tests/Wolfgang.Etl.FixedWidth.Tests.Concurrency` asserts correctness under
+  contention — concurrent first-use of the process-global caches (`FieldMap`
+  cache, `FixedWidthTransformer` static property-mapper), racing disposal, and
+  cross-thread cancellation mid-enumeration. A weekly `concurrency.yaml` sweep
+  cranks the iteration budget up via `STRESS_ITERATIONS`. (Coyote is not used —
+  its `IAsyncEnumerable` support is rough and its CLI is net8-only; the xunit
+  stress suite is the gate.)
 
 ### Changed
 
@@ -315,6 +323,7 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
 [#23]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/23
 [#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
+[#147]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/147
 [#153]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/153
 [#165]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/165
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
