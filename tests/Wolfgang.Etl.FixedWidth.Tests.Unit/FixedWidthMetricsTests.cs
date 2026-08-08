@@ -107,6 +107,30 @@ public sealed class FixedWidthMetricsTests
 
 
     [Fact]
+    public async Task Metrics_activate_with_no_opt_in_when_a_listener_is_subscribed()
+    {
+        using var capture = new MetricCapture();
+
+        // Zero-config (#275): there is no opt-in flag — a subscribed MeterListener alone turns metrics
+        // on. When nothing is listening the hot loop runs no metric code (that path is the pre-metrics
+        // throughput restored), but the moment a listener subscribes, both stages emit.
+        var extractor = new FixedWidthExtractor<MetricsSample>
+        (
+            new StringReader(Content(("Alice", "Smith", 30), ("Bob", "Jones", 25)))
+        );
+        await DrainAsync(extractor);
+
+        var writer = new StringWriter();
+        var loader = new FixedWidthLoader<MetricsSample>(writer);
+        await loader.LoadAsync(SampleAsync(), CancellationToken.None);
+
+        Assert.NotEmpty(capture.All);
+        Assert.Equal(2, capture.Sum("wolfgang.etl.fixedwidth.items.extracted"));
+        Assert.Equal(2, capture.Sum("wolfgang.etl.fixedwidth.items.loaded"));
+    }
+
+
+    [Fact]
     public void Duration_scope_dispose_is_idempotent()
     {
         using var capture = new MetricCapture();

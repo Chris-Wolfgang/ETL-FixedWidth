@@ -70,6 +70,7 @@ var input =
     "Bob       Jones     025\n" +
     "Carol     White     035\n";
 
+// Metrics are zero-config — the MeterListener subscribed above turns them on; there is no flag to set.
 var extractor = new FixedWidthExtractor<Person>(new StringReader(input)) { SkipItemCount = 1 };
 
 var people = new List<Person>();

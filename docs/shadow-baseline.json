@@ -1,0 +1,11 @@
+{
+  "_comment": "Shadow-workload baseline for #140. Regenerate by running samples/ShadowWorkloads in measure mode and updating these references in a reviewed PR. allocatedBytes is the HARD gate (deterministic managed allocation; a >allocTolerancePercent jump fails the nightly). medianMs is ADVISORY only: wall-clock on shared GitHub-hosted runners is too noisy to gate reliably — it is reported and flagged past latencyTolerancePercent but does not fail the job. Reliable latency gating would need a dedicated runner.",
+  "capturedOn": "windows-local, net10.0, 20000 records/scenario, 15 measured iterations",
+  "allocTolerancePercent": 50,
+  "latencyTolerancePercent": 20,
+  "scenarios": {
+    "streaming_round_trip": { "allocatedBytes": 11746947, "medianMs": 40.11 },
+    "reformat_transform": { "allocatedBytes": 13027700, "medianMs": 17.93 },
+    "pipeline_composition": { "allocatedBytes": 11587808, "medianMs": 15.80 }
+  }
+}

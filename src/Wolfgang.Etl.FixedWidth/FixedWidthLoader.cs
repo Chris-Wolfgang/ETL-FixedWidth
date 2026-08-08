@@ -389,6 +389,17 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
 
     /// <summary>
+    /// An optional layout that overrides the <c>[FixedWidthField]</c> / <c>[FixedWidthSkip]</c> attributes
+    /// on <typeparamref name="TRecord"/> (#23). Build one with <see cref="FixedWidthSchemaBuilder{T}"/> to
+    /// map a type you cannot decorate, or to define the layout in code. When <see langword="null"/> (the
+    /// default) the attribute-based layout is used. The schema's <see cref="FixedWidthSchema.RecordType"/>
+    /// must be <typeparamref name="TRecord"/>.
+    /// </summary>
+    public FixedWidthSchema? Schema { get; set; }
+
+
+
+    /// <summary>
     /// The 1-based physical line number of the line most recently written to the output.
     /// Updated after each line is written. Includes the header line and separator line
     /// if written. Matches the line number shown in a text editor.
@@ -470,19 +481,60 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
 
 
+    /// <summary>
+    /// Resolves the field map to use: the caller-supplied <see cref="Schema"/> when set, otherwise the
+    /// attribute-derived layout for <typeparamref name="TRecord"/>.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// <see cref="Schema"/> is set but describes a different record type.
+    /// </exception>
+    private FieldMapResult ResolveFieldMap()
+    {
+        if (Schema is null)
+        {
+            return FieldMap.GetResult<TRecord>();
+        }
+
+        if (Schema.RecordType != typeof(TRecord))
+        {
+            throw new InvalidOperationException
+            (
+                $"The supplied Schema describes '{Schema.RecordType.FullName}' but this loader is " +
+                $"typed for '{typeof(TRecord).FullName}'."
+            );
+        }
+
+        return Schema.MapResult;
+    }
+
+
+
     /// <inheritdoc/>
+#pragma warning disable MA0051 // hot-path load loop; the metric guards (#275) are inlined intentionally so the default metrics-off path calls and allocates nothing
     protected override async Task LoadWorkerAsync
     (
         IAsyncEnumerable<TRecord> items,
         CancellationToken token
     )
     {
-        var fieldMap = FieldMap.GetResult<TRecord>();
+        // Honor an already-cancelled token before consuming the source or writing a header, so a
+        // pre-cancelled load reads nothing (TestKit LoaderBase cancellation contract).
+        token.ThrowIfCancellationRequested();
+
+        var fieldMap = ResolveFieldMap();
         LogLoadingStarted(fieldMap);
 
-        // Metrics (#30): duration recorded on completion/throw; counters are no-ops without a listener.
-        var metricTags = FixedWidthMetrics.CreateTags(FixedWidthMetrics.LoadOperation, typeof(TRecord));
-        using var operationScope = FixedWidthMetrics.MeasureDuration(metricTags);
+        // Metrics (#30, #275): sampled once per operation from the instruments. When no MeterListener
+        // is subscribed the load loop runs no metric code — the per-record calls below are skipped and
+        // neither the tag set nor the duration scope is allocated — so telemetry is zero-cost and
+        // zero-config: it activates automatically when a listener subscribes.
+        var metricsEnabled = FixedWidthMetrics.AnyEnabled;
+        var metricTags = metricsEnabled
+            ? FixedWidthMetrics.CreateTags(FixedWidthMetrics.LoadOperation, typeof(TRecord))
+            : default;
+        using var operationScope = FixedWidthMetrics.DurationEnabled
+            ? FixedWidthMetrics.MeasureDuration(metricTags)
+            : null;
 
         // In dry-run mode, route all formatting through a throwaway writer so the
         // pipeline — including field-width validation — still runs, but nothing
@@ -507,7 +559,10 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
             if (CurrentSkippedItemCount < SkipItemCount)
             {
                 IncrementCurrentSkippedItemCount();
-                FixedWidthMetrics.RecordSkipped(metricTags);
+                if (metricsEnabled)
+                {
+                    FixedWidthMetrics.RecordSkipped(metricTags);
+                }
                 LogDebugItemSkipped();
                 continue;
             }
@@ -529,7 +584,10 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
             Interlocked.Increment(ref _currentLineNumber);
             await target.WriteLineAsync().ConfigureAwait(false);
             IncrementCurrentItemCount();
-            FixedWidthMetrics.RecordLoaded(metricTags);
+            if (metricsEnabled)
+            {
+                FixedWidthMetrics.RecordLoaded(metricTags);
+            }
             LogDebugRecordWritten();
         }
 
@@ -537,6 +595,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
         LogLoadingCompleted();
     }
+#pragma warning restore MA0051
 
 
 

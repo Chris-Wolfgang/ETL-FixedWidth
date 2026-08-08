@@ -363,6 +363,32 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
 
     /// <summary>
+    /// An optional dead-letter sink invoked once for each record that fails to parse (#29). The
+    /// failed line is reported as a <see cref="FixedWidthError"/> — its 1-based ordinal, raw content,
+    /// and exception — so the caller can log it, push it to a dead-letter queue, or collect it for
+    /// post-run inspection. Set <see cref="MalformedLineHandling"/> to
+    /// <see cref="Enums.MalformedLineHandling.Skip"/> to capture-and-continue; with the default
+    /// <see cref="Enums.MalformedLineHandling.ThrowException"/> the failure is still reported here
+    /// before the exception is re-thrown. Business rejects from <see cref="RecordValidator"/> are
+    /// <b>not</b> reported here — they are not parse errors.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// var errors = new List&lt;FixedWidthError&gt;();
+    /// var extractor = new FixedWidthExtractor&lt;Record&gt;(reader)
+    /// {
+    ///     MalformedLineHandling = MalformedLineHandling.Skip,
+    ///     OnError = errors.Add,
+    /// };
+    /// await foreach (var ok in extractor.ExtractAsync(token)) { /* only good records */ }
+    /// // errors now holds the dead letters
+    /// </code>
+    /// </example>
+    public Action<FixedWidthError>? OnError { get; set; }
+
+
+
+    /// <summary>
     /// A delegate that converts a raw string read from the file into the target property
     /// type. The <see cref="FieldContext"/> provides the property type, format string, and
     /// other field metadata needed to perform the conversion.
@@ -487,6 +513,17 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// </code>
     /// </example>
     public string? FieldDelimiter { get; set; }
+
+
+
+    /// <summary>
+    /// An optional layout that overrides the <c>[FixedWidthField]</c> / <c>[FixedWidthSkip]</c> attributes
+    /// on <typeparamref name="TRecord"/> (#23). Build one with <see cref="FixedWidthSchemaBuilder{T}"/> to
+    /// map a type you cannot decorate, or to define the layout in code. When <see langword="null"/> (the
+    /// default) the attribute-based layout is used. The schema's <see cref="FixedWidthSchema.RecordType"/>
+    /// must be <typeparamref name="TRecord"/>.
+    /// </summary>
+    public FixedWidthSchema? Schema { get; set; }
 
 
 
@@ -627,16 +664,23 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         // cost without benefit for file-based and memory-based streams.
         // The method remains async IAsyncEnumerable as required by the base class.
 
-        var fieldMap = FieldMap.GetResult<TRecord>();
+        var fieldMap = ResolveFieldMap();
         long dataLinesSkipped = 0;
         var separatorLineNo = HeaderLineCount > 0 && FieldSeparator.HasValue
             ? HeaderLineCount + 1
             : -1;
 
-        // Metrics (#30): records the operation duration when the enumerator completes, ends early, or
-        // throws; the per-item/line counters below are no-ops unless a MeterListener is subscribed.
-        var metricTags = FixedWidthMetrics.CreateTags(FixedWidthMetrics.ExtractOperation, typeof(TRecord));
-        using var operationScope = FixedWidthMetrics.MeasureDuration(metricTags);
+        // Metrics (#30, #275): sampled once per operation from the instruments. When no MeterListener
+        // is subscribed the extract loop runs no metric code — the per-line/record calls below are
+        // skipped and neither the tag set nor the duration scope is allocated — so telemetry is
+        // zero-cost and zero-config: it activates automatically when a listener subscribes.
+        var metricsEnabled = FixedWidthMetrics.AnyEnabled;
+        var metricTags = metricsEnabled
+            ? FixedWidthMetrics.CreateTags(FixedWidthMetrics.ExtractOperation, typeof(TRecord))
+            : default;
+        using var operationScope = FixedWidthMetrics.DurationEnabled
+            ? FixedWidthMetrics.MeasureDuration(metricTags)
+            : null;
 
         LogExtractionStarted(fieldMap);
 
@@ -652,7 +696,10 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             // Update before any processing so that if an exception is thrown,
             // CurrentLineNumber points to the offending line in the file.
             Interlocked.Increment(ref _currentLineNumber);
-            FixedWidthMetrics.RecordLineRead(metricTags);
+            if (metricsEnabled)
+            {
+                FixedWidthMetrics.RecordLineRead(metricTags);
+            }
 
             if (IsStructuralLine(separatorLineNo))
             {
@@ -676,7 +723,10 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
                 {
                     dataLinesSkipped++;
                     IncrementCurrentSkippedItemCount();
-                    FixedWidthMetrics.RecordSkipped(metricTags);
+                    if (metricsEnabled)
+                    {
+                        FixedWidthMetrics.RecordSkipped(metricTags);
+                    }
                     LogDebugBlankLineInSkipBudget(dataLinesSkipped);
                     continue;
                 }
@@ -691,7 +741,10 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
                 LogDebugBlankLineYieldedAsDefault();
                 IncrementCurrentItemCount();
-                FixedWidthMetrics.RecordExtracted(metricTags);
+                if (metricsEnabled)
+                {
+                    FixedWidthMetrics.RecordExtracted(metricTags);
+                }
                 yield return defaultRecord;
                 continue;
             }
@@ -715,7 +768,10 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             {
                 dataLinesSkipped++;
                 IncrementCurrentSkippedItemCount();
-                FixedWidthMetrics.RecordSkipped(metricTags);
+                if (metricsEnabled)
+                {
+                    FixedWidthMetrics.RecordSkipped(metricTags);
+                }
                 LogDebugDataLineSkipped(dataLinesSkipped);
                 continue;
             }
@@ -747,7 +803,10 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
             LogDebugRecordParsed();
             IncrementCurrentItemCount();
-            FixedWidthMetrics.RecordExtracted(metricTags);
+            if (metricsEnabled)
+            {
+                FixedWidthMetrics.RecordExtracted(metricTags);
+            }
             yield return record;
         }
 
@@ -1022,9 +1081,77 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
 
 
+    /// <summary>
+    /// Translates this extractor's <see cref="MalformedLineHandling"/> knob into the base
+    /// per-item error policy. <see cref="MalformedLineHandling.Skip"/> maps to
+    /// <see cref="ItemErrorAction.Skip"/>; <see cref="MalformedLineHandling.ThrowException"/>
+    /// maps to <see cref="ItemErrorAction.Abort"/>. <see cref="MalformedLineHandling.ReturnDefault"/>
+    /// recovers with a substitute record before the give-up decision, so it never reaches this
+    /// hook.
+    /// </summary>
+    /// <param name="context">The failure context supplied by the extract worker.</param>
+    /// <returns>The action the base class should apply to the failed line.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when <see cref="MalformedLineHandling"/> holds an unrecognized value.
+    /// </exception>
+    protected override ItemErrorAction OnItemError(ItemErrorContext context)
+    {
+        // Dead-letter capture (#29): report every failure to the sink — on Skip and on Abort — so the
+        // failing record is always observable, then apply the give-up decision below.
+        if (context != null)
+        {
+            OnError?.Invoke(new FixedWidthError(context.ItemNumber, context.RawContent?.Invoke(), context.Exception));
+        }
+
+        switch (MalformedLineHandling)
+        {
+            case MalformedLineHandling.Skip:
+                return ItemErrorAction.Skip;
+
+            case MalformedLineHandling.ThrowException:
+                return ItemErrorAction.Abort;
+
+            default:
+                throw new InvalidOperationException
+                (
+                    $"Unexpected {nameof(MalformedLineHandling)} value: {MalformedLineHandling}"
+                );
+        }
+    }
+
+
+
     // ------------------------------------------------------------------
     // Private helpers
     // ------------------------------------------------------------------
+
+    /// <summary>
+    /// Resolves the field map to use: the caller-supplied <see cref="Schema"/> when set, otherwise the
+    /// attribute-derived layout for <typeparamref name="TRecord"/>.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// <see cref="Schema"/> is set but describes a different record type.
+    /// </exception>
+    private FieldMapResult ResolveFieldMap()
+    {
+        if (Schema is null)
+        {
+            return FieldMap.GetResult<TRecord>();
+        }
+
+        if (Schema.RecordType != typeof(TRecord))
+        {
+            throw new InvalidOperationException
+            (
+                $"The supplied Schema describes '{Schema.RecordType.FullName}' but this extractor is " +
+                $"typed for '{typeof(TRecord).FullName}'."
+            );
+        }
+
+        return Schema.MapResult;
+    }
+
+
 
     /// <summary>
     /// Returns <see langword="true"/> if the current line is a header or separator
@@ -1139,26 +1266,26 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         {
             LogMalformedLine(ex);
 
-            switch (MalformedLineHandling)
+            // ReturnDefault recovers with a substitute record — it never reaches the
+            // "give up on this item" decision, so it does not go through the base error
+            // policy. The caller performs the yield and item-count increment.
+            if (MalformedLineHandling == MalformedLineHandling.ReturnDefault)
             {
-                case MalformedLineHandling.Skip:
-                    IncrementRejectedItemCount();
-                    return false;
-
-                case MalformedLineHandling.ReturnDefault:
-                    // Cannot yield inside catch — caller handles the yield and increment.
-                    record = CreateDefaultRecord(fieldMap);
-                    return true;
-
-                case MalformedLineHandling.ThrowException:
-                    throw;
-
-                default:
-                    throw new InvalidOperationException
-                    (
-                        $"Unexpected {nameof(MalformedLineHandling)} value: {MalformedLineHandling}"
-                    );
+                record = CreateDefaultRecord(fieldMap);
+                return true;
             }
+
+            // Throw / Skip are the give-up decisions. Route them through the base
+            // per-item error policy (OnItemError, translated from MalformedLineHandling)
+            // so the failure is counted (CurrentErrorItemCount) and surfaced in the
+            // pipeline (ErrorItemCount) rather than being silent.
+            if (HandleItemError(new ItemErrorContext(_currentLineNumber, ex, () => line)) == ItemErrorAction.Abort)
+            {
+                throw;
+            }
+
+            IncrementRejectedItemCount();
+            return false;
         }
     }
 }
