@@ -24,6 +24,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   distinct from `RecordValidator` business rejects (which `CurrentRejectedItemCount` counts).
   `MalformedLineHandling.ReturnDefault` recovers before the give-up decision, so it never enters
   the error policy. Closes #29.
+- Native-AOT / trim-compatibility smoke test ([#153]): a `PublishAot` console
+  consumer (`tests/AotSmoke`) exercises every public path against a concrete
+  record type and asserts the results, and the `aot-smoke.yaml` workflow
+  publishes it on Linux and runs the native binary so an AOT/trim regression
+  fails before merge. The `Expression.Compile` accessor sites carry documented
+  `IL3050` suppressions — under Native AOT they fall back to the interpreter, so
+  the library runs correctly (without JIT speed). **Known limitation surfaced by
+  the smoke:** attribute-based mapping reads `[FixedWidthField]` by reflection,
+  and Native-AOT trimming strips those attribute instances unless the record's
+  assembly is rooted (`TrimmerRootAssembly`) — a consumer using attribute mapping
+  under AOT must root its record types today; removing that need is the
+  source-generated-accessors follow-up.
+- Concurrency / race-condition stress suite ([#147]):
+  `tests/Wolfgang.Etl.FixedWidth.Tests.Concurrency` asserts correctness under
+  contention — concurrent first-use of the process-global caches (`FieldMap`
+  cache, `FixedWidthTransformer` static property-mapper), racing disposal, and
+  cross-thread cancellation mid-enumeration. A weekly `concurrency.yaml` sweep
+  cranks the iteration budget up via `STRESS_ITERATIONS`. (Coyote is not used —
+  its `IAsyncEnumerable` support is rough and its CLI is net8-only; the xunit
+  stress suite is the gate.)
+- Sustained-load GC / allocation profiling ([#152]): `tools/GcProfile` runs
+  extract → transform → load in a tight loop for a configurable duration and
+  reports allocated bytes per record and gen2 collections per million records.
+  A monthly `gc-profile.yaml` sweep gates the run against `docs/gc-baseline.json`
+  — a per-record allocation jump (hot-path regression) or gen2 promotion
+  (retention leak) fails the job. Complements the per-call allocation snapshot in
+  `docs/ALLOCATION-PROFILE.md` (#157).
 - Shadow-testing sample workloads ([#140]): `samples/ShadowWorkloads` runs
   realistic end-to-end scenarios (streaming round trip, reformat transform,
   pipeline composition) that double as usage documentation. A nightly
@@ -40,8 +67,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   is listening — removing the always-on per-line/per-record overhead that made
   extraction ~1.5–1.95× slower in 0.7.0 — with **no public API and no opt-in
   flag** (zero-config, consistent with the rest of the ETL family) ([#275]).
-- Bumped `Wolfgang.Etl.Abstractions` 0.17.0 → 0.22.0 (and `Wolfgang.Etl.TestKit`
-  0.10.0 → 0.22.0), adopting the renamed
+- Bumped `Wolfgang.Etl.Abstractions` 0.17.0 → 0.21.0 (and `Wolfgang.Etl.TestKit`
+  0.10.0 → 0.14.0), adopting the renamed
   `EtlPipelineProgress.{Extracted,Loaded,Error}ItemCount` counters (formerly
   `Records{Extracted,Loaded,Errored}`). The loader and transformer
   now honor an already-cancelled `CancellationToken` before consuming their
@@ -55,6 +82,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+- Consumer-side reproducible-build verification ([#165]): each release now
+  attaches a `reproducible-build-manifest.json` (expected per-framework assembly
+  SHA-256 hashes + the exact toolchain), and `docs/REPRODUCIBLE-BUILD.md` plus a
+  README "Verify the build" section document how a third party rebuilds the tag,
+  compares hashes, files a discrepancy, and publishes an independent verification
+  attestation.
 
 ## [0.7.0] - 2026-07-24
 
@@ -304,6 +338,10 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#23]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/23
 [#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
 [#140]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/140
+[#147]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/147
+[#152]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/152
+[#153]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/153
+[#165]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/165
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
 [#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
 [Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.7.0...HEAD
