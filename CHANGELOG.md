@@ -51,6 +51,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   — a per-record allocation jump (hot-path regression) or gen2 promotion
   (retention leak) fails the job. Complements the per-call allocation snapshot in
   `docs/ALLOCATION-PROFILE.md` (#157).
+- Shadow-testing sample workloads ([#140]): `samples/ShadowWorkloads` runs
+  realistic end-to-end scenarios (streaming round trip, reformat transform,
+  pipeline composition) that double as usage documentation. A nightly
+  `shadow.yaml` measures per-scenario latency + allocation and gates the result
+  against `docs/shadow-baseline.json` — allocation is the hard gate (a >50% jump
+  fails); latency is advisory (reported, not gated, since shared-runner wall-clock
+  is too noisy to fail on reliably).
 
 ### Changed
 
@@ -330,6 +337,7 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
 [#23]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/23
 [#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
+[#140]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/140
 [#147]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/147
 [#152]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/152
 [#153]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/153
