@@ -1,0 +1,71 @@
+name: AOT Smoke
+
+# Native-AOT / trim compatibility smoke test (#153).
+#
+# net8.0 / net10.0 consumers may publish with <PublishAot>true</PublishAot>, which
+# also trims. FixedWidth maps records with reflection (GetProperties) and
+# Expression.Compile accessors — both are AOT-legal (Expression.Compile falls back
+# to the interpreter) but the trimmer can silently remove the record property
+# metadata the mapping reflects over. This job publishes a tiny console consumer
+# with Native AOT on Linux, then RUNS the native binary: it exercises every public
+# path against a concrete record type and asserts the results, so a trim/AOT
+# regression exits non-zero and fails the check before merge. Native AOT can't be
+# published on the Windows dev box, so CI is the authoritative gate.
+
+on:
+  pull_request:
+    branches:
+      - main
+      - vNext
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aot-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  aot-smoke:
+    name: AOT publish + run
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PROJ: tests/AotSmoke/Wolfgang.Etl.FixedWidth.AotSmoke.csproj
+      OUT: tests/AotSmoke/bin/Release/net10.0/linux-x64/publish/Wolfgang.Etl.FixedWidth.AotSmoke
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install Native AOT prerequisites
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
+
+      - name: Publish Native AOT (linux-x64)
+        run: |
+          dotnet publish "${{ env.PROJ }}" -c Release -r linux-x64 2>&1 | tee publish.log
+
+      - name: Report trim / AOT warnings (informational)
+        if: always()
+        run: |
+          echo '### Trim / AOT analyzer warnings' >> "$GITHUB_STEP_SUMMARY"
+          if grep -oE 'IL[0-9]{4}' publish.log | sort | uniq -c > il.txt && [ -s il.txt ]; then
+            sed 's/^/    /' il.txt >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'None.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Run the native binary (the gate)
+        run: |
+          test -x "${{ env.OUT }}" || { echo "native binary not produced at ${{ env.OUT }}"; exit 1; }
+          "${{ env.OUT }}"
