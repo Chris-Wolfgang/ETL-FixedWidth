@@ -70,6 +70,11 @@ Wolfgang.Etl.FixedWidth.FieldContext.Pad.get -> char
 Wolfgang.Etl.FixedWidth.FieldContext.PropertyName.get -> string
 Wolfgang.Etl.FixedWidth.FieldContext.PropertyType.get -> System.Type
 Wolfgang.Etl.FixedWidth.FixedWidthConverter
+Wolfgang.Etl.FixedWidth.FixedWidthError
+Wolfgang.Etl.FixedWidth.FixedWidthError.Exception.get -> System.Exception
+Wolfgang.Etl.FixedWidth.FixedWidthError.FixedWidthError(long itemNumber, string rawContent, System.Exception exception) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthError.ItemNumber.get -> long
+Wolfgang.Etl.FixedWidth.FixedWidthError.RawContent.get -> string?
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.BlankLineHandling.get -> Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.BlankLineHandling.set -> void
@@ -92,8 +97,12 @@ Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.LineFilter.get -> System.Fu
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.LineFilter.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.MalformedLineHandling.get -> Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.MalformedLineHandling.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.OnError.get -> System.Action<Wolfgang.Etl.FixedWidth.FixedWidthError>
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.OnError.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.RecordValidator.get -> System.Func<TRecord, Wolfgang.Etl.FixedWidth.ValidationResult>
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.RecordValidator.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.Schema.get -> Wolfgang.Etl.FixedWidth.FixedWidthSchema?
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.Schema.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.ValueParser.get -> Wolfgang.Etl.FixedWidth.FixedWidthValueParser
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.ValueParser.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo
@@ -124,6 +133,8 @@ Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.HeaderConverter.get -> System.
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.HeaderConverter.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.IsDryRun.get -> bool
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.IsDryRun.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.Schema.get -> Wolfgang.Etl.FixedWidth.FixedWidthSchema?
+Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.Schema.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.ValueConverter.get -> System.Func<object, Wolfgang.Etl.FixedWidth.FieldContext, string>
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.ValueConverter.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.WriteHeader.get -> bool
@@ -143,6 +154,11 @@ Wolfgang.Etl.FixedWidth.FixedWidthSchema.RecordType.get -> System.Type
 Wolfgang.Etl.FixedWidth.FixedWidthSchema.SkipCount.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthSchema.ToDiagram() -> string
 Wolfgang.Etl.FixedWidth.FixedWidthSchema.TotalColumnCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>
+Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.Build() -> Wolfgang.Etl.FixedWidth.FixedWidthSchema
+Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.Field<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>> selector, int index, int length, Wolfgang.Etl.FixedWidth.Enums.FieldAlignment alignment = Wolfgang.Etl.FixedWidth.Enums.FieldAlignment.Left, char pad = ' ', string format = null, string header = null, System.Globalization.NumberStyles? numberStyles = null, bool trimValue = true) -> Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>
+Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.FixedWidthSchemaBuilder() -> void
+Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.Skip(int index, int length, string message = null) -> Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>
 Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>
 Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination> transform) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthValueParser

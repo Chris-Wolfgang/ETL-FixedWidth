@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [0.8.0] - 2026-08-07
+
+Code-first schema building, error dead-lettering, and zero-config metrics.
+Additive public API — no breaking changes.
+
+### Added
+
 - `FixedWidthSchemaBuilder<T>` — define a fixed-width layout with a fluent,
   type-safe code API (`.Field(r => r.Name, index, length, …)` / `.Skip(index, length)`
   / `.Build()`) instead of `[FixedWidthField]` attributes, for record types you
@@ -349,7 +366,8 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#165]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/165
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
 [#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.5.0...v0.5.1
