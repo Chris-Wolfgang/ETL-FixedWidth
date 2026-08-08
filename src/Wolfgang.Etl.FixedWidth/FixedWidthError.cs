@@ -14,7 +14,7 @@ public sealed class FixedWidthError
     /// <summary>
     /// Initializes a new <see cref="FixedWidthError"/>.
     /// </summary>
-    /// <param name="itemNumber">The 1-based ordinal of the failed record within the run.</param>
+    /// <param name="itemNumber">The 1-based physical source line number of the failed line.</param>
     /// <param name="rawContent">The original line that failed, or <see langword="null"/> if unavailable.</param>
     /// <param name="exception">The exception the record raised.</param>
     /// <exception cref="ArgumentNullException"><paramref name="exception"/> is <see langword="null"/>.</exception>
@@ -26,7 +26,9 @@ public sealed class FixedWidthError
     }
 
     /// <summary>
-    /// The 1-based ordinal of the failed record within the current run.
+    /// The 1-based physical source line number of the failed line — the same value as
+    /// <see cref="FixedWidthExtractor{TRecord}.CurrentLineNumber"/> and the line number in the
+    /// exception message, matching what a text editor shows. Not a logical record ordinal.
     /// </summary>
     public long ItemNumber { get; }
 

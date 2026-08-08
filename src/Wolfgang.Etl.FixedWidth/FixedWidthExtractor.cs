@@ -364,8 +364,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
     /// <summary>
     /// An optional dead-letter sink invoked once for each record that fails to parse (#29). The
-    /// failed line is reported as a <see cref="FixedWidthError"/> — its 1-based ordinal, raw content,
-    /// and exception — so the caller can log it, push it to a dead-letter queue, or collect it for
+    /// failed line is reported as a <see cref="FixedWidthError"/> — its 1-based source line number, raw
+    /// content, and exception — so the caller can log it, push it to a dead-letter queue, or collect it for
     /// post-run inspection. Set <see cref="MalformedLineHandling"/> to
     /// <see cref="Enums.MalformedLineHandling.Skip"/> to capture-and-continue; with the default
     /// <see cref="Enums.MalformedLineHandling.ThrowException"/> the failure is still reported here

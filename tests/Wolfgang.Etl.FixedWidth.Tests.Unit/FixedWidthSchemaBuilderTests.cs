@@ -38,6 +38,13 @@ public sealed class FixedWidthSchemaBuilderTests
     }
 
 
+    [ExcludeFromCodeCoverage]
+    private sealed class NestedHolder
+    {
+        public PlainPerson Inner { get; set; } = new();
+    }
+
+
     private static FixedWidthSchemaBuilder<PlainPerson> PlainPersonBuilder()
         => new FixedWidthSchemaBuilder<PlainPerson>()
             .Field(r => r.FirstName, index: 0, length: 10)
@@ -231,6 +238,18 @@ public sealed class FixedWidthSchemaBuilderTests
         var builder = new FixedWidthSchemaBuilder<PlainPerson>();
 
         Assert.Throws<ArgumentException>(() => builder.Field(r => r.Age + 1, 0, 5));
+    }
+
+
+    [Fact]
+    public void Field_with_a_nested_property_selector_throws()
+    {
+        var builder = new FixedWidthSchemaBuilder<NestedHolder>();
+
+        // A nested access (r => r.Inner.FirstName) is not a direct property on the record — it would
+        // compile a delegate that casts NestedHolder to PlainPerson and fail at runtime, so it is
+        // rejected up front.
+        Assert.Throws<ArgumentException>(() => builder.Field(r => r.Inner.FirstName, 0, 10));
     }
 
 

@@ -184,14 +184,19 @@ public sealed class FixedWidthSchemaBuilder<T>
             body = unary.Operand;
         }
 
-        if (body is MemberExpression { Member: PropertyInfo property })
+        // Require a property accessed directly on the record parameter (r => r.Name). A nested or
+        // foreign member access (r => r.Address.Street, or a captured variable) has a non-parameter
+        // Expression and would compile a delegate that casts the record to the wrong declaring type
+        // and fail at runtime — reject it here with a clear message instead.
+        if (body is MemberExpression { Member: PropertyInfo property, Expression: ParameterExpression })
         {
             return property;
         }
 
         throw new ArgumentException
         (
-            "The selector must be a simple property access, for example 'r => r.Name'.",
+            "The selector must be a simple property access directly on the record, for example "
+            + "'r => r.Name'. Nested (r => r.Address.Street) and captured member accesses are not supported.",
             nameof(selector)
         );
     }
