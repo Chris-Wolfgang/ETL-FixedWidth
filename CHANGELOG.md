@@ -61,6 +61,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+- Consumer-side reproducible-build verification ([#165]): each release now
+  attaches a `reproducible-build-manifest.json` (expected per-framework assembly
+  SHA-256 hashes + the exact toolchain), and `docs/REPRODUCIBLE-BUILD.md` plus a
+  README "Verify the build" section document how a third party rebuilds the tag,
+  compares hashes, files a discrepancy, and publishes an independent verification
+  attestation.
+
 ## [0.7.0] - 2026-07-24
 
 Pipeline composition and observability. Additive — no breaking changes.
@@ -309,6 +316,7 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#23]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/23
 [#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
 [#153]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/153
+[#165]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/165
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
 [#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
 [Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.7.0...HEAD
