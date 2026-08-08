@@ -363,6 +363,32 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
 
     /// <summary>
+    /// An optional dead-letter sink invoked once for each record that fails to parse (#29). The
+    /// failed line is reported as a <see cref="FixedWidthError"/> — its 1-based ordinal, raw content,
+    /// and exception — so the caller can log it, push it to a dead-letter queue, or collect it for
+    /// post-run inspection. Set <see cref="MalformedLineHandling"/> to
+    /// <see cref="Enums.MalformedLineHandling.Skip"/> to capture-and-continue; with the default
+    /// <see cref="Enums.MalformedLineHandling.ThrowException"/> the failure is still reported here
+    /// before the exception is re-thrown. Business rejects from <see cref="RecordValidator"/> are
+    /// <b>not</b> reported here — they are not parse errors.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// var errors = new List&lt;FixedWidthError&gt;();
+    /// var extractor = new FixedWidthExtractor&lt;Record&gt;(reader)
+    /// {
+    ///     MalformedLineHandling = MalformedLineHandling.Skip,
+    ///     OnError = errors.Add,
+    /// };
+    /// await foreach (var ok in extractor.ExtractAsync(token)) { /* only good records */ }
+    /// // errors now holds the dead letters
+    /// </code>
+    /// </example>
+    public Action<FixedWidthError>? OnError { get; set; }
+
+
+
+    /// <summary>
     /// A delegate that converts a raw string read from the file into the target property
     /// type. The <see cref="FieldContext"/> provides the property type, format string, and
     /// other field metadata needed to perform the conversion.
@@ -1070,6 +1096,13 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// </exception>
     protected override ItemErrorAction OnItemError(ItemErrorContext context)
     {
+        // Dead-letter capture (#29): report every failure to the sink — on Skip and on Abort — so the
+        // failing record is always observable, then apply the give-up decision below.
+        if (context != null)
+        {
+            OnError?.Invoke(new FixedWidthError(context.ItemNumber, context.RawContent?.Invoke(), context.Exception));
+        }
+
         switch (MalformedLineHandling)
         {
             case MalformedLineHandling.Skip:

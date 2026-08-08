@@ -23,7 +23,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   counted in `CurrentErrorItemCount` and surfaced in the pipeline's `ErrorItemCount` — kept
   distinct from `RecordValidator` business rejects (which `CurrentRejectedItemCount` counts).
   `MalformedLineHandling.ReturnDefault` recovers before the give-up decision, so it never enters
-  the error policy. Closes #29.
+  the error policy. Part of #29.
+- `OnError` dead-letter sink (`Action<FixedWidthError>?`) on `FixedWidthExtractor<T>`: each record
+  that fails to parse is reported as a `FixedWidthError` (1-based `ItemNumber`, `RawContent`,
+  `Exception`) instead of only aborting. With `MalformedLineHandling.Skip` it is capture-and-continue;
+  even on the default `ThrowException` the failure is reported before the throw. `RecordValidator`
+  business rejects are **not** reported here (they are not parse errors). Closes #29.
 - Native-AOT / trim-compatibility smoke test ([#153]): a `PublishAot` console
   consumer (`tests/AotSmoke`) exercises every public path against a concrete
   record type and asserts the results, and the `aot-smoke.yaml` workflow
