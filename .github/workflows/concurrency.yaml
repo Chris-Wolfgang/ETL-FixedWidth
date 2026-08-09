@@ -1,0 +1,53 @@
+name: Concurrency Stress
+
+# Weekly race-condition stress sweep (#147).
+#
+# tests/Wolfgang.Etl.FixedWidth.Tests.Concurrency asserts correctness under
+# contention — concurrent first-use of the process-global caches, racing
+# disposal, and cross-thread cancellation mid-enumeration. Per-PR the suite runs
+# a modest, fast, deterministic budget; here STRESS_ITERATIONS is cranked up for a
+# generous weekly exploration of schedule interleavings.
+#
+# Coyote (Microsoft's async model checker) is intentionally not used: its
+# IAsyncEnumerable support is rough and its CLI is net8-only, so systematic
+# schedule exploration of a streaming library is unreliable. The xunit stress
+# suite is the gate.
+
+on:
+  schedule:
+    - cron: '17 4 * * 1'   # Mondays 04:17 UTC (scheduled workflows run from the default branch)
+  workflow_dispatch:
+    inputs:
+      iterations:
+        description: 'STRESS_ITERATIONS per test (x fanout)'
+        required: false
+        default: '2000'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: concurrency-stress-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  stress:
+    name: Concurrency stress sweep
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      STRESS_ITERATIONS: ${{ github.event.inputs.iterations || '2000' }}
+      PROJ: tests/Wolfgang.Etl.FixedWidth.Tests.Concurrency/Wolfgang.Etl.FixedWidth.Tests.Concurrency.csproj
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Run concurrency stress suite
+        run: dotnet test "$PROJ" -c Release --filter "Category=Concurrency"

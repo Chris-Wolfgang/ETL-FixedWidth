@@ -1,0 +1,69 @@
+name: GC Profile
+
+# Sustained-load GC / allocation profiling (#152).
+#
+# BDN micro-benchmarks measure single-call cost; this measures what only shows up
+# under long-running server / ETL load. tools/GcProfile runs extract -> transform
+# -> load in a tight loop for GC_PROFILE_SECONDS, then reports allocated bytes per
+# record and gen2 collections per million records. The run is gated against
+# docs/gc-baseline.json: a per-record allocation jump (hot-path regression) or any
+# meaningful gen2 promotion (retention leak) fails the job.
+
+on:
+  schedule:
+    - cron: '23 5 1 * *'   # 1st of each month, 05:23 UTC (runs from the default branch)
+  workflow_dispatch:
+    inputs:
+      seconds:
+        description: 'GC_PROFILE_SECONDS (sustained-load duration)'
+        required: false
+        default: '600'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gc-profile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gc-profile:
+    name: Sustained-load GC profile
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      GC_PROFILE_SECONDS: ${{ github.event.inputs.seconds || '600' }}
+      GC_PROFILE_OUT: gc-run.json
+      PROJ: tools/GcProfile/Wolfgang.Etl.FixedWidth.GcProfile.csproj
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Run sustained-load profiler
+        run: dotnet run --project "$PROJ" -c Release
+
+      - name: Summarize
+        if: always()
+        run: |
+          echo '### Sustained-load GC profile' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat "$GC_PROFILE_OUT" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || echo '(no run produced)' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload GC run
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: gc-run
+          path: ${{ env.GC_PROFILE_OUT }}
+          if-no-files-found: warn
+
+      - name: Compare against baseline
+        run: python3 tools/GcProfile/compare.py "$GC_PROFILE_OUT" docs/gc-baseline.json
