@@ -1,0 +1,64 @@
+name: Shadow Workloads
+
+# Shadow-testing against realistic consumer workloads (#140).
+#
+# Unit + property tests prove behaviour on synthetic input; these run realistic
+# end-to-end scenarios (streaming round trip, reformat transform, pipeline
+# composition) nightly and gate them against docs/shadow-baseline.json.
+# allocatedBytes is the hard gate (deterministic managed allocation); medianMs is
+# advisory — wall-clock on shared runners is too noisy to fail on, so it is
+# reported but does not fail the job. Distinct from the P2 BDN gh-pages trend
+# chart: this runs whole-scenario consumer flows, not curated micro-benchmarks.
+
+on:
+  schedule:
+    - cron: '41 3 * * *'   # nightly 03:41 UTC (runs from the default branch)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: shadow-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  shadow:
+    name: Shadow workloads vs baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SHADOW_OUT: shadow-run.json
+      PROJ: samples/ShadowWorkloads/Wolfgang.Etl.FixedWidth.ShadowWorkloads.csproj
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Run shadow workloads
+        run: dotnet run --project "$PROJ" -c Release -- --measure
+
+      - name: Summarize
+        if: always()
+        run: |
+          echo '### Shadow workloads' >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat "$SHADOW_OUT" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || echo '(no run produced)' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload shadow run
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: shadow-run
+          path: ${{ env.SHADOW_OUT }}
+          if-no-files-found: warn
+
+      - name: Compare against baseline
+        run: python3 samples/ShadowWorkloads/compare.py "$SHADOW_OUT" docs/shadow-baseline.json
