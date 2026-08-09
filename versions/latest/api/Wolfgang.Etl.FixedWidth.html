@@ -104,6 +104,15 @@ for use with <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.ht
 </dd>
     </dl>
     <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthError.html">FixedWidthError</a></dt>
+      <dd><p>A record that failed to parse during extraction — a &quot;dead letter&quot;. When
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_OnError">OnError</a> is set, each failed line is
+reported as one of these instead of the exception aborting the run (provided
+<a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling.html#Wolfgang_Etl_FixedWidth_Enums_MalformedLineHandling_Skip">Skip</a> is configured to continue). Capture
+them for logging, a dead-letter queue, or post-run inspection (#29).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a></dt>
       <dd><p>Reads a fixed-width text file and yields records of type <code class="typeparamref">TRecord</code>
 as an asynchronous stream.</p>
@@ -136,6 +145,16 @@ fixed-width file processing.</p>
 that <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a> / <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a>
 derive from <code>[FixedWidthField]</code> / <code>[FixedWidthSkip]</code> attributes — useful
 for generating documentation, building validation tooling, or debugging a layout.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder-1.html">FixedWidthSchemaBuilder&lt;T&gt;</a></dt>
+      <dd><p>Builds a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchema.html">FixedWidthSchema</a> for <code class="typeparamref">T</code> from a fluent, type-safe code
+API instead of <code>[FixedWidthField]</code> / <code>[FixedWidthSkip]</code> attributes (#23). Use it when the
+record type is not yours to decorate, when you prefer configuration-as-code, or when the layout is
+built dynamically. The resulting schema is equivalent to one resolved from attributes — assign it to
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Schema">Schema</a> / <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_Schema">Schema</a> to
+use it, or inspect it with <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchema.html#Wolfgang_Etl_FixedWidth_FixedWidthSchema_Fields">Fields</a> / <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchema.html#Wolfgang_Etl_FixedWidth_FixedWidthSchema_ToDiagram">ToDiagram()</a>.</p>
 </dd>
     </dl>
     <dl class="jumplist">

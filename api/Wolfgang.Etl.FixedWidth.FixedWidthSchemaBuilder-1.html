@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class FixedWidthSchemaBuilder&lt;T&gt; | Wolfgang.Etl.FixedWidth Documentation </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class FixedWidthSchemaBuilder&lt;T&gt; | Wolfgang.Etl.FixedWidth Documentation ">
+      
+      <meta name="description" content="Builds a  for T from a fluent, type-safe code API instead of [FixedWidthField] / [FixedWidthSkip] attributes (#23). Use it when the record type is not yours to decorate, when you prefer configuration-as-code, or when the layout is built dynamically. The resulting schema is equivalent to one resolved from attributes — assign it to  /  to use it, or inspect it with  / .">
+      <link rel="icon" href="../favicon.svg">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.8.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="Wolfgang.Etl.FixedWidth">
+            Wolfgang.Etl.FixedWidth
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+
+      <div class="content">
+        <div class="actionbar">
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1">
+
+
+
+  <h1 id="Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1" class="text-break">
+Class FixedWidthSchemaBuilder&lt;T&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/src/Wolfgang.Etl.FixedWidth/FixedWidthSchemaBuilder.cs/#L34"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Wolfgang.html">Wolfgang</a>.<a class="xref" href="Wolfgang.Etl.html">Etl</a>.<a class="xref" href="Wolfgang.Etl.FixedWidth.html">FixedWidth</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Wolfgang.Etl.FixedWidth.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Builds a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchema.html">FixedWidthSchema</a> for <code class="typeparamref">T</code> from a fluent, type-safe code
+API instead of <code>[FixedWidthField]</code> / <code>[FixedWidthSkip]</code> attributes (#23). Use it when the
+record type is not yours to decorate, when you prefer configuration-as-code, or when the layout is
+built dynamically. The resulting schema is equivalent to one resolved from attributes — assign it to
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Schema">Schema</a> / <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_Schema">Schema</a> to
+use it, or inspect it with <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchema.html#Wolfgang_Etl_FixedWidth_FixedWidthSchema_Fields">Fields</a> / <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchema.html#Wolfgang_Etl_FixedWidth_FixedWidthSchema_ToDiagram">ToDiagram()</a>.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed class FixedWidthSchemaBuilder&lt;T&gt; where T : notnull</code></pre>
+  </div>
+
+
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>T</code></dt>
+    <dd><p>The record type the schema describes.</p>
+</dd>
+  </dl>
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">FixedWidthSchemaBuilder&lt;T&gt;</span></div>
+    </dd>
+  </dl>
+
+
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </dd></dl>
+
+
+
+  <h2 id="Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1_examples">Examples</h2>
+  <pre><code class="lang-csharp">var schema = new FixedWidthSchemaBuilder&lt;CustomerRecord&gt;()
+    .Field(r =&gt; r.CustomerId, index: 0, length: 8)
+    .Field(r =&gt; r.Name, index: 1, length: 30)
+    .Skip(index: 2, length: 5)
+    .Field(r =&gt; r.Balance, index: 3, length: 9, alignment: FieldAlignment.Right, format: "0000000.00")
+    .Build();
+
+var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;(reader) { Schema = schema };</code></pre>
+
+
+
+
+  <h2 class="section" id="methods">Methods
+</h2>
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1_Build_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Build*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1_Build" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Build">
+  Build()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/src/Wolfgang.Etl.FixedWidth/FixedWidthSchemaBuilder.cs/#L127"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Validates the accumulated fields and skips and produces the immutable <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchema.html">FixedWidthSchema</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FixedWidthSchema Build()</code></pre>
+  </div>
+
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchema.html">FixedWidthSchema</a></dt>
+    <dd><p>The resolved schema.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a></dt>
+    <dd><p>No fields were defined, or two columns share the same index.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1_Field_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Field*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1_Field__1_System_Linq_Expressions_Expression_System_Func__0___0___System_Int32_System_Int32_Wolfgang_Etl_FixedWidth_Enums_FieldAlignment_System_Char_System_String_System_String_System_Nullable_System_Globalization_NumberStyles__System_Boolean_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Field``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Int32,System.Int32,Wolfgang.Etl.FixedWidth.Enums.FieldAlignment,System.Char,System.String,System.String,System.Nullable{System.Globalization.NumberStyles},System.Boolean)">
+  Field&lt;TProperty&gt;(Expression&lt;Func&lt;T, TProperty&gt;&gt;, int, int, FieldAlignment, char, string?, string?, NumberStyles?, bool)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/src/Wolfgang.Etl.FixedWidth/FixedWidthSchemaBuilder.cs/#L60"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a mapped field. The <code class="paramref">index</code> is a zero-based column ordinal (matching
+<code>[FixedWidthField(index, length)]</code>); start positions are computed by summing the lengths of
+all lower-indexed columns, so indexes only need to be unique, not contiguous.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FixedWidthSchemaBuilder&lt;T&gt; Field&lt;TProperty&gt;(Expression&lt;Func&lt;T, TProperty&gt;&gt; selector, int index, int length, FieldAlignment alignment = FieldAlignment.Left, char pad = &#39; &#39;, string? format = null, string? header = null, NumberStyles? numberStyles = null, bool trimValue = true)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>selector</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.linq.expressions.expression-1">Expression</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;T, TProperty&gt;&gt;</dt>
+    <dd><p>A simple property access expression, e.g. <code>r =&gt; r.Name</code>.</p>
+</dd>
+    <dt><code>index</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The zero-based column index. Must be unique across fields and skips.</p>
+</dd>
+    <dt><code>length</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The field width in characters. Must be greater than zero.</p>
+</dd>
+    <dt><code>alignment</code> <a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.FieldAlignment.html">FieldAlignment</a></dt>
+    <dd><p>Padding alignment for writing. Defaults to <a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.FieldAlignment.html#Wolfgang_Etl_FixedWidth_Enums_FieldAlignment_Left">Left</a>.</p>
+</dd>
+    <dt><code>pad</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a></dt>
+    <dd><p>Pad character for writing. Defaults to <code>' '</code>.</p>
+</dd>
+    <dt><code>format</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>Optional format string for parsing/formatting the value.</p>
+</dd>
+    <dt><code>header</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>Optional header label; defaults to the property name when writing headers.</p>
+</dd>
+    <dt><code>numberStyles</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.numberstyles">NumberStyles</a>?</dt>
+    <dd><p>Optional <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.numberstyles">NumberStyles</a> for numeric parsing; defaults to the type's natural style.</p>
+</dd>
+    <dt><code>trimValue</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd><p>Whether to trim whitespace from the extracted value. Defaults to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder-1.html">FixedWidthSchemaBuilder</a>&lt;T&gt;</dt>
+    <dd><p>The same builder, for chaining.</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TProperty</code></dt>
+    <dd><p>The property type.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
+    <dd><p><code class="paramref">selector</code> is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>.</p>
+</dd>
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></dt>
+    <dd><p><code class="paramref">selector</code> is not a simple property access.</p>
+</dd>
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception">ArgumentOutOfRangeException</a></dt>
+    <dd><p><code class="paramref">index</code> is negative or <code class="paramref">length</code> is not positive.</p>
+</dd>
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a></dt>
+    <dd><p>The selected property has no public setter.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1_Skip_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Skip*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1_Skip_System_Int32_System_Int32_System_String_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Skip(System.Int32,System.Int32,System.String)">
+  Skip(int, int, string?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/src/Wolfgang.Etl.FixedWidth/FixedWidthSchemaBuilder.cs/#L112"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Adds a skipped column — a range in the file mapped to no property. Its width still contributes to
+the positions of later fields.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FixedWidthSchemaBuilder&lt;T&gt; Skip(int index, int length, string? message = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>index</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The zero-based column index. Must be unique across fields and skips.</p>
+</dd>
+    <dt><code>length</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd><p>The skipped width in characters. Must be greater than zero.</p>
+</dd>
+    <dt><code>message</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>Optional note describing the skipped column (surfaced by schema introspection).</p>
+</dd>
+  </dl>
+
+  <h4 class="section">Returns</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder-1.html">FixedWidthSchemaBuilder</a>&lt;T&gt;</dt>
+    <dd><p>The same builder, for chaining.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception">ArgumentOutOfRangeException</a></dt>
+    <dd><p><code class="paramref">index</code> is negative or <code class="paramref">length</code> is not positive.</p>
+</dd>
+  </dl>
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/src/Wolfgang.Etl.FixedWidth/FixedWidthSchemaBuilder.cs/#L34" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Made with DocFX <script>(function(){var r='/';if(window.location.hostname.endsWith('.github.io')){var s=window.location.pathname.split('/').filter(Boolean);if(s.length)r='/'+s[0]+'/';}var t=document.createElement('script');t.src=r+'public/version-picker.js';t.async=true;document.head.appendChild(t);})();</script>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

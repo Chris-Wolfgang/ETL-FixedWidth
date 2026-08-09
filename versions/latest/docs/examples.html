@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/docfx_project/docs/examples.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/docfx_project/docs/examples.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -110,11 +110,14 @@
 <h2 id="metrics">Metrics</h2>
 <p>Subscribes to the <code>Wolfgang.Etl.FixedWidth</code> meter with a <code>MeterListener</code> and prints the counters and duration histogram the extractor and loader emit during an extract → load round trip (<code>items.extracted</code>, <code>items.loaded</code>, <code>items.skipped</code>, <code>lines.read</code>, <code>operation.duration</code>, each tagged with <code>etl.operation</code> and <code>etl.record_type</code>). In production you would subscribe with <code>AddMeter(&quot;Wolfgang.Etl.FixedWidth&quot;)</code> via OpenTelemetry instead.</p>
 <p><a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/Metrics">View source</a></p>
+<h2 id="schemabuilder">SchemaBuilder</h2>
+<p>Defines a fixed-width layout in code with <code>FixedWidthSchemaBuilder&lt;T&gt;</code> for a record type that carries no <code>[FixedWidthField]</code> attributes, then uses it — via the extractor/loader <code>Schema</code> property — to load and re-extract records. Also shows that a code-built schema is fully introspectable (<code>ToDiagram</code> / <code>Fields</code>), exactly like an attribute-resolved one.</p>
+<p><a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/SchemaBuilder">View source</a></p>
 
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/docfx_project/docs/examples.md/#L1" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/docfx_project/docs/examples.md/#L1" class="edit-link">Edit this page</a>
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>

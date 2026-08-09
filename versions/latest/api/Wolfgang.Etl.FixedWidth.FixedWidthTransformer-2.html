@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.7.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthTransformer_2.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthTransformer%602%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.8.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthTransformer_2.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthTransformer%602%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,7 +75,7 @@
 
 
   <h1 id="Wolfgang_Etl_FixedWidth_FixedWidthTransformer_2" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthTransformer`2" class="text-break">
-Class FixedWidthTransformer&lt;TSource, TDestination&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/src/Wolfgang.Etl.FixedWidth/FixedWidthTransformer.cs/#L33"><i class="bi bi-code-slash"></i></a>
+Class FixedWidthTransformer&lt;TSource, TDestination&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/src/Wolfgang.Etl.FixedWidth/FixedWidthTransformer.cs/#L33"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -93,7 +93,7 @@ a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWi
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class FixedWidthTransformer&lt;TSource, TDestination&gt; : TransformerBase&lt;TSource, TDestination, FixedWidthReport&gt;, ITransformWithProgressAndCancellationAsync&lt;TSource, TDestination, FixedWidthReport&gt;, ITransformWithCancellationAsync&lt;TSource, TDestination&gt;, ITransformWithProgressAsync&lt;TSource, TDestination, FixedWidthReport&gt;, ITransformAsync&lt;TSource, TDestination&gt;, IAsyncDisposable, IDisposable where TSource : notnull where TDestination : notnull</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class FixedWidthTransformer&lt;TSource, TDestination&gt; : TransformerBase&lt;TSource, TDestination, FixedWidthReport&gt;, ITransformWithProgressAndCancellationAsync&lt;TSource, TDestination, FixedWidthReport&gt;, ITransformWithCancellationAsync&lt;TSource, TDestination&gt;, ITransformWithProgressAsync&lt;TSource, TDestination, FixedWidthReport&gt;, ITransformAsync&lt;TSource, TDestination&gt;, IReportsItemErrors, IAsyncDisposable, IDisposable where TSource : notnull where TDestination : notnull</code></pre>
   </div>
 
 
@@ -124,6 +124,7 @@ a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWi
       <div><span class="xref">ITransformWithCancellationAsync</span>&lt;TSource, TDestination&gt;</div>
       <div><span class="xref">ITransformWithProgressAsync</span>&lt;TSource, TDestination, <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a>&gt;</div>
       <div><span class="xref">ITransformAsync</span>&lt;TSource, TDestination&gt;</div>
+      <div><span class="xref">IReportsItemErrors</span></div>
       <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iasyncdisposable">IAsyncDisposable</a></div>
       <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
     </dd>
@@ -161,10 +162,16 @@ a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWi
       <span class="xref">TransformerBase&lt;TSource, TDestination, FixedWidthReport&gt;.CurrentSkippedItemCount</span>
     </div>
     <div>
+      <span class="xref">TransformerBase&lt;TSource, TDestination, FixedWidthReport&gt;.CurrentErrorItemCount</span>
+    </div>
+    <div>
       <span class="xref">TransformerBase&lt;TSource, TDestination, FixedWidthReport&gt;.MaximumItemCount</span>
     </div>
     <div>
       <span class="xref">TransformerBase&lt;TSource, TDestination, FixedWidthReport&gt;.SkipItemCount</span>
+    </div>
+    <div>
+      <span class="xref">TransformerBase&lt;TSource, TDestination, FixedWidthReport&gt;.ErrorPolicy</span>
     </div>
     <div>
       <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
@@ -208,7 +215,7 @@ await loader.LoadAsync(modern, token);</code></pre>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthTransformer_2__ctor_System_Func__0__1__" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthTransformer`2.#ctor(System.Func{`0,`1})">
   FixedWidthTransformer(Func&lt;TSource, TDestination&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/src/Wolfgang.Etl.FixedWidth/FixedWidthTransformer.cs/#L54"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/src/Wolfgang.Etl.FixedWidth/FixedWidthTransformer.cs/#L54"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates a transformer that projects each source record with <code class="paramref">transform</code>.
@@ -253,7 +260,7 @@ format-converted fields.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthTransformer_2_ByMatchingProperties" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthTransformer`2.ByMatchingProperties">
   ByMatchingProperties()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/src/Wolfgang.Etl.FixedWidth/FixedWidthTransformer.cs/#L78"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/src/Wolfgang.Etl.FixedWidth/FixedWidthTransformer.cs/#L78"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates a transformer that copies every source property to the destination
@@ -289,7 +296,7 @@ fields).</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthTransformer_2_CreateProgressReport" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthTransformer`2.CreateProgressReport">
   CreateProgressReport()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/src/Wolfgang.Etl.FixedWidth/FixedWidthTransformer.cs/#L125"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/src/Wolfgang.Etl.FixedWidth/FixedWidthTransformer.cs/#L129"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates a progress report object of type TProgress.</p>
@@ -322,7 +329,7 @@ fields).</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthTransformer_2_CreateProgressTimer_System_IProgress_Wolfgang_Etl_FixedWidth_FixedWidthReport__" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthTransformer`2.CreateProgressTimer(System.IProgress{Wolfgang.Etl.FixedWidth.FixedWidthReport})">
   CreateProgressTimer(IProgress&lt;FixedWidthReport&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/src/Wolfgang.Etl.FixedWidth/FixedWidthTransformer.cs/#L140"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/src/Wolfgang.Etl.FixedWidth/FixedWidthTransformer.cs/#L144"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the <span class="xref">Wolfgang.Etl.Abstractions.IProgressTimer</span> used to drive progress callbacks.
@@ -363,7 +370,7 @@ Override this method in a derived class to inject a custom timer
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthTransformer_2_TransformWorkerAsync_System_Collections_Generic_IAsyncEnumerable__0__System_Threading_CancellationToken_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthTransformer`2.TransformWorkerAsync(System.Collections.Generic.IAsyncEnumerable{`0},System.Threading.CancellationToken)">
   TransformWorkerAsync(IAsyncEnumerable&lt;TSource&gt;, CancellationToken)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/src/Wolfgang.Etl.FixedWidth/FixedWidthTransformer.cs/#L85"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/src/Wolfgang.Etl.FixedWidth/FixedWidthTransformer.cs/#L85"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The worker method that performs the actual transformation.</p>
@@ -403,7 +410,7 @@ Override this method in a derived class to inject a custom timer
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/src/Wolfgang.Etl.FixedWidth/FixedWidthTransformer.cs/#L33" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/src/Wolfgang.Etl.FixedWidth/FixedWidthTransformer.cs/#L33" class="edit-link">Edit this page</a>
         </div>
 
 

@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/docfx_project/docs/getting-started.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/docfx_project/docs/getting-started.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -178,6 +178,18 @@ Console.WriteLine($&quot;Line width: {schema.ExpectedLineWidth}, fields: {schema
 //
 // Total width: 24  |  Columns: 3 (2 fields + 1 skip)  |  Delimiter: none
 </code></pre>
+<h3 id="defining-the-layout-in-code">Defining the layout in code</h3>
+<p>When you can't decorate the record type, or the layout is chosen at runtime, build the schema with <code>FixedWidthSchemaBuilder&lt;T&gt;</code> and assign it to the extractor/loader <code>Schema</code> property instead of using attributes:</p>
+<pre><code class="lang-csharp">var schema = new FixedWidthSchemaBuilder&lt;CustomerRecord&gt;()
+    .Field(r =&gt; r.CustomerId, index: 0, length: 8)
+    .Field(r =&gt; r.Name, index: 1, length: 30)
+    .Skip(index: 2, length: 5)
+    .Field(r =&gt; r.Balance, index: 3, length: 9, alignment: FieldAlignment.Right, format: &quot;0000000.00&quot;)
+    .Build();
+
+using var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;(reader) { Schema = schema };
+</code></pre>
+<p>The lambda selectors are type-safe (no magic strings) and <code>index</code> is the zero-based column ordinal, matching <code>[FixedWidthField(index, length)]</code>. A built schema is equivalent to an attribute-resolved one — same validation and the same <code>Fields</code> / <code>ToDiagram()</code> introspection — and overrides any attributes on the type when set. See the <a href="examples.html#schemabuilder">SchemaBuilder example</a>.</p>
 <h3 id="transforming-between-layouts">Transforming between layouts</h3>
 <p><code>FixedWidthTransformer&lt;TSource, TDestination&gt;</code> reformats records from one layout to another (reorder, add/remove, or format-convert fields) as the projection stage between an extractor and a loader:</p>
 <pre><code class="lang-csharp">using var extractor   = new FixedWidthExtractor&lt;LegacyRecord&gt;(sourceReader);
@@ -205,11 +217,11 @@ await EtlPipeline
 </code></pre>
 <p>Every source and sink has <strong>path</strong>, <code>Stream</code>, and <code>TextReader</code>/<code>TextWriter</code> overloads (plus an existing-<code>FixedWidthExtractor&lt;T&gt;</code> overload). Path factories own the file stream they open and dispose it when the run finishes, on success or failure; caller-supplied streams, readers, and writers are left open. See the <a href="examples.html#pipelineextensions">PipelineExtensions example</a> for a runnable walk-through.</p>
 <h3 id="metrics-and-observability">Metrics and observability</h3>
-<p>The extractor and loader emit <code>System.Diagnostics.Metrics</code> instruments from the meter <code>Wolfgang.Etl.FixedWidth</code> — counters (<code>items.extracted</code>, <code>items.loaded</code>, <code>items.skipped</code>, <code>lines.read</code>) and a duration histogram (<code>operation.duration</code>), each tagged with <code>etl.operation</code> and <code>etl.record_type</code>. Subscribe with OpenTelemetry and the telemetry flows to Prometheus, Grafana, Application Insights, and so on, with no changes to your extraction/loading code:</p>
+<p>The extractor and loader can emit <code>System.Diagnostics.Metrics</code> instruments from the meter <code>Wolfgang.Etl.FixedWidth</code> — counters (<code>items.extracted</code>, <code>items.loaded</code>, <code>items.skipped</code>, <code>lines.read</code>) and a duration histogram (<code>operation.duration</code>), each tagged with <code>etl.operation</code> and <code>etl.record_type</code>. Metrics are <strong>zero-config</strong>: they activate automatically when a listener subscribes to the meter — there is no flag to set — so the telemetry flows to Prometheus, Grafana, Application Insights, and so on:</p>
 <pre><code class="lang-csharp">builder.Services.AddOpenTelemetry()
     .WithMetrics(m =&gt; m.AddMeter(&quot;Wolfgang.Etl.FixedWidth&quot;));
 </code></pre>
-<p>Metrics are a no-op when nothing is listening. See the <a href="examples.html#metrics">Metrics example</a> for a raw <code>MeterListener</code> walk-through.</p>
+<p>When nothing is listening, the extract/load loop (sampling once per operation) runs no metric code, so there is no overhead. See the <a href="examples.html#metrics">Metrics example</a> for a raw <code>MeterListener</code> walk-through.</p>
 <h2 id="next-steps">Next Steps</h2>
 <ul>
 <li>Browse the <a href="examples.html">Examples</a> for more detailed scenarios</li>
@@ -231,7 +243,7 @@ await EtlPipeline
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.7.0/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>

@@ -800,6 +800,70 @@ references:
   commentId: F:Wolfgang.Etl.FixedWidth.FixedWidthConverter.TruncateHeader
   fullName: Wolfgang.Etl.FixedWidth.FixedWidthConverter.TruncateHeader
   nameWithType: FixedWidthConverter.TruncateHeader
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthError
+  name: FixedWidthError
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthError.html
+  commentId: T:Wolfgang.Etl.FixedWidth.FixedWidthError
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthError
+  nameWithType: FixedWidthError
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthError.#ctor(System.Int64,System.String,System.Exception)
+  name: FixedWidthError(long, string?, Exception)
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthError.html#Wolfgang_Etl_FixedWidth_FixedWidthError__ctor_System_Int64_System_String_System_Exception_
+  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthError.#ctor(System.Int64,System.String,System.Exception)
+  name.vb: New(Long, String, Exception)
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthError.FixedWidthError(long, string?, System.Exception)
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthError.New(Long, String, System.Exception)
+  nameWithType: FixedWidthError.FixedWidthError(long, string?, Exception)
+  nameWithType.vb: FixedWidthError.New(Long, String, Exception)
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthError.#ctor*
+  name: FixedWidthError
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthError.html#Wolfgang_Etl_FixedWidth_FixedWidthError__ctor_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthError.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthError.FixedWidthError
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthError.New
+  nameWithType: FixedWidthError.FixedWidthError
+  nameWithType.vb: FixedWidthError.New
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthError.Exception
+  name: Exception
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthError.html#Wolfgang_Etl_FixedWidth_FixedWidthError_Exception
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthError.Exception
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthError.Exception
+  nameWithType: FixedWidthError.Exception
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthError.Exception*
+  name: Exception
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthError.html#Wolfgang_Etl_FixedWidth_FixedWidthError_Exception_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthError.Exception
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthError.Exception
+  nameWithType: FixedWidthError.Exception
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthError.ItemNumber
+  name: ItemNumber
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthError.html#Wolfgang_Etl_FixedWidth_FixedWidthError_ItemNumber
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthError.ItemNumber
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthError.ItemNumber
+  nameWithType: FixedWidthError.ItemNumber
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthError.ItemNumber*
+  name: ItemNumber
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthError.html#Wolfgang_Etl_FixedWidth_FixedWidthError_ItemNumber_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthError.ItemNumber
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthError.ItemNumber
+  nameWithType: FixedWidthError.ItemNumber
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthError.RawContent
+  name: RawContent
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthError.html#Wolfgang_Etl_FixedWidth_FixedWidthError_RawContent
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthError.RawContent
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthError.RawContent
+  nameWithType: FixedWidthError.RawContent
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthError.RawContent*
+  name: RawContent
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthError.html#Wolfgang_Etl_FixedWidth_FixedWidthError_RawContent_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthError.RawContent
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthError.RawContent
+  nameWithType: FixedWidthError.RawContent
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1
   name: FixedWidthExtractor<TRecord>
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html
@@ -1095,6 +1159,40 @@ references:
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord).MalformedLineHandling
   nameWithType: FixedWidthExtractor<TRecord>.MalformedLineHandling
   nameWithType.vb: FixedWidthExtractor(Of TRecord).MalformedLineHandling
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.OnError
+  name: OnError
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_OnError
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.OnError
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.OnError
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord).OnError
+  nameWithType: FixedWidthExtractor<TRecord>.OnError
+  nameWithType.vb: FixedWidthExtractor(Of TRecord).OnError
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.OnError*
+  name: OnError
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_OnError_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.OnError
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.OnError
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord).OnError
+  nameWithType: FixedWidthExtractor<TRecord>.OnError
+  nameWithType.vb: FixedWidthExtractor(Of TRecord).OnError
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.OnItemError(Wolfgang.Etl.Abstractions.ItemErrorContext)
+  name: OnItemError(ItemErrorContext)
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_OnItemError_Wolfgang_Etl_Abstractions_ItemErrorContext_
+  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.OnItemError(Wolfgang.Etl.Abstractions.ItemErrorContext)
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.OnItemError(Wolfgang.Etl.Abstractions.ItemErrorContext)
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord).OnItemError(Wolfgang.Etl.Abstractions.ItemErrorContext)
+  nameWithType: FixedWidthExtractor<TRecord>.OnItemError(ItemErrorContext)
+  nameWithType.vb: FixedWidthExtractor(Of TRecord).OnItemError(ItemErrorContext)
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.OnItemError*
+  name: OnItemError
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_OnItemError_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.OnItemError
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.OnItemError
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord).OnItemError
+  nameWithType: FixedWidthExtractor<TRecord>.OnItemError
+  nameWithType.vb: FixedWidthExtractor(Of TRecord).OnItemError
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.RecordValidator
   name: RecordValidator
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_RecordValidator
@@ -1112,6 +1210,23 @@ references:
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord).RecordValidator
   nameWithType: FixedWidthExtractor<TRecord>.RecordValidator
   nameWithType.vb: FixedWidthExtractor(Of TRecord).RecordValidator
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.Schema
+  name: Schema
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Schema
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.Schema
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.Schema
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord).Schema
+  nameWithType: FixedWidthExtractor<TRecord>.Schema
+  nameWithType.vb: FixedWidthExtractor(Of TRecord).Schema
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.Schema*
+  name: Schema
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Schema_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.Schema
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.Schema
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord).Schema
+  nameWithType: FixedWidthExtractor<TRecord>.Schema
+  nameWithType.vb: FixedWidthExtractor(Of TRecord).Schema
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.ValueParser
   name: ValueParser
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_ValueParser
@@ -1515,6 +1630,23 @@ references:
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthLoader(Of TRecord).LoadWorkerAsync
   nameWithType: FixedWidthLoader<TRecord>.LoadWorkerAsync
   nameWithType.vb: FixedWidthLoader(Of TRecord).LoadWorkerAsync
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.Schema
+  name: Schema
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_Schema
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.Schema
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.Schema
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthLoader(Of TRecord).Schema
+  nameWithType: FixedWidthLoader<TRecord>.Schema
+  nameWithType.vb: FixedWidthLoader(Of TRecord).Schema
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.Schema*
+  name: Schema
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_Schema_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.Schema
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.Schema
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthLoader(Of TRecord).Schema
+  nameWithType: FixedWidthLoader<TRecord>.Schema
+  nameWithType.vb: FixedWidthLoader(Of TRecord).Schema
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.ValueConverter
   name: ValueConverter
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_ValueConverter
@@ -1754,6 +1886,68 @@ references:
   isSpec: "True"
   fullName: Wolfgang.Etl.FixedWidth.FixedWidthSchema.TotalColumnCount
   nameWithType: FixedWidthSchema.TotalColumnCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1
+  name: FixedWidthSchemaBuilder<T>
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder-1.html
+  commentId: T:Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1
+  name.vb: FixedWidthSchemaBuilder(Of T)
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder(Of T)
+  nameWithType: FixedWidthSchemaBuilder<T>
+  nameWithType.vb: FixedWidthSchemaBuilder(Of T)
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Build
+  name: Build()
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder-1.html#Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1_Build
+  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Build
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.Build()
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder(Of T).Build()
+  nameWithType: FixedWidthSchemaBuilder<T>.Build()
+  nameWithType.vb: FixedWidthSchemaBuilder(Of T).Build()
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Build*
+  name: Build
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder-1.html#Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1_Build_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Build
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.Build
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder(Of T).Build
+  nameWithType: FixedWidthSchemaBuilder<T>.Build
+  nameWithType.vb: FixedWidthSchemaBuilder(Of T).Build
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Field*
+  name: Field
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder-1.html#Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1_Field_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Field
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.Field
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder(Of T).Field
+  nameWithType: FixedWidthSchemaBuilder<T>.Field
+  nameWithType.vb: FixedWidthSchemaBuilder(Of T).Field
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Field``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Int32,System.Int32,Wolfgang.Etl.FixedWidth.Enums.FieldAlignment,System.Char,System.String,System.String,System.Nullable{System.Globalization.NumberStyles},System.Boolean)
+  name: Field<TProperty>(Expression<Func<T, TProperty>>, int, int, FieldAlignment, char, string?, string?, NumberStyles?, bool)
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder-1.html#Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1_Field__1_System_Linq_Expressions_Expression_System_Func__0___0___System_Int32_System_Int32_Wolfgang_Etl_FixedWidth_Enums_FieldAlignment_System_Char_System_String_System_String_System_Nullable_System_Globalization_NumberStyles__System_Boolean_
+  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Field``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Int32,System.Int32,Wolfgang.Etl.FixedWidth.Enums.FieldAlignment,System.Char,System.String,System.String,System.Nullable{System.Globalization.NumberStyles},System.Boolean)
+  name.vb: Field(Of TProperty)(Expression(Of Func(Of T, TProperty)), Integer, Integer, FieldAlignment, Char, String, String, NumberStyles?, Boolean)
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.Field<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>>, int, int, Wolfgang.Etl.FixedWidth.Enums.FieldAlignment, char, string?, string?, System.Globalization.NumberStyles?, bool)
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder(Of T).Field(Of TProperty)(System.Linq.Expressions.Expression(Of System.Func(Of T, TProperty)), Integer, Integer, Wolfgang.Etl.FixedWidth.Enums.FieldAlignment, Char, String, String, System.Globalization.NumberStyles?, Boolean)
+  nameWithType: FixedWidthSchemaBuilder<T>.Field<TProperty>(Expression<Func<T, TProperty>>, int, int, FieldAlignment, char, string?, string?, NumberStyles?, bool)
+  nameWithType.vb: FixedWidthSchemaBuilder(Of T).Field(Of TProperty)(Expression(Of Func(Of T, TProperty)), Integer, Integer, FieldAlignment, Char, String, String, NumberStyles?, Boolean)
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Skip(System.Int32,System.Int32,System.String)
+  name: Skip(int, int, string?)
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder-1.html#Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1_Skip_System_Int32_System_Int32_System_String_
+  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Skip(System.Int32,System.Int32,System.String)
+  name.vb: Skip(Integer, Integer, String)
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.Skip(int, int, string?)
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder(Of T).Skip(Integer, Integer, String)
+  nameWithType: FixedWidthSchemaBuilder<T>.Skip(int, int, string?)
+  nameWithType.vb: FixedWidthSchemaBuilder(Of T).Skip(Integer, Integer, String)
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Skip*
+  name: Skip
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder-1.html#Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1_Skip_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Skip
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.Skip
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder(Of T).Skip
+  nameWithType: FixedWidthSchemaBuilder<T>.Skip
+  nameWithType.vb: FixedWidthSchemaBuilder(Of T).Skip
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthTransformer`2
   name: FixedWidthTransformer<TSource, TDestination>
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthTransformer-2.html
