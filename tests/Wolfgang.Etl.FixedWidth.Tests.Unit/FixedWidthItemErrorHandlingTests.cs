@@ -230,6 +230,15 @@ public class FixedWidthItemErrorHandlingTests
 
         protected override Report CreateProgressReport() => new(CurrentItemCount);
 
-        public sealed record Report(int Count);
+        // Non-positional record with a get-only property + ctor rather than a positional
+        // record: a positional parameter compiles an `init` setter, which needs
+        // System.Runtime.CompilerServices.IsExternalInit — absent on net462-481 and
+        // netcoreapp3.1. This form keeps value equality without it.
+        public sealed record Report
+        {
+            public Report(int count) => Count = count;
+
+            public int Count { get; }
+        }
     }
 }
