@@ -1,0 +1,6 @@
+{
+  "_comment": "Sustained-load GC baseline for #152. Regenerate by running tools/GcProfile and updating these references in a reviewed PR. allocatedBytesPerRecord is environment-sensitive (GC mode, JIT version) so it carries a wide tolerance and only catches a gross hot-path allocation regression; gen2CollectionsPerMillion is the environment-robust retention-leak gate (a materializing streaming library should promote ~nothing to gen2).",
+  "capturedOn": "windows-local, ServerGC, net10.0, 15s (~49.5M records)",
+  "allocatedBytesPerRecord": { "reference": 340.0, "tolerancePercent": 25 },
+  "gen2CollectionsPerMillion": { "max": 1.0 }
+}

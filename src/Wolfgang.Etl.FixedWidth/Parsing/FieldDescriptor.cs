@@ -118,6 +118,10 @@ internal sealed class FieldDescriptor
     /// <summary>
     /// Compiles a getter delegate: (object instance) => (object?)instance.Property
     /// </summary>
+#if NET8_0_OR_GREATER
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050",
+        Justification = "Expression.Compile is RequiresDynamicCode but falls back to the interpreter when RuntimeFeature.IsDynamicCodeSupported is false, so the compiled getter still runs correctly under Native AOT (without JIT speed). See #153.")]
+#endif
     private static Func<object, object?> CompileGetter(PropertyInfo property)
     {
         // Parameter: object instance
@@ -140,6 +144,10 @@ internal sealed class FieldDescriptor
     /// <summary>
     /// Compiles a setter delegate: (object instance, object? value) => instance.Property = (T)value
     /// </summary>
+#if NET8_0_OR_GREATER
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050",
+        Justification = "Expression.Compile is RequiresDynamicCode but falls back to the interpreter when RuntimeFeature.IsDynamicCodeSupported is false, so the compiled setter still runs correctly under Native AOT (without JIT speed). See #153.")]
+#endif
     private static Action<object, object?> CompileSetter(PropertyInfo property)
     {
         // Parameters: object instance, object? value

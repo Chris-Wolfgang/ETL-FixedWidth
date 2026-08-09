@@ -77,6 +77,10 @@ internal sealed class FieldMapResult
     /// Returns a throwing delegate if the type has no public parameterless constructor
     /// (e.g. when used by the loader which never needs to instantiate records).
     /// </summary>
+#if NET8_0_OR_GREATER
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050",
+        Justification = "Expression.Compile is RequiresDynamicCode but falls back to the interpreter when RuntimeFeature.IsDynamicCodeSupported is false, so the compiled activator still runs correctly under Native AOT (without JIT speed). See #153.")]
+#endif
     internal static Func<object> CompileFactory(Type type)
     {
         var ctor = type.GetConstructor(Type.EmptyTypes);
