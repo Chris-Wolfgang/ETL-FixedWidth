@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Wolfgang.Etl.Abstractions;
 using Xunit;
 
 namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
@@ -148,5 +149,88 @@ public class FixedWidthTransformerTests
     {
         // The mapper is compiled eagerly by the factory, so it throws here.
         Assert.Throws<InvalidOperationException>(FixedWidthTransformer<Src, NoParameterlessCtor>.ByMatchingProperties);
+    }
+
+
+
+    [Fact]
+    public async Task TransformAsync_reports_progress_via_the_injected_timer()
+    {
+        var timer = new ManualProgressTimer();
+        var sink = new CollectingProgress();
+        using var transformer = new FixedWidthTransformer<Src, Dst>(
+            s => new Dst { Name = s.Name, Value = s.Value },
+            timer);
+
+        await foreach (var _ in transformer.TransformAsync(ToAsync(Sources), sink, CancellationToken.None))
+        {
+            // Fire the injected timer mid-enumeration so the wired progress callback runs.
+            timer.Fire();
+        }
+
+        // A report per Fire() proves the injected timer's Elapsed is wired to the progress callback;
+        // the fire after the last item reports the full transformed count.
+        Assert.NotEmpty(sink.Reports);
+        Assert.Equal(Sources.Count, (int)sink.Reports.Max(r => r.CurrentItemCount));
+    }
+
+
+
+    [Fact]
+    public async Task TransformAsync_when_token_already_cancelled_reads_nothing()
+    {
+        using var transformer = new FixedWidthTransformer<Src, Dst>(s => new Dst { Name = s.Name });
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        var enumerated = false;
+        async IAsyncEnumerable<Src> Poisoned()
+        {
+            enumerated = true;
+            yield return new Src { Name = "never" };
+            await Task.CompletedTask;
+        }
+
+        // The pre-cancellation guard throws before the source is touched.
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+            await transformer.TransformAsync(Poisoned(), cts.Token).ToListAsync());
+
+        Assert.False(enumerated);
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class ManualProgressTimer : IProgressTimer
+    {
+        private Action? _elapsed;
+
+        public bool WasStarted { get; private set; }
+
+        public event Action? Elapsed
+        {
+            add => _elapsed += value;
+            remove => _elapsed -= value;
+        }
+
+        public void Start(int intervalMilliseconds) => WasStarted = true;
+
+        public void StopTimer()
+        {
+        }
+
+        public void Fire() => _elapsed?.Invoke();
+
+        public void Dispose()
+        {
+        }
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class CollectingProgress : IProgress<FixedWidthReport>
+    {
+        public List<FixedWidthReport> Reports { get; } = new();
+
+        public void Report(FixedWidthReport value) => Reports.Add(value);
     }
 }
