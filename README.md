@@ -319,7 +319,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 
 **Examples:**
 
-The [examples/](examples/) folder contains 13 runnable console projects demonstrating each feature:
+The [examples/](examples/) folder contains 14 runnable console projects demonstrating each feature:
 
 | Example | Description |
 |---------|-------------|
@@ -336,6 +336,7 @@ The [examples/](examples/) folder contains 13 runnable console projects demonstr
 | [PipelineExtensions](examples/PipelineExtensions) | Compose extract → transform → load as one `EtlPipeline` fluent chain |
 | [Metrics](examples/Metrics) | Subscribe to the `Wolfgang.Etl.FixedWidth` meter and read throughput/duration metrics |
 | [SchemaBuilder](examples/SchemaBuilder) | Define a layout in code with `FixedWidthSchemaBuilder<T>` instead of attributes |
+| [DataReader](examples/DataReader) | Expose a fixed-width source as an `IDataReader` for `SqlBulkCopy` / `DataTable` (no POCO per row) |
 
 ---
 
