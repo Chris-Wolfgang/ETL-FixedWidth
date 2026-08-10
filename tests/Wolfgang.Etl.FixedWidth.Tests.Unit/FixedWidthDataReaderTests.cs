@@ -118,7 +118,7 @@ public sealed class FixedWidthDataReaderTests
     [Fact]
     public void BlankLineHandling_Skip_ignores_blank_lines()
     {
-        using var reader = Reader(Line("A", "1", 1, "1"), "   ", Line("B", "2", 2, "2"));
+        using var reader = Reader(Line("A", "1", 1, "1"), string.Empty, Line("B", "2", 2, "2"));
         reader.BlankLineHandling = BlankLineHandling.Skip;
 
         Assert.True(reader.Read());
@@ -132,25 +132,28 @@ public sealed class FixedWidthDataReaderTests
     [Fact]
     public void BlankLineHandling_ThrowException_throws()
     {
-        // Blank line first — a trailing empty line is swallowed by TextReader.ReadLine.
-        using var reader = Reader("   ", Line("A", "1", 1, "1"));
+        // A zero-length line in the middle (a trailing empty line is swallowed by ReadLine).
+        using var reader = Reader(Line("A", "1", 1, "1"), string.Empty, Line("B", "2", 2, "2"));
         reader.BlankLineHandling = BlankLineHandling.ThrowException;
 
-        Assert.Throws<LineTooShortException>(() => reader.Read());
+        Assert.True(reader.Read());   // A
+        Assert.Throws<LineTooShortException>(() => reader.Read());   // the blank line
     }
 
 
     [Fact]
     public void BlankLineHandling_ReturnDefault_yields_a_default_row()
     {
-        using var reader = Reader(Line("A", "1", 1, "1"), "   ");
+        using var reader = Reader(Line("A", "1", 1, "1"), string.Empty, Line("B", "2", 2, "2"));
         reader.BlankLineHandling = BlankLineHandling.ReturnDefault;
 
-        Assert.True(reader.Read());
-        Assert.True(reader.Read());
+        Assert.True(reader.Read());   // A
+        Assert.True(reader.Read());   // default row from the blank line
         Assert.True(reader.IsDBNull(0));   // reference-type (string) default -> null -> DBNull
         Assert.Equal(0, reader.GetInt32(2));   // value-type default
         Assert.True(reader.IsDBNull(3));        // nullable default -> null
+        Assert.True(reader.Read());   // B
+        Assert.Equal("B", reader.GetString(0));
     }
 
 
@@ -353,12 +356,39 @@ public sealed class FixedWidthDataReaderTests
     [Fact]
     public void BlankLine_ReturnDefault_within_skip_budget_is_skipped()
     {
-        using var reader = Reader("   ", Line("A", "1", 1, "1"));
+        using var reader = Reader(string.Empty, Line("A", "1", 1, "1"));
         reader.BlankLineHandling = BlankLineHandling.ReturnDefault;
         reader.SkipItemCount = 1;   // the blank consumes the skip budget, then A is served
 
         Assert.True(reader.Read());
         Assert.Equal("A", reader.GetString(0));
         Assert.False(reader.Read());
+    }
+
+
+    [Fact]
+    public void A_whitespace_only_line_is_a_data_line_not_a_blank_line()
+    {
+        // With BlankLineHandling.Skip a *blank* (zero-length) line would be skipped. A whitespace-only
+        // line is NOT blank (matches the extractor) — it is a data line, so a short one is malformed
+        // and hits MalformedLineHandling (default ThrowException) rather than being silently skipped.
+        using var reader = Reader("     ");
+        reader.BlankLineHandling = BlankLineHandling.Skip;
+
+        Assert.Throws<LineTooShortException>(() => reader.Read());
+    }
+
+
+    [Fact]
+    public void Accessing_values_after_Close_reports_the_closed_reader()
+    {
+        var reader = Reader(Line("A", "1", 1, "1"));
+        Assert.True(reader.Read());
+
+        reader.Close();
+
+        var ex = Assert.Throws<InvalidOperationException>(() => reader.GetValue(0));
+        Assert.Contains("closed", ex.Message, StringComparison.OrdinalIgnoreCase);
+        reader.Close();   // idempotent
     }
 }

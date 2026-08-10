@@ -230,8 +230,20 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     /// <inheritdoc/>
     public void Close()
     {
+        if (_closed)
+        {
+            return;
+        }
+
         _closed = true;
         _hasRow = false;
+
+        // Many ADO.NET consumers call Close() rather than Dispose(); release the internal
+        // StreamReader here too. It was created with leaveOpen:true, so the caller's stream stays open.
+        if (_ownsReader)
+        {
+            _reader.Dispose();
+        }
     }
 
 
@@ -373,13 +385,23 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     public long GetChars(int i, long fieldoffset, char[]? buffer, int bufferoffset, int length)
     {
         var text = GetString(i);
+        if (fieldoffset < 0 || fieldoffset > text.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(fieldoffset));
+        }
+
         if (buffer == null)
         {
             return text.Length;
         }
 
-        var available = Math.Max(0, text.Length - (int)fieldoffset);
-        var count = Math.Min(length, available);
+        if (bufferoffset < 0 || bufferoffset > buffer.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(bufferoffset));
+        }
+
+        var available = text.Length - (int)fieldoffset;
+        var count = Math.Max(0, Math.Min(length, available));
         text.CopyTo((int)fieldoffset, buffer, bufferoffset, count);
         return count;
     }
@@ -422,14 +444,7 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     // ------------------------------------------------------------------
 
     /// <inheritdoc/>
-    public void Dispose()
-    {
-        Close();
-        if (_ownsReader)
-        {
-            _reader.Dispose();
-        }
-    }
+    public void Dispose() => Close();
 
 
 
@@ -439,13 +454,21 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
 
     private void EnsureRow()
     {
+        if (_closed)
+        {
+            throw new InvalidOperationException("Invalid attempt to read from a closed data reader.");
+        }
+
         if (!_hasRow)
         {
             throw new InvalidOperationException("No current row. Call Read() first, and check that it returned true.");
         }
     }
 
-    private static bool IsBlank(string line) => line.Length == 0 || string.IsNullOrWhiteSpace(line);
+    // A "blank" line is zero-length only, matching FixedWidthExtractor. A whitespace-only line is a
+    // valid data line and flows through normal parsing (so a short one raises LineTooShortException
+    // with its actual content/length, not the blank-line path).
+    private static bool IsBlank(string line) => line.Length == 0;
 
     private static string[] BuildNames(FieldMapResult fieldMap)
     {
