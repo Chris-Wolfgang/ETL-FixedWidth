@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `FixedWidthDataReader<TRecord>` — a forward-only, read-only `IDataReader` over a
+  fixed-width source, with the layout taken from `TRecord`'s `[FixedWidthField]`
+  attributes. It serves each field value directly from the parsed line — **no
+  `TRecord` is allocated per row** — the optimal shape for `SqlBulkCopy`,
+  `DataTable.Load`, and other ADO.NET consumers that would otherwise discard a POCO
+  per row. Supports the extractor's configuration (`HeaderLineCount`,
+  `SkipItemCount`, `MaximumItemCount`, `BlankLineHandling`, `MalformedLineHandling`,
+  `FieldDelimiter`), typed accessors, and `GetSchemaTable()` ([#26]).
+
 ### Changed
 
 ### Deprecated
@@ -365,6 +374,7 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#153]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/153
 [#165]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/165
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
+[#26]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/26
 [#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
 [Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.8.0...HEAD
 [0.8.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.7.0...v0.8.0
