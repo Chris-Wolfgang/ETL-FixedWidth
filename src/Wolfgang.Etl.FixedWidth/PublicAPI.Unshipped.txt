@@ -63,3 +63,6 @@ Wolfgang.Etl.FixedWidth.Enums.BinaryFieldType.Text = 0 -> Wolfgang.Etl.FixedWidt
 Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>
 Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>.FixedWidthBinaryExtractor(System.IO.Stream stream, System.Text.Encoding encoding = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>.RecordByteLength.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.FixedWidthBinaryLoader(System.IO.Stream stream, System.Text.Encoding encoding = null) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.RecordByteLength.get -> int

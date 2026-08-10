@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace Wolfgang.Etl.FixedWidth.Binary;
 
@@ -73,6 +74,53 @@ internal static class PackedDecimal
         }
 
         return value;
+    }
+
+    /// <summary>
+    /// Encodes <paramref name="value"/> as COMP-3 packed decimal into <paramref name="destination"/>,
+    /// whose length is the field's byte width. The value is truncated (COBOL default, not rounded) to
+    /// <paramref name="scale"/> implied decimal places.
+    /// </summary>
+    /// <param name="value">The value to encode.</param>
+    /// <param name="scale">The number of implied decimal places.</param>
+    /// <param name="destination">The field bytes to write (its length is the field width).</param>
+    /// <exception cref="ArgumentException"><paramref name="destination"/> is empty.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="scale"/> is negative.</exception>
+    /// <exception cref="OverflowException">The value needs more digits than the field can hold.</exception>
+    internal static void Encode(decimal value, int scale, Span<byte> destination)
+    {
+        if (destination.Length == 0)
+        {
+            throw new ArgumentException("A packed-decimal field needs at least one byte.", nameof(destination));
+        }
+
+        if (scale < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(scale), scale, "Scale cannot be negative.");
+        }
+
+        var negative = value < 0;
+        var unscaled = Math.Truncate(Math.Abs(value) * Pow10(scale));
+
+        var maxDigits = (destination.Length * 2) - 1;
+        var digits = unscaled.ToString("F0", CultureInfo.InvariantCulture);
+        if (digits.Length > maxDigits)
+        {
+            throw new OverflowException($"Value '{value}' needs {digits.Length} digits but the {destination.Length}-byte packed-decimal field holds only {maxDigits}.");
+        }
+
+        var padded = digits.PadLeft(maxDigits, '0');
+        destination.Clear();
+
+        for (var d = 0; d < maxDigits; d++)
+        {
+            var digit = padded[d] - '0';
+            var byteIndex = d / 2;
+            destination[byteIndex] |= (byte)((d % 2 == 0) ? digit << 4 : digit);
+        }
+
+        // Sign nibble in the low nibble of the last byte: 0xC positive, 0xD negative.
+        destination[destination.Length - 1] |= (byte)(negative ? 0x0D : 0x0C);
     }
 
     private static decimal Pow10(int scale)

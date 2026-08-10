@@ -46,7 +46,7 @@ internal static class BinaryFieldMap
                 throw new InvalidOperationException($"Duplicate [FixedWidthBinaryField] index {attribute.Index} on type '{type.FullName}'.");
             }
 
-            descriptors.Add(new BinaryFieldDescriptor(entry.Property, attribute, offset, CompileSetter(entry.Property)));
+            descriptors.Add(new BinaryFieldDescriptor(entry.Property, attribute, offset, CompileSetter(entry.Property), CompileGetter(entry.Property)));
             offset += attribute.ByteLength;
         }
 
@@ -69,6 +69,20 @@ internal static class BinaryFieldMap
         );
 
         return Expression.Lambda<Action<object, object?>>(assign, instance, value).Compile();
+    }
+
+
+#if NET8_0_OR_GREATER
+    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050",
+        Justification = "Expression.Compile is RequiresDynamicCode but falls back to the interpreter under Native AOT, so the compiled getter still runs correctly (without JIT speed). See #153.")]
+#endif
+    private static Func<object, object?> CompileGetter(PropertyInfo property)
+    {
+        var instance = Expression.Parameter(typeof(object), "instance");
+        var access = Expression.Property(Expression.Convert(instance, property.DeclaringType!), property);
+        var boxed = Expression.Convert(access, typeof(object));
+
+        return Expression.Lambda<Func<object, object?>>(boxed, instance).Compile();
     }
 
 

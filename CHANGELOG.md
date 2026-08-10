@@ -9,13 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Binary / mainframe field support ([#21]): `FixedWidthBinaryExtractor<TRecord>` reads
-  fixed-length **binary** records (no newline delimiters — each record is a fixed number of
-  bytes) from a `Stream`, decoding COBOL `COMP-3` packed-decimal and `COMP` binary-integer
-  fields alongside text. Fields are declared with the new
+- Binary / mainframe field support ([#21]): `FixedWidthBinaryExtractor<TRecord>` and
+  `FixedWidthBinaryLoader<TRecord>` read and write fixed-length **binary** records (no newline
+  delimiters — each record is a fixed number of bytes) over a `Stream`, decoding/encoding COBOL
+  `COMP-3` packed-decimal and `COMP` binary-integer fields alongside text (a round-trip is
+  symmetric). Fields are declared with the new
   `[FixedWidthBinaryField(index, byteLength, BinaryFieldType, Scale/Signed)]` attribute
-  (byte-based, type-driven); text fields decode via the extractor's encoding (ASCII default;
-  pass a code-page encoding for EBCDIC). The existing text extractor/loader are unchanged.
+  (byte-based, type-driven); text fields use the extractor/loader's encoding (ASCII default;
+  pass a code-page encoding for EBCDIC). The existing text extractor and loader are unchanged.
 - `FixedWidthDataReader<TRecord>` — a forward-only, read-only `IDataReader` over a
   fixed-width source, with the layout taken from `TRecord`'s `[FixedWidthField]`
   attributes. It serves each field value directly from the parsed line — **no

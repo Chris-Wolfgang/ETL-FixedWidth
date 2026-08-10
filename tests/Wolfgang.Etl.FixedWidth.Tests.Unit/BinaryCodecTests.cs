@@ -99,4 +99,66 @@ public sealed class BinaryCodecTests
         Assert.Throws<ArgumentException>(() => BinaryInteger.Decode(ReadOnlySpan<byte>.Empty));
         Assert.Throws<ArgumentException>(() => BinaryInteger.Decode(new byte[9]));
     }
+
+
+    // -------------------- encode round-trips --------------------
+
+    [Theory]
+    [InlineData("1234.56", 2, 4)]
+    [InlineData("-0.05", 2, 5)]
+    [InlineData("0", 0, 1)]
+    [InlineData("9999999", 0, 4)]
+    [InlineData("-123", 0, 2)]
+    [InlineData("1234.567", 2, 4)]   // truncated to 1234.56 on encode
+    public void PackedDecimal_encode_round_trips(string value, int scale, int byteLength)
+    {
+        var v = decimal.Parse(value, CultureInfo.InvariantCulture);
+        var expected = Math.Truncate(Math.Abs(v) * Pow10(scale)) / Pow10(scale) * Math.Sign(v == 0 ? 1 : v);
+
+        var buffer = new byte[byteLength];
+        PackedDecimal.Encode(v, scale, buffer);
+
+        Assert.Equal(expected, PackedDecimal.Decode(buffer, scale));
+    }
+
+
+    [Fact]
+    public void PackedDecimal_encode_overflows_when_too_many_digits()
+    {
+        Assert.Throws<OverflowException>(() => PackedDecimal.Encode(12345m, 0, new byte[2]));   // 2 bytes -> 3 digits max
+    }
+
+
+    [Theory]
+    [InlineData(123L, true, 2)]
+    [InlineData(-123L, true, 2)]
+    [InlineData(256L, true, 4)]
+    [InlineData(65413L, false, 4)]
+    [InlineData(-1L, true, 8)]
+    public void BinaryInteger_encode_round_trips(long value, bool signed, int byteLength)
+    {
+        var buffer = new byte[byteLength];
+        BinaryInteger.Encode(value, signed, buffer);
+
+        Assert.Equal(value, BinaryInteger.Decode(buffer, signed));
+    }
+
+
+    [Fact]
+    public void BinaryInteger_encode_overflows_when_out_of_range()
+    {
+        Assert.Throws<OverflowException>(() => BinaryInteger.Encode(300, signed: true, new byte[1]));   // max 127
+        Assert.Throws<OverflowException>(() => BinaryInteger.Encode(-1, signed: false, new byte[2]));   // unsigned
+    }
+
+    private static decimal Pow10(int scale)
+    {
+        decimal r = 1m;
+        for (var i = 0; i < scale; i++)
+        {
+            r *= 10m;
+        }
+
+        return r;
+    }
 }
