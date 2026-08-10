@@ -151,6 +151,16 @@ public sealed class BinaryCodecTests
         Assert.Throws<OverflowException>(() => BinaryInteger.Encode(-1, signed: false, new byte[2]));   // unsigned
     }
 
+
+    [Fact]
+    public void Encode_rejects_bad_destinations_and_scale()
+    {
+        Assert.Throws<ArgumentException>(() => PackedDecimal.Encode(1m, 0, Array.Empty<byte>()));
+        Assert.Throws<ArgumentOutOfRangeException>(() => PackedDecimal.Encode(1m, -1, new byte[4]));
+        Assert.Throws<ArgumentException>(() => BinaryInteger.Encode(1, signed: true, Array.Empty<byte>()));
+        Assert.Throws<ArgumentException>(() => BinaryInteger.Encode(1, signed: true, new byte[9]));
+    }
+
     private static decimal Pow10(int scale)
     {
         decimal r = 1m;

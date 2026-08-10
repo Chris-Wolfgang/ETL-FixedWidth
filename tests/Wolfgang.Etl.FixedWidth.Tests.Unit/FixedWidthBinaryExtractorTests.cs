@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Attributes;
+using Wolfgang.Etl.FixedWidth.Binary;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Xunit;
 
@@ -182,6 +183,46 @@ public sealed class FixedWidthBinaryExtractorTests
 
         Assert.Equal(1234.56m, record.Balance);
         Assert.Equal(42L, record.Count);
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class DuplicateIndex
+    {
+        [FixedWidthBinaryField(0, 4, BinaryFieldType.Binary)]
+        public int A { get; set; }
+
+        [FixedWidthBinaryField(0, 4, BinaryFieldType.Binary)]
+        public int B { get; set; }
+    }
+
+
+    [Fact]
+    public void Duplicate_field_index_throws()
+        => Assert.Throws<InvalidOperationException>(() => new FixedWidthBinaryExtractor<DuplicateIndex>(new MemoryStream()));
+
+
+    [Fact]
+    public void Descriptor_with_an_unknown_field_type_throws_on_decode_and_encode()
+    {
+        var prop = typeof(Account).GetProperty(nameof(Account.TransactionCount))!;
+        var attribute = new FixedWidthBinaryFieldAttribute(0, 4, (BinaryFieldType)99);
+        var descriptor = new BinaryFieldDescriptor(prop, attribute, 0, (_, _) => { }, _ => 0);
+
+        Assert.Throws<InvalidOperationException>(() => descriptor.Decode(new byte[4], Encoding.ASCII));
+        Assert.Throws<InvalidOperationException>(() => descriptor.Encode(new Account(), new byte[4], Encoding.ASCII));
+    }
+
+
+    [Fact]
+    public async Task ExtractAsync_with_progress_and_no_injected_timer_uses_the_base_timer()
+    {
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(Record("A", 1, Balance1234_56)));
+        var sink = new CollectingProgress();
+
+        var result = await extractor.ExtractAsync(sink, CancellationToken.None).ToListAsync();
+
+        Assert.Single(result);
     }
 
 

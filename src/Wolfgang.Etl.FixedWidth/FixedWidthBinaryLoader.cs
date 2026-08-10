@@ -75,11 +75,7 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
     /// <inheritdoc/>
     protected override async Task LoadWorkerAsync(IAsyncEnumerable<TRecord> items, CancellationToken cancellationToken)
     {
-        if (items == null)
-        {
-            throw new ArgumentNullException(nameof(items));
-        }
-
+        // items is guaranteed non-null by the LoaderBase.LoadAsync entry point.
         cancellationToken.ThrowIfCancellationRequested();
 
         var buffer = new byte[_map.RecordByteLength];

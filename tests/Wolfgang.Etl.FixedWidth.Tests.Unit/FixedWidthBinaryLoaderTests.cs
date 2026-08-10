@@ -103,6 +103,43 @@ public sealed class FixedWidthBinaryLoaderTests
 
 
     [Fact]
+    public async Task LoadAsync_rejects_a_null_source()
+    {
+        using var ms = new MemoryStream();
+        using var loader = new FixedWidthBinaryLoader<Account>(ms);
+
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await loader.LoadAsync(null!, CancellationToken.None));
+    }
+
+
+    [Fact]
+    public async Task A_multibyte_text_value_in_a_fixed_byte_field_throws()
+    {
+        // "€" is one char but three UTF-8 bytes; padded to 8 chars it encodes to more than 8 bytes.
+        var accounts = new[] { new Account { AccountId = "€", TransactionCount = 1, Balance = 0m } };
+        using var ms = new MemoryStream();
+        using var loader = new FixedWidthBinaryLoader<Account>(ms, System.Text.Encoding.UTF8);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await loader.LoadAsync(ToAsync(accounts), CancellationToken.None));
+    }
+
+
+    [Fact]
+    public async Task LoadAsync_with_progress_and_no_injected_timer_uses_the_base_timer()
+    {
+        var accounts = new[] { new Account { AccountId = "A", TransactionCount = 1, Balance = 1m } };
+        using var ms = new MemoryStream();
+        using var loader = new FixedWidthBinaryLoader<Account>(ms);
+        var sink = new CollectingProgress();
+
+        await loader.LoadAsync(ToAsync(accounts), sink, CancellationToken.None);
+
+        Assert.Equal(17, ms.Length);
+    }
+
+
+    [Fact]
     public async Task LoadAsync_reports_progress_via_the_injected_timer()
     {
         var accounts = new[]
