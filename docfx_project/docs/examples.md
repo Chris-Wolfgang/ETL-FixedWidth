@@ -85,3 +85,9 @@ Defines a fixed-width layout in code with `FixedWidthSchemaBuilder<T>` for a rec
 Exposes a fixed-width source as a forward-only `IDataReader` via `FixedWidthDataReader<T>`, with the layout taken from `T`'s `[FixedWidthField]` attributes. It serves each field value directly from the parsed line — **no `T` is allocated per row** — then loads a `DataTable` through `DataTable.Load` (no database required). In production the same reader flows straight into `SqlBulkCopy.WriteToServerAsync`, the zero-per-row-allocation path for bulk-loading a database.
 
 [View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/DataReader)
+
+## BinaryRecords
+
+Reads and writes fixed-length **binary** (mainframe / COBOL) records — text plus `COMP` binary-integer and `COMP-3` packed-decimal fields, declared with `[FixedWidthBinaryField]`. Records are a fixed number of bytes with no newline delimiters, so `FixedWidthBinaryLoader<T>` writes them back-to-back and `FixedWidthBinaryExtractor<T>` reads them straight from the stream. Shows a symmetric write → read round trip and documents the EBCDIC code-page option.
+
+[View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/BinaryRecords)

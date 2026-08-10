@@ -205,6 +205,46 @@ The builder uses lambda expressions for type-safe, refactor-proof property refer
 
 See the [SchemaBuilder](examples/SchemaBuilder) example for a runnable walk-through.
 
+### Reading and writing binary / mainframe records
+
+Mainframe (COBOL) files mix text with binary-encoded numeric fields — `COMP` big-endian integers and `COMP-3` packed decimals — and are **not** newline-delimited: every record is a fixed number of *bytes*, written back-to-back. Because packed-decimal and binary bytes routinely contain `0x0A`/`0x0D`, they must never be split on newlines. `FixedWidthBinaryExtractor<T>` / `FixedWidthBinaryLoader<T>` read and write these records by byte count, decoding/encoding each field per its declared type.
+
+Declare the layout with `[FixedWidthBinaryField]` — widths are in **bytes**, and `BinaryFieldType` selects the decoding (`Text`, `Binary`, or `PackedDecimal`):
+
+```csharp
+using Wolfgang.Etl.FixedWidth;
+using Wolfgang.Etl.FixedWidth.Attributes;
+using Wolfgang.Etl.FixedWidth.Enums;
+
+public class AccountRecord
+{
+    [FixedWidthBinaryField(0, 8, BinaryFieldType.Text)]
+    public string AccountId { get; set; } = string.Empty;
+
+    [FixedWidthBinaryField(1, 4, BinaryFieldType.Binary)]              // COMP
+    public int TransactionCount { get; set; }
+
+    [FixedWidthBinaryField(2, 5, BinaryFieldType.PackedDecimal, Scale = 2)]   // PIC S9(7)V99 COMP-3
+    public decimal Balance { get; set; }
+}
+
+await using var stream = File.OpenRead("accounts.dat");
+using var extractor = new FixedWidthBinaryExtractor<AccountRecord>(stream);
+await foreach (var account in extractor.ExtractAsync(CancellationToken.None))
+{
+    // account.Balance decoded from COMP-3, account.TransactionCount from COMP
+}
+```
+
+Text fields decode with the extractor/loader's encoding — **ASCII by default**. For EBCDIC data, register the code-page provider and pass the encoding (the `System.Text.Encoding.CodePages` package is only needed by consumers who use it, so it is not bundled):
+
+```csharp
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+using var extractor = new FixedWidthBinaryExtractor<AccountRecord>(stream, Encoding.GetEncoding("IBM037"));
+```
+
+Writing is symmetric — `FixedWidthBinaryLoader<T>` encodes each field back to its `COMP`/`COMP-3`/text bytes. See the [BinaryRecords](examples/BinaryRecords) example for a runnable write → read round trip.
+
 ### Transforming between layouts
 
 To reformat a fixed-width file from one layout to another — reordering, adding/removing, or format-converting fields (a common mainframe-migration task) — `FixedWidthTransformer<TSource, TDestination>` is the projection stage between an extractor and a loader:
@@ -312,6 +352,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 | **Compiled delegates** | Field accessors use compiled delegates instead of reflection for fast property get/set |
 | **Schema introspection** | `FixedWidthSchema.For<T>()` exposes the resolved layout (positions, widths, types, skips); `ToDiagram()` renders it as a text table |
 | **Code-defined layout** | `FixedWidthSchemaBuilder<T>` defines a layout in fluent, type-safe code (no attributes required); assign it to the extractor/loader `Schema` property |
+| **Binary / mainframe** | `FixedWidthBinaryExtractor<T>` / `FixedWidthBinaryLoader<T>` read/write fixed-length binary records with COBOL `COMP` / `COMP-3` fields via `[FixedWidthBinaryField]` |
 | **Format transformation** | `FixedWidthTransformer<TSource, TDestination>` projects one layout to another in a single streaming pass, with optional `ByMatchingProperties()` auto-mapping |
 | **Pipeline composition** | `EtlPipeline.Create().FixedWidthExtractor<T>(…).FixedWidthLoader<T>(…).RunAsync()` — fluent source factories and sink terminators over the generic `EtlPipeline` (requires `Wolfgang.Etl.Abstractions` 0.16.0) |
 | **Metrics** | Zero-config `System.Diagnostics.Metrics` instruments (throughput, skips, duration) from the `Wolfgang.Etl.FixedWidth` meter — OpenTelemetry / Prometheus / any `MeterListener` |
@@ -319,7 +360,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 
 **Examples:**
 
-The [examples/](examples/) folder contains 14 runnable console projects demonstrating each feature:
+The [examples/](examples/) folder contains 15 runnable console projects demonstrating each feature:
 
 | Example | Description |
 |---------|-------------|
@@ -337,6 +378,7 @@ The [examples/](examples/) folder contains 14 runnable console projects demonstr
 | [Metrics](examples/Metrics) | Subscribe to the `Wolfgang.Etl.FixedWidth` meter and read throughput/duration metrics |
 | [SchemaBuilder](examples/SchemaBuilder) | Define a layout in code with `FixedWidthSchemaBuilder<T>` instead of attributes |
 | [DataReader](examples/DataReader) | Expose a fixed-width source as an `IDataReader` for `SqlBulkCopy` / `DataTable` (no POCO per row) |
+| [BinaryRecords](examples/BinaryRecords) | Read/write fixed-length **binary** (mainframe) records with `COMP-3` / `COMP` fields |
 
 ---
 
