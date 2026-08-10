@@ -42,6 +42,7 @@
     <Project Path="examples/BasicLoading/BasicLoading.csproj" />
     <Project Path="examples/CompressedStreams/CompressedStreams.csproj" />
     <Project Path="examples/CustomParsersConverters/CustomParsersConverters.csproj" />
+    <Project Path="examples/DataReader/DataReader.csproj" />
     <Project Path="examples/ErrorHandling/ErrorHandling.csproj" />
     <Project Path="examples/FieldDelimiter/FieldDelimiter.csproj" />
     <Project Path="examples/HeadersAndSeparators/HeadersAndSeparators.csproj" />

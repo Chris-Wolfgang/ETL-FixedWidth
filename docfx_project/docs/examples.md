@@ -79,3 +79,9 @@ Subscribes to the `Wolfgang.Etl.FixedWidth` meter with a `MeterListener` and pri
 Defines a fixed-width layout in code with `FixedWidthSchemaBuilder<T>` for a record type that carries no `[FixedWidthField]` attributes, then uses it — via the extractor/loader `Schema` property — to load and re-extract records. Also shows that a code-built schema is fully introspectable (`ToDiagram` / `Fields`), exactly like an attribute-resolved one.
 
 [View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/SchemaBuilder)
+
+## DataReader
+
+Exposes a fixed-width source as a forward-only `IDataReader` via `FixedWidthDataReader<T>`, with the layout taken from `T`'s `[FixedWidthField]` attributes. It serves each field value directly from the parsed line — **no `T` is allocated per row** — then loads a `DataTable` through `DataTable.Load` (no database required). In production the same reader flows straight into `SqlBulkCopy.WriteToServerAsync`, the zero-per-row-allocation path for bulk-loading a database.
+
+[View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/DataReader)
