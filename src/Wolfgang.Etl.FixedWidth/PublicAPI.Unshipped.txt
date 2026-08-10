@@ -47,3 +47,19 @@ Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.SkipItemCount.get -> long
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.SkipItemCount.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.this[int i].get -> object
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.this[string name].get -> object
+Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute
+Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.ByteLength.get -> int
+Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.FixedWidthBinaryFieldAttribute(int index, int byteLength, Wolfgang.Etl.FixedWidth.Enums.BinaryFieldType type) -> void
+Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Index.get -> int
+Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Scale.get -> int
+Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Scale.set -> void
+Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Signed.get -> bool
+Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Signed.set -> void
+Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Type.get -> Wolfgang.Etl.FixedWidth.Enums.BinaryFieldType
+Wolfgang.Etl.FixedWidth.Enums.BinaryFieldType
+Wolfgang.Etl.FixedWidth.Enums.BinaryFieldType.Binary = 2 -> Wolfgang.Etl.FixedWidth.Enums.BinaryFieldType
+Wolfgang.Etl.FixedWidth.Enums.BinaryFieldType.PackedDecimal = 1 -> Wolfgang.Etl.FixedWidth.Enums.BinaryFieldType
+Wolfgang.Etl.FixedWidth.Enums.BinaryFieldType.Text = 0 -> Wolfgang.Etl.FixedWidth.Enums.BinaryFieldType
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>.FixedWidthBinaryExtractor(System.IO.Stream stream, System.Text.Encoding encoding = null) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>.RecordByteLength.get -> int
