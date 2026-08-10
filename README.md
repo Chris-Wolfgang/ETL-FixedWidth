@@ -319,7 +319,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 
 **Examples:**
 
-The [examples/](examples/) folder contains 13 runnable console projects demonstrating each feature:
+The [examples/](examples/) folder contains 14 runnable console projects demonstrating each feature:
 
 | Example | Description |
 |---------|-------------|
