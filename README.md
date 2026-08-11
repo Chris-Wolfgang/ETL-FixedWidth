@@ -255,6 +255,15 @@ await foreach (var record in extractor.ExtractAsync(token))
 
 Each record type keeps its own independent `[FixedWidthField]` layout. A line that matches no rule throws by default; set `UnmatchedLineHandling = UnmatchedLineHandling.Skip` to drop it, or register a catch-all type with `.Otherwise(typeof(UnknownRecord))`. Blank lines are skipped before predicates run (so a discriminator can index the line safely), and the extractor shares the family's `HeaderLineCount`, `FieldDelimiter`, `ValueParser`, `SkipItemCount`/`MaximumItemCount`, dead-letter `OnError`, and progress reporting.
 
+**Trailer record-count validation** falls out of this naturally: capture the trailer as it streams past, count the details, and compare — no extra API needed.
+
+```csharp
+if (trailer.RecordCount != detailCount)
+    throw new InvalidDataException($"Trailer says {trailer.RecordCount}, file has {detailCount}.");
+```
+
+See the [MultiRecordTrailer](examples/MultiRecordTrailer) example for a runnable header/detail/trailer walk-through that checks both the record count and a control total.
+
 ### Composing an ETL pipeline
 
 Rather than wiring an extractor, transformer, and loader together by hand, the whole extract → transform → load flow can be expressed as one fluent chain on the generic `EtlPipeline` (from `Wolfgang.Etl.Abstractions` 0.16.0). `FixedWidthExtractor<T>` source factories hang off `EtlPipeline.Create()` and `FixedWidthLoader<T>` sink terminators hang off the pipeline, with the extractor/loader configuration exposed as inline setters:
@@ -343,7 +352,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 
 **Examples:**
 
-The [examples/](examples/) folder contains 14 runnable console projects demonstrating each feature:
+The [examples/](examples/) folder contains 15 runnable console projects demonstrating each feature:
 
 | Example | Description |
 |---------|-------------|
@@ -361,6 +370,7 @@ The [examples/](examples/) folder contains 14 runnable console projects demonstr
 | [Metrics](examples/Metrics) | Subscribe to the `Wolfgang.Etl.FixedWidth` meter and read throughput/duration metrics |
 | [SchemaBuilder](examples/SchemaBuilder) | Define a layout in code with `FixedWidthSchemaBuilder<T>` instead of attributes |
 | [DataReader](examples/DataReader) | Expose a fixed-width source as an `IDataReader` for `SqlBulkCopy` / `DataTable` (no POCO per row) |
+| [MultiRecordTrailer](examples/MultiRecordTrailer) | Route header/detail/trailer records with `FixedWidthMultiExtractor` and validate the trailer's record count and control total |
 
 ---
 
