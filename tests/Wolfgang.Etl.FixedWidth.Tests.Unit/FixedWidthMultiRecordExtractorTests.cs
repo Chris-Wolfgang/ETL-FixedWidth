@@ -14,10 +14,10 @@ using Xunit;
 namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 
 /// <summary>
-/// Covers <see cref="FixedWidthMultiExtractor"/> (#19) — routing a file of interleaved record
+/// Covers <see cref="FixedWidthMultiRecordExtractor"/> (#19) — routing a file of interleaved record
 /// types to different POCOs via discriminator predicates.
 /// </summary>
-public sealed class FixedWidthMultiExtractorTests
+public sealed class FixedWidthMultiRecordExtractorTests
 {
     [ExcludeFromCodeCoverage]
     private sealed class HeaderRecord
@@ -52,8 +52,8 @@ public sealed class FixedWidthMultiExtractorTests
         "T00000002\n";
 
 
-    private static FixedWidthMultiExtractor NewExtractor(string content)
-        => new FixedWidthMultiExtractor(new StringReader(content))
+    private static FixedWidthMultiRecordExtractor NewExtractor(string content)
+        => new FixedWidthMultiRecordExtractor(new StringReader(content))
             .When(l => l[0] == 'H', typeof(HeaderRecord))
             .When(l => l[0] == 'D', typeof(DetailRecord))
             .When(l => l[0] == 'T', typeof(TrailerRecord));
@@ -83,7 +83,7 @@ public sealed class FixedWidthMultiExtractorTests
     public async Task First_matching_rule_wins()
     {
         // Both rules match a 'D' line; the first registered rule (HeaderRecord) must win.
-        using var extractor = new FixedWidthMultiExtractor(new StringReader("D00000001John Smith\n"))
+        using var extractor = new FixedWidthMultiRecordExtractor(new StringReader("D00000001John Smith\n"))
             .When(l => l[0] == 'D', typeof(HeaderRecord))
             .When(l => l[0] == 'D', typeof(DetailRecord));
 
@@ -96,7 +96,7 @@ public sealed class FixedWidthMultiExtractorTests
     [Fact]
     public async Task Otherwise_routes_unmatched_lines_to_the_fallback_type()
     {
-        using var extractor = new FixedWidthMultiExtractor(new StringReader("D00000001John Smith\nX........ ........\n"))
+        using var extractor = new FixedWidthMultiRecordExtractor(new StringReader("D00000001John Smith\nX........ ........\n"))
             .When(l => l[0] == 'D', typeof(DetailRecord))
             .Otherwise(typeof(HeaderRecord));
 
@@ -110,7 +110,7 @@ public sealed class FixedWidthMultiExtractorTests
     [Fact]
     public async Task Unmatched_line_throws_InvalidDataException_by_default()
     {
-        using var extractor = new FixedWidthMultiExtractor(new StringReader("Z-unknown\n"))
+        using var extractor = new FixedWidthMultiRecordExtractor(new StringReader("Z-unknown\n"))
             .When(l => l[0] == 'D', typeof(DetailRecord));
 
         await Assert.ThrowsAsync<InvalidDataException>(async () =>
@@ -121,7 +121,7 @@ public sealed class FixedWidthMultiExtractorTests
     [Fact]
     public async Task Unmatched_line_skipped_when_configured()
     {
-        using var extractor = new FixedWidthMultiExtractor(new StringReader("D00000001John Smith\nZ-unknown\n"))
+        using var extractor = new FixedWidthMultiRecordExtractor(new StringReader("D00000001John Smith\nZ-unknown\n"))
         {
             UnmatchedLineHandling = UnmatchedLineHandling.Skip,
         };
@@ -150,7 +150,7 @@ public sealed class FixedWidthMultiExtractorTests
     [Fact]
     public async Task Blank_line_is_unmatched_when_SkipBlankLines_is_false()
     {
-        using var extractor = new FixedWidthMultiExtractor(new StringReader("D00000001John Smith\n\n"))
+        using var extractor = new FixedWidthMultiRecordExtractor(new StringReader("D00000001John Smith\n\n"))
         {
             SkipBlankLines = false,
             UnmatchedLineHandling = UnmatchedLineHandling.Skip,
@@ -168,7 +168,7 @@ public sealed class FixedWidthMultiExtractorTests
     [Fact]
     public async Task Header_lines_are_skipped()
     {
-        using var extractor = new FixedWidthMultiExtractor(new StringReader("BANNER LINE\nD00000001John Smith\n"))
+        using var extractor = new FixedWidthMultiRecordExtractor(new StringReader("BANNER LINE\nD00000001John Smith\n"))
         {
             HasHeader = true,
         };
@@ -186,7 +186,7 @@ public sealed class FixedWidthMultiExtractorTests
     public async Task FieldDelimiter_is_honored()
     {
         // Detail with a "|" delimiter between the three columns.
-        using var extractor = new FixedWidthMultiExtractor(new StringReader("D|00000001|John Smith\n"))
+        using var extractor = new FixedWidthMultiRecordExtractor(new StringReader("D|00000001|John Smith\n"))
         {
             FieldDelimiter = "|",
         };
@@ -203,7 +203,7 @@ public sealed class FixedWidthMultiExtractorTests
     public async Task Malformed_matched_line_is_skipped_and_reported()
     {
         var errors = new List<FixedWidthError>();
-        using var extractor = new FixedWidthMultiExtractor(new StringReader("D001\nD00000002Jane Doe  \n"))
+        using var extractor = new FixedWidthMultiRecordExtractor(new StringReader("D001\nD00000002Jane Doe  \n"))
         {
             MalformedLineHandling = MalformedLineHandling.Skip,
             OnError = errors.Add,
@@ -224,7 +224,7 @@ public sealed class FixedWidthMultiExtractorTests
     public async Task Malformed_matched_line_throws_but_still_reports()
     {
         var errors = new List<FixedWidthError>();
-        using var extractor = new FixedWidthMultiExtractor(new StringReader("D001\n"))
+        using var extractor = new FixedWidthMultiRecordExtractor(new StringReader("D001\n"))
         {
             OnError = errors.Add,   // MalformedLineHandling defaults to ThrowException
         };
@@ -240,7 +240,7 @@ public sealed class FixedWidthMultiExtractorTests
     [Fact]
     public async Task ReturnDefault_malformed_handling_is_not_supported()
     {
-        using var extractor = new FixedWidthMultiExtractor(new StringReader("D001\n"))
+        using var extractor = new FixedWidthMultiRecordExtractor(new StringReader("D001\n"))
         {
             MalformedLineHandling = MalformedLineHandling.ReturnDefault,
         };
@@ -254,7 +254,7 @@ public sealed class FixedWidthMultiExtractorTests
     [Fact]
     public async Task No_rules_registered_throws()
     {
-        using var extractor = new FixedWidthMultiExtractor(new StringReader("D00000001John Smith\n"));
+        using var extractor = new FixedWidthMultiRecordExtractor(new StringReader("D00000001John Smith\n"));
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
@@ -280,17 +280,17 @@ public sealed class FixedWidthMultiExtractorTests
     [Fact]
     public void Constructor_validates_arguments()
     {
-        Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiExtractor((TextReader)null!));
-        Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiExtractor((Stream)null!));
-        Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiExtractor(new StringReader(""), (Microsoft.Extensions.Logging.ILogger<FixedWidthMultiExtractor>)null!));
-        Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiExtractor(new MemoryStream(), (Microsoft.Extensions.Logging.ILogger<FixedWidthMultiExtractor>)null!));
+        Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((TextReader)null!));
+        Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((Stream)null!));
+        Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor(new StringReader(""), (Microsoft.Extensions.Logging.ILogger<FixedWidthMultiRecordExtractor>)null!));
+        Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor(new MemoryStream(), (Microsoft.Extensions.Logging.ILogger<FixedWidthMultiRecordExtractor>)null!));
     }
 
 
     [Fact]
     public void When_and_Otherwise_validate_arguments()
     {
-        using var extractor = new FixedWidthMultiExtractor(new StringReader(""));
+        using var extractor = new FixedWidthMultiRecordExtractor(new StringReader(""));
 
         Assert.Throws<ArgumentNullException>(() => extractor.When(null!, typeof(DetailRecord)));
         Assert.Throws<ArgumentNullException>(() => extractor.When(_ => true, null!));
@@ -301,7 +301,7 @@ public sealed class FixedWidthMultiExtractorTests
     [Fact]
     public void Registering_a_type_with_a_duplicate_index_throws()
     {
-        using var extractor = new FixedWidthMultiExtractor(new StringReader(""));
+        using var extractor = new FixedWidthMultiRecordExtractor(new StringReader(""));
 
         Assert.Throws<InvalidOperationException>(() => extractor.When(_ => true, typeof(DuplicateIndex)));
     }
@@ -320,7 +320,7 @@ public sealed class FixedWidthMultiExtractorTests
     {
         var bytes = Encoding.UTF8.GetBytes(SampleFile);
         using var stream = new MemoryStream(bytes);
-        var extractor = new FixedWidthMultiExtractor(stream)
+        var extractor = new FixedWidthMultiRecordExtractor(stream)
             .When(l => l[0] == 'H', typeof(HeaderRecord))
             .When(l => l[0] == 'D', typeof(DetailRecord))
             .When(l => l[0] == 'T', typeof(TrailerRecord));
@@ -336,7 +336,7 @@ public sealed class FixedWidthMultiExtractorTests
     [Fact]
     public async Task Custom_ValueParser_is_applied()
     {
-        using var extractor = new FixedWidthMultiExtractor(new StringReader("D00000001John Smith\n"))
+        using var extractor = new FixedWidthMultiRecordExtractor(new StringReader("D00000001John Smith\n"))
         {
             ValueParser = (text, ctx) => string.Equals(ctx.PropertyName, nameof(DetailRecord.Name), StringComparison.Ordinal)
                 ? "OVERRIDDEN"
@@ -355,7 +355,7 @@ public sealed class FixedWidthMultiExtractorTests
     {
         var timer = new ManualProgressTimer();
         var sink = new CollectingProgress();
-        using var extractor = new FixedWidthMultiExtractor(new StringReader(SampleFile), timer)
+        using var extractor = new FixedWidthMultiRecordExtractor(new StringReader(SampleFile), timer)
             .When(l => l[0] == 'H', typeof(HeaderRecord))
             .When(l => l[0] == 'D', typeof(DetailRecord))
             .When(l => l[0] == 'T', typeof(TrailerRecord));
@@ -418,8 +418,8 @@ public sealed class FixedWidthMultiExtractorTests
     [Fact]
     public async Task Logging_constructor_emits_start_and_completion_logs()
     {
-        var logger = new CapturingLogger<FixedWidthMultiExtractor>();
-        using var extractor = new FixedWidthMultiExtractor(new StringReader(SampleFile), logger)
+        var logger = new CapturingLogger<FixedWidthMultiRecordExtractor>();
+        using var extractor = new FixedWidthMultiRecordExtractor(new StringReader(SampleFile), logger)
             .When(l => l[0] == 'H', typeof(HeaderRecord))
             .When(l => l[0] == 'D', typeof(DetailRecord))
             .Otherwise(typeof(TrailerRecord));   // fallback name is included in the start log
@@ -435,9 +435,9 @@ public sealed class FixedWidthMultiExtractorTests
     [Fact]
     public async Task Stream_logging_constructor_reads_records()
     {
-        var logger = new CapturingLogger<FixedWidthMultiExtractor>();
+        var logger = new CapturingLogger<FixedWidthMultiRecordExtractor>();
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(SampleFile));
-        using var extractor = new FixedWidthMultiExtractor(stream, logger)
+        using var extractor = new FixedWidthMultiRecordExtractor(stream, logger)
             .When(l => l[0] == 'H', typeof(HeaderRecord))
             .When(l => l[0] == 'D', typeof(DetailRecord))
             .When(l => l[0] == 'T', typeof(TrailerRecord));

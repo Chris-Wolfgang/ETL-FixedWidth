@@ -39,7 +39,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// </remarks>
 /// <example>
 /// <code>
-/// using var extractor = new FixedWidthMultiExtractor(reader)
+/// using var extractor = new FixedWidthMultiRecordExtractor(reader)
 ///     .When(line => line[0] == 'H', typeof(HeaderRecord))
 ///     .When(line => line[0] == 'D', typeof(DetailRecord))
 ///     .When(line => line[0] == 'T', typeof(TrailerRecord));
@@ -55,7 +55,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// }
 /// </code>
 /// </example>
-public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthReport>
+public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, FixedWidthReport>
 {
     // ------------------------------------------------------------------
     // Fields
@@ -89,12 +89,12 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     // ------------------------------------------------------------------
 
     /// <summary>
-    /// Initializes a new <see cref="FixedWidthMultiExtractor"/> that reads from the specified
+    /// Initializes a new <see cref="FixedWidthMultiRecordExtractor"/> that reads from the specified
     /// <see cref="TextReader"/>. The caller owns the reader's lifetime.
     /// </summary>
     /// <param name="reader">The reader to pull fixed-width lines from.</param>
     /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <see langword="null"/>.</exception>
-    public FixedWidthMultiExtractor(TextReader reader)
+    public FixedWidthMultiRecordExtractor(TextReader reader)
     {
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
         _logger = NullLogger.Instance;
@@ -103,7 +103,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
 
 
     /// <summary>
-    /// Initializes a new <see cref="FixedWidthMultiExtractor"/> that reads from the specified
+    /// Initializes a new <see cref="FixedWidthMultiRecordExtractor"/> that reads from the specified
     /// <see cref="TextReader"/> with diagnostic logging.
     /// </summary>
     /// <param name="reader">The reader to pull fixed-width lines from.</param>
@@ -111,7 +111,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     /// <exception cref="ArgumentNullException">
     /// <paramref name="reader"/> or <paramref name="logger"/> is <see langword="null"/>.
     /// </exception>
-    public FixedWidthMultiExtractor(TextReader reader, ILogger<FixedWidthMultiExtractor> logger)
+    public FixedWidthMultiRecordExtractor(TextReader reader, ILogger<FixedWidthMultiRecordExtractor> logger)
     {
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -120,7 +120,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
 
 
     /// <summary>
-    /// Initializes a new <see cref="FixedWidthMultiExtractor"/> that reads from the specified
+    /// Initializes a new <see cref="FixedWidthMultiRecordExtractor"/> that reads from the specified
     /// <see cref="Stream"/> using an internal <see cref="StreamReader"/> with a 64&#160;KB buffer.
     /// The caller retains ownership of the stream.
     /// </summary>
@@ -130,7 +130,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     /// <see cref="Encoding.UTF8"/>.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    public FixedWidthMultiExtractor(Stream stream, Encoding? encoding = null)
+    public FixedWidthMultiRecordExtractor(Stream stream, Encoding? encoding = null)
     {
         _reader = CreateBufferedReader(stream, encoding);
         _ownsReader = true;
@@ -140,7 +140,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
 
 
     /// <summary>
-    /// Initializes a new <see cref="FixedWidthMultiExtractor"/> that reads from the specified
+    /// Initializes a new <see cref="FixedWidthMultiRecordExtractor"/> that reads from the specified
     /// <see cref="Stream"/> with diagnostic logging.
     /// </summary>
     /// <param name="stream">The readable source stream.</param>
@@ -152,7 +152,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     /// <exception cref="ArgumentNullException">
     /// <paramref name="stream"/> or <paramref name="logger"/> is <see langword="null"/>.
     /// </exception>
-    public FixedWidthMultiExtractor(Stream stream, ILogger<FixedWidthMultiExtractor> logger, Encoding? encoding = null)
+    public FixedWidthMultiRecordExtractor(Stream stream, ILogger<FixedWidthMultiRecordExtractor> logger, Encoding? encoding = null)
     {
         _reader = CreateBufferedReader(stream, encoding);
         _ownsReader = true;
@@ -162,7 +162,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
 
 
     // Test-only constructor that injects a deterministic progress timer.
-    internal FixedWidthMultiExtractor(TextReader reader, IProgressTimer timer)
+    internal FixedWidthMultiRecordExtractor(TextReader reader, IProgressTimer timer)
     {
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
@@ -209,7 +209,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     /// <paramref name="recordType"/> has an invalid layout (for example duplicate column indexes
     /// or a mapped property with no public setter).
     /// </exception>
-    public FixedWidthMultiExtractor When(Func<string, bool> predicate, Type recordType)
+    public FixedWidthMultiRecordExtractor When(Func<string, bool> predicate, Type recordType)
     {
         if (predicate == null)
         {
@@ -236,7 +236,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     /// <param name="recordType">The catch-all POCO type for unmatched lines.</param>
     /// <exception cref="ArgumentNullException"><paramref name="recordType"/> is <see langword="null"/>.</exception>
     /// <exception cref="InvalidOperationException"><paramref name="recordType"/> has an invalid layout.</exception>
-    public FixedWidthMultiExtractor Otherwise(Type recordType)
+    public FixedWidthMultiRecordExtractor Otherwise(Type recordType)
     {
         if (recordType == null)
         {
@@ -437,7 +437,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
             throw new InvalidOperationException
             (
                 $"{nameof(MalformedLineHandling)}.{nameof(MalformedLineHandling.ReturnDefault)} is not " +
-                $"supported by {nameof(FixedWidthMultiExtractor)} — the substitute record type is ambiguous."
+                $"supported by {nameof(FixedWidthMultiRecordExtractor)} — the substitute record type is ambiguous."
             );
         }
 

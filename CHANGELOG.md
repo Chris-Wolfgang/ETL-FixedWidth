@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   per row. Supports the extractor's configuration (`HeaderLineCount`,
   `SkipItemCount`, `MaximumItemCount`, `BlankLineHandling`, `MalformedLineHandling`,
   `FieldDelimiter`), typed accessors, and `GetSchemaTable()` ([#26]).
-- `FixedWidthMultiExtractor` — reads a file that interleaves **multiple record types**
+- `FixedWidthMultiRecordExtractor` — reads a file that interleaves **multiple record types**
   (a mainframe header/detail/trailer batch, for example) and yields each line as the
   concrete POCO it maps to. Register one rule per type with
   `.When(line => line[0] == 'D', typeof(DetailRecord))`; the first matching predicate

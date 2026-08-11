@@ -1,7 +1,7 @@
 namespace Wolfgang.Etl.FixedWidth.Enums;
 
 /// <summary>
-/// Controls what a <see cref="FixedWidthMultiExtractor"/> does with a data line that no
+/// Controls what a <see cref="FixedWidthMultiRecordExtractor"/> does with a data line that no
 /// registered <c>When</c> predicate matches and for which no <c>Otherwise</c> fallback
 /// record type has been registered (#19).
 /// </summary>
