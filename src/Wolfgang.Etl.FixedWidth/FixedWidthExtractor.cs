@@ -567,6 +567,15 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// constructor; a caller-owned <see cref="TextReader"/> has no addressable byte stream. Setting
     /// <see cref="StartByteOffset"/> to a non-zero value enables tracking implicitly.
     /// </summary>
+    /// <remarks>
+    /// Byte offsets are computed with the encoding passed to the <see cref="Stream"/> constructor
+    /// (<see cref="Encoding.UTF8"/> by default), so tracking assumes the stream is actually encoded
+    /// that way. A byte-order mark that would switch the internal <see cref="StreamReader"/> to a
+    /// <em>different</em> encoding (for example a UTF-16 BOM when UTF-8 was specified) is not
+    /// supported for tracking and would yield incorrect offsets — pass the stream's real encoding to
+    /// the constructor when enabling tracking. A matching-encoding BOM (e.g. a UTF-8 BOM with the
+    /// default encoding) is handled correctly.
+    /// </remarks>
     public bool TrackByteOffset { get; set; }
 
 
@@ -1240,13 +1249,6 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     // ------------------------------------------------------------------
 
     /// <summary>
-    /// Resolves the field map to use: the caller-supplied <see cref="Schema"/> when set, otherwise the
-    /// attribute-derived layout for <typeparamref name="TRecord"/>.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">
-    /// <see cref="Schema"/> is set but describes a different record type.
-    /// </exception>
-    /// <summary>
     /// Sets up the reader used for this extraction. When byte-offset tracking is off, returns the
     /// plain reader (the hot path is unchanged). When on, wraps it in a <see cref="ByteCountingLineReader"/>,
     /// seeking the stream first for a resume and accounting for any byte-order-mark preamble on a fresh run.
@@ -1336,6 +1338,13 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
 
 
+    /// <summary>
+    /// Resolves the field map to use: the caller-supplied <see cref="Schema"/> when set, otherwise the
+    /// attribute-derived layout for <typeparamref name="TRecord"/>.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// <see cref="Schema"/> is set but describes a different record type.
+    /// </exception>
     private FieldMapResult ResolveFieldMap()
     {
         if (Schema is null)

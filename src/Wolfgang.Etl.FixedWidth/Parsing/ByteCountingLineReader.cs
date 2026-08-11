@@ -43,10 +43,16 @@ internal sealed class ByteCountingLineReader : TextReader
     /// </param>
     /// <param name="bufferSize">The character read-ahead buffer size.</param>
     /// <exception cref="ArgumentNullException"><paramref name="inner"/> or <paramref name="encoding"/> is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="bufferSize"/> is not positive.</exception>
     public ByteCountingLineReader(TextReader inner, Encoding encoding, long initialByteOffset = 0, int bufferSize = 8192)
     {
         _inner = inner ?? throw new ArgumentNullException(nameof(inner));
         _encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
+        if (bufferSize <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(bufferSize), bufferSize, "Buffer size must be greater than zero.");
+        }
+
         _buffer = new char[bufferSize];
         _bytesConsumed = initialByteOffset;
         _lfBytes = encoding.GetByteCount("\n");

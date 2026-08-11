@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -114,6 +115,13 @@ public sealed class ByteCountingLineReaderTests
         var (actual, _) = ReadAll(input, Encoding.ASCII, bufferSize: 4);
 
         Assert.Equal(expected, actual);
+    }
+
+
+    [Fact]
+    public void Rejects_a_non_positive_buffer_size()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new ByteCountingLineReader(new StringReader(string.Empty), Encoding.ASCII, 0, 0));
     }
 
 
