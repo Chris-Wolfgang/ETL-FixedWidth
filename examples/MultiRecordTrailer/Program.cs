@@ -32,7 +32,9 @@ using var extractor = new FixedWidthMultiExtractor(new StringReader(file))
 
 var detailCount = 0L;
 var runningTotal = 0L;
-TrailerRecord? trailer = null;
+var sawTrailer = false;
+var trailerRecordCount = 0L;
+var trailerTotal = 0L;
 
 await foreach (var record in extractor.ExtractAsync(CancellationToken.None))
 {
@@ -49,7 +51,9 @@ await foreach (var record in extractor.ExtractAsync(CancellationToken.None))
             break;
 
         case TrailerRecord t:
-            trailer = t;
+            sawTrailer = true;
+            trailerRecordCount = t.RecordCount;
+            trailerTotal = t.Total;
             break;
     }
 }
@@ -57,13 +61,13 @@ await foreach (var record in extractor.ExtractAsync(CancellationToken.None))
 Console.WriteLine();
 
 // Integrity check: the trailer's declared counts must match what we actually read.
-if (trailer is null)
+if (!sawTrailer)
 {
     throw new InvalidDataException("File ended without a trailer record.");
 }
 
-ValidateCount("record count", trailer.RecordCount, detailCount);
-ValidateCount("control total", trailer.Total, runningTotal);
+ValidateCount("record count", trailerRecordCount, detailCount);
+ValidateCount("control total", trailerTotal, runningTotal);
 
 Console.WriteLine($"Trailer OK: {detailCount} detail records totalling {Money(runningTotal)} match the trailer.");
 
