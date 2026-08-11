@@ -578,9 +578,9 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
 
     /// <summary>
     /// Parses <paramref name="line"/> into <paramref name="record"/> using the matched rule.
-    /// Returns <see langword="true"/> on success. On a parse failure, reports the line to
-    /// <see cref="OnError"/> and either skips (returns <see langword="false"/>) or re-throws,
-    /// per <see cref="MalformedLineHandling"/>.
+    /// Returns <see langword="true"/> on success. On a parse failure, routes the error through the
+    /// base per-item error policy (<see cref="OnItemError"/>), then either skips (returns
+    /// <see langword="false"/>) or re-throws, per <see cref="MalformedLineHandling"/>.
     /// </summary>
     private bool TryParseLine(string line, Rule rule, out object record)
     {
@@ -599,16 +599,39 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
         }
         catch (MalformedLineException ex)
         {
-            OnError?.Invoke(new FixedWidthError(_currentLineNumber, line, ex));
-
-            if (MalformedLineHandling == MalformedLineHandling.Skip)
+            // Route through the base per-item error policy (OnItemError, translated from
+            // MalformedLineHandling) so the failure is counted (CurrentErrorItemCount) and surfaced in
+            // the pipeline (ErrorItemCount) — matching FixedWidthExtractor. OnError is invoked from
+            // OnItemError, so the dead-letter sink still sees every failure.
+            if (HandleItemError(new ItemErrorContext(_currentLineNumber, ex, () => line)) == ItemErrorAction.Abort)
             {
-                IncrementRejectedItemCount();
-                return false;
+                throw;
             }
 
-            throw;
+            IncrementRejectedItemCount();
+            return false;
         }
+    }
+
+
+
+    /// <summary>
+    /// Translates <see cref="MalformedLineHandling"/> into the base per-item error policy and reports
+    /// the failure to the <see cref="OnError"/> dead-letter sink. <see cref="MalformedLineHandling.Skip"/>
+    /// maps to <see cref="ItemErrorAction.Skip"/>; <see cref="MalformedLineHandling.ThrowException"/>
+    /// (the default) maps to <see cref="ItemErrorAction.Abort"/>. <see cref="MalformedLineHandling.ReturnDefault"/>
+    /// is rejected up front, so it never reaches this hook.
+    /// </summary>
+    protected override ItemErrorAction OnItemError(ItemErrorContext context)
+    {
+        if (context != null)
+        {
+            OnError?.Invoke(new FixedWidthError(context.ItemNumber, context.RawContent?.Invoke(), context.Exception));
+        }
+
+        return MalformedLineHandling == MalformedLineHandling.Skip
+            ? ItemErrorAction.Skip
+            : ItemErrorAction.Abort;
     }
 
 
