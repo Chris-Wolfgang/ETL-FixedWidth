@@ -121,7 +121,7 @@ public sealed class FixedWidthBinaryExtractorTests
 
 
     [Fact]
-    public async Task ExtractAsync_when_token_already_cancelled_reads_nothing()
+    public async Task ExtractAsync_when_token_already_cancelled_throws_OperationCanceledException()
     {
         var data = Record("ACCT0001", 42, Balance1234_56);
         using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data));
