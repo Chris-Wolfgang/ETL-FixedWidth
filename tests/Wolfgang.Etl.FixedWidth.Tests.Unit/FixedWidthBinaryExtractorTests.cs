@@ -302,6 +302,74 @@ public sealed class FixedWidthBinaryExtractorTests
 
 
     [ExcludeFromCodeCoverage]
+    private sealed class UnsignedBig
+    {
+        [FixedWidthBinaryField(0, 8, BinaryFieldType.Binary, Signed = false)]
+        public ulong Value { get; set; }
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class SignedBig
+    {
+        [FixedWidthBinaryField(0, 8, BinaryFieldType.Binary, Signed = false)]
+        public long Value { get; set; }
+    }
+
+
+#pragma warning disable CS1998 // synchronous sample sequence
+    private static async System.Collections.Generic.IAsyncEnumerable<T> ToAsync<T>(System.Collections.Generic.IEnumerable<T> items)
+    {
+        foreach (var item in items)
+        {
+            yield return item;
+        }
+    }
+#pragma warning restore CS1998
+
+
+    [Fact]
+    public async Task Eight_byte_unsigned_field_maps_its_full_range_to_a_ulong_property()
+    {
+        var data = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };   // ulong.MaxValue
+        using var extractor = new FixedWidthBinaryExtractor<UnsignedBig>(new MemoryStream(data));
+
+        var record = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+
+        Assert.Equal(ulong.MaxValue, record.Value);
+    }
+
+
+    [Fact]
+    public async Task Eight_byte_unsigned_value_above_Int64_max_throws_for_a_long_property()
+    {
+        var data = new byte[] { 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };   // 2^63, one past long.MaxValue
+
+        using var extractor = new FixedWidthBinaryExtractor<SignedBig>(new MemoryStream(data));
+
+        await Assert.ThrowsAnyAsync<OverflowException>(async () =>
+            await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+    }
+
+
+    [Fact]
+    public async Task Unsigned_binary_value_round_trips_through_the_loader()
+    {
+        using var ms = new MemoryStream();
+        using (var loader = new FixedWidthBinaryLoader<UnsignedBig>(ms))
+        {
+            await loader.LoadAsync(ToAsync(new[] { new UnsignedBig { Value = ulong.MaxValue } }), CancellationToken.None);
+        }
+
+        ms.Position = 0;
+        using var extractor = new FixedWidthBinaryExtractor<UnsignedBig>(ms);
+        var read = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+
+        Assert.Equal(ulong.MaxValue, read.Value);
+    }
+
+
+    [ExcludeFromCodeCoverage]
     private sealed class ManualProgressTimer : IProgressTimer
     {
         private Action? _elapsed;

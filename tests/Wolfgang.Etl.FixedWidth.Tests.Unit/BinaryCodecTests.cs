@@ -101,6 +101,46 @@ public sealed class BinaryCodecTests
     }
 
 
+    // -------------------- COMP unsigned (full 0..2^64-1 range) --------------------
+
+    [Theory]
+    [InlineData("FFFFFFFFFFFFFFFF", 18446744073709551615UL)]   // ulong.MaxValue — 8 bytes, high bit set
+    [InlineData("8000000000000000", 9223372036854775808UL)]    // 2^63 exactly (one past long.MaxValue)
+    [InlineData("00000000000000FF", 255UL)]
+    [InlineData("0100", 256UL)]                                  // big-endian
+    public void BinaryInteger_DecodeUnsigned_reads_the_full_ulong_range(string hex, ulong expected)
+    {
+        if (hex is null)
+        {
+            throw new ArgumentNullException(nameof(hex));
+        }
+
+        Assert.Equal(expected, BinaryInteger.DecodeUnsigned(Hex(hex)));
+    }
+
+
+    [Theory]
+    [InlineData(18446744073709551615UL, 8)]   // ulong.MaxValue
+    [InlineData(9223372036854775808UL, 8)]    // 2^63
+    [InlineData(65413UL, 2)]
+    [InlineData(255UL, 1)]
+    public void BinaryInteger_EncodeUnsigned_round_trips(ulong value, int byteLength)
+    {
+        var buffer = new byte[byteLength];
+        BinaryInteger.EncodeUnsigned(value, buffer);
+
+        Assert.Equal(value, BinaryInteger.DecodeUnsigned(buffer));
+    }
+
+
+    [Fact]
+    public void BinaryInteger_EncodeUnsigned_overflows_when_too_wide_for_the_field()
+    {
+        Assert.Throws<OverflowException>(() => BinaryInteger.EncodeUnsigned(256, new byte[1]));   // max 255
+        Assert.Throws<ArgumentException>(() => BinaryInteger.EncodeUnsigned(1, new byte[9]));
+    }
+
+
     // -------------------- encode round-trips --------------------
 
     [Theory]

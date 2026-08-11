@@ -59,7 +59,12 @@ internal sealed class BinaryFieldDescriptor
                 return Coerce(PackedDecimal.Decode(new ReadOnlySpan<byte>(record, ByteOffset, length), Attribute.Scale));
 
             case BinaryFieldType.Binary:
-                return Coerce(BinaryInteger.Decode(new ReadOnlySpan<byte>(record, ByteOffset, length), Attribute.Signed));
+                // Decode signed fields as long and unsigned fields as ulong, so an 8-byte unsigned
+                // value above long.MaxValue keeps its magnitude. Coerce then converts to the property
+                // type — a value that doesn't fit a signed target overflows (throws) via Convert.ChangeType.
+                return Attribute.Signed
+                    ? Coerce(BinaryInteger.Decode(new ReadOnlySpan<byte>(record, ByteOffset, length)))
+                    : Coerce(BinaryInteger.DecodeUnsigned(new ReadOnlySpan<byte>(record, ByteOffset, length)));
 
             default:
                 throw new InvalidOperationException($"Unknown {nameof(BinaryFieldType)} '{Attribute.Type}'.");
@@ -96,7 +101,15 @@ internal sealed class BinaryFieldDescriptor
                 break;
 
             case BinaryFieldType.Binary:
-                BinaryInteger.Encode(Convert.ToInt64(value, CultureInfo.InvariantCulture), Attribute.Signed, span);
+                if (Attribute.Signed)
+                {
+                    BinaryInteger.Encode(Convert.ToInt64(value, CultureInfo.InvariantCulture), signed: true, span);
+                }
+                else
+                {
+                    BinaryInteger.EncodeUnsigned(Convert.ToUInt64(value, CultureInfo.InvariantCulture), span);
+                }
+
                 break;
 
             default:

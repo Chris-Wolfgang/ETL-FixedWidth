@@ -20,17 +20,7 @@ internal static class BinaryInteger
     /// <exception cref="ArgumentException"><paramref name="bytes"/> is empty or longer than 8 bytes.</exception>
     internal static long Decode(ReadOnlySpan<byte> bytes, bool signed = true)
     {
-        if (bytes.Length is < 1 or > 8)
-        {
-            throw new ArgumentException("A binary integer field must be 1–8 bytes.", nameof(bytes));
-        }
-
-        ulong magnitude = 0;
-        foreach (var b in bytes)
-        {
-            magnitude = (magnitude << 8) | b;
-        }
-
+        var magnitude = DecodeUnsigned(bytes);
         var bits = bytes.Length * 8;
 
         if (signed && bits < 64)
@@ -44,6 +34,34 @@ internal static class BinaryInteger
         }
 
         return unchecked((long)magnitude);
+    }
+
+
+    /// <summary>
+    /// Decodes a big-endian binary integer as an <b>unsigned</b> magnitude. Unlike
+    /// <see cref="Decode"/> (which returns <see cref="long"/>), this preserves the full 0…2⁶⁴−1
+    /// range, so an 8-byte <c>COMP</c> field with the high bit set is not misread as a negative
+    /// value. The caller converts the result to the target property type — a value above
+    /// <see cref="long.MaxValue"/> landing in a signed property then overflows (throws) rather than
+    /// wrapping to a negative number.
+    /// </summary>
+    /// <param name="bytes">The raw bytes, most-significant first (1–8 bytes).</param>
+    /// <returns>The decoded unsigned value.</returns>
+    /// <exception cref="ArgumentException"><paramref name="bytes"/> is empty or longer than 8 bytes.</exception>
+    internal static ulong DecodeUnsigned(ReadOnlySpan<byte> bytes)
+    {
+        if (bytes.Length is < 1 or > 8)
+        {
+            throw new ArgumentException("A binary integer field must be 1–8 bytes.", nameof(bytes));
+        }
+
+        ulong magnitude = 0;
+        foreach (var b in bytes)
+        {
+            magnitude = (magnitude << 8) | b;
+        }
+
+        return magnitude;
     }
 
 
@@ -76,6 +94,38 @@ internal static class BinaryInteger
             bits >>= 8;
         }
     }
+
+    /// <summary>
+    /// Encodes an <b>unsigned</b> <paramref name="value"/> as a big-endian binary integer into
+    /// <paramref name="destination"/> (1–8 bytes). The counterpart to <see cref="DecodeUnsigned"/>,
+    /// this writes the full 0…2⁶⁴−1 range so an 8-byte value above <see cref="long.MaxValue"/>
+    /// round-trips correctly.
+    /// </summary>
+    /// <param name="value">The unsigned value to encode.</param>
+    /// <param name="destination">The field bytes to write.</param>
+    /// <exception cref="ArgumentException"><paramref name="destination"/> is empty or longer than 8 bytes.</exception>
+    /// <exception cref="OverflowException">The value does not fit in the field width.</exception>
+    internal static void EncodeUnsigned(ulong value, Span<byte> destination)
+    {
+        var byteLength = destination.Length;
+        if (byteLength is < 1 or > 8)
+        {
+            throw new ArgumentException("A binary integer field must be 1–8 bytes.", nameof(destination));
+        }
+
+        if (byteLength < 8 && value > (1UL << (byteLength * 8)) - 1)
+        {
+            throw new OverflowException($"Value {value} does not fit in a {byteLength}-byte unsigned binary field.");
+        }
+
+        var bits = value;
+        for (var i = byteLength - 1; i >= 0; i--)
+        {
+            destination[i] = (byte)(bits & 0xFF);
+            bits >>= 8;
+        }
+    }
+
 
     private static bool FitsInField(long value, int byteLength, bool signed)
     {
