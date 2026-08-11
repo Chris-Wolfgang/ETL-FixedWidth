@@ -1,13 +1,13 @@
 #nullable enable
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.BlankLineHandling.get -> Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling
-Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.BlankLineHandling.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.BlankLineHandling.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.Close() -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.Depth.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.Dispose() -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FieldCount.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FieldDelimiter.get -> string?
-Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FieldDelimiter.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FieldDelimiter.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FixedWidthDataReader(System.IO.Stream stream, System.Text.Encoding encoding = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FixedWidthDataReader(System.IO.TextReader reader) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.GetBoolean(int i) -> bool
@@ -33,18 +33,18 @@ Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.GetString(int i) -> string
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.GetValue(int i) -> object
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.GetValues(object[] values) -> int
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.HeaderLineCount.get -> int
-Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.HeaderLineCount.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.HeaderLineCount.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.IsClosed.get -> bool
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.IsDBNull(int i) -> bool
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.MalformedLineHandling.get -> Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling
-Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.MalformedLineHandling.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.MalformedLineHandling.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.MaximumItemCount.get -> long
-Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.MaximumItemCount.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.MaximumItemCount.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.NextResult() -> bool
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.Read() -> bool
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.RecordsAffected.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.SkipItemCount.get -> long
-Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.SkipItemCount.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.SkipItemCount.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.this[int i].get -> object
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.this[string name].get -> object
 Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling

@@ -95,22 +95,22 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     // ------------------------------------------------------------------
 
     /// <summary>The number of leading lines to treat as a header and skip. Default 0.</summary>
-    public int HeaderLineCount { get; set; }
+    public int HeaderLineCount { get; init; }
 
     /// <summary>The number of data rows to skip before the first row is served. Default 0.</summary>
-    public long SkipItemCount { get; set; }
+    public long SkipItemCount { get; init; }
 
     /// <summary>The maximum number of data rows to serve. Default <see cref="long.MaxValue"/>.</summary>
-    public long MaximumItemCount { get; set; } = long.MaxValue;
+    public long MaximumItemCount { get; init; } = long.MaxValue;
 
     /// <summary>How blank lines are handled. Default <see cref="BlankLineHandling.ThrowException"/>.</summary>
-    public BlankLineHandling BlankLineHandling { get; set; } = BlankLineHandling.ThrowException;
+    public BlankLineHandling BlankLineHandling { get; init; } = BlankLineHandling.ThrowException;
 
     /// <summary>How malformed lines are handled. Default <see cref="MalformedLineHandling.ThrowException"/>.</summary>
-    public MalformedLineHandling MalformedLineHandling { get; set; } = MalformedLineHandling.ThrowException;
+    public MalformedLineHandling MalformedLineHandling { get; init; } = MalformedLineHandling.ThrowException;
 
     /// <summary>The inter-field delimiter used when the file was written, or <see langword="null"/> for none.</summary>
-    public string? FieldDelimiter { get; set; }
+    public string? FieldDelimiter { get; init; }
 
 
 
