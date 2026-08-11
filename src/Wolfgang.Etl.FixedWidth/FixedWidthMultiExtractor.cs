@@ -1,0 +1,636 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.FixedWidth.Enums;
+using Wolfgang.Etl.FixedWidth.Exceptions;
+using Wolfgang.Etl.FixedWidth.Parsing;
+
+namespace Wolfgang.Etl.FixedWidth;
+
+/// <summary>
+/// Reads a fixed-width file that interleaves <b>multiple record types</b> — for example a
+/// mainframe batch file with a header, detail, and trailer layout on different lines — and
+/// yields each line as the <see cref="object"/> it maps to (#19).
+/// </summary>
+/// <remarks>
+/// <para>
+/// Register one rule per record type with <see cref="When"/>: a predicate over the raw line
+/// (typically a discriminator character such as <c>line[0] == 'D'</c>) and the POCO type to
+/// materialize when it matches. Rules are evaluated in registration order — the first match
+/// wins. A line that matches no rule is handled per <see cref="UnmatchedLineHandling"/>, unless
+/// a fallback type was registered with <see cref="Otherwise"/>.
+/// </para>
+/// <para>
+/// Each record type keeps its own independent <c>[FixedWidthField]</c> layout. The yielded
+/// records are the concrete types you registered — pattern-match on them at the call site.
+/// </para>
+/// <para>
+/// Ownership semantics match <see cref="FixedWidthExtractor{TRecord}"/>: a caller-supplied
+/// <see cref="TextReader"/> is not disposed; a <see cref="Stream"/> is wrapped in an internal
+/// 64&#160;KB <see cref="StreamReader"/> that <see cref="System.IDisposable.Dispose"/> releases
+/// while the stream itself stays open.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// using var extractor = new FixedWidthMultiExtractor(reader)
+///     .When(line => line[0] == 'H', typeof(HeaderRecord))
+///     .When(line => line[0] == 'D', typeof(DetailRecord))
+///     .When(line => line[0] == 'T', typeof(TrailerRecord));
+///
+/// await foreach (var record in extractor.ExtractAsync(token))
+/// {
+///     switch (record)
+///     {
+///         case HeaderRecord h: /* ... */ break;
+///         case DetailRecord d: /* ... */ break;
+///         case TrailerRecord t: /* ... */ break;
+///     }
+/// }
+/// </code>
+/// </example>
+public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthReport>
+{
+    // ------------------------------------------------------------------
+    // Fields
+    // ------------------------------------------------------------------
+
+    /// <summary>
+    /// Default buffer size used when constructing a <see cref="StreamReader"/> from a
+    /// <see cref="Stream"/>. 64&#160;KB reduces syscall frequency compared to the
+    /// <see cref="StreamReader"/> default of 1&#160;KB.
+    /// </summary>
+    private const int DefaultBufferSize = 65536;
+
+    private readonly TextReader _reader;
+    private readonly bool _ownsReader;
+    private readonly ILogger _logger;
+    private readonly IProgressTimer? _progressTimer;
+    private readonly List<Rule> _rules = new();
+    private bool _progressTimerWired;
+    private Rule? _fallback;
+    private long _currentLineNumber;
+    private int _currentRejectedItemCount;
+    private int _currentFilteredLineCount;
+
+    // _currentLineNumber is read by CreateProgressReport on a Timer threadpool thread and
+    // written by ExtractWorkerAsync on the async continuation thread. Interlocked keeps the
+    // read/write atomic on all targets including 32-bit net462.
+
+
+    // ------------------------------------------------------------------
+    // Constructors
+    // ------------------------------------------------------------------
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthMultiExtractor"/> that reads from the specified
+    /// <see cref="TextReader"/>. The caller owns the reader's lifetime.
+    /// </summary>
+    /// <param name="reader">The reader to pull fixed-width lines from.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <see langword="null"/>.</exception>
+    public FixedWidthMultiExtractor(TextReader reader)
+    {
+        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
+        _logger = NullLogger.Instance;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthMultiExtractor"/> that reads from the specified
+    /// <see cref="TextReader"/> with diagnostic logging.
+    /// </summary>
+    /// <param name="reader">The reader to pull fixed-width lines from.</param>
+    /// <param name="logger">The logger for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="reader"/> or <paramref name="logger"/> is <see langword="null"/>.
+    /// </exception>
+    public FixedWidthMultiExtractor(TextReader reader, ILogger<FixedWidthMultiExtractor> logger)
+    {
+        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthMultiExtractor"/> that reads from the specified
+    /// <see cref="Stream"/> using an internal <see cref="StreamReader"/> with a 64&#160;KB buffer.
+    /// The caller retains ownership of the stream.
+    /// </summary>
+    /// <param name="stream">The readable source stream.</param>
+    /// <param name="encoding">
+    /// The encoding used to decode the stream. Pass <see langword="null"/> (the default) for
+    /// <see cref="Encoding.UTF8"/>.
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
+    public FixedWidthMultiExtractor(Stream stream, Encoding? encoding = null)
+    {
+        _reader = CreateBufferedReader(stream, encoding);
+        _ownsReader = true;
+        _logger = NullLogger.Instance;
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthMultiExtractor"/> that reads from the specified
+    /// <see cref="Stream"/> with diagnostic logging.
+    /// </summary>
+    /// <param name="stream">The readable source stream.</param>
+    /// <param name="logger">The logger for diagnostic output.</param>
+    /// <param name="encoding">
+    /// The encoding used to decode the stream. Pass <see langword="null"/> (the default) for
+    /// <see cref="Encoding.UTF8"/>.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="stream"/> or <paramref name="logger"/> is <see langword="null"/>.
+    /// </exception>
+    public FixedWidthMultiExtractor(Stream stream, ILogger<FixedWidthMultiExtractor> logger, Encoding? encoding = null)
+    {
+        _reader = CreateBufferedReader(stream, encoding);
+        _ownsReader = true;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+
+
+    // Test-only constructor that injects a deterministic progress timer.
+    internal FixedWidthMultiExtractor(TextReader reader, IProgressTimer timer)
+    {
+        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
+        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
+        _logger = NullLogger.Instance;
+    }
+
+
+
+    private static StreamReader CreateBufferedReader(Stream stream, Encoding? encoding)
+    {
+        if (stream == null)
+        {
+            throw new ArgumentNullException(nameof(stream));
+        }
+
+        return new StreamReader(stream, encoding ?? Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // Registration
+    // ------------------------------------------------------------------
+
+    /// <summary>
+    /// Registers a rule: when <paramref name="predicate"/> returns <see langword="true"/> for a
+    /// line, that line is parsed as <paramref name="recordType"/>. Rules are evaluated in the
+    /// order they are registered and the first match wins. Returns this extractor so calls can
+    /// be chained.
+    /// </summary>
+    /// <param name="predicate">
+    /// A discriminator over the raw line — for example <c>line =&gt; line[0] == 'D'</c>. Blank
+    /// lines are not passed to the predicate when <see cref="SkipBlankLines"/> is
+    /// <see langword="true"/> (the default), so a discriminator may index the line safely.
+    /// </param>
+    /// <param name="recordType">
+    /// The POCO type to materialize, decorated with <c>[FixedWidthField]</c> attributes and
+    /// having a public parameterless constructor.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="predicate"/> or <paramref name="recordType"/> is <see langword="null"/>.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    /// <paramref name="recordType"/> has an invalid layout (for example duplicate column indexes
+    /// or a mapped property with no public setter).
+    /// </exception>
+    public FixedWidthMultiExtractor When(Func<string, bool> predicate, Type recordType)
+    {
+        if (predicate == null)
+        {
+            throw new ArgumentNullException(nameof(predicate));
+        }
+
+        if (recordType == null)
+        {
+            throw new ArgumentNullException(nameof(recordType));
+        }
+
+        _rules.Add(new Rule(predicate, recordType, FieldMap.GetResult(recordType)));
+        return this;
+    }
+
+
+
+    /// <summary>
+    /// Registers a fallback record type for lines that match no <see cref="When"/> rule. When a
+    /// fallback is set it takes precedence over <see cref="UnmatchedLineHandling"/> — the
+    /// otherwise-unmatched line is parsed as <paramref name="recordType"/> instead of being
+    /// thrown or skipped. Returns this extractor so calls can be chained.
+    /// </summary>
+    /// <param name="recordType">The catch-all POCO type for unmatched lines.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="recordType"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException"><paramref name="recordType"/> has an invalid layout.</exception>
+    public FixedWidthMultiExtractor Otherwise(Type recordType)
+    {
+        if (recordType == null)
+        {
+            throw new ArgumentNullException(nameof(recordType));
+        }
+
+        _fallback = new Rule(_ => true, recordType, FieldMap.GetResult(recordType));
+        return this;
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // Properties
+    // ------------------------------------------------------------------
+
+    /// <summary>
+    /// What to do with a data line that matches no <see cref="When"/> rule and for which no
+    /// <see cref="Otherwise"/> fallback was registered. Defaults to
+    /// <see cref="UnmatchedLineHandling.ThrowException"/>.
+    /// </summary>
+    public UnmatchedLineHandling UnmatchedLineHandling { get; set; } = UnmatchedLineHandling.ThrowException;
+
+
+
+    /// <summary>
+    /// What to do when a matched line cannot be parsed into its record type — too short, or a
+    /// field value that will not convert. Defaults to
+    /// <see cref="MalformedLineHandling.ThrowException"/>; <see cref="MalformedLineHandling.Skip"/>
+    /// drops the line and continues. <see cref="MalformedLineHandling.ReturnDefault"/> is not
+    /// supported here (the substitute type would be ambiguous) and throws
+    /// <see cref="InvalidOperationException"/> if set.
+    /// </summary>
+    public MalformedLineHandling MalformedLineHandling { get; set; } = MalformedLineHandling.ThrowException;
+
+
+
+    /// <summary>
+    /// When <see langword="true"/> (the default), zero-length lines are skipped before any
+    /// predicate runs, so discriminators may index the line without guarding against empty
+    /// input. When <see langword="false"/>, a blank line is treated as an unmatched line.
+    /// </summary>
+    public bool SkipBlankLines { get; set; } = true;
+
+
+
+    /// <summary>
+    /// The number of header lines to skip at the start of the file before routing begins.
+    /// Defaults to 0. Use this only for banner lines that precede the record body; a leading
+    /// <c>H</c> record that you want to capture should be registered with <see cref="When"/>
+    /// instead.
+    /// </summary>
+    public int HeaderLineCount { get; set; }
+
+
+
+    /// <summary>
+    /// Convenience wrapper over <see cref="HeaderLineCount"/> — <see langword="true"/> maps to 1,
+    /// <see langword="false"/> to 0.
+    /// </summary>
+    public bool HasHeader
+    {
+        get => HeaderLineCount > 0;
+        set => HeaderLineCount = value ? 1 : 0;
+    }
+
+
+
+    /// <summary>
+    /// An optional delimiter present between columns in the source file, or <see langword="null"/>
+    /// (the default) for pure fixed-width input. Applies to every registered record type.
+    /// </summary>
+    public string? FieldDelimiter { get; set; }
+
+
+
+    /// <summary>
+    /// The value parser applied to every field of every record type. Defaults to
+    /// <see cref="FixedWidthConverter.DefaultParser"/>.
+    /// </summary>
+    public FixedWidthValueParser ValueParser { get; set; } = FixedWidthConverter.DefaultParser;
+
+
+
+    /// <summary>
+    /// An optional dead-letter sink invoked once for each line that fails to parse (#29). With
+    /// <see cref="MalformedLineHandling.Skip"/> the line is reported and dropped; with the default
+    /// <see cref="MalformedLineHandling.ThrowException"/> it is reported before the exception is
+    /// re-thrown.
+    /// </summary>
+    public Action<FixedWidthError>? OnError { get; set; }
+
+
+
+    /// <summary>
+    /// The 1-based physical line number of the line most recently read. Thread-safe so it may be
+    /// sampled from a progress timer thread.
+    /// </summary>
+    public long CurrentLineNumber => Interlocked.Read(ref _currentLineNumber);
+
+
+
+    /// <summary>
+    /// The number of matched lines dropped by <see cref="MalformedLineHandling.Skip"/>. Distinct
+    /// from the <c>SkipItemCount</c> pagination budget.
+    /// </summary>
+    public int CurrentRejectedItemCount => Volatile.Read(ref _currentRejectedItemCount);
+
+
+
+    /// <summary>
+    /// The number of physical lines read that produced no record and were not counted as skipped
+    /// or rejected: header lines, blank lines dropped by <see cref="SkipBlankLines"/>, and
+    /// unmatched lines dropped by <see cref="UnmatchedLineHandling.Skip"/>.
+    /// </summary>
+    public int CurrentFilteredLineCount => Volatile.Read(ref _currentFilteredLineCount);
+
+
+
+    // ------------------------------------------------------------------
+    // ExtractorBase overrides
+    // ------------------------------------------------------------------
+
+    /// <inheritdoc/>
+    protected override FixedWidthReport CreateProgressReport()
+    {
+        return new FixedWidthReport
+        (
+            CurrentItemCount,
+            CurrentSkippedItemCount,
+            CurrentRejectedItemCount,
+            CurrentFilteredLineCount,
+            Interlocked.Read(ref _currentLineNumber)
+        );
+    }
+
+
+
+    /// <inheritdoc/>
+    protected override IProgressTimer CreateProgressTimer(IProgress<FixedWidthReport> progress)
+    {
+        if (_progressTimer != null)
+        {
+            if (!_progressTimerWired)
+            {
+                _progressTimerWired = true;
+                _progressTimer.Elapsed += () => progress.Report(CreateProgressReport());
+            }
+
+            return _progressTimer;
+        }
+
+        return base.CreateProgressTimer(progress);
+    }
+
+
+
+    /// <inheritdoc/>
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing && _ownsReader)
+        {
+            _reader.Dispose();
+        }
+
+        base.Dispose(disposing);
+    }
+
+
+
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
+    /// <inheritdoc/>
+#pragma warning disable MA0051 // async iterator methods cannot delegate 'yield return' to sub-methods
+#pragma warning disable CS1998 // async method lacks 'await' — intentionally synchronous; see comment below
+    protected override async IAsyncEnumerable<object> ExtractWorkerAsync([EnumeratorCancellation] CancellationToken token)
+#else
+    /// <inheritdoc/>
+#pragma warning disable MA0051
+#pragma warning disable CS1998
+    protected override async IAsyncEnumerable<object> ExtractWorkerAsync([System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
+#endif
+#pragma warning restore CS1998
+#pragma warning restore MA0051
+    {
+        // Synchronous ReadLine — the TextReader/StreamReader buffers internally, so async I/O
+        // adds state-machine cost without benefit for file- and memory-based sources.
+        if (_rules.Count == 0 && _fallback == null)
+        {
+            throw new InvalidOperationException
+            (
+                "No record-type rules registered. Call When(...) at least once (or Otherwise(...)) " +
+                "before extracting."
+            );
+        }
+
+        if (MalformedLineHandling == MalformedLineHandling.ReturnDefault)
+        {
+            throw new InvalidOperationException
+            (
+                $"{nameof(MalformedLineHandling)}.{nameof(MalformedLineHandling.ReturnDefault)} is not " +
+                $"supported by {nameof(FixedWidthMultiExtractor)} — the substitute record type is ambiguous."
+            );
+        }
+
+        long dataLinesSkipped = 0;
+
+        LogExtractionStarted();
+        token.ThrowIfCancellationRequested();
+
+        string? line;
+#pragma warning disable CA1849, VSTHRD103, S6966 // ReadLine is intentionally synchronous
+        while ((line = _reader.ReadLine()) != null)
+#pragma warning restore CA1849, VSTHRD103, S6966
+        {
+            token.ThrowIfCancellationRequested();
+
+            Interlocked.Increment(ref _currentLineNumber);
+
+            if (_currentLineNumber <= HeaderLineCount)
+            {
+                IncrementFilteredLineCount();
+                continue;
+            }
+
+            if (SkipBlankLines && line.Length == 0)
+            {
+                IncrementFilteredLineCount();
+                continue;
+            }
+
+            var rule = MatchRule(line);
+            if (rule == null)
+            {
+                if (UnmatchedLineHandling == UnmatchedLineHandling.Skip)
+                {
+                    IncrementFilteredLineCount();
+                    continue;
+                }
+
+                throw new InvalidDataException
+                (
+                    $"Line {_currentLineNumber} matched no registered record type: '{line}'."
+                );
+            }
+
+            if (dataLinesSkipped < SkipItemCount)
+            {
+                dataLinesSkipped++;
+                IncrementCurrentSkippedItemCount();
+                continue;
+            }
+
+            if (CurrentItemCount >= MaximumItemCount)
+            {
+                yield break;
+            }
+
+            if (!TryParseLine(line, rule, out var record))
+            {
+                continue;
+            }
+
+            IncrementCurrentItemCount();
+            yield return record;
+        }
+
+        LogExtractionCompleted();
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // Logging helpers
+    // ------------------------------------------------------------------
+
+    private void LogExtractionStarted()
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation
+            (
+                "Multi-record extraction started. Rules={RuleCount}, Fallback={Fallback}, " +
+                "HeaderLineCount={HeaderLineCount}, UnmatchedLineHandling={UnmatchedLineHandling}",
+                _rules.Count,
+                _fallback?.RecordType.Name ?? "(none)",
+                HeaderLineCount,
+                UnmatchedLineHandling
+            );
+        }
+    }
+
+
+
+    private void LogExtractionCompleted()
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation
+            (
+                "Multi-record extraction completed: {ItemCount} extracted, {SkippedCount} skipped, " +
+                "{RejectedCount} rejected, {LineCount} lines read",
+                CurrentItemCount,
+                CurrentSkippedItemCount,
+                CurrentRejectedItemCount,
+                Interlocked.Read(ref _currentLineNumber)
+            );
+        }
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // Private helpers
+    // ------------------------------------------------------------------
+
+    /// <summary>
+    /// Returns the first rule whose predicate matches <paramref name="line"/>, the registered
+    /// <see cref="Otherwise"/> fallback if none match, or <see langword="null"/> when neither
+    /// applies.
+    /// </summary>
+    private Rule? MatchRule(string line)
+    {
+        for (var i = 0; i < _rules.Count; i++)
+        {
+            if (_rules[i].Predicate(line))
+            {
+                return _rules[i];
+            }
+        }
+
+        return _fallback;
+    }
+
+
+
+    /// <summary>
+    /// Parses <paramref name="line"/> into <paramref name="record"/> using the matched rule.
+    /// Returns <see langword="true"/> on success. On a parse failure, reports the line to
+    /// <see cref="OnError"/> and either skips (returns <see langword="false"/>) or re-throws,
+    /// per <see cref="MalformedLineHandling"/>.
+    /// </summary>
+    private bool TryParseLine(string line, Rule rule, out object record)
+    {
+        record = null!;
+        try
+        {
+            record = FixedWidthLineParser.ParseLine<object>
+            (
+                line,
+                _currentLineNumber,
+                rule.Map,
+                FieldDelimiter,
+                ValueParser
+            );
+            return true;
+        }
+        catch (MalformedLineException ex)
+        {
+            OnError?.Invoke(new FixedWidthError(_currentLineNumber, line, ex));
+
+            if (MalformedLineHandling == MalformedLineHandling.Skip)
+            {
+                IncrementRejectedItemCount();
+                return false;
+            }
+
+            throw;
+        }
+    }
+
+
+
+    private void IncrementRejectedItemCount() => Interlocked.Increment(ref _currentRejectedItemCount);
+
+
+
+    private void IncrementFilteredLineCount() => Interlocked.Increment(ref _currentFilteredLineCount);
+
+
+
+    /// <summary>A registered discriminator rule: predicate, target type, and its resolved map.</summary>
+    private sealed class Rule
+    {
+        public Rule(Func<string, bool> predicate, Type recordType, FieldMapResult map)
+        {
+            Predicate = predicate;
+            RecordType = recordType;
+            Map = map;
+        }
+
+        public Func<string, bool> Predicate { get; }
+
+        public Type RecordType { get; }
+
+        public FieldMapResult Map { get; }
+    }
+}
