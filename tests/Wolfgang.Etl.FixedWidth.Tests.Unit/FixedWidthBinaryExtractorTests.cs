@@ -133,6 +133,48 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
+    [Fact]
+    public async Task ExtractAsync_cancelled_after_the_first_record_stops_iterating()
+    {
+        var data = Concat(Record("A", 1, Balance1234_56), Record("B", 2, Balance1234_56));
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data));
+        using var cts = new CancellationTokenSource();
+        var seen = 0;
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+        {
+            await foreach (var _ in extractor.ExtractAsync(cts.Token))
+            {
+                seen++;
+                cts.Cancel();   // the next iteration's in-loop guard must observe this
+            }
+        });
+
+        Assert.Equal(1, seen);
+    }
+
+
+    [Fact]
+    public async Task Extract_uses_the_supplied_encoding_for_text_fields()
+    {
+        // 0xE9 is 'é' in Latin-1 but decodes to '?' under the default ASCII encoding.
+        var record = new byte[17];
+        record[0] = 0xE9;
+        for (var i = 1; i < 8; i++)
+        {
+            record[i] = (byte)' ';
+        }
+
+        Balance1234_56.CopyTo(record, 12);   // a valid packed value so decoding the record succeeds
+        var latin1 = Encoding.GetEncoding("ISO-8859-1");
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(record), latin1);
+
+        var account = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+
+        Assert.Equal("é", account.AccountId);   // ASCII would have produced "?"
+    }
+
+
     [ExcludeFromCodeCoverage]
     private sealed class WriteOnlyStream : MemoryStream
     {
@@ -241,6 +283,21 @@ public sealed class FixedWidthBinaryExtractorTests
 
         Assert.NotEmpty(sink.Reports);
         Assert.Equal(2, (int)sink.Reports.Max(r => r.CurrentItemCount));
+        Assert.Equal(2, (int)sink.Reports.Max(r => r.CurrentLineNumber));   // record counter advances per record
+    }
+
+
+    [Fact]
+    public void Attribute_validates_arguments_and_defaults_signed_to_true()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new FixedWidthBinaryFieldAttribute(-1, 4, BinaryFieldType.Binary));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new FixedWidthBinaryFieldAttribute(0, 0, BinaryFieldType.Binary));
+
+        var attribute = new FixedWidthBinaryFieldAttribute(2, 4, BinaryFieldType.Binary);
+
+        Assert.True(attribute.Signed);   // signed defaults to true
+        Assert.Equal(2, attribute.Index);
+        Assert.Equal(4, attribute.ByteLength);
     }
 
 

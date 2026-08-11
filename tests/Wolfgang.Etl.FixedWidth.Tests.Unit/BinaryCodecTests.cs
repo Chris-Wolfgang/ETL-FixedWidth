@@ -161,6 +161,67 @@ public sealed class BinaryCodecTests
         Assert.Throws<ArgumentException>(() => BinaryInteger.Encode(1, signed: true, new byte[9]));
     }
 
+    // -------------------- range boundaries (mutation-hardening) --------------------
+
+    [Theory]
+    [InlineData(127L, true, 1)]      // max signed, 1 byte
+    [InlineData(-128L, true, 1)]     // min signed, 1 byte
+    [InlineData(255L, false, 1)]     // max unsigned, 1 byte
+    [InlineData(0L, false, 1)]       // min unsigned
+    [InlineData(32767L, true, 2)]
+    [InlineData(-32768L, true, 2)]
+    public void BinaryInteger_encode_exact_boundaries_round_trip(long value, bool signed, int byteLength)
+    {
+        var buffer = new byte[byteLength];
+        BinaryInteger.Encode(value, signed, buffer);
+
+        Assert.Equal(value, BinaryInteger.Decode(buffer, signed));
+    }
+
+
+    [Fact]
+    public void BinaryInteger_encode_8_byte_extremes_round_trip()
+    {
+        foreach (var value in new[] { long.MaxValue, long.MinValue, 0L, -1L })
+        {
+            var buffer = new byte[8];
+            BinaryInteger.Encode(value, signed: true, buffer);
+            Assert.Equal(value, BinaryInteger.Decode(buffer, signed: true));
+        }
+    }
+
+
+    [Theory]
+    [InlineData(128L, true, 1)]      // one past signed max
+    [InlineData(-129L, true, 1)]     // one past signed min
+    [InlineData(256L, false, 1)]     // one past unsigned max
+    [InlineData(-1L, false, 1)]      // negative into unsigned
+    public void BinaryInteger_encode_just_out_of_range_throws(long value, bool signed, int byteLength)
+        => Assert.Throws<OverflowException>(() => BinaryInteger.Encode(value, signed, new byte[byteLength]));
+
+
+    [Fact]
+    public void PackedDecimal_encode_clears_stale_bytes()
+    {
+        var buffer = new byte[] { 0xFF, 0xFF, 0xFF };   // pre-dirtied
+        PackedDecimal.Encode(123m, 0, buffer);          // 3 bytes -> 5 digits "00123", sign C
+
+        Assert.Equal(new byte[] { 0x00, 0x12, 0x3C }, buffer);
+    }
+
+
+    [Fact]
+    public void PackedDecimal_encode_sets_the_correct_sign_nibble()
+    {
+        var pos = new byte[1];
+        PackedDecimal.Encode(0m, 0, pos);
+        Assert.Equal(new byte[] { 0x0C }, pos);     // zero is positive (sign C), not D
+
+        var neg = new byte[2];
+        PackedDecimal.Encode(-12m, 0, neg);
+        Assert.Equal(new byte[] { 0x01, 0x2D }, neg);   // 3 digits "012", sign D
+    }
+
     private static decimal Pow10(int scale)
     {
         decimal r = 1m;

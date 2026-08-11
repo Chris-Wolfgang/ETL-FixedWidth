@@ -113,6 +113,46 @@ public sealed class FixedWidthBinaryLoaderTests
 
 
     [Fact]
+    public async Task LoadAsync_when_token_already_cancelled_writes_nothing()
+    {
+        var accounts = new[] { new Account { AccountId = "A", TransactionCount = 1, Balance = 1m } };
+        using var ms = new MemoryStream();
+        using var loader = new FixedWidthBinaryLoader<Account>(ms);
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+            await loader.LoadAsync(ToAsync(accounts), cts.Token));
+
+        Assert.Equal(0, ms.Length);
+    }
+
+
+    [Fact]
+    public async Task LoadAsync_cancelled_mid_stream_stops_writing_the_next_record()
+    {
+        using var ms = new MemoryStream();
+        using var loader = new FixedWidthBinaryLoader<Account>(ms);
+        using var cts = new CancellationTokenSource();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+            await loader.LoadAsync(CancelAfterFirst(cts), cts.Token));
+
+        Assert.Equal(17, ms.Length);   // only the first record was written before cancellation
+    }
+
+
+#pragma warning disable CS1998
+    private static async IAsyncEnumerable<Account> CancelAfterFirst(CancellationTokenSource cts)
+    {
+        yield return new Account { AccountId = "A", TransactionCount = 1, Balance = 1m };
+        cts.Cancel();
+        yield return new Account { AccountId = "B", TransactionCount = 2, Balance = 2m };
+    }
+#pragma warning restore CS1998
+
+
+    [Fact]
     public async Task A_multibyte_text_value_in_a_fixed_byte_field_throws()
     {
         // "€" is one char but three UTF-8 bytes; padded to 8 chars it encodes to more than 8 bytes.
@@ -157,6 +197,7 @@ public sealed class FixedWidthBinaryLoaderTests
 
         Assert.NotEmpty(sink.Reports);
         Assert.Equal(2, (int)sink.Reports.Max(r => r.CurrentItemCount));
+        Assert.Equal(2, (int)sink.Reports.Max(r => r.CurrentLineNumber));   // record counter advances per record
     }
 
 
