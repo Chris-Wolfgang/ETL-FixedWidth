@@ -193,7 +193,7 @@ await foreach (var record in extractor.ExtractAsync(token))
 }
 ```
 
-Each record type keeps its own independent `[FixedWidthField]` layout. A line matching no rule throws by default; set `UnmatchedLineHandling.Skip` to drop it or register a catch-all with `.Otherwise(typeof(UnknownRecord))`. The extractor shares the family's `HeaderLineCount`, `FieldDelimiter`, `ValueParser`, `SkipItemCount`/`MaximumItemCount`, dead-letter `OnError`, and progress reporting.
+Each record type keeps its own independent `[FixedWidthField]` layout. A line matching no rule throws by default; set `UnmatchedLineHandling = UnmatchedLineHandling.Skip` to drop it or register a catch-all with `.Otherwise(typeof(UnknownRecord))`. The extractor shares the family's `HeaderLineCount`, `FieldDelimiter`, `ValueParser`, `SkipItemCount`/`MaximumItemCount`, dead-letter `OnError`, and progress reporting.
 
 ### Composing an ETL pipeline
 

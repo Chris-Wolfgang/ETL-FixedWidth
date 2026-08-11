@@ -491,6 +491,10 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
 
             if (CurrentItemCount >= MaximumItemCount)
             {
+                // Mirror FixedWidthExtractor: the line was read but won't be yielded, so count it
+                // as filtered and log completion before ending early.
+                IncrementFilteredLineCount();
+                LogExtractionCompleted();
                 yield break;
             }
 
