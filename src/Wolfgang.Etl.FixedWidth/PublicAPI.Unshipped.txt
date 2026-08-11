@@ -55,24 +55,24 @@ Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.CurrentFilteredLineCount.
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.CurrentLineNumber.get -> long
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.CurrentRejectedItemCount.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FieldDelimiter.get -> string?
-Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FieldDelimiter.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FieldDelimiter.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(System.IO.Stream stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor> logger, System.Text.Encoding encoding = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(System.IO.Stream stream, System.Text.Encoding encoding = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(System.IO.TextReader reader) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(System.IO.TextReader reader, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor> logger) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.HasHeader.get -> bool
-Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.HasHeader.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.HasHeader.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.HeaderLineCount.get -> int
-Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.HeaderLineCount.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.HeaderLineCount.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.MalformedLineHandling.get -> Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling
-Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.MalformedLineHandling.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.MalformedLineHandling.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.OnError.get -> System.Action<Wolfgang.Etl.FixedWidth.FixedWidthError>
-Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.OnError.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.OnError.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.Otherwise(System.Type recordType) -> Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.SkipBlankLines.get -> bool
-Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.SkipBlankLines.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.SkipBlankLines.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.UnmatchedLineHandling.get -> Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling
-Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.UnmatchedLineHandling.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.UnmatchedLineHandling.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.ValueParser.get -> Wolfgang.Etl.FixedWidth.FixedWidthValueParser
-Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.ValueParser.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.ValueParser.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.When(System.Func<string, bool> predicate, System.Type recordType) -> Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor

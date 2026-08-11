@@ -25,7 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   or routed to a fallback type via `.Otherwise(...)`. Each record type keeps its own
   independent `[FixedWidthField]` layout, and the extractor shares the family's
   `HeaderLineCount`, `FieldDelimiter`, `ValueParser`, `SkipItemCount`/`MaximumItemCount`,
-  malformed-line dead-lettering (`OnError`), and progress reporting ([#19]).
+  malformed-line dead-lettering (`OnError`), and progress reporting. Its configuration
+  properties are `init`-only — set them in the object initializer, so config is fixed for
+  the run ([#19]).
 
 ### Changed
 

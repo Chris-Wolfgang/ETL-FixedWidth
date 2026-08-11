@@ -258,7 +258,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// <see cref="Otherwise"/> fallback was registered. Defaults to
     /// <see cref="UnmatchedLineHandling.ThrowException"/>.
     /// </summary>
-    public UnmatchedLineHandling UnmatchedLineHandling { get; set; } = UnmatchedLineHandling.ThrowException;
+    public UnmatchedLineHandling UnmatchedLineHandling { get; init; } = UnmatchedLineHandling.ThrowException;
 
 
 
@@ -270,7 +270,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// supported here (the substitute type would be ambiguous) and throws
     /// <see cref="InvalidOperationException"/> if set.
     /// </summary>
-    public MalformedLineHandling MalformedLineHandling { get; set; } = MalformedLineHandling.ThrowException;
+    public MalformedLineHandling MalformedLineHandling { get; init; } = MalformedLineHandling.ThrowException;
 
 
 
@@ -279,7 +279,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// predicate runs, so discriminators may index the line without guarding against empty
     /// input. When <see langword="false"/>, a blank line is treated as an unmatched line.
     /// </summary>
-    public bool SkipBlankLines { get; set; } = true;
+    public bool SkipBlankLines { get; init; } = true;
 
 
 
@@ -289,7 +289,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// <c>H</c> record that you want to capture should be registered with <see cref="When"/>
     /// instead.
     /// </summary>
-    public int HeaderLineCount { get; set; }
+    public int HeaderLineCount { get; init; }
 
 
 
@@ -300,7 +300,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     public bool HasHeader
     {
         get => HeaderLineCount > 0;
-        set => HeaderLineCount = value ? 1 : 0;
+        init => HeaderLineCount = value ? 1 : 0;
     }
 
 
@@ -309,7 +309,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// An optional delimiter present between columns in the source file, or <see langword="null"/>
     /// (the default) for pure fixed-width input. Applies to every registered record type.
     /// </summary>
-    public string? FieldDelimiter { get; set; }
+    public string? FieldDelimiter { get; init; }
 
 
 
@@ -317,7 +317,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// The value parser applied to every field of every record type. Defaults to
     /// <see cref="FixedWidthConverter.DefaultParser"/>.
     /// </summary>
-    public FixedWidthValueParser ValueParser { get; set; } = FixedWidthConverter.DefaultParser;
+    public FixedWidthValueParser ValueParser { get; init; } = FixedWidthConverter.DefaultParser;
 
 
 
@@ -327,7 +327,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// <see cref="MalformedLineHandling.ThrowException"/> it is reported before the exception is
     /// re-thrown.
     /// </summary>
-    public Action<FixedWidthError>? OnError { get; set; }
+    public Action<FixedWidthError>? OnError { get; init; }
 
 
 
