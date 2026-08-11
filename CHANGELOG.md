@@ -18,8 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (byte-based, type-driven); text fields use the extractor/loader's encoding (ASCII default;
   pass a code-page encoding for EBCDIC). Unsigned `COMP` fields (`Signed = false`) decode over the
   full unsigned range: an 8-byte value above `Int64.MaxValue` maps cleanly to a `ulong` property,
-  and overflows (throws) rather than wrapping negative if the target property is signed. The
-  existing text extractor and loader are unchanged.
+  and overflows (throws) rather than wrapping negative if the target property is signed. A
+  `COMP-3` field with a fractional part (`Scale > 0`) mapped to an integral property throws rather
+  than silently rounding it away (map it to a `decimal`/floating-point property, or declare
+  `Scale = 0`). The existing text extractor and loader are unchanged.
 - `FixedWidthDataReader<TRecord>` — a forward-only, read-only `IDataReader` over a
   fixed-width source, with the layout taken from `TRecord`'s `[FixedWidthField]`
   attributes. It serves each field value directly from the parsed line — **no

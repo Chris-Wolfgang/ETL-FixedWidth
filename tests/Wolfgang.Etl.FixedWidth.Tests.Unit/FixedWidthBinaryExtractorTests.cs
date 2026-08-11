@@ -370,6 +370,65 @@ public sealed class FixedWidthBinaryExtractorTests
 
 
     [ExcludeFromCodeCoverage]
+    private sealed class FractionalToInt
+    {
+        [FixedWidthBinaryField(0, 4, BinaryFieldType.PackedDecimal, Scale = 2)]
+        public int Amount { get; set; }
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class WholeToInt
+    {
+        [FixedWidthBinaryField(0, 4, BinaryFieldType.PackedDecimal, Scale = 0)]
+        public int Amount { get; set; }
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class FractionalToDouble
+    {
+        [FixedWidthBinaryField(0, 4, BinaryFieldType.PackedDecimal, Scale = 2)]
+        public double Amount { get; set; }
+    }
+
+
+    [Fact]
+    public async Task Fractional_packed_decimal_into_an_integer_property_throws()
+    {
+        var data = new byte[] { 0x01, 0x23, 0x45, 0x6C };   // 0123456 @ Scale 2 = 1234.56 (fractional)
+        using var extractor = new FixedWidthBinaryExtractor<FractionalToInt>(new MemoryStream(data));
+
+        await Assert.ThrowsAnyAsync<OverflowException>(async () =>
+            await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+    }
+
+
+    [Fact]
+    public async Task Whole_packed_decimal_into_an_integer_property_succeeds()
+    {
+        var data = new byte[] { 0x00, 0x01, 0x23, 0x4C };   // 0001234 @ Scale 0 = 1234 (exact)
+        using var extractor = new FixedWidthBinaryExtractor<WholeToInt>(new MemoryStream(data));
+
+        var record = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+
+        Assert.Equal(1234, record.Amount);
+    }
+
+
+    [Fact]
+    public async Task Fractional_packed_decimal_into_a_floating_point_property_is_allowed()
+    {
+        var data = new byte[] { 0x01, 0x23, 0x45, 0x6C };   // 1234.56
+        using var extractor = new FixedWidthBinaryExtractor<FractionalToDouble>(new MemoryStream(data));
+
+        var record = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+
+        Assert.Equal(1234.56, record.Amount, 2);
+    }
+
+
+    [ExcludeFromCodeCoverage]
     private sealed class ManualProgressTimer : IProgressTimer
     {
         private Action? _elapsed;

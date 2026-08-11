@@ -120,7 +120,44 @@ internal sealed class BinaryFieldDescriptor
     // Convert the decoded numeric to the property's underlying type BEFORE boxing, so the compiled
     // setter's unbox matches for both T and T? (a boxed long won't unbox to int?).
     private object Coerce(object value)
-        => value.GetType() == UnderlyingType
-            ? value
-            : Convert.ChangeType(value, UnderlyingType, CultureInfo.InvariantCulture);
+    {
+        if (value.GetType() == UnderlyingType)
+        {
+            return value;
+        }
+
+        // A packed-decimal field with Scale > 0 decodes to a decimal with a fractional part. Assigning
+        // that to an integral property would silently round via Convert.ChangeType, quietly corrupting
+        // the value — fail fast instead, mirroring how the text parser rejects "1234.56" as an int.
+        if (value is decimal dec && dec != Math.Truncate(dec) && IsIntegralType(UnderlyingType))
+        {
+            throw new OverflowException
+            (
+                $"Value {dec.ToString(CultureInfo.InvariantCulture)} for property '{Property.Name}' has a " +
+                $"fractional part and cannot be assigned to the integral type '{UnderlyingType.Name}'. Map the " +
+                $"field to a decimal or floating-point property, or declare Scale = 0."
+            );
+        }
+
+        return Convert.ChangeType(value, UnderlyingType, CultureInfo.InvariantCulture);
+    }
+
+
+    private static bool IsIntegralType(Type type)
+    {
+        switch (Type.GetTypeCode(type))
+        {
+            case TypeCode.SByte:
+            case TypeCode.Byte:
+            case TypeCode.Int16:
+            case TypeCode.UInt16:
+            case TypeCode.Int32:
+            case TypeCode.UInt32:
+            case TypeCode.Int64:
+            case TypeCode.UInt64:
+                return true;
+            default:
+                return false;
+        }
+    }
 }
