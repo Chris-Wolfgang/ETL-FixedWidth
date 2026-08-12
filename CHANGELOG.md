@@ -57,6 +57,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   once multiple record types can be routed ([#19]), verifying a trailer's declared record
   count and control total against what was read is ordinary application logic, needing no
   new API ([#25]).
+- Compile-time field-mapping source generator ([#13]): a new analyzer package,
+  `Wolfgang.Etl.FixedWidth.Analyzers`, ships inside this NuGet and — for every type with
+  `[FixedWidthField]` properties — emits a factory plus direct-access getter/setter
+  delegates and registers them from a module initializer. The runtime prefers these over
+  the previous `Expression.Compile`d delegates, removing the last `RequiresDynamicCode`
+  code path so extraction and loading are **Native AOT and trimming compatible**, with no
+  per-type startup JIT cost. It requires no code changes — keep decorating POCOs with
+  `[FixedWidthField]`. Types the generator cannot handle (generic, inaccessible, or on
+  `net462`/`netstandard2.0` where module initializers do not exist) transparently fall
+  back to the reflection path, so behaviour is identical either way. Groundwork for the
+  Native AOT support tracked by [#12].
 
 ### Changed
 
@@ -412,6 +423,8 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#21]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/21
 [#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
 [#31]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/31
+[#12]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/12
+[#13]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/13
 [#140]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/140
 [#147]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/147
 [#152]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/152

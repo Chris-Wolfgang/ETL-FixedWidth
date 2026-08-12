@@ -404,7 +404,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 | **Checkpoint / resume** | `TrackByteOffset` + `CurrentByteOffset` / `StartByteOffset` — persist a byte-offset checkpoint per record and resume a crashed run without re-reading the file |
 | **Zero-copy parsing** | `ReadOnlyMemory<char>` slicing avoids string allocations during field extraction |
 | **Span-based numerics** | `Span<char>`-based numeric parsing on net8.0+ for reduced allocation |
-| **Compiled delegates** | Field accessors use compiled delegates instead of reflection for fast property get/set |
+| **Source-generated accessors** | A bundled Roslyn generator emits direct-access factory/getter/setter delegates for `[FixedWidthField]` types at compile time — no reflection, no `Expression.Compile`, **Native AOT & trimming compatible**; falls back to compiled delegates on net462/netstandard2.0 |
 | **Schema introspection** | `FixedWidthSchema.For<T>()` exposes the resolved layout (positions, widths, types, skips); `ToDiagram()` renders it as a text table |
 | **Code-defined layout** | `FixedWidthSchemaBuilder<T>` defines a layout in fluent, type-safe code (no attributes required); assign it to the extractor/loader `Schema` property |
 | **Binary / mainframe** | `FixedWidthBinaryExtractor<T>` / `FixedWidthBinaryLoader<T>` read/write fixed-length binary records with COBOL `COMP` / `COMP-3` fields via `[FixedWidthBinaryField]` |

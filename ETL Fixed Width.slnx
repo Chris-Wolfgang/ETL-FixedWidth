@@ -57,6 +57,7 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/Wolfgang.Etl.FixedWidth/Wolfgang.Etl.FixedWidth.csproj" />
+    <Project Path="src/Wolfgang.Etl.FixedWidth.Analyzers/Wolfgang.Etl.FixedWidth.Analyzers.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Wolfgang.Etl.FixedWidth.Tests.Concurrency/Wolfgang.Etl.FixedWidth.Tests.Concurrency.csproj" />

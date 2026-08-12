@@ -106,3 +106,7 @@ Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.UnmatchedLineHandling.ini
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.ValueParser.get -> Wolfgang.Etl.FixedWidth.FixedWidthValueParser
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.ValueParser.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.When(System.Func<string, bool> predicate, System.Type recordType) -> Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor
+Wolfgang.Etl.FixedWidth.Generated.GeneratedAccessorRegistry
+static Wolfgang.Etl.FixedWidth.Generated.GeneratedAccessorRegistry.RegisterFactory(System.Type type, System.Func<object> factory) -> void
+static Wolfgang.Etl.FixedWidth.Generated.GeneratedAccessorRegistry.RegisterGetter(System.Type declaringType, string propertyName, System.Func<object, object> getter) -> void
+static Wolfgang.Etl.FixedWidth.Generated.GeneratedAccessorRegistry.RegisterSetter(System.Type declaringType, string propertyName, System.Action<object, object> setter) -> void
