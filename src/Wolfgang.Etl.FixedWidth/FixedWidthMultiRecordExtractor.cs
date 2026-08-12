@@ -122,6 +122,10 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     public FixedWidthMultiRecordExtractor(Stream stream, ILogger<FixedWidthMultiRecordExtractor>? logger = null)
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
+
+        // We create the internal StreamReader that wraps the caller's stream, so we own (and dispose)
+        // that reader. It is created with leaveOpen:true, so the caller's stream itself is never closed
+        // — the caller retains ownership of the Stream. (A caller-supplied TextReader leaves this false.)
         _ownsReader = true;
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
