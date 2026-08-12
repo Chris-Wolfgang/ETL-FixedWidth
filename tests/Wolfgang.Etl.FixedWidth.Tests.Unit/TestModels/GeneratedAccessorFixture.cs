@@ -29,3 +29,19 @@ public sealed class GeneratedAccessorFixture
     [FixedWidthField(3, 6)]
     public decimal? Salary { get; set; }
 }
+
+
+
+/// <summary>
+/// A fixed-width record with an <c>init</c>-only mapped property. The generator must NOT
+/// emit a setter for it — a plain <c>obj.Prop = value</c> assignment is invalid C# for an
+/// init-only property (CS8852) and would break this project's build. Extraction still works
+/// through the reflection/Expression setter fallback. The fact that this file compiles is
+/// itself the regression guard.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public sealed class GeneratedAccessorInitOnlyFixture
+{
+    [FixedWidthField(0, 5)]
+    public string Code { get; init; } = string.Empty;
+}

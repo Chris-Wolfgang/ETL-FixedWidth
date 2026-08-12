@@ -68,6 +68,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `net462`/`netstandard2.0` where module initializers do not exist) transparently fall
   back to the reflection path, so behaviour is identical either way. Groundwork for the
   Native AOT support tracked by [#12].
+- Compile-time layout diagnostics ([#27]): the `Wolfgang.Etl.FixedWidth.Analyzers` package
+  now also ships a Roslyn analyzer that flags `[FixedWidthField]` mistakes in the IDE and
+  the build, before the code runs — **FW003** (error) duplicate column index, **FW004**
+  (warning) a `DateTime`/`DateTimeOffset`/`TimeSpan` field with no `Format` (which throws at
+  runtime), **FW005** (warning) a `Format` pattern wider than the field, **FW007** (warning)
+  a mapped property with no public setter, and **FW008** (info) one with no public getter.
+  (The issue's FW001/FW002 — overlapping/gapped byte positions — do not apply to this
+  library's index-based model, where positions are derived and contiguous by construction
+  and gaps are declared explicitly with `[FixedWidthSkip]`; FW006 is deferred as too
+  heuristic to flag without false positives.)
 
 ### Changed
 
@@ -425,6 +435,7 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#31]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/31
 [#12]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/12
 [#13]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/13
+[#27]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/27
 [#140]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/140
 [#147]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/147
 [#152]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/152
