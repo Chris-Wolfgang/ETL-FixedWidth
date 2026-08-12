@@ -16,7 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `DataTable.Load`, and other ADO.NET consumers that would otherwise discard a POCO
   per row. Supports the extractor's configuration (`HeaderLineCount`,
   `SkipItemCount`, `MaximumItemCount`, `BlankLineHandling`, `MalformedLineHandling`,
-  `FieldDelimiter`), typed accessors, and `GetSchemaTable()` ([#26]).
+  `FieldDelimiter` — all `init`-only, set in the object initializer), typed accessors, and
+  `GetSchemaTable()` ([#26]).
 - Byte-offset checkpoint / resume on `FixedWidthExtractor<T>` ([#31]): opt in with
   `TrackByteOffset = true` and read `CurrentByteOffset` after each record to persist a
   checkpoint; on restart, set `StartByteOffset` to that value to seek straight to the next

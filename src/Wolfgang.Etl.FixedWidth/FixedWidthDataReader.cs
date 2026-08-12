@@ -4,6 +4,8 @@ using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Wolfgang.Etl.FixedWidth.Exceptions;
 using Wolfgang.Etl.FixedWidth.Parsing;
@@ -34,12 +36,15 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
 {
     private const int DefaultBufferSize = 65536;
 
-    private readonly TextReader _reader;
+    private readonly Stream? _stream;   // set by the Stream constructor; wrapped lazily using Encoding
     private readonly bool _ownsReader;
+    private readonly ILogger _logger;
     private readonly FieldMapResult _fieldMap;
     private readonly string[] _names;
     private readonly object?[] _current;
 
+    private TextReader? _reader;        // supplied directly (TextReader) or created from _stream on first Read
+    private bool _startedLogged;
     private bool _hasRow;
     private bool _closed;
     private long _recordsRead;
@@ -54,10 +59,15 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     /// <see cref="TextReader"/>. The caller owns the reader's lifetime — it is not disposed.
     /// </summary>
     /// <param name="reader">The fixed-width text source.</param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output. Pass
+    /// <see langword="null"/> (the default) to disable logging.
+    /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <see langword="null"/>.</exception>
-    public FixedWidthDataReader(TextReader reader)
+    public FixedWidthDataReader(TextReader reader, ILogger<FixedWidthDataReader<TRecord>>? logger = null)
     {
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
         _fieldMap = FieldMap.GetResult<TRecord>();
         _names = BuildNames(_fieldMap);
         _current = new object?[_fieldMap.Descriptors.Count];
@@ -69,20 +79,20 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     /// Initializes a new <see cref="FixedWidthDataReader{TRecord}"/> reading from a
     /// <see cref="Stream"/> via an internal 64 KB-buffered <see cref="StreamReader"/>. The caller
     /// retains ownership of the stream (it is not closed), but <see cref="Dispose"/> must be called
-    /// to release the internal reader.
+    /// to release the internal reader. Set <see cref="Encoding"/> to decode with a specific encoding
+    /// (defaults to <see cref="Encoding.UTF8"/>).
     /// </summary>
     /// <param name="stream">The readable fixed-width stream.</param>
-    /// <param name="encoding">The encoding to decode with, or <see langword="null"/> for <see cref="Encoding.UTF8"/>.</param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output. Pass
+    /// <see langword="null"/> (the default) to disable logging.
+    /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    public FixedWidthDataReader(Stream stream, Encoding? encoding = null)
+    public FixedWidthDataReader(Stream stream, ILogger<FixedWidthDataReader<TRecord>>? logger = null)
     {
-        if (stream == null)
-        {
-            throw new ArgumentNullException(nameof(stream));
-        }
-
-        _reader = new StreamReader(stream, encoding ?? Encoding.UTF8, detectEncodingFromByteOrderMarks: true, DefaultBufferSize, leaveOpen: true);
+        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _ownsReader = true;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
         _fieldMap = FieldMap.GetResult<TRecord>();
         _names = BuildNames(_fieldMap);
         _current = new object?[_fieldMap.Descriptors.Count];
@@ -94,23 +104,31 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     // Configuration (mirrors FixedWidthExtractor<TRecord>)
     // ------------------------------------------------------------------
 
+    /// <summary>
+    /// The encoding used to decode the source when constructed from a <see cref="Stream"/>. Defaults
+    /// to <see cref="Encoding.UTF8"/>. Ignored when constructed from a <see cref="TextReader"/>. The
+    /// stream is wrapped lazily on the first <see cref="Read"/>, so this value is read then — set it
+    /// in the object initializer.
+    /// </summary>
+    public Encoding Encoding { get; init; } = Encoding.UTF8;
+
     /// <summary>The number of leading lines to treat as a header and skip. Default 0.</summary>
-    public int HeaderLineCount { get; set; }
+    public int HeaderLineCount { get; init; }
 
     /// <summary>The number of data rows to skip before the first row is served. Default 0.</summary>
-    public long SkipItemCount { get; set; }
+    public long SkipItemCount { get; init; }
 
     /// <summary>The maximum number of data rows to serve. Default <see cref="long.MaxValue"/>.</summary>
-    public long MaximumItemCount { get; set; } = long.MaxValue;
+    public long MaximumItemCount { get; init; } = long.MaxValue;
 
     /// <summary>How blank lines are handled. Default <see cref="BlankLineHandling.ThrowException"/>.</summary>
-    public BlankLineHandling BlankLineHandling { get; set; } = BlankLineHandling.ThrowException;
+    public BlankLineHandling BlankLineHandling { get; init; } = BlankLineHandling.ThrowException;
 
     /// <summary>How malformed lines are handled. Default <see cref="MalformedLineHandling.ThrowException"/>.</summary>
-    public MalformedLineHandling MalformedLineHandling { get; set; } = MalformedLineHandling.ThrowException;
+    public MalformedLineHandling MalformedLineHandling { get; init; } = MalformedLineHandling.ThrowException;
 
     /// <summary>The inter-field delimiter used when the file was written, or <see langword="null"/> for none.</summary>
-    public string? FieldDelimiter { get; set; }
+    public string? FieldDelimiter { get; init; }
 
 
 
@@ -127,6 +145,16 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
             throw new InvalidOperationException("The data reader is closed.");
         }
 
+        // Wrap the stream lazily so the Encoding init property is read here (after the object
+        // initializer has run), not in the constructor. A TextReader source is used as supplied.
+        var reader = _reader ??= new StreamReader(_stream!, Encoding, detectEncodingFromByteOrderMarks: true, DefaultBufferSize, leaveOpen: true);
+
+        if (!_startedLogged)
+        {
+            _startedLogged = true;
+            LogReadStarted();
+        }
+
         while (true)
         {
             if (_recordsRead >= MaximumItemCount)
@@ -135,7 +163,7 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
                 return false;
             }
 
-            var line = _reader.ReadLine();
+            var line = reader.ReadLine();
             if (line == null)
             {
                 _hasRow = false;
@@ -242,7 +270,8 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
         // StreamReader here too. It was created with leaveOpen:true, so the caller's stream stays open.
         if (_ownsReader)
         {
-            _reader.Dispose();
+            // _reader is null if the reader was never read; the caller-owned stream stays open.
+            _reader?.Dispose();
         }
     }
 
@@ -469,6 +498,22 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     // valid data line and flows through normal parsing (so a short one raises LineTooShortException
     // with its actual content/length, not the blank-line path).
     private static bool IsBlank(string line) => line.Length == 0;
+
+    private void LogReadStarted()
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation
+            (
+                "FixedWidthDataReader started for {RecordType}: HeaderLineCount={HeaderLineCount}, " +
+                "SkipItemCount={SkipItemCount}, MaximumItemCount={MaximumItemCount}",
+                typeof(TRecord).Name,
+                HeaderLineCount,
+                SkipItemCount,
+                MaximumItemCount
+            );
+        }
+    }
 
     private static string[] BuildNames(FieldMapResult fieldMap)
     {

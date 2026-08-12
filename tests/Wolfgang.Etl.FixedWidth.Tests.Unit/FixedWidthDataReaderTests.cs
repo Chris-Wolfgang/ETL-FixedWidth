@@ -42,6 +42,11 @@ public sealed class FixedWidthDataReaderTests
     private static FixedWidthDataReader<Person> Reader(params string[] lines)
         => new(new StringReader(string.Join("\n", lines)));
 
+    // Source reader for tests that also set init-only config in an object initializer
+    // (init props can't be assigned on the Reader(...) factory result).
+    private static StringReader Src(params string[] lines)
+        => new(string.Join("\n", lines));
+
 
     [Fact]
     public void Read_serves_fields_by_ordinal_name_and_typed_accessor()
@@ -87,8 +92,10 @@ public sealed class FixedWidthDataReaderTests
     [Fact]
     public void HeaderLineCount_skips_leading_lines()
     {
-        using var reader = Reader("HEADER ROW IGNORED         00xxxxx", Line("Alice", "Smith", 30, "1"));
-        reader.HeaderLineCount = 1;
+        using var reader = new FixedWidthDataReader<Person>(Src("HEADER ROW IGNORED         00xxxxx", Line("Alice", "Smith", 30, "1")))
+        {
+            HeaderLineCount = 1,
+        };
 
         Assert.True(reader.Read());
         Assert.Equal("Alice", reader.GetString(0));
@@ -99,13 +106,15 @@ public sealed class FixedWidthDataReaderTests
     [Fact]
     public void Skip_and_Maximum_item_counts_are_honored()
     {
-        using var reader = Reader(
+        using var reader = new FixedWidthDataReader<Person>(Src(
             Line("A", "1", 1, "1"),
             Line("B", "2", 2, "2"),
             Line("C", "3", 3, "3"),
-            Line("D", "4", 4, "4"));
-        reader.SkipItemCount = 1;
-        reader.MaximumItemCount = 2;
+            Line("D", "4", 4, "4")))
+        {
+            SkipItemCount = 1,
+            MaximumItemCount = 2,
+        };
 
         Assert.True(reader.Read());
         Assert.Equal("B", reader.GetString(0));
@@ -118,8 +127,10 @@ public sealed class FixedWidthDataReaderTests
     [Fact]
     public void BlankLineHandling_Skip_ignores_blank_lines()
     {
-        using var reader = Reader(Line("A", "1", 1, "1"), string.Empty, Line("B", "2", 2, "2"));
-        reader.BlankLineHandling = BlankLineHandling.Skip;
+        using var reader = new FixedWidthDataReader<Person>(Src(Line("A", "1", 1, "1"), string.Empty, Line("B", "2", 2, "2")))
+        {
+            BlankLineHandling = BlankLineHandling.Skip,
+        };
 
         Assert.True(reader.Read());
         Assert.Equal("A", reader.GetString(0));
@@ -133,8 +144,10 @@ public sealed class FixedWidthDataReaderTests
     public void BlankLineHandling_ThrowException_throws()
     {
         // A zero-length line in the middle (a trailing empty line is swallowed by ReadLine).
-        using var reader = Reader(Line("A", "1", 1, "1"), string.Empty, Line("B", "2", 2, "2"));
-        reader.BlankLineHandling = BlankLineHandling.ThrowException;
+        using var reader = new FixedWidthDataReader<Person>(Src(Line("A", "1", 1, "1"), string.Empty, Line("B", "2", 2, "2")))
+        {
+            BlankLineHandling = BlankLineHandling.ThrowException,
+        };
 
         Assert.True(reader.Read());   // A
         Assert.Throws<LineTooShortException>(() => reader.Read());   // the blank line
@@ -144,8 +157,10 @@ public sealed class FixedWidthDataReaderTests
     [Fact]
     public void BlankLineHandling_ReturnDefault_yields_a_default_row()
     {
-        using var reader = Reader(Line("A", "1", 1, "1"), string.Empty, Line("B", "2", 2, "2"));
-        reader.BlankLineHandling = BlankLineHandling.ReturnDefault;
+        using var reader = new FixedWidthDataReader<Person>(Src(Line("A", "1", 1, "1"), string.Empty, Line("B", "2", 2, "2")))
+        {
+            BlankLineHandling = BlankLineHandling.ReturnDefault,
+        };
 
         Assert.True(reader.Read());   // A
         Assert.True(reader.Read());   // default row from the blank line
@@ -160,8 +175,10 @@ public sealed class FixedWidthDataReaderTests
     [Fact]
     public void MalformedLineHandling_Skip_skips_short_lines()
     {
-        using var reader = Reader(Line("A", "1", 1, "1"), "TOO SHORT", Line("B", "2", 2, "2"));
-        reader.MalformedLineHandling = MalformedLineHandling.Skip;
+        using var reader = new FixedWidthDataReader<Person>(Src(Line("A", "1", 1, "1"), "TOO SHORT", Line("B", "2", 2, "2")))
+        {
+            MalformedLineHandling = MalformedLineHandling.Skip,
+        };
 
         Assert.True(reader.Read());
         Assert.Equal("A", reader.GetString(0));
@@ -343,8 +360,10 @@ public sealed class FixedWidthDataReaderTests
     [Fact]
     public void MalformedLineHandling_ReturnDefault_yields_a_default_row()
     {
-        using var reader = Reader("SHORT", Line("A", "1", 1, "1"));
-        reader.MalformedLineHandling = MalformedLineHandling.ReturnDefault;
+        using var reader = new FixedWidthDataReader<Person>(Src("SHORT", Line("A", "1", 1, "1")))
+        {
+            MalformedLineHandling = MalformedLineHandling.ReturnDefault,
+        };
 
         Assert.True(reader.Read());
         Assert.True(reader.IsDBNull(0));   // default row from the short line
@@ -356,9 +375,11 @@ public sealed class FixedWidthDataReaderTests
     [Fact]
     public void BlankLine_ReturnDefault_within_skip_budget_is_skipped()
     {
-        using var reader = Reader(string.Empty, Line("A", "1", 1, "1"));
-        reader.BlankLineHandling = BlankLineHandling.ReturnDefault;
-        reader.SkipItemCount = 1;   // the blank consumes the skip budget, then A is served
+        using var reader = new FixedWidthDataReader<Person>(Src(string.Empty, Line("A", "1", 1, "1")))
+        {
+            BlankLineHandling = BlankLineHandling.ReturnDefault,
+            SkipItemCount = 1,   // the blank consumes the skip budget, then A is served
+        };
 
         Assert.True(reader.Read());
         Assert.Equal("A", reader.GetString(0));
@@ -372,8 +393,10 @@ public sealed class FixedWidthDataReaderTests
         // With BlankLineHandling.Skip a *blank* (zero-length) line would be skipped. A whitespace-only
         // line is NOT blank (matches the extractor) — it is a data line, so a short one is malformed
         // and hits MalformedLineHandling (default ThrowException) rather than being silently skipped.
-        using var reader = Reader("     ");
-        reader.BlankLineHandling = BlankLineHandling.Skip;
+        using var reader = new FixedWidthDataReader<Person>(Src("     "))
+        {
+            BlankLineHandling = BlankLineHandling.Skip,
+        };
 
         Assert.Throws<LineTooShortException>(() => reader.Read());
     }
@@ -390,5 +413,60 @@ public sealed class FixedWidthDataReaderTests
         var ex = Assert.Throws<InvalidOperationException>(() => reader.GetValue(0));
         Assert.Contains("closed", ex.Message, StringComparison.OrdinalIgnoreCase);
         reader.Close();   // idempotent
+    }
+
+
+    [Fact]
+    public void Encoding_property_decodes_a_stream_with_a_non_default_encoding()
+    {
+        // 0xE9 is 'é' in Latin-1 but an invalid lead byte under the default UTF-8.
+        var latin1 = Encoding.GetEncoding("ISO-8859-1");
+        var data = latin1.GetBytes(Line("é", "X", 1, "1"));
+        using var reader = new FixedWidthDataReader<Person>(new MemoryStream(data)) { Encoding = latin1 };
+
+        Assert.True(reader.Read());
+        Assert.Equal("é", reader.GetString(0));   // UTF-8 (the default) would have mis-decoded 0xE9
+    }
+
+
+    [Fact]
+    public void Read_emits_a_start_log_when_a_logger_is_supplied()
+    {
+        var logger = new CapturingLogger<FixedWidthDataReader<Person>>();
+        using var reader = new FixedWidthDataReader<Person>(new StringReader(Line("A", "1", 1, "1")), logger);
+
+        reader.Read();
+
+        Assert.Contains(logger.Messages, m => m.Contains("started", StringComparison.OrdinalIgnoreCase));
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class CapturingLogger<T> : Microsoft.Extensions.Logging.ILogger<T>
+    {
+        public System.Collections.Generic.List<string> Messages { get; } = new();
+
+        public IDisposable BeginScope<TState>(TState state)
+            where TState : notnull => NoopScope.Instance;
+
+        public bool IsEnabled(Microsoft.Extensions.Logging.LogLevel logLevel) => true;
+
+        public void Log<TState>
+        (
+            Microsoft.Extensions.Logging.LogLevel logLevel,
+            Microsoft.Extensions.Logging.EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter
+        ) => Messages.Add(formatter(state, exception));
+
+        private sealed class NoopScope : IDisposable
+        {
+            public static readonly NoopScope Instance = new();
+
+            public void Dispose()
+            {
+            }
+        }
     }
 }
