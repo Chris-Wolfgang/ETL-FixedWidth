@@ -68,9 +68,10 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// </summary>
     private const int DefaultBufferSize = 65536;
 
-    private readonly TextReader _reader;
+    private readonly Stream? _stream;   // set by the Stream constructor; wrapped lazily using Encoding
     private readonly bool _ownsReader;
     private readonly ILogger _logger;
+    private TextReader? _reader;         // supplied directly (TextReader) or created from _stream at enumeration
     private readonly IProgressTimer? _progressTimer;
     private readonly List<Rule> _rules = new();
     private bool _progressTimerWired;
@@ -93,28 +94,15 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// <see cref="TextReader"/>. The caller owns the reader's lifetime.
     /// </summary>
     /// <param name="reader">The reader to pull fixed-width lines from.</param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output. Pass
+    /// <see langword="null"/> (the default) to disable logging.
+    /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <see langword="null"/>.</exception>
-    public FixedWidthMultiRecordExtractor(TextReader reader)
+    public FixedWidthMultiRecordExtractor(TextReader reader, ILogger<FixedWidthMultiRecordExtractor>? logger = null)
     {
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _logger = NullLogger.Instance;
-    }
-
-
-
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthMultiRecordExtractor"/> that reads from the specified
-    /// <see cref="TextReader"/> with diagnostic logging.
-    /// </summary>
-    /// <param name="reader">The reader to pull fixed-width lines from.</param>
-    /// <param name="logger">The logger for diagnostic output.</param>
-    /// <exception cref="ArgumentNullException">
-    /// <paramref name="reader"/> or <paramref name="logger"/> is <see langword="null"/>.
-    /// </exception>
-    public FixedWidthMultiRecordExtractor(TextReader reader, ILogger<FixedWidthMultiRecordExtractor> logger)
-    {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -122,41 +110,20 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// <summary>
     /// Initializes a new <see cref="FixedWidthMultiRecordExtractor"/> that reads from the specified
     /// <see cref="Stream"/> using an internal <see cref="StreamReader"/> with a 64&#160;KB buffer.
-    /// The caller retains ownership of the stream.
+    /// The caller retains ownership of the stream. Set <see cref="Encoding"/> to decode with a
+    /// specific encoding (defaults to <see cref="Encoding.UTF8"/>).
     /// </summary>
     /// <param name="stream">The readable source stream.</param>
-    /// <param name="encoding">
-    /// The encoding used to decode the stream. Pass <see langword="null"/> (the default) for
-    /// <see cref="Encoding.UTF8"/>.
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output. Pass
+    /// <see langword="null"/> (the default) to disable logging.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    public FixedWidthMultiRecordExtractor(Stream stream, Encoding? encoding = null)
+    public FixedWidthMultiRecordExtractor(Stream stream, ILogger<FixedWidthMultiRecordExtractor>? logger = null)
     {
-        _reader = CreateBufferedReader(stream, encoding);
+        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         _ownsReader = true;
-        _logger = NullLogger.Instance;
-    }
-
-
-
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthMultiRecordExtractor"/> that reads from the specified
-    /// <see cref="Stream"/> with diagnostic logging.
-    /// </summary>
-    /// <param name="stream">The readable source stream.</param>
-    /// <param name="logger">The logger for diagnostic output.</param>
-    /// <param name="encoding">
-    /// The encoding used to decode the stream. Pass <see langword="null"/> (the default) for
-    /// <see cref="Encoding.UTF8"/>.
-    /// </param>
-    /// <exception cref="ArgumentNullException">
-    /// <paramref name="stream"/> or <paramref name="logger"/> is <see langword="null"/>.
-    /// </exception>
-    public FixedWidthMultiRecordExtractor(Stream stream, ILogger<FixedWidthMultiRecordExtractor> logger, Encoding? encoding = null)
-    {
-        _reader = CreateBufferedReader(stream, encoding);
-        _ownsReader = true;
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -171,14 +138,9 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
 
 
 
-    private static StreamReader CreateBufferedReader(Stream stream, Encoding? encoding)
+    private static StreamReader CreateBufferedReader(Stream stream, Encoding encoding)
     {
-        if (stream == null)
-        {
-            throw new ArgumentNullException(nameof(stream));
-        }
-
-        return new StreamReader(stream, encoding ?? Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
+        return new StreamReader(stream, encoding, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
     }
 
 
@@ -252,6 +214,16 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     // ------------------------------------------------------------------
     // Properties
     // ------------------------------------------------------------------
+
+    /// <summary>
+    /// The encoding used to decode the source when constructed from a <see cref="Stream"/>. Defaults
+    /// to <see cref="Encoding.UTF8"/>. Ignored when constructed from a <see cref="TextReader"/> (the
+    /// reader already decodes). The stream is wrapped lazily when extraction begins, so this value is
+    /// read then — set it in the object initializer.
+    /// </summary>
+    public Encoding Encoding { get; init; } = Encoding.UTF8;
+
+
 
     /// <summary>
     /// What to do with a data line that matches no <see cref="When"/> rule and for which no
@@ -399,7 +371,8 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     {
         if (disposing && _ownsReader)
         {
-            _reader.Dispose();
+            // _reader is null if the extractor was never enumerated; the caller-owned stream stays open.
+            _reader?.Dispose();
         }
 
         base.Dispose(disposing);
@@ -443,12 +416,16 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
 
         long dataLinesSkipped = 0;
 
+        // Wrap the stream lazily so the Encoding init property is read here (after the object
+        // initializer has run), not in the constructor. A TextReader source is used as supplied.
+        var reader = _reader ??= CreateBufferedReader(_stream!, Encoding);
+
         LogExtractionStarted();
         token.ThrowIfCancellationRequested();
 
         string? line;
 #pragma warning disable CA1849, VSTHRD103, S6966 // ReadLine is intentionally synchronous
-        while ((line = _reader.ReadLine()) != null)
+        while ((line = reader.ReadLine()) != null)
 #pragma warning restore CA1849, VSTHRD103, S6966
         {
             token.ThrowIfCancellationRequested();
