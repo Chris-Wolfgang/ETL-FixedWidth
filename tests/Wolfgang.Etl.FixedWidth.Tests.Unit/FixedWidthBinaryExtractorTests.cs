@@ -167,7 +167,7 @@ public sealed class FixedWidthBinaryExtractorTests
 
         Balance1234_56.CopyTo(record, 12);   // a valid packed value so decoding the record succeeds
         var latin1 = Encoding.GetEncoding("ISO-8859-1");
-        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(record), latin1);
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(record)) { Encoding = latin1 };
 
         var account = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
 

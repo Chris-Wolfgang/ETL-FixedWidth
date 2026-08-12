@@ -5,6 +5,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Binary;
 
@@ -36,7 +38,7 @@ public sealed class FixedWidthBinaryExtractor<TRecord> : ExtractorBase<TRecord, 
     where TRecord : notnull, new()
 {
     private readonly Stream _stream;
-    private readonly Encoding _encoding;
+    private readonly ILogger _logger;
     private readonly BinaryRecordMap _map;
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
@@ -45,18 +47,26 @@ public sealed class FixedWidthBinaryExtractor<TRecord> : ExtractorBase<TRecord, 
 
 
     /// <summary>
+    /// The encoding used to decode <see cref="Enums.BinaryFieldType.Text"/> fields. Defaults to
+    /// <see cref="Encoding.ASCII"/>; set a code-page encoding (e.g. IBM037) for EBCDIC data. Read
+    /// when extraction begins — set it in the object initializer.
+    /// </summary>
+    public Encoding Encoding { get; init; } = Encoding.ASCII;
+
+
+
+    /// <summary>
     /// Initializes a new <see cref="FixedWidthBinaryExtractor{TRecord}"/> that reads fixed-length
     /// binary records from <paramref name="stream"/>. The caller retains ownership of the stream.
     /// </summary>
     /// <param name="stream">The readable binary record stream.</param>
-    /// <param name="encoding">
-    /// The encoding used to decode <see cref="Enums.BinaryFieldType.Text"/> fields. Pass
-    /// <see langword="null"/> (the default) for <see cref="Encoding.ASCII"/>; pass a code-page
-    /// encoding (e.g. IBM037) for EBCDIC data.
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output. Pass
+    /// <see langword="null"/> (the default) to disable logging.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException"><paramref name="stream"/> is not readable.</exception>
-    public FixedWidthBinaryExtractor(Stream stream, Encoding? encoding = null)
+    public FixedWidthBinaryExtractor(Stream stream, ILogger<FixedWidthBinaryExtractor<TRecord>>? logger = null)
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         if (!stream.CanRead)
@@ -64,15 +74,15 @@ public sealed class FixedWidthBinaryExtractor<TRecord> : ExtractorBase<TRecord, 
             throw new ArgumentException("Stream must be readable.", nameof(stream));
         }
 
-        _encoding = encoding ?? Encoding.ASCII;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
         _map = BinaryFieldMap.GetResult<TRecord>();
     }
 
 
 
     // Test-only constructor that injects a deterministic progress timer.
-    internal FixedWidthBinaryExtractor(Stream stream, IProgressTimer timer, Encoding? encoding = null)
-        : this(stream, encoding)
+    internal FixedWidthBinaryExtractor(Stream stream, IProgressTimer timer)
+        : this(stream)
     {
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }
@@ -92,6 +102,18 @@ public sealed class FixedWidthBinaryExtractor<TRecord> : ExtractorBase<TRecord, 
     {
         // Honor an already-cancelled token before touching the stream (TestKit cancellation contract).
         cancellationToken.ThrowIfCancellationRequested();
+
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation
+            (
+                "Binary extraction started for {RecordType}: RecordByteLength={RecordByteLength}, SkipItemCount={SkipItemCount}, MaximumItemCount={MaximumItemCount}",
+                typeof(TRecord).Name,
+                _map.RecordByteLength,
+                SkipItemCount,
+                MaximumItemCount
+            );
+        }
 
         var recordLength = _map.RecordByteLength;
         var buffer = new byte[recordLength];
@@ -127,7 +149,7 @@ public sealed class FixedWidthBinaryExtractor<TRecord> : ExtractorBase<TRecord, 
             var record = (TRecord)_map.Factory();
             foreach (var descriptor in _map.Descriptors)
             {
-                descriptor.Setter(record, descriptor.Decode(buffer, _encoding));
+                descriptor.Setter(record, descriptor.Decode(buffer, Encoding));
             }
 
             IncrementCurrentItemCount();

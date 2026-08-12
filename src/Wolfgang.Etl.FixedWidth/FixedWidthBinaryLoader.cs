@@ -4,6 +4,8 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Binary;
 
@@ -24,7 +26,7 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
     where TRecord : notnull
 {
     private readonly Stream _stream;
-    private readonly Encoding _encoding;
+    private readonly ILogger _logger;
     private readonly BinaryRecordMap _map;
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
@@ -33,18 +35,26 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
 
 
     /// <summary>
+    /// The encoding used to write <see cref="Enums.BinaryFieldType.Text"/> fields. Defaults to
+    /// <see cref="Encoding.ASCII"/>; set a code-page encoding for EBCDIC output. Read when loading
+    /// begins — set it in the object initializer.
+    /// </summary>
+    public Encoding Encoding { get; init; } = Encoding.ASCII;
+
+
+
+    /// <summary>
     /// Initializes a new <see cref="FixedWidthBinaryLoader{TRecord}"/> that writes fixed-length
     /// binary records to <paramref name="stream"/>. The caller retains ownership of the stream.
     /// </summary>
     /// <param name="stream">The writable destination stream.</param>
-    /// <param name="encoding">
-    /// The encoding used to write <see cref="Enums.BinaryFieldType.Text"/> fields. Pass
-    /// <see langword="null"/> (the default) for <see cref="Encoding.ASCII"/>; pass a code-page
-    /// encoding for EBCDIC output.
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output. Pass
+    /// <see langword="null"/> (the default) to disable logging.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException"><paramref name="stream"/> is not writable.</exception>
-    public FixedWidthBinaryLoader(Stream stream, Encoding? encoding = null)
+    public FixedWidthBinaryLoader(Stream stream, ILogger<FixedWidthBinaryLoader<TRecord>>? logger = null)
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         if (!stream.CanWrite)
@@ -52,15 +62,15 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
             throw new ArgumentException("Stream must be writable.", nameof(stream));
         }
 
-        _encoding = encoding ?? Encoding.ASCII;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
         _map = BinaryFieldMap.GetResult<TRecord>();
     }
 
 
 
     // Test-only constructor that injects a deterministic progress timer.
-    internal FixedWidthBinaryLoader(Stream stream, IProgressTimer timer, Encoding? encoding = null)
-        : this(stream, encoding)
+    internal FixedWidthBinaryLoader(Stream stream, IProgressTimer timer)
+        : this(stream)
     {
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }
@@ -78,6 +88,16 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
         // items is guaranteed non-null by the LoaderBase.LoadAsync entry point.
         cancellationToken.ThrowIfCancellationRequested();
 
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation
+            (
+                "Binary load started for {RecordType}: RecordByteLength={RecordByteLength}",
+                typeof(TRecord).Name,
+                _map.RecordByteLength
+            );
+        }
+
         var buffer = new byte[_map.RecordByteLength];
 
         await foreach (var item in items.WithCancellation(cancellationToken).ConfigureAwait(false))
@@ -87,7 +107,7 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
             Array.Clear(buffer, 0, buffer.Length);
             foreach (var descriptor in _map.Descriptors)
             {
-                descriptor.Encode(item, buffer, _encoding);
+                descriptor.Encode(item, buffer, Encoding);
             }
 
             await _stream.WriteAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false);
