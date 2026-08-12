@@ -17,17 +17,23 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
 
-    <!-- Analyzer-project noise that does not apply to an emitter:
-         RS1036 - the SDK analyzer-release-tracking prompt (no shipped diagnostics here)
-         RS2008 - enable-analyzer-release-tracking (source generator, not a diagnostic analyzer)
-         MA0028 - interpolated StringBuilder.AppendLine (this IS the emitter; readability wins)
-         NU1701 - transitive package TFM fallback for the Roslyn packages -->
-    <NoWarn>$(NoWarn);RS1036;RS2008;MA0028;NU1701</NoWarn>
+    <!-- Analyzer-project noise that does not apply here:
+         RS1036 - the SDK analyzer-release-tracking prompt (satisfied by AnalyzerReleases.*.txt below)
+         MA0028 - interpolated StringBuilder.AppendLine (the generator IS an emitter; readability wins)
+         NU1701 - transitive package TFM fallback for the Roslyn packages
+         (RS2008 is NOT suppressed — the diagnostic IDs are tracked in AnalyzerReleases.*.txt.) -->
+    <NoWarn>$(NoWarn);RS1036;MA0028;NU1701</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Analyzer release tracking (RS2007/RS2008): the shipped/unshipped diagnostic IDs. -->
+  <ItemGroup>
+    <AdditionalFiles Include="AnalyzerReleases.Shipped.txt" />
+    <AdditionalFiles Include="AnalyzerReleases.Unshipped.txt" />
   </ItemGroup>
 
 </Project>

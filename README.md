@@ -437,6 +437,18 @@ The [examples/](examples/) folder contains 16 runnable console projects demonstr
 | [BinaryRecords](examples/BinaryRecords) | Read/write fixed-length **binary** (mainframe) records with `COMP-3` / `COMP` fields |
 | [MultiRecordTrailer](examples/MultiRecordTrailer) | Route header/detail/trailer records with `FixedWidthMultiRecordExtractor` and validate the trailer's record count and control total |
 
+**Compile-time diagnostics:**
+
+The package ships a Roslyn analyzer that catches `[FixedWidthField]` layout mistakes in the IDE and the build — no configuration required:
+
+| ID | Severity | Flags |
+|----|----------|-------|
+| `FW003` | Error | Two columns declare the same `Index` (field mapping throws at runtime) |
+| `FW004` | Warning | A `DateTime` / `DateTimeOffset` / `TimeSpan` field with no `Format` (parsing and writing throw) |
+| `FW005` | Warning | A `Format` pattern wider than the field length (the value overflows on write) |
+| `FW007` | Warning | A mapped property with no public setter (extraction throws) |
+| `FW008` | Info | A mapped property with no public getter (loading throws) |
+
 ---
 
 ## 🎯 Supported Frameworks
