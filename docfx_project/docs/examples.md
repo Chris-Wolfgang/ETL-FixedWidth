@@ -91,3 +91,8 @@ Exposes a fixed-width source as a forward-only `IDataReader` via `FixedWidthData
 Reads and writes fixed-length **binary** (mainframe / COBOL) records — text plus `COMP` binary-integer and `COMP-3` packed-decimal fields, declared with `[FixedWidthBinaryField]`. Records are a fixed number of bytes with no newline delimiters, so `FixedWidthBinaryLoader<T>` writes them back-to-back and `FixedWidthBinaryExtractor<T>` reads them straight from the stream. Shows a symmetric write → read round trip and documents the EBCDIC code-page option.
 
 [View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/BinaryRecords)
+## MultiRecordTrailer
+
+Routes a mainframe-style batch of interleaved header/detail/trailer records to different POCOs with `FixedWidthMultiRecordExtractor` (`.When(line => line[0] == 'D', typeof(DetailRecord))`), then validates the file's integrity: the trailer's declared record count and control total are compared against the details actually read. Shows that trailer-count validation is ordinary application logic on top of multi-record routing — no extra API required.
+
+[View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/MultiRecordTrailer)

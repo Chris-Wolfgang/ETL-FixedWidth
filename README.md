@@ -150,6 +150,28 @@ await loader.LoadAsync(records, CancellationToken.None);
 
 `NewLine` accepts any string (`"\n"`, `"\r\n"`, or a custom terminator). The default is `Environment.NewLine`.
 
+### Checkpoint and resume (large files)
+
+Processing a multi-GB fixed-width export can take a while; if the pipeline crashes at record 5,000,000 you don't want to re-read from the top. Opt in to byte-offset tracking, persist `CurrentByteOffset` after each record, and resume from the saved position with `StartByteOffset`:
+
+```csharp
+// First run — checkpoint after each record
+await using var stream = File.OpenRead("huge.dat");
+using var extractor = new FixedWidthExtractor<Record>(stream) { TrackByteOffset = true };
+await foreach (var record in extractor.ExtractAsync(token))
+{
+    Process(record);
+    SaveCheckpoint(extractor.CurrentByteOffset);   // byte position of the next unread line
+}
+
+// After a crash — seek straight to the next unread line, skipping everything already done
+await using var stream = File.OpenRead("huge.dat");
+using var extractor = new FixedWidthExtractor<Record>(stream) { StartByteOffset = LoadCheckpoint() };
+await foreach (var record in extractor.ExtractAsync(token)) { /* only the remainder */ }
+```
+
+Terminators (`\n`, `\r`, `\r\n`), multi-byte UTF-8, and a leading byte-order mark are all counted exactly, so a saved offset is a precise byte position. Tracking is **opt-in** — it wraps the reader in a byte-counting decoder, so the default read path keeps its throughput — and requires the `Stream` constructor (seekable for resume). On resume, header lines are not re-skipped and `SkipItemCount` applies from the resumed position. `CurrentLineNumber` is available for diagnostics independently of checkpointing.
+
 ### Inspecting the layout
 
 `FixedWidthSchema.For<T>()` exposes the resolved field layout as a read-only view — useful for generating documentation, building validation tooling, or debugging a mapping. It applies the same validation as extraction, so an invalid layout (duplicate column index, a mapped field with no public setter) throws here too.
@@ -295,6 +317,15 @@ await foreach (var record in extractor.ExtractAsync(token))
 
 Each record type keeps its own independent `[FixedWidthField]` layout. A line that matches no rule throws by default; set `UnmatchedLineHandling = UnmatchedLineHandling.Skip` to drop it, or register a catch-all type with `.Otherwise(typeof(UnknownRecord))`. Blank lines are skipped before predicates run (so a discriminator can index the line safely), and the extractor shares the family's `HeaderLineCount`, `FieldDelimiter`, `ValueParser`, `SkipItemCount`/`MaximumItemCount`, dead-letter `OnError`, and progress reporting.
 
+**Trailer record-count validation** falls out of this naturally: capture the trailer as it streams past, count the details, and compare — no extra API needed.
+
+```csharp
+if (trailer.RecordCount != detailCount)
+    throw new InvalidDataException($"Trailer says {trailer.RecordCount}, file has {detailCount}.");
+```
+
+See the [MultiRecordTrailer](examples/MultiRecordTrailer) example for a runnable header/detail/trailer walk-through that checks both the record count and a control total.
+
 ### Composing an ETL pipeline
 
 Rather than wiring an extractor, transformer, and loader together by hand, the whole extract → transform → load flow can be expressed as one fluent chain on the generic `EtlPipeline` (from `Wolfgang.Etl.Abstractions` 0.16.0). `FixedWidthExtractor<T>` source factories hang off `EtlPipeline.Create()` and `FixedWidthLoader<T>` sink terminators hang off the pipeline, with the extractor/loader configuration exposed as inline setters:
@@ -370,6 +401,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 | **Malformed line handling** | `MalformedLineHandling` — `ThrowException`, `Skip`, or `ReturnDefault` |
 | **Line filtering** | `LineFilter` delegate for custom line-level control (`Process`, `Skip`, `Stop`) |
 | **Progress reporting** | Timer-based `IProgress<T>` reporting via `FixedWidthReport` (includes `CurrentLineNumber`) |
+| **Checkpoint / resume** | `TrackByteOffset` + `CurrentByteOffset` / `StartByteOffset` — persist a byte-offset checkpoint per record and resume a crashed run without re-reading the file |
 | **Zero-copy parsing** | `ReadOnlyMemory<char>` slicing avoids string allocations during field extraction |
 | **Span-based numerics** | `Span<char>`-based numeric parsing on net8.0+ for reduced allocation |
 | **Compiled delegates** | Field accessors use compiled delegates instead of reflection for fast property get/set |
@@ -384,7 +416,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 
 **Examples:**
 
-The [examples/](examples/) folder contains 15 runnable console projects demonstrating each feature:
+The [examples/](examples/) folder contains 16 runnable console projects demonstrating each feature:
 
 | Example | Description |
 |---------|-------------|
@@ -403,6 +435,7 @@ The [examples/](examples/) folder contains 15 runnable console projects demonstr
 | [SchemaBuilder](examples/SchemaBuilder) | Define a layout in code with `FixedWidthSchemaBuilder<T>` instead of attributes |
 | [DataReader](examples/DataReader) | Expose a fixed-width source as an `IDataReader` for `SqlBulkCopy` / `DataTable` (no POCO per row) |
 | [BinaryRecords](examples/BinaryRecords) | Read/write fixed-length **binary** (mainframe) records with `COMP-3` / `COMP` fields |
+| [MultiRecordTrailer](examples/MultiRecordTrailer) | Route header/detail/trailer records with `FixedWidthMultiRecordExtractor` and validate the trailer's record count and control total |
 
 ---
 

@@ -70,6 +70,11 @@ Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.Encoding.get -> System.T
 Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.Encoding.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.FixedWidthBinaryLoader(System.IO.Stream stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>> logger = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.RecordByteLength.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.CurrentByteOffset.get -> long
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.StartByteOffset.get -> long
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.StartByteOffset.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.TrackByteOffset.get -> bool
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.TrackByteOffset.set -> void
 Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling
 Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling.Skip = 1 -> Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling
 Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling.ThrowException = 0 -> Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling
