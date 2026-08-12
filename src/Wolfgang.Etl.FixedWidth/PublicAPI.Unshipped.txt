@@ -8,8 +8,10 @@ Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.Dispose() -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FieldCount.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FieldDelimiter.get -> string?
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FieldDelimiter.init -> void
-Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FixedWidthDataReader(System.IO.Stream stream, System.Text.Encoding encoding = null) -> void
-Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FixedWidthDataReader(System.IO.TextReader reader) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.Encoding.get -> System.Text.Encoding
+Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.Encoding.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FixedWidthDataReader(System.IO.Stream stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>> logger = null) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FixedWidthDataReader(System.IO.TextReader reader, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>> logger = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.GetBoolean(int i) -> bool
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.GetByte(int i) -> byte
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length) -> long

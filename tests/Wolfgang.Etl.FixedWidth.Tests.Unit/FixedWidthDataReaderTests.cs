@@ -414,4 +414,59 @@ public sealed class FixedWidthDataReaderTests
         Assert.Contains("closed", ex.Message, StringComparison.OrdinalIgnoreCase);
         reader.Close();   // idempotent
     }
+
+
+    [Fact]
+    public void Encoding_property_decodes_a_stream_with_a_non_default_encoding()
+    {
+        // 0xE9 is 'é' in Latin-1 but an invalid lead byte under the default UTF-8.
+        var latin1 = Encoding.GetEncoding("ISO-8859-1");
+        var data = latin1.GetBytes(Line("é", "X", 1, "1"));
+        using var reader = new FixedWidthDataReader<Person>(new MemoryStream(data)) { Encoding = latin1 };
+
+        Assert.True(reader.Read());
+        Assert.Equal("é", reader.GetString(0));   // UTF-8 (the default) would have mis-decoded 0xE9
+    }
+
+
+    [Fact]
+    public void Read_emits_a_start_log_when_a_logger_is_supplied()
+    {
+        var logger = new CapturingLogger<FixedWidthDataReader<Person>>();
+        using var reader = new FixedWidthDataReader<Person>(new StringReader(Line("A", "1", 1, "1")), logger);
+
+        reader.Read();
+
+        Assert.Contains(logger.Messages, m => m.Contains("started", StringComparison.OrdinalIgnoreCase));
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class CapturingLogger<T> : Microsoft.Extensions.Logging.ILogger<T>
+    {
+        public System.Collections.Generic.List<string> Messages { get; } = new();
+
+        public IDisposable BeginScope<TState>(TState state)
+            where TState : notnull => NoopScope.Instance;
+
+        public bool IsEnabled(Microsoft.Extensions.Logging.LogLevel logLevel) => true;
+
+        public void Log<TState>
+        (
+            Microsoft.Extensions.Logging.LogLevel logLevel,
+            Microsoft.Extensions.Logging.EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter
+        ) => Messages.Add(formatter(state, exception));
+
+        private sealed class NoopScope : IDisposable
+        {
+            public static readonly NoopScope Instance = new();
+
+            public void Dispose()
+            {
+            }
+        }
+    }
 }
