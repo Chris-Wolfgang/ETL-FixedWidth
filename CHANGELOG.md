@@ -18,6 +18,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `SkipItemCount`, `MaximumItemCount`, `BlankLineHandling`, `MalformedLineHandling`,
   `FieldDelimiter` — all `init`-only, set in the object initializer), typed accessors, and
   `GetSchemaTable()` ([#26]).
+- Byte-offset checkpoint / resume on `FixedWidthExtractor<T>` ([#31]): opt in with
+  `TrackByteOffset = true` and read `CurrentByteOffset` after each record to persist a
+  checkpoint; on restart, set `StartByteOffset` to that value to seek straight to the next
+  unread line and skip the millions of records already processed. Terminators (`\n`, `\r`,
+  `\r\n`), multi-byte UTF-8, and a leading byte-order mark are all counted exactly, so a
+  saved offset is a precise byte position. Tracking is opt-in (it wraps the reader in a
+  byte-counting decoder) and requires the `Stream` constructor — a seekable stream for
+  resume; the default read path is unchanged. On resume, header lines are not re-skipped
+  and `SkipItemCount` applies from the resumed position. `CurrentLineNumber` is exposed for
+  diagnostics independent of checkpointing.
 - `FixedWidthMultiRecordExtractor` — reads a file that interleaves **multiple record types**
   (a mainframe header/detail/trailer batch, for example) and yields each line as the
   concrete POCO it maps to. Register one rule per type with
@@ -29,6 +39,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   malformed-line dead-lettering (`OnError`), and progress reporting. Its configuration
   properties are `init`-only — set them in the object initializer, so config is fixed for
   the run ([#19]).
+- Trailer record-count validation guidance and a runnable `MultiRecordTrailer` example —
+  once multiple record types can be routed ([#19]), verifying a trailer's declared record
+  count and control total against what was read is ordinary application logic, needing no
+  new API ([#25]).
 
 ### Changed
 
@@ -379,8 +393,10 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#19]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/19
 [#22]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/22
 [#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
+[#25]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/25
 [#23]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/23
 [#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
+[#31]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/31
 [#140]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/140
 [#147]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/147
 [#152]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/152

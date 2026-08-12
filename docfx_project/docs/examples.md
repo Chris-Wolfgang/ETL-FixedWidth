@@ -85,3 +85,9 @@ Defines a fixed-width layout in code with `FixedWidthSchemaBuilder<T>` for a rec
 Exposes a fixed-width source as a forward-only `IDataReader` via `FixedWidthDataReader<T>`, with the layout taken from `T`'s `[FixedWidthField]` attributes. It serves each field value directly from the parsed line — **no `T` is allocated per row** — then loads a `DataTable` through `DataTable.Load` (no database required). In production the same reader flows straight into `SqlBulkCopy.WriteToServerAsync`, the zero-per-row-allocation path for bulk-loading a database.
 
 [View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/DataReader)
+
+## MultiRecordTrailer
+
+Routes a mainframe-style batch of interleaved header/detail/trailer records to different POCOs with `FixedWidthMultiRecordExtractor` (`.When(line => line[0] == 'D', typeof(DetailRecord))`), then validates the file's integrity: the trailer's declared record count and control total are compared against the details actually read. Shows that trailer-count validation is ordinary application logic on top of multi-record routing — no extra API required.
+
+[View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/MultiRecordTrailer)

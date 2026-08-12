@@ -282,8 +282,10 @@ public sealed class FixedWidthMultiRecordExtractorTests
     {
         Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((TextReader)null!));
         Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((Stream)null!));
-        Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor(new StringReader(""), (Microsoft.Extensions.Logging.ILogger<FixedWidthMultiRecordExtractor>)null!));
-        Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor(new MemoryStream(), (Microsoft.Extensions.Logging.ILogger<FixedWidthMultiRecordExtractor>)null!));
+
+        // The logger is optional — a null logger is tolerated (defaults to NullLogger), not rejected.
+        using var withNullReaderLogger = new FixedWidthMultiRecordExtractor(new StringReader(""), (Microsoft.Extensions.Logging.ILogger<FixedWidthMultiRecordExtractor>?)null);
+        using var withNullStreamLogger = new FixedWidthMultiRecordExtractor(new MemoryStream(), (Microsoft.Extensions.Logging.ILogger<FixedWidthMultiRecordExtractor>?)null);
     }
 
 
@@ -445,6 +447,28 @@ public sealed class FixedWidthMultiRecordExtractorTests
         var records = await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
 
         Assert.Equal(4, records.Count);
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class EncodedRecord
+    {
+        [FixedWidthField(0, 3)] public string Value { get; set; } = string.Empty;
+    }
+
+
+    [Fact]
+    public async Task Encoding_property_decodes_the_stream_with_a_non_default_encoding()
+    {
+        // 0xE9 is 'é' in Latin-1 but an invalid lead byte under the default UTF-8.
+        var latin1 = Encoding.GetEncoding("ISO-8859-1");
+        var data = latin1.GetBytes("éXY\n");
+        using var extractor = new FixedWidthMultiRecordExtractor(new MemoryStream(data)) { Encoding = latin1 };
+        extractor.Otherwise(typeof(EncodedRecord));
+
+        var record = Assert.IsType<EncodedRecord>(Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync()));
+
+        Assert.Equal("éXY", record.Value);   // UTF-8 (the default) would have produced a replacement char
     }
 
 
