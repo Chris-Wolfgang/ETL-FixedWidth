@@ -28,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   malformed-line dead-lettering (`OnError`), and progress reporting. Its configuration
   properties are `init`-only — set them in the object initializer, so config is fixed for
   the run ([#19]).
+- Trailer record-count validation guidance and a runnable `MultiRecordTrailer` example —
+  once multiple record types can be routed ([#19]), verifying a trailer's declared record
+  count and control total against what was read is ordinary application logic, needing no
+  new API ([#25]).
 
 ### Changed
 
@@ -378,6 +382,7 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#19]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/19
 [#22]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/22
 [#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
+[#25]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/25
 [#23]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/23
 [#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
 [#140]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/140
