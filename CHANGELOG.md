@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [0.9.0] - 2026-08-12
+
+Compile-time tooling (a source generator for Native-AOT-friendly field accessors and a
+Roslyn analyzer for layout mistakes), multi-record-type routing, an `IDataReader`,
+byte-offset checkpoint/resume, and COBOL binary field support. Additive public API — no
+breaking changes.
+
+### Added
+
 - Binary / mainframe field support ([#21]): `FixedWidthBinaryExtractor<TRecord>` and
   `FixedWidthBinaryLoader<TRecord>` read and write fixed-length **binary** records (no newline
   delimiters — each record is a fixed number of bytes) over a `Stream`, decoding/encoding COBOL
@@ -444,7 +463,8 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
 [#26]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/26
 [#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.5.1...v0.6.0
