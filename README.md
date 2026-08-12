@@ -272,6 +272,29 @@ using var transformer = FixedWidthTransformer<LegacyRecord, ModernRecord>.ByMatc
 
 `ByMatchingProperties()` copies every source property to the destination property of the same name and an assignable type, and requires a public parameterless constructor on the destination.
 
+### Reading files with multiple record types
+
+Mainframe and EDI batch files often interleave several record layouts on different lines — a header, many detail rows, and a trailer — distinguished by a discriminator character. `FixedWidthMultiRecordExtractor` routes each line to the right POCO: register one rule per type, and the first matching predicate wins.
+
+```csharp
+using var extractor = new FixedWidthMultiRecordExtractor(reader)
+    .When(line => line[0] == 'H', typeof(HeaderRecord))
+    .When(line => line[0] == 'D', typeof(DetailRecord))
+    .When(line => line[0] == 'T', typeof(TrailerRecord));
+
+await foreach (var record in extractor.ExtractAsync(token))
+{
+    switch (record)
+    {
+        case HeaderRecord h: /* ... */ break;
+        case DetailRecord d: /* ... */ break;
+        case TrailerRecord t: /* ... */ break;
+    }
+}
+```
+
+Each record type keeps its own independent `[FixedWidthField]` layout. A line that matches no rule throws by default; set `UnmatchedLineHandling = UnmatchedLineHandling.Skip` to drop it, or register a catch-all type with `.Otherwise(typeof(UnknownRecord))`. Blank lines are skipped before predicates run (so a discriminator can index the line safely), and the extractor shares the family's `HeaderLineCount`, `FieldDelimiter`, `ValueParser`, `SkipItemCount`/`MaximumItemCount`, dead-letter `OnError`, and progress reporting.
+
 ### Composing an ETL pipeline
 
 Rather than wiring an extractor, transformer, and loader together by hand, the whole extract → transform → load flow can be expressed as one fluent chain on the generic `EtlPipeline` (from `Wolfgang.Etl.Abstractions` 0.16.0). `FixedWidthExtractor<T>` source factories hang off `EtlPipeline.Create()` and `FixedWidthLoader<T>` sink terminators hang off the pipeline, with the extractor/loader configuration exposed as inline setters:
@@ -354,6 +377,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 | **Code-defined layout** | `FixedWidthSchemaBuilder<T>` defines a layout in fluent, type-safe code (no attributes required); assign it to the extractor/loader `Schema` property |
 | **Binary / mainframe** | `FixedWidthBinaryExtractor<T>` / `FixedWidthBinaryLoader<T>` read/write fixed-length binary records with COBOL `COMP` / `COMP-3` fields via `[FixedWidthBinaryField]` |
 | **Format transformation** | `FixedWidthTransformer<TSource, TDestination>` projects one layout to another in a single streaming pass, with optional `ByMatchingProperties()` auto-mapping |
+| **Multi-record-type files** | `FixedWidthMultiRecordExtractor` routes each line to a different POCO by a discriminator predicate (`.When(…)` / `.Otherwise(…)`), for header/detail/trailer batch files |
 | **Pipeline composition** | `EtlPipeline.Create().FixedWidthExtractor<T>(…).FixedWidthLoader<T>(…).RunAsync()` — fluent source factories and sink terminators over the generic `EtlPipeline` (requires `Wolfgang.Etl.Abstractions` 0.16.0) |
 | **Metrics** | Zero-config `System.Diagnostics.Metrics` instruments (throughput, skips, duration) from the `Wolfgang.Etl.FixedWidth` meter — OpenTelemetry / Prometheus / any `MeterListener` |
 | **Multi-TFM support** | net462, net481, netstandard2.0, net8.0, net10.0 |
