@@ -27,6 +27,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   resume; the default read path is unchanged. On resume, header lines are not re-skipped
   and `SkipItemCount` applies from the resumed position. `CurrentLineNumber` is exposed for
   diagnostics independent of checkpointing.
+- `FixedWidthMultiRecordExtractor` — reads a file that interleaves **multiple record types**
+  (a mainframe header/detail/trailer batch, for example) and yields each line as the
+  concrete POCO it maps to. Register one rule per type with
+  `.When(line => line[0] == 'D', typeof(DetailRecord))`; the first matching predicate
+  wins. Lines that match no rule are handled per `UnmatchedLineHandling` (throw or skip)
+  or routed to a fallback type via `.Otherwise(...)`. Each record type keeps its own
+  independent `[FixedWidthField]` layout, and the extractor shares the family's
+  `HeaderLineCount`, `FieldDelimiter`, `ValueParser`, `SkipItemCount`/`MaximumItemCount`,
+  malformed-line dead-lettering (`OnError`), and progress reporting. Its configuration
+  properties are `init`-only — set them in the object initializer, so config is fixed for
+  the run ([#19]).
 
 ### Changed
 
@@ -374,6 +385,7 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#162]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/162
 [#163]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/163
 [#14]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/14
+[#19]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/19
 [#22]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/22
 [#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
 [#23]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/23

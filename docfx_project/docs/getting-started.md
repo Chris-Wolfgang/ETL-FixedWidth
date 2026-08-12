@@ -194,6 +194,29 @@ await loader.LoadAsync(modern, token);
 
 When source and destination share property names and compatible types, `FixedWidthTransformer<LegacyRecord, ModernRecord>.ByMatchingProperties()` builds the copy automatically (the destination needs a public parameterless constructor).
 
+### Reading files with multiple record types
+
+Mainframe and EDI batch files interleave several record layouts on different lines — a header, detail rows, and a trailer — distinguished by a discriminator character. `FixedWidthMultiRecordExtractor` routes each line to the right POCO. Register one rule per type; the first matching predicate wins.
+
+```csharp
+using var extractor = new FixedWidthMultiRecordExtractor(reader)
+    .When(line => line[0] == 'H', typeof(HeaderRecord))
+    .When(line => line[0] == 'D', typeof(DetailRecord))
+    .When(line => line[0] == 'T', typeof(TrailerRecord));
+
+await foreach (var record in extractor.ExtractAsync(token))
+{
+    switch (record)
+    {
+        case HeaderRecord h: /* ... */ break;
+        case DetailRecord d: /* ... */ break;
+        case TrailerRecord t: /* ... */ break;
+    }
+}
+```
+
+Each record type keeps its own independent `[FixedWidthField]` layout. A line matching no rule throws by default; set `UnmatchedLineHandling = UnmatchedLineHandling.Skip` to drop it or register a catch-all with `.Otherwise(typeof(UnknownRecord))`. The extractor shares the family's `HeaderLineCount`, `FieldDelimiter`, `ValueParser`, `SkipItemCount`/`MaximumItemCount`, dead-letter `OnError`, and progress reporting.
+
 ### Composing an ETL pipeline
 
 The whole extract → transform → load flow can be written as one fluent chain on the generic `EtlPipeline` (from `Wolfgang.Etl.Abstractions` 0.16.0). `FixedWidthExtractor<T>` source factories hang off `EtlPipeline.Create()` and `FixedWidthLoader<T>` sink terminators hang off the pipeline, with the extractor/loader configuration exposed as inline setters:
