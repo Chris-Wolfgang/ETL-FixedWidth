@@ -69,6 +69,15 @@ jobs:
         if: steps.detect.outputs.found == 'true'
         run: |
           while IFS= read -r proj; do
+            # SourceLink is verified against the net10.0 build output. Skip projects that
+            # do not target net10.0 — e.g. a netstandard2.0-only Roslyn analyzer / source
+            # generator, whose PDB ships inside the main package and is covered by that
+            # package's SourceLink. Forcing "-f net10.0" on such a project fails with
+            # NETSDK1005 (no net10.0 target in the assets file).
+            if ! grep -qE '<TargetFrameworks?>[^<]*net10\.0' "$proj"; then
+              echo "== skip $proj (no net10.0 target) =="
+              continue
+            fi
             echo "== build $proj =="
             dotnet build "$proj" -c Release -f net10.0 -p:ContinuousIntegrationBuild=true
           done < <(git ls-files 'src/**/*.csproj' 'src/*.csproj')
