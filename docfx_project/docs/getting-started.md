@@ -178,6 +178,30 @@ using var extractor = new FixedWidthExtractor<CustomerRecord>(reader) { Schema =
 
 The lambda selectors are type-safe (no magic strings) and `index` is the zero-based column ordinal, matching `[FixedWidthField(index, length)]`. A built schema is equivalent to an attribute-resolved one — same validation and the same `Fields` / `ToDiagram()` introspection — and overrides any attributes on the type when set. See the [SchemaBuilder example](examples.md#schemabuilder).
 
+### Binary / mainframe records
+
+Mainframe (COBOL) files mix text with binary numeric fields — `COMP` big-endian integers and `COMP-3` packed decimals — and are **not** newline-delimited: each record is a fixed number of *bytes*. `FixedWidthBinaryExtractor<T>` / `FixedWidthBinaryLoader<T>` read and write them by byte count, so packed/binary bytes that happen to be `0x0A`/`0x0D` are never mistaken for separators. Declare the layout with `[FixedWidthBinaryField]` (widths in bytes; `BinaryFieldType` picks the decoding):
+
+```csharp
+public class AccountRecord
+{
+    [FixedWidthBinaryField(0, 8, BinaryFieldType.Text)]
+    public string AccountId { get; set; } = string.Empty;
+
+    [FixedWidthBinaryField(1, 4, BinaryFieldType.Binary)]              // COMP
+    public int TransactionCount { get; set; }
+
+    [FixedWidthBinaryField(2, 5, BinaryFieldType.PackedDecimal, Scale = 2)]   // PIC S9(7)V99 COMP-3
+    public decimal Balance { get; set; }
+}
+
+await using var stream = File.OpenRead("accounts.dat");
+using var extractor = new FixedWidthBinaryExtractor<AccountRecord>(stream);
+await foreach (var account in extractor.ExtractAsync(CancellationToken.None)) { /* … */ }
+```
+
+Text fields decode with the encoding (ASCII by default). For EBCDIC, register the code-page provider and pass the encoding: `Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)` then `new FixedWidthBinaryExtractor<AccountRecord>(stream, Encoding.GetEncoding("IBM037"))`. Writing is symmetric via `FixedWidthBinaryLoader<T>`. See the [BinaryRecords example](examples.md#binaryrecords).
+
 ### Transforming between layouts
 
 `FixedWidthTransformer<TSource, TDestination>` reformats records from one layout to another (reorder, add/remove, or format-convert fields) as the projection stage between an extractor and a loader:

@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Binary / mainframe field support ([#21]): `FixedWidthBinaryExtractor<TRecord>` and
+  `FixedWidthBinaryLoader<TRecord>` read and write fixed-length **binary** records (no newline
+  delimiters — each record is a fixed number of bytes) over a `Stream`, decoding/encoding COBOL
+  `COMP-3` packed-decimal and `COMP` binary-integer fields alongside text (a round-trip is
+  symmetric). Fields are declared with the new
+  `[FixedWidthBinaryField(index, byteLength, BinaryFieldType, Scale/Signed)]` attribute
+  (byte-based, type-driven); text fields use the extractor/loader's `Encoding` init property (ASCII
+  default; set a code-page encoding for EBCDIC). Both take an optional `ILogger` as the last ctor
+  argument. Unsigned `COMP` fields (`Signed = false`) decode over the
+  full unsigned range: an 8-byte value above `Int64.MaxValue` maps cleanly to a `ulong` property,
+  and overflows (throws) rather than wrapping negative if the target property is signed. A
+  `COMP-3` field with a fractional part (`Scale > 0`) mapped to an integral property throws rather
+  than silently rounding it away (map it to a `decimal`/floating-point property, or declare
+  `Scale = 0`). The existing text extractor and loader are unchanged.
 - `FixedWidthDataReader<TRecord>` — a forward-only, read-only `IDataReader` over a
   fixed-width source, with the layout taken from `TRecord`'s `[FixedWidthField]`
   attributes. It serves each field value directly from the parsed line — **no
@@ -395,6 +409,7 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
 [#25]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/25
 [#23]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/23
+[#21]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/21
 [#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
 [#31]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/31
 [#140]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/140
