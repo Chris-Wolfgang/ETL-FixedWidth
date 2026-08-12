@@ -112,7 +112,30 @@ public sealed class FixedWidthAccessorGeneratorTests
         }
     }
 
+
+
+    [Fact]
+    public void Generator_does_not_emit_a_setter_for_an_init_only_property()
+    {
+        // An init-only property must NOT get a generated setter (that would be invalid C#).
+        // The getter is still emitted; the setter falls back to the reflection path.
+        Assert.False(GeneratedAccessorRegistry.TryGetSetter(typeof(GeneratedAccessorInitOnlyFixture), "Code", out _));
+        Assert.True(GeneratedAccessorRegistry.TryGetGetter(typeof(GeneratedAccessorInitOnlyFixture), "Code", out _));
+    }
+
 #endif
+
+
+
+    [Fact]
+    public async Task Extraction_populates_an_init_only_property_via_the_fallback_setter()
+    {
+        var extractor = new FixedWidthExtractor<GeneratedAccessorInitOnlyFixture>(new StringReader("ABCDE"));
+
+        var results = await extractor.ExtractAsync().ToListAsync();
+
+        Assert.Equal("ABCDE", Assert.Single(results).Code);
+    }
 
 
 

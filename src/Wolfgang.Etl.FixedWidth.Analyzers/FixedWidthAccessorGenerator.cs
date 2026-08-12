@@ -100,7 +100,8 @@ public sealed class FixedWidthAccessorGenerator : IIncrementalGenerator
             }
 
             var canGet = IsPublicAccessor(property.GetMethod);
-            var canSet = IsPublicAccessor(property.SetMethod);
+            // Exclude init-only setters: a generated "obj.Prop = value" is invalid C# (CS8852).
+            var canSet = IsPublicAccessor(property.SetMethod) && !property.SetMethod!.IsInitOnly;
             if (!canGet && !canSet)
             {
                 continue;
