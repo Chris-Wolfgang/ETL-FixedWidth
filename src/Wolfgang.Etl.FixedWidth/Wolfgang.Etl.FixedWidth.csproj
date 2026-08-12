@@ -63,5 +63,27 @@
 
   <!-- Analyzer PackageReferences are centralized in Directory.Build.props -->
 
+  <!-- Source generator (#13): built alongside the runtime and packed into this same
+       NuGet under analyzers/dotnet/cs. OutputItemType=Analyzer runs it against this
+       project's own compilation; ReferenceOutputAssembly=false + PrivateAssets=all keep
+       it out of the runtime reference set and off consumers' transitive graph. -->
+  <ItemGroup>
+    <ProjectReference Include="..\Wolfgang.Etl.FixedWidth.Analyzers\Wolfgang.Etl.FixedWidth.Analyzers.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false"
+                      PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Embed the built generator DLL into the package under analyzers/dotnet/cs so that
+       consuming projects load it automatically. The generator always builds as the single
+       netstandard2.0 assembly regardless of this library's target framework. -->
+  <Target Name="PackAnalyzer" BeforeTargets="_GetPackageFiles">
+    <ItemGroup>
+      <None Include="..\Wolfgang.Etl.FixedWidth.Analyzers\bin\$(Configuration)\netstandard2.0\Wolfgang.Etl.FixedWidth.Analyzers.dll"
+            Pack="true"
+            PackagePath="analyzers/dotnet/cs"
+            Visible="false" />
+    </ItemGroup>
+  </Target>
 
 </Project>

@@ -73,16 +73,26 @@ internal sealed class FieldMapResult
     // ------------------------------------------------------------------
 
     /// <summary>
-    /// Compiles a factory delegate: () => (object)new T().
-    /// Returns a throwing delegate if the type has no public parameterless constructor
-    /// (e.g. when used by the loader which never needs to instantiate records).
+    /// Resolves a factory delegate: () => (object)new T().
+    /// Prefers a source-generated factory registered in
+    /// <see cref="Generated.GeneratedAccessorRegistry"/> (direct <c>new T()</c>, no
+    /// dynamic code); falls back to an <see cref="Expression"/>-compiled activator when
+    /// no generated entry exists. Returns a throwing delegate if the type has no public
+    /// parameterless constructor (e.g. when used by the loader which never needs to
+    /// instantiate records).
     /// </summary>
 #if NET8_0_OR_GREATER
     [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050",
-        Justification = "Expression.Compile is RequiresDynamicCode but falls back to the interpreter when RuntimeFeature.IsDynamicCodeSupported is false, so the compiled activator still runs correctly under Native AOT (without JIT speed). See #153.")]
+        Justification = "Expression.Compile is RequiresDynamicCode but falls back to the interpreter when RuntimeFeature.IsDynamicCodeSupported is false, so the compiled activator still runs correctly under Native AOT (without JIT speed). See #153. The source-generated factory (preferred when registered) uses no dynamic code at all. See #13.")]
 #endif
     internal static Func<object> CompileFactory(Type type)
     {
+        // Prefer a source-generated factory when one has been registered for this type.
+        if (Generated.GeneratedAccessorRegistry.TryGetFactory(type, out var generated))
+        {
+            return generated;
+        }
+
         var ctor = type.GetConstructor(Type.EmptyTypes);
         if (ctor == null)
         {

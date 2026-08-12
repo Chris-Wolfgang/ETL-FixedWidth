@@ -42,10 +42,8 @@ internal sealed class FieldDescriptor
                 ? (NumberStyles?)null
                 : attribute.NumberStyles
         );
-        Getter = property.GetMethod != null && property.GetMethod.IsPublic
-            ? CompileGetter(property)
-            : null;
-        Setter = CompileSetter(property);
+        Getter = ResolveGetter(property);
+        Setter = ResolveSetter(property);
         TypeConverter = TypeDescriptor.GetConverter(property.PropertyType);
     }
 
@@ -112,7 +110,62 @@ internal sealed class FieldDescriptor
 
 
     // ------------------------------------------------------------------
-    // Delegate compilation
+    // Delegate resolution — source-generated first, reflection fallback
+    // ------------------------------------------------------------------
+
+    /// <summary>
+    /// The type used to key <see cref="Generated.GeneratedAccessorRegistry"/> lookups.
+    /// <see cref="MemberInfo.ReflectedType"/> is the concrete record type the property
+    /// was obtained from (the type the generator emits registrations for), which is
+    /// preferred over <see cref="MemberInfo.DeclaringType"/> so that a property declared
+    /// on a base type is still matched to the derived type's generated accessors.
+    /// </summary>
+    private static Type? LookupType(PropertyInfo property)
+        => property.ReflectedType ?? property.DeclaringType;
+
+
+
+    /// <summary>
+    /// Resolves the getter delegate: a source-generated getter when one is registered,
+    /// otherwise an <see cref="Expression"/>-compiled getter, or <see langword="null"/>
+    /// when the property has no public getter (the loader treats that as unreadable).
+    /// </summary>
+    private static Func<object, object?>? ResolveGetter(PropertyInfo property)
+    {
+        var lookupType = LookupType(property);
+        if (lookupType != null
+            && Generated.GeneratedAccessorRegistry.TryGetGetter(lookupType, property.Name, out var generated))
+        {
+            return generated;
+        }
+
+        return property.GetMethod != null && property.GetMethod.IsPublic
+            ? CompileGetter(property)
+            : null;
+    }
+
+
+
+    /// <summary>
+    /// Resolves the setter delegate: a source-generated setter when one is registered,
+    /// otherwise an <see cref="Expression"/>-compiled setter.
+    /// </summary>
+    private static Action<object, object?> ResolveSetter(PropertyInfo property)
+    {
+        var lookupType = LookupType(property);
+        if (lookupType != null
+            && Generated.GeneratedAccessorRegistry.TryGetSetter(lookupType, property.Name, out var generated))
+        {
+            return generated;
+        }
+
+        return CompileSetter(property);
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // Delegate compilation (reflection fallback)
     // ------------------------------------------------------------------
 
     /// <summary>

@@ -11,6 +11,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Wolfgang.Etl.FixedWidth\Wolfgang.Etl.FixedWidth.csproj" />
+    <!-- Reference the source generator as an analyzer so it runs over this project's own
+         [FixedWidthField] fixtures at compile time. Analyzers do not flow transitively
+         through the runtime ProjectReference above, so it must be listed explicitly. -->
+    <ProjectReference Include="..\..\src\Wolfgang.Etl.FixedWidth.Analyzers\Wolfgang.Etl.FixedWidth.Analyzers.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false"
+                      PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

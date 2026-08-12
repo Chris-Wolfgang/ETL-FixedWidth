@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Roslyn source generators / analyzers MUST target netstandard2.0 — it is the
+         analyzer host load contract. This project is NOT multi-targeted. -->
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+
+    <!-- This project is not packed on its own — its DLL is embedded into the main
+         Wolfgang.Etl.FixedWidth NuGet under analyzers/dotnet/cs (see the main csproj
+         PackAnalyzer target). It has no public API surface and ships no docs. -->
+    <IsPackable>false</IsPackable>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+    <!-- Analyzer-project noise that does not apply to an emitter:
+         RS1036 - the SDK analyzer-release-tracking prompt (no shipped diagnostics here)
+         RS2008 - enable-analyzer-release-tracking (source generator, not a diagnostic analyzer)
+         MA0028 - interpolated StringBuilder.AppendLine (this IS the emitter; readability wins)
+         NU1701 - transitive package TFM fallback for the Roslyn packages -->
+    <NoWarn>$(NoWarn);RS1036;RS2008;MA0028;NU1701</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>
