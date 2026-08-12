@@ -47,6 +47,11 @@ Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.SkipItemCount.get -> long
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.SkipItemCount.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.this[int i].get -> object
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.this[string name].get -> object
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.CurrentByteOffset.get -> long
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.StartByteOffset.get -> long
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.StartByteOffset.set -> void
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.TrackByteOffset.get -> bool
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.TrackByteOffset.set -> void
 Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling
 Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling.Skip = 1 -> Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling
 Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling.ThrowException = 0 -> Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling

@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
@@ -69,6 +70,15 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     private long _currentLineNumber;
     private int _currentRejectedItemCount;
     private int _currentFilteredLineCount;
+
+    // Byte-offset checkpoint/resume (#31). Non-null only for the Stream constructors — a
+    // caller-owned TextReader has no addressable byte stream. Tracking is opt-in (see
+    // TrackByteOffset) because wrapping the reader changes the read path.
+    private readonly Stream? _offsetStream;
+    private readonly Encoding? _offsetEncoding;
+    private long _currentByteOffset;
+    private long _startByteOffset;
+    private IDisposable? _resumeReader;   // the StreamReader re-created after a resume seek, disposed with this instance
 
     // _currentLineNumber is read by CreateProgressReport on a Timer threadpool thread
     // and written by ExtractWorkerAsync on the async continuation thread.
@@ -173,6 +183,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     {
         _reader = CreateBufferedReader(stream, encoding);
         _ownsReader = true;
+        _offsetStream = stream;
+        _offsetEncoding = encoding ?? Encoding.UTF8;
         _logger = NullLogger.Instance;
     }
 
@@ -205,6 +217,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     {
         _reader = CreateBufferedReader(stream, encoding);
         _ownsReader = true;
+        _offsetStream = stream;
+        _offsetEncoding = encoding ?? Encoding.UTF8;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -237,6 +251,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     {
         _reader = CreateBufferedReader(stream, encoding: null);
         _ownsReader = true;
+        _offsetStream = stream;
+        _offsetEncoding = Encoding.UTF8;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
@@ -543,6 +559,89 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
 
     /// <summary>
+    /// Enables byte-offset tracking for checkpoint/resume (#31). When <see langword="true"/>,
+    /// <see cref="CurrentByteOffset"/> reports the byte position of the next unread line so a
+    /// pipeline can save a checkpoint after each record and resume via <see cref="StartByteOffset"/>
+    /// after a crash. Defaults to <see langword="false"/> — tracking is opt-in because it wraps the
+    /// reader in a byte-counting decoder, changing the read path. Requires the <see cref="Stream"/>
+    /// constructor; a caller-owned <see cref="TextReader"/> has no addressable byte stream. Setting
+    /// <see cref="StartByteOffset"/> to a non-zero value enables tracking implicitly.
+    /// </summary>
+    /// <remarks>
+    /// Byte offsets are computed with the encoding passed to the <see cref="Stream"/> constructor
+    /// (<see cref="Encoding.UTF8"/> by default), so tracking assumes the stream is actually encoded
+    /// that way. A byte-order mark that would switch the internal <see cref="StreamReader"/> to a
+    /// <em>different</em> encoding (for example a UTF-16 BOM when UTF-8 was specified) is not
+    /// supported for tracking and would yield incorrect offsets — pass the stream's real encoding to
+    /// the constructor when enabling tracking. A matching-encoding BOM (e.g. a UTF-8 BOM with the
+    /// default encoding) is handled correctly.
+    /// </remarks>
+    public bool TrackByteOffset { get; set; }
+
+
+
+    /// <summary>
+    /// The byte offset to seek to before extraction begins — a checkpoint saved from a prior run's
+    /// <see cref="CurrentByteOffset"/>. Defaults to 0 (start of stream). A non-zero value requires a
+    /// seekable <see cref="Stream"/>-constructed extractor and implicitly enables
+    /// <see cref="TrackByteOffset"/>. On resume, header lines are <b>not</b> re-skipped (the checkpoint
+    /// is past them); <see cref="ExtractorBase{TRecord,FixedWidthReport}.SkipItemCount"/> is applied
+    /// from the resumed position.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">The value is negative.</exception>
+    public long StartByteOffset
+    {
+        get => _startByteOffset;
+        set
+        {
+            if (value < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), value, "StartByteOffset cannot be negative.");
+            }
+
+            _startByteOffset = value;
+        }
+    }
+
+
+
+    /// <summary>
+    /// The byte offset of the start of the next unread line — the value to persist as a checkpoint
+    /// after processing each record. Advances as every physical line is consumed (including headers,
+    /// blank, and skipped lines) so a resume continues exactly where reading stopped.
+    /// </summary>
+    /// <remarks>
+    /// Thread-safe: read with <see cref="Interlocked"/> so it may be sampled from a progress timer thread.
+    /// </remarks>
+    /// <exception cref="InvalidOperationException">
+    /// Byte-offset tracking is not enabled — set <see cref="TrackByteOffset"/> or
+    /// <see cref="StartByteOffset"/> first, and construct the extractor from a <see cref="Stream"/>.
+    /// </exception>
+    public long CurrentByteOffset
+    {
+        get
+        {
+            if (!ByteOffsetTrackingEnabled)
+            {
+                throw new InvalidOperationException
+                (
+                    "Byte-offset tracking is not enabled. Set TrackByteOffset (or StartByteOffset) and " +
+                    "construct the extractor from a Stream before reading CurrentByteOffset."
+                );
+            }
+
+            return Interlocked.Read(ref _currentByteOffset);
+        }
+    }
+
+
+
+    /// <summary>Whether byte-offset tracking has been requested (explicitly or via a resume offset).</summary>
+    private bool ByteOffsetTrackingEnabled => TrackByteOffset || _startByteOffset > 0;
+
+
+
+    /// <summary>
     /// The number of parsed records rejected so far: records discarded via
     /// <see cref="Enums.MalformedLineHandling.Skip"/> and records rejected by
     /// <see cref="RecordValidator"/>. Distinct from
@@ -635,9 +734,16 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// </param>
     protected override void Dispose(bool disposing)
     {
-        if (disposing && _ownsReader)
+        if (disposing)
         {
-            _reader.Dispose();
+            // A resume seek re-created the reader; dispose that too. Disposing the original _reader
+            // again is harmless (StreamReader.Dispose is idempotent).
+            _resumeReader?.Dispose();
+
+            if (_ownsReader)
+            {
+                _reader.Dispose();
+            }
         }
 
         base.Dispose(disposing);
@@ -670,6 +776,15 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             ? HeaderLineCount + 1
             : -1;
 
+        // Byte-offset checkpoint/resume (#31): when tracking is enabled, read through a byte-counting
+        // decorator (and seek first when resuming). When it is not, activeReader is the plain reader
+        // and the hot path is unchanged. On resume the header is already behind us, so it is not re-skipped.
+        var resuming = _startByteOffset > 0;
+        var preambleBytes = ByteOffsetTrackingEnabled && _offsetStream != null && _offsetEncoding != null && !resuming
+            ? await DetectPreambleBytesAsync(_offsetStream, _offsetEncoding, token).ConfigureAwait(false)
+            : 0L;
+        var activeReader = InitializeReadPosition(preambleBytes, out var byteCounter);
+
         // Metrics (#30, #275): sampled once per operation from the instruments. When no MeterListener
         // is subscribed the extract loop runs no metric code — the per-line/record calls below are
         // skipped and neither the tag set nor the duration scope is allocated — so telemetry is
@@ -688,7 +803,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
         string? line;
 #pragma warning disable CA1849, VSTHRD103, S6966 // ReadLine is intentionally synchronous — see comment above
-        while ((line = _reader.ReadLine()) != null)
+        while ((line = activeReader.ReadLine()) != null)
 #pragma warning restore CA1849, VSTHRD103, S6966
         {
             token.ThrowIfCancellationRequested();
@@ -696,12 +811,20 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             // Update before any processing so that if an exception is thrown,
             // CurrentLineNumber points to the offending line in the file.
             Interlocked.Increment(ref _currentLineNumber);
+
+            // byteCounter.BytesConsumed now spans through this line's terminator — the start of the
+            // next unread line, which is exactly the checkpoint to persist after yielding this record.
+            if (byteCounter != null)
+            {
+                Interlocked.Exchange(ref _currentByteOffset, byteCounter.BytesConsumed);
+            }
+
             if (metricsEnabled)
             {
                 FixedWidthMetrics.RecordLineRead(metricTags);
             }
 
-            if (IsStructuralLine(separatorLineNo))
+            if (!resuming && IsStructuralLine(separatorLineNo))
             {
                 IncrementFilteredLineCount();
                 LogDebugStructuralLineSkipped();
@@ -1124,6 +1247,96 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     // ------------------------------------------------------------------
     // Private helpers
     // ------------------------------------------------------------------
+
+    /// <summary>
+    /// Sets up the reader used for this extraction. When byte-offset tracking is off, returns the
+    /// plain reader (the hot path is unchanged). When on, wraps it in a <see cref="ByteCountingLineReader"/>,
+    /// seeking the stream first for a resume and accounting for any byte-order-mark preamble on a fresh run.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Byte tracking was requested without a <see cref="Stream"/> constructor, or a non-zero
+    /// <see cref="StartByteOffset"/> was set on a non-seekable stream.
+    /// </exception>
+    private TextReader InitializeReadPosition(long freshRunPreambleBytes, out ByteCountingLineReader? counter)
+    {
+        counter = null;
+        if (!ByteOffsetTrackingEnabled)
+        {
+            return _reader;
+        }
+
+        if (_offsetStream is null || _offsetEncoding is null)
+        {
+            throw new InvalidOperationException
+            (
+                "Byte-offset tracking requires the Stream constructor — a caller-owned TextReader has no " +
+                "addressable byte stream. Construct the extractor from a Stream to use TrackByteOffset / StartByteOffset."
+            );
+        }
+
+        if (_startByteOffset > 0)
+        {
+            if (!_offsetStream.CanSeek)
+            {
+                throw new InvalidOperationException("StartByteOffset requires a seekable stream.");
+            }
+
+            // Discard the original reader's buffer and re-read from the checkpoint. No BOM detection
+            // mid-file; the byte offset already accounts for the preamble consumed on the first run.
+            _reader.Dispose();
+            _offsetStream.Seek(_startByteOffset, SeekOrigin.Begin);
+            var seekedReader = new StreamReader(_offsetStream, _offsetEncoding, detectEncodingFromByteOrderMarks: false, bufferSize: DefaultBufferSize, leaveOpen: true);
+            counter = new ByteCountingLineReader(seekedReader, _offsetEncoding, _startByteOffset);
+            _resumeReader = counter;
+        }
+        else
+        {
+            // Fresh run: the original StreamReader will skip a leading BOM, so seed the counter with
+            // the preamble length to keep reported offsets aligned with actual stream bytes.
+            counter = new ByteCountingLineReader(_reader, _offsetEncoding, freshRunPreambleBytes);
+        }
+
+        Interlocked.Exchange(ref _currentByteOffset, counter.BytesConsumed);
+        return counter;
+    }
+
+
+
+    /// <summary>
+    /// Returns the number of leading bytes that match <paramref name="encoding"/>'s byte-order-mark
+    /// preamble (which a <see cref="StreamReader"/> will silently skip), or 0 when the stream is not
+    /// seekable or has no matching BOM. The stream position is restored.
+    /// </summary>
+    private static async Task<long> DetectPreambleBytesAsync(Stream stream, Encoding encoding, CancellationToken token)
+    {
+        var preamble = encoding.GetPreamble();
+        if (preamble.Length == 0 || !stream.CanSeek)
+        {
+            return 0;
+        }
+
+        var origin = stream.Position;
+        var probe = new byte[preamble.Length];
+        var read = await stream.ReadAsync(probe, 0, probe.Length, token).ConfigureAwait(false);
+        stream.Seek(origin, SeekOrigin.Begin);
+
+        if (read < preamble.Length)
+        {
+            return 0;
+        }
+
+        for (var i = 0; i < preamble.Length; i++)
+        {
+            if (probe[i] != preamble[i])
+            {
+                return 0;
+            }
+        }
+
+        return preamble.Length;
+    }
+
+
 
     /// <summary>
     /// Resolves the field map to use: the caller-supplied <see cref="Schema"/> when set, otherwise the

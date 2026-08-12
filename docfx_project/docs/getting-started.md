@@ -109,6 +109,28 @@ await loader.LoadAsync(recordsAsyncEnumerable, CancellationToken.None);
 
 `NewLine` accepts any string; the default is `Environment.NewLine`.
 
+### Checkpoint and resume
+
+For multi-GB files, opt in to byte-offset tracking so a crashed run can resume without re-reading. Persist `CurrentByteOffset` after each record and pass it back as `StartByteOffset` on restart:
+
+```csharp
+// First run
+await using var stream = File.OpenRead("huge.dat");
+using var extractor = new FixedWidthExtractor<Record>(stream) { TrackByteOffset = true };
+await foreach (var record in extractor.ExtractAsync(token))
+{
+    Process(record);
+    SaveCheckpoint(extractor.CurrentByteOffset);
+}
+
+// Resume after a crash
+await using var stream = File.OpenRead("huge.dat");
+using var extractor = new FixedWidthExtractor<Record>(stream) { StartByteOffset = LoadCheckpoint() };
+await foreach (var record in extractor.ExtractAsync(token)) { /* the remainder */ }
+```
+
+Terminators (`\n`/`\r`/`\r\n`), multi-byte UTF-8, and a leading BOM are counted exactly. Tracking is opt-in and requires the `Stream` constructor (seekable for resume); the default read path is unchanged. On resume, header lines are not re-skipped and `SkipItemCount` applies from the resumed position.
+
 ### Inspecting the layout
 
 `FixedWidthSchema.For<T>()` exposes the resolved field layout as a read-only view — handy for generating documentation, building validation tooling, or debugging a mapping. It runs the same validation as extraction, so an invalid layout throws here too.
