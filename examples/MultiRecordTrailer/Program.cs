@@ -11,7 +11,7 @@ using Wolfgang.Etl.FixedWidth.Attributes;
 //   D = detail  (one per transaction)
 //   T = trailer (a record count + control total for integrity checking)
 //
-// FixedWidthMultiExtractor (#19) routes each line to the right POCO by its leading discriminator
+// FixedWidthMultiRecordExtractor (#19) routes each line to the right POCO by its leading discriminator
 // character. Trailer-count validation (#25) is then ordinary application logic on top: capture the
 // trailer, count the details as they stream past, and compare. No extra library API is needed.
 
@@ -25,7 +25,7 @@ var file = string.Join
     Trailer(count: 3, total: 1115275) // sum of the three amounts
 );
 
-using var extractor = new FixedWidthMultiExtractor(new StringReader(file))
+using var extractor = new FixedWidthMultiRecordExtractor(new StringReader(file))
     .When(line => line[0] == 'H', typeof(HeaderRecord))
     .When(line => line[0] == 'D', typeof(DetailRecord))
     .When(line => line[0] == 'T', typeof(TrailerRecord));

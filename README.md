@@ -234,10 +234,10 @@ using var transformer = FixedWidthTransformer<LegacyRecord, ModernRecord>.ByMatc
 
 ### Reading files with multiple record types
 
-Mainframe and EDI batch files often interleave several record layouts on different lines — a header, many detail rows, and a trailer — distinguished by a discriminator character. `FixedWidthMultiExtractor` routes each line to the right POCO: register one rule per type, and the first matching predicate wins.
+Mainframe and EDI batch files often interleave several record layouts on different lines — a header, many detail rows, and a trailer — distinguished by a discriminator character. `FixedWidthMultiRecordExtractor` routes each line to the right POCO: register one rule per type, and the first matching predicate wins.
 
 ```csharp
-using var extractor = new FixedWidthMultiExtractor(reader)
+using var extractor = new FixedWidthMultiRecordExtractor(reader)
     .When(line => line[0] == 'H', typeof(HeaderRecord))
     .When(line => line[0] == 'D', typeof(DetailRecord))
     .When(line => line[0] == 'T', typeof(TrailerRecord));
@@ -345,7 +345,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 | **Schema introspection** | `FixedWidthSchema.For<T>()` exposes the resolved layout (positions, widths, types, skips); `ToDiagram()` renders it as a text table |
 | **Code-defined layout** | `FixedWidthSchemaBuilder<T>` defines a layout in fluent, type-safe code (no attributes required); assign it to the extractor/loader `Schema` property |
 | **Format transformation** | `FixedWidthTransformer<TSource, TDestination>` projects one layout to another in a single streaming pass, with optional `ByMatchingProperties()` auto-mapping |
-| **Multi-record-type files** | `FixedWidthMultiExtractor` routes each line to a different POCO by a discriminator predicate (`.When(…)` / `.Otherwise(…)`), for header/detail/trailer batch files |
+| **Multi-record-type files** | `FixedWidthMultiRecordExtractor` routes each line to a different POCO by a discriminator predicate (`.When(…)` / `.Otherwise(…)`), for header/detail/trailer batch files |
 | **Pipeline composition** | `EtlPipeline.Create().FixedWidthExtractor<T>(…).FixedWidthLoader<T>(…).RunAsync()` — fluent source factories and sink terminators over the generic `EtlPipeline` (requires `Wolfgang.Etl.Abstractions` 0.16.0) |
 | **Metrics** | Zero-config `System.Diagnostics.Metrics` instruments (throughput, skips, duration) from the `Wolfgang.Etl.FixedWidth` meter — OpenTelemetry / Prometheus / any `MeterListener` |
 | **Multi-TFM support** | net462, net481, netstandard2.0, net8.0, net10.0 |
@@ -370,7 +370,7 @@ The [examples/](examples/) folder contains 15 runnable console projects demonstr
 | [Metrics](examples/Metrics) | Subscribe to the `Wolfgang.Etl.FixedWidth` meter and read throughput/duration metrics |
 | [SchemaBuilder](examples/SchemaBuilder) | Define a layout in code with `FixedWidthSchemaBuilder<T>` instead of attributes |
 | [DataReader](examples/DataReader) | Expose a fixed-width source as an `IDataReader` for `SqlBulkCopy` / `DataTable` (no POCO per row) |
-| [MultiRecordTrailer](examples/MultiRecordTrailer) | Route header/detail/trailer records with `FixedWidthMultiExtractor` and validate the trailer's record count and control total |
+| [MultiRecordTrailer](examples/MultiRecordTrailer) | Route header/detail/trailer records with `FixedWidthMultiRecordExtractor` and validate the trailer's record count and control total |
 
 ---
 

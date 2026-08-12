@@ -39,7 +39,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// </remarks>
 /// <example>
 /// <code>
-/// using var extractor = new FixedWidthMultiExtractor(reader)
+/// using var extractor = new FixedWidthMultiRecordExtractor(reader)
 ///     .When(line => line[0] == 'H', typeof(HeaderRecord))
 ///     .When(line => line[0] == 'D', typeof(DetailRecord))
 ///     .When(line => line[0] == 'T', typeof(TrailerRecord));
@@ -55,7 +55,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// }
 /// </code>
 /// </example>
-public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthReport>
+public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, FixedWidthReport>
 {
     // ------------------------------------------------------------------
     // Fields
@@ -68,9 +68,10 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     /// </summary>
     private const int DefaultBufferSize = 65536;
 
-    private readonly TextReader _reader;
+    private readonly Stream? _stream;   // set by the Stream constructor; wrapped lazily using Encoding
     private readonly bool _ownsReader;
     private readonly ILogger _logger;
+    private TextReader? _reader;         // supplied directly (TextReader) or created from _stream at enumeration
     private readonly IProgressTimer? _progressTimer;
     private readonly List<Rule> _rules = new();
     private bool _progressTimerWired;
@@ -89,80 +90,50 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     // ------------------------------------------------------------------
 
     /// <summary>
-    /// Initializes a new <see cref="FixedWidthMultiExtractor"/> that reads from the specified
+    /// Initializes a new <see cref="FixedWidthMultiRecordExtractor"/> that reads from the specified
     /// <see cref="TextReader"/>. The caller owns the reader's lifetime.
     /// </summary>
     /// <param name="reader">The reader to pull fixed-width lines from.</param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output. Pass
+    /// <see langword="null"/> (the default) to disable logging.
+    /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <see langword="null"/>.</exception>
-    public FixedWidthMultiExtractor(TextReader reader)
+    public FixedWidthMultiRecordExtractor(TextReader reader, ILogger<FixedWidthMultiRecordExtractor>? logger = null)
     {
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _logger = NullLogger.Instance;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
 
     /// <summary>
-    /// Initializes a new <see cref="FixedWidthMultiExtractor"/> that reads from the specified
-    /// <see cref="TextReader"/> with diagnostic logging.
-    /// </summary>
-    /// <param name="reader">The reader to pull fixed-width lines from.</param>
-    /// <param name="logger">The logger for diagnostic output.</param>
-    /// <exception cref="ArgumentNullException">
-    /// <paramref name="reader"/> or <paramref name="logger"/> is <see langword="null"/>.
-    /// </exception>
-    public FixedWidthMultiExtractor(TextReader reader, ILogger<FixedWidthMultiExtractor> logger)
-    {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
-
-
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthMultiExtractor"/> that reads from the specified
+    /// Initializes a new <see cref="FixedWidthMultiRecordExtractor"/> that reads from the specified
     /// <see cref="Stream"/> using an internal <see cref="StreamReader"/> with a 64&#160;KB buffer.
-    /// The caller retains ownership of the stream.
+    /// The caller retains ownership of the stream. Set <see cref="Encoding"/> to decode with a
+    /// specific encoding (defaults to <see cref="Encoding.UTF8"/>).
     /// </summary>
     /// <param name="stream">The readable source stream.</param>
-    /// <param name="encoding">
-    /// The encoding used to decode the stream. Pass <see langword="null"/> (the default) for
-    /// <see cref="Encoding.UTF8"/>.
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output. Pass
+    /// <see langword="null"/> (the default) to disable logging.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    public FixedWidthMultiExtractor(Stream stream, Encoding? encoding = null)
+    public FixedWidthMultiRecordExtractor(Stream stream, ILogger<FixedWidthMultiRecordExtractor>? logger = null)
     {
-        _reader = CreateBufferedReader(stream, encoding);
+        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
+
+        // We create the internal StreamReader that wraps the caller's stream, so we own (and dispose)
+        // that reader. It is created with leaveOpen:true, so the caller's stream itself is never closed
+        // — the caller retains ownership of the Stream. (A caller-supplied TextReader leaves this false.)
         _ownsReader = true;
-        _logger = NullLogger.Instance;
-    }
-
-
-
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthMultiExtractor"/> that reads from the specified
-    /// <see cref="Stream"/> with diagnostic logging.
-    /// </summary>
-    /// <param name="stream">The readable source stream.</param>
-    /// <param name="logger">The logger for diagnostic output.</param>
-    /// <param name="encoding">
-    /// The encoding used to decode the stream. Pass <see langword="null"/> (the default) for
-    /// <see cref="Encoding.UTF8"/>.
-    /// </param>
-    /// <exception cref="ArgumentNullException">
-    /// <paramref name="stream"/> or <paramref name="logger"/> is <see langword="null"/>.
-    /// </exception>
-    public FixedWidthMultiExtractor(Stream stream, ILogger<FixedWidthMultiExtractor> logger, Encoding? encoding = null)
-    {
-        _reader = CreateBufferedReader(stream, encoding);
-        _ownsReader = true;
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
 
     // Test-only constructor that injects a deterministic progress timer.
-    internal FixedWidthMultiExtractor(TextReader reader, IProgressTimer timer)
+    internal FixedWidthMultiRecordExtractor(TextReader reader, IProgressTimer timer)
     {
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
@@ -171,14 +142,9 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
 
 
 
-    private static StreamReader CreateBufferedReader(Stream stream, Encoding? encoding)
+    private static StreamReader CreateBufferedReader(Stream stream, Encoding encoding)
     {
-        if (stream == null)
-        {
-            throw new ArgumentNullException(nameof(stream));
-        }
-
-        return new StreamReader(stream, encoding ?? Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
+        return new StreamReader(stream, encoding, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
     }
 
 
@@ -209,7 +175,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     /// <paramref name="recordType"/> has an invalid layout (for example duplicate column indexes
     /// or a mapped property with no public setter).
     /// </exception>
-    public FixedWidthMultiExtractor When(Func<string, bool> predicate, Type recordType)
+    public FixedWidthMultiRecordExtractor When(Func<string, bool> predicate, Type recordType)
     {
         if (predicate == null)
         {
@@ -236,7 +202,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     /// <param name="recordType">The catch-all POCO type for unmatched lines.</param>
     /// <exception cref="ArgumentNullException"><paramref name="recordType"/> is <see langword="null"/>.</exception>
     /// <exception cref="InvalidOperationException"><paramref name="recordType"/> has an invalid layout.</exception>
-    public FixedWidthMultiExtractor Otherwise(Type recordType)
+    public FixedWidthMultiRecordExtractor Otherwise(Type recordType)
     {
         if (recordType == null)
         {
@@ -254,11 +220,21 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     // ------------------------------------------------------------------
 
     /// <summary>
+    /// The encoding used to decode the source when constructed from a <see cref="Stream"/>. Defaults
+    /// to <see cref="Encoding.UTF8"/>. Ignored when constructed from a <see cref="TextReader"/> (the
+    /// reader already decodes). The stream is wrapped lazily when extraction begins, so this value is
+    /// read then — set it in the object initializer.
+    /// </summary>
+    public Encoding Encoding { get; init; } = Encoding.UTF8;
+
+
+
+    /// <summary>
     /// What to do with a data line that matches no <see cref="When"/> rule and for which no
     /// <see cref="Otherwise"/> fallback was registered. Defaults to
     /// <see cref="UnmatchedLineHandling.ThrowException"/>.
     /// </summary>
-    public UnmatchedLineHandling UnmatchedLineHandling { get; set; } = UnmatchedLineHandling.ThrowException;
+    public UnmatchedLineHandling UnmatchedLineHandling { get; init; } = UnmatchedLineHandling.ThrowException;
 
 
 
@@ -270,7 +246,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     /// supported here (the substitute type would be ambiguous) and throws
     /// <see cref="InvalidOperationException"/> if set.
     /// </summary>
-    public MalformedLineHandling MalformedLineHandling { get; set; } = MalformedLineHandling.ThrowException;
+    public MalformedLineHandling MalformedLineHandling { get; init; } = MalformedLineHandling.ThrowException;
 
 
 
@@ -279,7 +255,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     /// predicate runs, so discriminators may index the line without guarding against empty
     /// input. When <see langword="false"/>, a blank line is treated as an unmatched line.
     /// </summary>
-    public bool SkipBlankLines { get; set; } = true;
+    public bool SkipBlankLines { get; init; } = true;
 
 
 
@@ -289,7 +265,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     /// <c>H</c> record that you want to capture should be registered with <see cref="When"/>
     /// instead.
     /// </summary>
-    public int HeaderLineCount { get; set; }
+    public int HeaderLineCount { get; init; }
 
 
 
@@ -300,7 +276,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     public bool HasHeader
     {
         get => HeaderLineCount > 0;
-        set => HeaderLineCount = value ? 1 : 0;
+        init => HeaderLineCount = value ? 1 : 0;
     }
 
 
@@ -309,7 +285,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     /// An optional delimiter present between columns in the source file, or <see langword="null"/>
     /// (the default) for pure fixed-width input. Applies to every registered record type.
     /// </summary>
-    public string? FieldDelimiter { get; set; }
+    public string? FieldDelimiter { get; init; }
 
 
 
@@ -317,7 +293,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     /// The value parser applied to every field of every record type. Defaults to
     /// <see cref="FixedWidthConverter.DefaultParser"/>.
     /// </summary>
-    public FixedWidthValueParser ValueParser { get; set; } = FixedWidthConverter.DefaultParser;
+    public FixedWidthValueParser ValueParser { get; init; } = FixedWidthConverter.DefaultParser;
 
 
 
@@ -327,7 +303,7 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     /// <see cref="MalformedLineHandling.ThrowException"/> it is reported before the exception is
     /// re-thrown.
     /// </summary>
-    public Action<FixedWidthError>? OnError { get; set; }
+    public Action<FixedWidthError>? OnError { get; init; }
 
 
 
@@ -399,7 +375,8 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
     {
         if (disposing && _ownsReader)
         {
-            _reader.Dispose();
+            // _reader is null if the extractor was never enumerated; the caller-owned stream stays open.
+            _reader?.Dispose();
         }
 
         base.Dispose(disposing);
@@ -437,18 +414,22 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
             throw new InvalidOperationException
             (
                 $"{nameof(MalformedLineHandling)}.{nameof(MalformedLineHandling.ReturnDefault)} is not " +
-                $"supported by {nameof(FixedWidthMultiExtractor)} — the substitute record type is ambiguous."
+                $"supported by {nameof(FixedWidthMultiRecordExtractor)} — the substitute record type is ambiguous."
             );
         }
 
         long dataLinesSkipped = 0;
+
+        // Wrap the stream lazily so the Encoding init property is read here (after the object
+        // initializer has run), not in the constructor. A TextReader source is used as supplied.
+        var reader = _reader ??= CreateBufferedReader(_stream!, Encoding);
 
         LogExtractionStarted();
         token.ThrowIfCancellationRequested();
 
         string? line;
 #pragma warning disable CA1849, VSTHRD103, S6966 // ReadLine is intentionally synchronous
-        while ((line = _reader.ReadLine()) != null)
+        while ((line = reader.ReadLine()) != null)
 #pragma warning restore CA1849, VSTHRD103, S6966
         {
             token.ThrowIfCancellationRequested();
@@ -491,6 +472,10 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
 
             if (CurrentItemCount >= MaximumItemCount)
             {
+                // Mirror FixedWidthExtractor: the line was read but won't be yielded, so count it
+                // as filtered and log completion before ending early.
+                IncrementFilteredLineCount();
+                LogExtractionCompleted();
                 yield break;
             }
 
@@ -574,9 +559,9 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
 
     /// <summary>
     /// Parses <paramref name="line"/> into <paramref name="record"/> using the matched rule.
-    /// Returns <see langword="true"/> on success. On a parse failure, reports the line to
-    /// <see cref="OnError"/> and either skips (returns <see langword="false"/>) or re-throws,
-    /// per <see cref="MalformedLineHandling"/>.
+    /// Returns <see langword="true"/> on success. On a parse failure, routes the error through the
+    /// base per-item error policy (<see cref="OnItemError"/>), then either skips (returns
+    /// <see langword="false"/>) or re-throws, per <see cref="MalformedLineHandling"/>.
     /// </summary>
     private bool TryParseLine(string line, Rule rule, out object record)
     {
@@ -595,16 +580,39 @@ public sealed class FixedWidthMultiExtractor : ExtractorBase<object, FixedWidthR
         }
         catch (MalformedLineException ex)
         {
-            OnError?.Invoke(new FixedWidthError(_currentLineNumber, line, ex));
-
-            if (MalformedLineHandling == MalformedLineHandling.Skip)
+            // Route through the base per-item error policy (OnItemError, translated from
+            // MalformedLineHandling) so the failure is counted (CurrentErrorItemCount) and surfaced in
+            // the pipeline (ErrorItemCount) — matching FixedWidthExtractor. OnError is invoked from
+            // OnItemError, so the dead-letter sink still sees every failure.
+            if (HandleItemError(new ItemErrorContext(_currentLineNumber, ex, () => line)) == ItemErrorAction.Abort)
             {
-                IncrementRejectedItemCount();
-                return false;
+                throw;
             }
 
-            throw;
+            IncrementRejectedItemCount();
+            return false;
         }
+    }
+
+
+
+    /// <summary>
+    /// Translates <see cref="MalformedLineHandling"/> into the base per-item error policy and reports
+    /// the failure to the <see cref="OnError"/> dead-letter sink. <see cref="MalformedLineHandling.Skip"/>
+    /// maps to <see cref="ItemErrorAction.Skip"/>; <see cref="MalformedLineHandling.ThrowException"/>
+    /// (the default) maps to <see cref="ItemErrorAction.Abort"/>. <see cref="MalformedLineHandling.ReturnDefault"/>
+    /// is rejected up front, so it never reaches this hook.
+    /// </summary>
+    protected override ItemErrorAction OnItemError(ItemErrorContext context)
+    {
+        if (context != null)
+        {
+            OnError?.Invoke(new FixedWidthError(context.ItemNumber, context.RawContent?.Invoke(), context.Exception));
+        }
+
+        return MalformedLineHandling == MalformedLineHandling.Skip
+            ? ItemErrorAction.Skip
+            : ItemErrorAction.Abort;
     }
 
 

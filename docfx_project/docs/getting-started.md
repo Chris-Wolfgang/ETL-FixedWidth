@@ -174,10 +174,10 @@ When source and destination share property names and compatible types, `FixedWid
 
 ### Reading files with multiple record types
 
-Mainframe and EDI batch files interleave several record layouts on different lines — a header, detail rows, and a trailer — distinguished by a discriminator character. `FixedWidthMultiExtractor` routes each line to the right POCO. Register one rule per type; the first matching predicate wins.
+Mainframe and EDI batch files interleave several record layouts on different lines — a header, detail rows, and a trailer — distinguished by a discriminator character. `FixedWidthMultiRecordExtractor` routes each line to the right POCO. Register one rule per type; the first matching predicate wins.
 
 ```csharp
-using var extractor = new FixedWidthMultiExtractor(reader)
+using var extractor = new FixedWidthMultiRecordExtractor(reader)
     .When(line => line[0] == 'H', typeof(HeaderRecord))
     .When(line => line[0] == 'D', typeof(DetailRecord))
     .When(line => line[0] == 'T', typeof(TrailerRecord));
@@ -193,7 +193,7 @@ await foreach (var record in extractor.ExtractAsync(token))
 }
 ```
 
-Each record type keeps its own independent `[FixedWidthField]` layout. A line matching no rule throws by default; set `UnmatchedLineHandling.Skip` to drop it or register a catch-all with `.Otherwise(typeof(UnknownRecord))`. The extractor shares the family's `HeaderLineCount`, `FieldDelimiter`, `ValueParser`, `SkipItemCount`/`MaximumItemCount`, dead-letter `OnError`, and progress reporting.
+Each record type keeps its own independent `[FixedWidthField]` layout. A line matching no rule throws by default; set `UnmatchedLineHandling = UnmatchedLineHandling.Skip` to drop it or register a catch-all with `.Otherwise(typeof(UnknownRecord))`. The extractor shares the family's `HeaderLineCount`, `FieldDelimiter`, `ValueParser`, `SkipItemCount`/`MaximumItemCount`, dead-letter `OnError`, and progress reporting.
 
 ### Composing an ETL pipeline
 

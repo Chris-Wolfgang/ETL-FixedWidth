@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   per row. Supports the extractor's configuration (`HeaderLineCount`,
   `SkipItemCount`, `MaximumItemCount`, `BlankLineHandling`, `MalformedLineHandling`,
   `FieldDelimiter`), typed accessors, and `GetSchemaTable()` ([#26]).
-- `FixedWidthMultiExtractor` — reads a file that interleaves **multiple record types**
+- `FixedWidthMultiRecordExtractor` — reads a file that interleaves **multiple record types**
   (a mainframe header/detail/trailer batch, for example) and yields each line as the
   concrete POCO it maps to. Register one rule per type with
   `.When(line => line[0] == 'D', typeof(DetailRecord))`; the first matching predicate
@@ -25,7 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   or routed to a fallback type via `.Otherwise(...)`. Each record type keeps its own
   independent `[FixedWidthField]` layout, and the extractor shares the family's
   `HeaderLineCount`, `FieldDelimiter`, `ValueParser`, `SkipItemCount`/`MaximumItemCount`,
-  malformed-line dead-lettering (`OnError`), and progress reporting ([#19]).
+  malformed-line dead-lettering (`OnError`), and progress reporting. Its configuration
+  properties are `init`-only — set them in the object initializer, so config is fixed for
+  the run ([#19]).
 - Trailer record-count validation guidance and a runnable `MultiRecordTrailer` example —
   once multiple record types can be routed ([#19]), verifying a trailer's declared record
   count and control total against what was read is ordinary application logic, needing no

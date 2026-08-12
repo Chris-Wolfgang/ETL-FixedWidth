@@ -88,6 +88,6 @@ Exposes a fixed-width source as a forward-only `IDataReader` via `FixedWidthData
 
 ## MultiRecordTrailer
 
-Routes a mainframe-style batch of interleaved header/detail/trailer records to different POCOs with `FixedWidthMultiExtractor` (`.When(line => line[0] == 'D', typeof(DetailRecord))`), then validates the file's integrity: the trailer's declared record count and control total are compared against the details actually read. Shows that trailer-count validation is ordinary application logic on top of multi-record routing — no extra API required.
+Routes a mainframe-style batch of interleaved header/detail/trailer records to different POCOs with `FixedWidthMultiRecordExtractor` (`.When(line => line[0] == 'D', typeof(DetailRecord))`), then validates the file's integrity: the trailer's declared record count and control total are compared against the details actually read. Shows that trailer-count validation is ordinary application logic on top of multi-record routing — no extra API required.
 
 [View source](https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/MultiRecordTrailer)
