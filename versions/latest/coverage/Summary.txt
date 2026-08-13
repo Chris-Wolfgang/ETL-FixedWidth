@@ -1,48 +1,65 @@
 Summary
-  Generated on: 8/9/2026 - 7:42:38 PM
-  Coverage date: 8/9/2026 - 7:42:34 PM
+  Generated on: 8/13/2026 - 5:44:17 PM
+  Coverage date: 8/13/2026 - 5:44:13 PM
   Parser: Cobertura
-  Assemblies: 1
-  Classes: 26
-  Files: 26
-  Line coverage: 96.1%
-  Covered lines: 1754
-  Uncovered lines: 70
-  Coverable lines: 1824
-  Total lines: 6344
-  Branch coverage: 88.6% (553 of 624)
-  Covered branches: 553
-  Total branches: 624
-  Method coverage: 98.2% (289 of 294)
-  Full method coverage: 93.5% (275 of 294)
-  Covered methods: 289
-  Fully covered methods: 275
-  Total methods: 294
+  Assemblies: 2
+  Classes: 41
+  Files: 41
+  Line coverage: 97.1%
+  Covered lines: 2905
+  Uncovered lines: 84
+  Coverable lines: 2989
+  Total lines: 9984
+  Branch coverage: 88.8% (1113 of 1252)
+  Covered branches: 1113
+  Total branches: 1252
+  Method coverage: 98.5% (490 of 497)
+  Full method coverage: 93.5% (465 of 497)
+  Covered methods: 490
+  Fully covered methods: 465
+  Total methods: 497
 
-Wolfgang.Etl.FixedWidth                                         96.1%
-  Wolfgang.Etl.FixedWidth.Attributes.FixedWidthFieldAttribute    100%
-  Wolfgang.Etl.FixedWidth.Attributes.FixedWidthSkipAttribute     100%
-  Wolfgang.Etl.FixedWidth.Diagnostics.FixedWidthMetrics          100%
-  Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions        100%
-  Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException    100%
-  Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException      100%
-  Wolfgang.Etl.FixedWidth.Exceptions.LineTooShortException       100%
-  Wolfgang.Etl.FixedWidth.Exceptions.MalformedLineException      100%
-  Wolfgang.Etl.FixedWidth.FieldContext                           100%
-  Wolfgang.Etl.FixedWidth.FixedWidthConverter                   92.5%
-  Wolfgang.Etl.FixedWidth.FixedWidthError                        100%
-  Wolfgang.Etl.FixedWidth.FixedWidthExtractor<T>                91.1%
-  Wolfgang.Etl.FixedWidth.FixedWidthExtractorBuilder<T>         96.1%
-  Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo                    100%
-  Wolfgang.Etl.FixedWidth.FixedWidthLoader<T>                   92.2%
-  Wolfgang.Etl.FixedWidth.FixedWidthLoaderBuilder<T>             100%
-  Wolfgang.Etl.FixedWidth.FixedWidthReport                       100%
-  Wolfgang.Etl.FixedWidth.FixedWidthSchema                       100%
-  Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>             100%
-  Wolfgang.Etl.FixedWidth.FixedWidthTransformer<T1, T2>         98.4%
-  Wolfgang.Etl.FixedWidth.Parsing.FieldDescriptor                100%
-  Wolfgang.Etl.FixedWidth.Parsing.FieldMap                      98.9%
-  Wolfgang.Etl.FixedWidth.Parsing.FieldMapResult                 100%
-  Wolfgang.Etl.FixedWidth.Parsing.FixedWidthLineParser           100%
-  Wolfgang.Etl.FixedWidth.Parsing.FixedWidthMemoryExtensions     100%
-  Wolfgang.Etl.FixedWidth.ValidationResult                       100%
+Wolfgang.Etl.FixedWidth                                               97.2%
+  Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute    100%
+  Wolfgang.Etl.FixedWidth.Attributes.FixedWidthFieldAttribute          100%
+  Wolfgang.Etl.FixedWidth.Attributes.FixedWidthSkipAttribute           100%
+  Wolfgang.Etl.FixedWidth.Binary.BinaryFieldDescriptor                 100%
+  Wolfgang.Etl.FixedWidth.Binary.BinaryFieldMap                        100%
+  Wolfgang.Etl.FixedWidth.Binary.BinaryInteger                         100%
+  Wolfgang.Etl.FixedWidth.Binary.BinaryRecordMap                       100%
+  Wolfgang.Etl.FixedWidth.Binary.PackedDecimal                         100%
+  Wolfgang.Etl.FixedWidth.Diagnostics.FixedWidthMetrics               98.4%
+  Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions              100%
+  Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException          100%
+  Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException            100%
+  Wolfgang.Etl.FixedWidth.Exceptions.LineTooShortException             100%
+  Wolfgang.Etl.FixedWidth.Exceptions.MalformedLineException            100%
+  Wolfgang.Etl.FixedWidth.FieldContext                                 100%
+  Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<T>                 100%
+  Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<T>                    100%
+  Wolfgang.Etl.FixedWidth.FixedWidthConverter                         92.5%
+  Wolfgang.Etl.FixedWidth.FixedWidthDataReader<T>                     92.9%
+  Wolfgang.Etl.FixedWidth.FixedWidthError                              100%
+  Wolfgang.Etl.FixedWidth.FixedWidthExtractor<T>                      95.3%
+  Wolfgang.Etl.FixedWidth.FixedWidthExtractorBuilder<T>               96.1%
+  Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo                          100%
+  Wolfgang.Etl.FixedWidth.FixedWidthLoader<T>                         92.2%
+  Wolfgang.Etl.FixedWidth.FixedWidthLoaderBuilder<T>                   100%
+  Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor               100%
+  Wolfgang.Etl.FixedWidth.FixedWidthReport                             100%
+  Wolfgang.Etl.FixedWidth.FixedWidthSchema                             100%
+  Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>                   100%
+  Wolfgang.Etl.FixedWidth.FixedWidthTransformer<T1, T2>               98.4%
+  Wolfgang.Etl.FixedWidth.Generated.GeneratedAccessorRegistry         97.1%
+  Wolfgang.Etl.FixedWidth.Parsing.ByteCountingLineReader               100%
+  Wolfgang.Etl.FixedWidth.Parsing.FieldDescriptor                      100%
+  Wolfgang.Etl.FixedWidth.Parsing.FieldMap                            98.9%
+  Wolfgang.Etl.FixedWidth.Parsing.FieldMapResult                       100%
+  Wolfgang.Etl.FixedWidth.Parsing.FixedWidthLineParser                 100%
+  Wolfgang.Etl.FixedWidth.Parsing.FixedWidthMemoryExtensions           100%
+  Wolfgang.Etl.FixedWidth.ValidationResult                             100%
+
+Wolfgang.Etl.FixedWidth.Analyzers                                     96.8%
+  Wolfgang.Etl.FixedWidth.Analyzers.FixedWidthAccessorGenerator       96.9%
+  Wolfgang.Etl.FixedWidth.Analyzers.FixedWidthDiagnostics              100%
+  Wolfgang.Etl.FixedWidth.Analyzers.FixedWidthFieldAnalyzer           95.2%

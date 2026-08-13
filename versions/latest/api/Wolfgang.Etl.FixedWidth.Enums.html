@@ -81,6 +81,11 @@
 Enums
 </h3>
     <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.BinaryFieldType.html">BinaryFieldType</a></dt>
+      <dd><p>How the bytes of a <a class="xref" href="Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.html">FixedWidthBinaryFieldAttribute</a> field are decoded (#21).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling.html">BlankLineHandling</a></dt>
       <dd><p>Specifies how the extractor behaves when it encounters a blank line in the file.</p>
 </dd>
@@ -100,6 +105,13 @@ Returned by the <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtracto
       <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling.html">MalformedLineHandling</a></dt>
       <dd><p>Specifies how the extractor behaves when it encounters a malformed line
 (e.g. a line that is shorter than expected) or a field that cannot be parsed.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling.html">UnmatchedLineHandling</a></dt>
+      <dd><p>Controls what a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.html">FixedWidthMultiRecordExtractor</a> does with a data line that no
+registered <code>When</code> predicate matches and for which no <code>Otherwise</code> fallback
+record type has been registered (#19).</p>
 </dd>
     </dl>
     <dl class="jumplist">

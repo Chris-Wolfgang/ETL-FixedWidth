@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/docfx_project/docs/examples.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.9.0/docfx_project/docs/examples.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -113,11 +113,20 @@
 <h2 id="schemabuilder">SchemaBuilder</h2>
 <p>Defines a fixed-width layout in code with <code>FixedWidthSchemaBuilder&lt;T&gt;</code> for a record type that carries no <code>[FixedWidthField]</code> attributes, then uses it — via the extractor/loader <code>Schema</code> property — to load and re-extract records. Also shows that a code-built schema is fully introspectable (<code>ToDiagram</code> / <code>Fields</code>), exactly like an attribute-resolved one.</p>
 <p><a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/SchemaBuilder">View source</a></p>
+<h2 id="datareader">DataReader</h2>
+<p>Exposes a fixed-width source as a forward-only <code>IDataReader</code> via <code>FixedWidthDataReader&lt;T&gt;</code>, with the layout taken from <code>T</code>'s <code>[FixedWidthField]</code> attributes. It serves each field value directly from the parsed line — <strong>no <code>T</code> is allocated per row</strong> — then loads a <code>DataTable</code> through <code>DataTable.Load</code> (no database required). In production the same reader flows straight into <code>SqlBulkCopy.WriteToServerAsync</code>, the zero-per-row-allocation path for bulk-loading a database.</p>
+<p><a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/DataReader">View source</a></p>
+<h2 id="binaryrecords">BinaryRecords</h2>
+<p>Reads and writes fixed-length <strong>binary</strong> (mainframe / COBOL) records — text plus <code>COMP</code> binary-integer and <code>COMP-3</code> packed-decimal fields, declared with <code>[FixedWidthBinaryField]</code>. Records are a fixed number of bytes with no newline delimiters, so <code>FixedWidthBinaryLoader&lt;T&gt;</code> writes them back-to-back and <code>FixedWidthBinaryExtractor&lt;T&gt;</code> reads them straight from the stream. Shows a symmetric write → read round trip and documents the EBCDIC code-page option.</p>
+<p><a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/BinaryRecords">View source</a></p>
+<h2 id="multirecordtrailer">MultiRecordTrailer</h2>
+<p>Routes a mainframe-style batch of interleaved header/detail/trailer records to different POCOs with <code>FixedWidthMultiRecordExtractor</code> (<code>.When(line =&gt; line[0] == 'D', typeof(DetailRecord))</code>), then validates the file's integrity: the trailer's declared record count and control total are compared against the details actually read. Shows that trailer-count validation is ordinary application logic on top of multi-record routing — no extra API required.</p>
+<p><a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/tree/main/examples/MultiRecordTrailer">View source</a></p>
 
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.8.0/docfx_project/docs/examples.md/#L1" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.9.0/docfx_project/docs/examples.md/#L1" class="edit-link">Edit this page</a>
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>

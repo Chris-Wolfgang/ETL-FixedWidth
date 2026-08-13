@@ -81,6 +81,16 @@
 Classes
 </h3>
     <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.html">FixedWidthBinaryFieldAttribute</a></dt>
+      <dd><p>Marks a property as a field in a fixed-length <b>binary</b> record (#21) — the mainframe
+counterpart to <a class="xref" href="Wolfgang.Etl.FixedWidth.Attributes.FixedWidthFieldAttribute.html">FixedWidthFieldAttribute</a>. Widths are in <b>bytes</b> (not
+characters), the byte offset is summed from the <a class="xref" href="Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.html#Wolfgang_Etl_FixedWidth_Attributes_FixedWidthBinaryFieldAttribute_ByteLength">ByteLength</a> of preceding columns in
+<a class="xref" href="Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.html#Wolfgang_Etl_FixedWidth_Attributes_FixedWidthBinaryFieldAttribute_Index">Index</a> order, and <a class="xref" href="Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.html#Wolfgang_Etl_FixedWidth_Attributes_FixedWidthBinaryFieldAttribute_Type">Type</a> selects how the bytes are decoded (text,
+<code>COMP-3</code> packed decimal, or <code>COMP</code> binary integer). Read a record with
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor-1.html">FixedWidthBinaryExtractor&lt;TRecord&gt;</a>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.Attributes.FixedWidthFieldAttribute.html">FixedWidthFieldAttribute</a></dt>
       <dd><p>Marks a property as a fixed-width field and specifies its column index and width.
 Apply this attribute to any property on a POCO that represents a single record

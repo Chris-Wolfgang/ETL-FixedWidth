@@ -22,6 +22,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.yml\" sourcestartlinenumber=\"1\">Marks a property as a field in a fixed-length <b>binary</b> record (#21) — the mainframe\ncounterpart to <xref href=\"Wolfgang.Etl.FixedWidth.Attributes.FixedWidthFieldAttribute\" data-throw-if-not-resolved=\"false\"></xref>. Widths are in <b>bytes</b> (not\ncharacters), the byte offset is summed from the <xref href=\"Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.ByteLength\" data-throw-if-not-resolved=\"false\"></xref> of preceding columns in\n<xref href=\"Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Index\" data-throw-if-not-resolved=\"false\"></xref> order, and <xref href=\"Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Type\" data-throw-if-not-resolved=\"false\"></xref> selects how the bytes are decoded (text,\n<code>COMP-3</code> packed decimal, or <code>COMP</code> binary integer). Read a record with\n<xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor%601\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Wolfgang.Etl.FixedWidth.Attributes.FixedWidthFieldAttribute.yml",
       "output": {
         ".html": {
@@ -61,6 +75,20 @@
       "IsMRef": true,
       "Title": "Wolfgang.Etl.FixedWidth.Attributes",
       "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.Enums.BinaryFieldType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.Enums.BinaryFieldType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.Enums.BinaryFieldType",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.Enums.BinaryFieldType.yml\" sourcestartlinenumber=\"1\">How the bytes of a <xref href=\"Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute\" data-throw-if-not-resolved=\"false\"></xref> field are decoded (#21).</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -117,6 +145,20 @@
       "IsMRef": true,
       "Title": "Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling",
       "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling.yml\" sourcestartlinenumber=\"1\">Specifies how the extractor behaves when it encounters a malformed line\n(e.g. a line that is shorter than expected) or a field that cannot be parsed.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.Enums.UnmatchedLineHandling.yml\" sourcestartlinenumber=\"1\">Controls what a <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor\" data-throw-if-not-resolved=\"false\"></xref> does with a data line that no\nregistered <code>When</code> predicate matches and for which no <code>Otherwise</code> fallback\nrecord type has been registered (#19).</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -246,6 +288,34 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor-1.yml\" sourcestartlinenumber=\"1\">Reads a fixed-length <b>binary</b> record file (mainframe / COBOL, #21) and yields records of\ntype <code class=\"typeparamref\">TRecord</code>. Unlike <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601\" data-throw-if-not-resolved=\"false\"></xref>, records\nare <b>not</b> newline-delimited — each record is a fixed number of bytes (the sum of the\n<xref href=\"Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.ByteLength\" data-throw-if-not-resolved=\"false\"></xref> of every field), read directly\nfrom the stream, so packed-decimal and binary bytes that happen to be <code>0x0A</code>/<code>0x0D</code> are\nnever mistaken for record separators.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader-1.yml\" sourcestartlinenumber=\"1\">Writes records of type <code class=\"typeparamref\">TRecord</code> to a fixed-length <b>binary</b> record\nstream (mainframe / COBOL, #21) — the write counterpart of\n<xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor%601\" data-throw-if-not-resolved=\"false\"></xref>. Each record is encoded to a fixed number of\nbytes (the field byte widths) and written back-to-back with no delimiters, encoding\n<code>COMP-3</code> packed-decimal and <code>COMP</code> binary-integer fields alongside text.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthConverter.yml",
       "output": {
         ".html": {
@@ -257,6 +327,20 @@
       "IsMRef": true,
       "Title": "Wolfgang.Etl.FixedWidth.FixedWidthConverter",
       "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthConverter.yml\" sourcestartlinenumber=\"1\">Provides built-in value converter, header converter, and value parser functions\nfor use with <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthLoader%601\" data-throw-if-not-resolved=\"false\"></xref> and\n<xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthDataReader-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthDataReader-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthDataReader-1.yml\" sourcestartlinenumber=\"1\">A forward-only, read-only <xref href=\"System.Data.IDataReader\" data-throw-if-not-resolved=\"false\"></xref> over a fixed-width text source, with the\nfield layout taken from the <code>[FixedWidthField]</code> / <code>[FixedWidthSkip]</code> attributes on\n<code class=\"typeparamref\">TRecord</code> (#26). Serves each field's value directly from the parsed line —\n<b>no <code class=\"typeparamref\">TRecord</code> instance is created per row</b> — which is the optimal shape\nfor <code>SqlBulkCopy</code>, <xref href=\"System.Data.DataTable.Load(System.Data.IDataReader)\" data-throw-if-not-resolved=\"false\"></xref>, and other ADO.NET consumers\nthat would otherwise discard a POCO per row.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -313,6 +397,20 @@
       "IsMRef": true,
       "Title": "Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>",
       "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.yml\" sourcestartlinenumber=\"1\">Writes records of type <code class=\"typeparamref\">TRecord</code> to a fixed-width text stream\nas an asynchronous operation.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.yml\" sourcestartlinenumber=\"1\">Reads a fixed-width file that interleaves <b>multiple record types</b> — for example a\nmainframe batch file with a header, detail, and trailer layout on different lines — and\nyields each line as the <xref href=\"System.Object\" data-throw-if-not-resolved=\"false\"></xref> it maps to (#19).</p>\n"
     },
     {
       "type": "ManagedReference",
