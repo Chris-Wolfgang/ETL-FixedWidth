@@ -114,6 +114,12 @@ internal static class FixedWidthMetrics
     // default), the JIT skips the Add call and its argument marshalling entirely — the measurement
     // machinery is only touched once a consumer opts in by subscribing. Instrument.Enabled is a cheap
     // volatile field read; an unguarded Counter.Add would otherwise run a non-inlined call per item.
+    //
+    // TagList is a non-readonly struct in System.Diagnostics; we deliberately pass it by `in` to
+    // avoid the ~64-byte copy on every hot-loop invocation. The helpers do not mutate `tags` — the
+    // only method called on it (Counter<T>.Add) takes it by value/ref-in on the receiver's side —
+    // so the usual "defensive-copy on non-readonly `in` struct" concern doesn't apply.
+#pragma warning disable RCS1242 // Do not pass non-read-only struct by read-only reference
 
     /// <summary>Records one successfully extracted item, if a listener is subscribed.</summary>
     internal static void RecordExtracted(in TagList tags)
@@ -153,6 +159,7 @@ internal static class FixedWidthMetrics
             LinesRead.Add(1, tags);
         }
     }
+#pragma warning restore RCS1242
 
 
     /// <summary>

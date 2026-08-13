@@ -290,6 +290,11 @@ public static class FixedWidthConverter
             );
         }
 
+        // Defensive `?? string.Empty` — the object.ToString() contract declares
+        // non-null but real-world overrides return null; guard stays regardless of
+        // what ReSharper's NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
+        // infers.
+        // ReSharper disable once ConstantNullCoalescingCondition
         return value.ToString() ?? string.Empty;
     }
 
@@ -496,6 +501,9 @@ public static class FixedWidthConverter
             TypeCode.UInt64 => ulong.Parse(text, style, culture),
             TypeCode.UInt16 => ushort.Parse(text, style, culture),
             TypeCode.SByte => sbyte.Parse(text, style, culture),
+            // Cast pins the switch expression's result type to `object?` — the
+            // value-type branches box otherwise and lose the nullable annotation.
+            // ReSharper disable once RedundantCast
             _ => (object?)null,
         };
     }
@@ -591,6 +599,9 @@ public static class FixedWidthConverter
             TypeCode.UInt64 => ulong.Parse(span, style, culture),
             TypeCode.UInt16 => ushort.Parse(span, style, culture),
             TypeCode.SByte => sbyte.Parse(span, style, culture),
+            // Cast pins the switch expression's result type to `object?` — the
+            // value-type branches box otherwise and lose the nullable annotation.
+            // ReSharper disable once RedundantCast
             _ => (object?)null,
         };
     }

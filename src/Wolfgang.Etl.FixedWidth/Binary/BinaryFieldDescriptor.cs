@@ -45,6 +45,11 @@ internal sealed class BinaryFieldDescriptor
 
 
     // Decodes this field's value from the record buffer, using the encoding for Text fields.
+    // Return stays `object?` — FixedWidthConverter.ParseValue is itself nullable, and callers
+    // (FixedWidthBinaryExtractor) treat null as "no value" rather than as an error, so the
+    // ReSharper hint to make this non-nullable would push a null-forgiving cast to every
+    // call-site instead.
+    // ReSharper disable once ReturnTypeCanBeNotNullable
     internal object? Decode(byte[] record, Encoding encoding)
     {
         var length = Attribute.ByteLength;

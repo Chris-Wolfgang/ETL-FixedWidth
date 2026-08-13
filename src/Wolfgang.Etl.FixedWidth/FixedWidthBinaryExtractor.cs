@@ -95,10 +95,15 @@ public sealed class FixedWidthBinaryExtractor<TRecord> : ExtractorBase<TRecord, 
 
 
     /// <inheritdoc/>
+    // Keep the descriptive `cancellationToken` name at the override site; the base
+    // class shortens it to `token` but the longer form is the fleet-wide convention
+    // in this repo.
+#pragma warning disable S927 // Parameter names should match base declaration
     protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync
     (
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
+#pragma warning restore S927
     {
         // Honor an already-cancelled token before touching the stream (TestKit cancellation contract).
         cancellationToken.ThrowIfCancellationRequested();

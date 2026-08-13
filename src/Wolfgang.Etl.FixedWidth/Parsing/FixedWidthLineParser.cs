@@ -428,9 +428,15 @@ internal static class FixedWidthLineParser
     )
     {
         valueParser ??= FixedWidthConverter.DefaultParser;
+        // `!` needed on net462 / netstandard2.0 / net481 where string.IsNullOrEmpty
+        // lacks [NotNullWhen(false)]. RedundantSuppressNullableWarningExpression /
+        // S8969 fire on modern TFMs where the flow analysis handles it.
+#pragma warning disable S8969 // Remove this null-forgiving operator
+        // ReSharper disable once RedundantSuppressNullableWarningExpression
         var delimiterWidth = string.IsNullOrEmpty(fieldDelimiter)
             ? 0
             : fieldDelimiter!.Length;
+#pragma warning restore S8969
         var delimiterCount = Math.Max(0, fieldMap.TotalColumnCount - 1);
         var fullExpectedWidth = fieldMap.ExpectedLineWidth + delimiterWidth * delimiterCount;
 

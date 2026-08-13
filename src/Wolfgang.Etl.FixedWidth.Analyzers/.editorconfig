@@ -1,0 +1,38 @@
+# Per-src-project overrides for the Analyzers/generators project.
+#
+# This is a netstandard2.0 Roslyn analyzer/generator project embedded in
+# the main NuGet under analyzers/dotnet/cs. It has no public API surface
+# and is not run against tests, benchmarks, or examples, so a handful of
+# solution-wide rules are legitimately wrong for this whole project.
+# Anything narrower goes as an inline `#pragma warning disable` or
+# [SuppressMessage] at the call-site.
+
+[*.cs]
+
+# -----------------------------------------------------------------------
+# Roslyn analyzer rules
+# -----------------------------------------------------------------------
+
+# RS0016 / RS0037: PublicApiAnalyzer — the project ships no public API
+# (IsPackable=false, IncludeBuildOutput=false); MSBuild honors the
+# Exists('PublicAPI.Shipped.txt') AdditionalFiles condition in
+# Directory.Build.props, InspectCode does not.
+dotnet_diagnostic.RS0016.severity = none
+dotnet_diagnostic.RS0037.severity = none
+
+# RS2008: Enable analyzer release tracking — the AnalyzerReleases.Shipped.txt
+# and AnalyzerReleases.Unshipped.txt files ARE declared as AdditionalFiles
+# in Wolfgang.Etl.FixedWidth.Analyzers.csproj (both diagnostic IDs and
+# their release history are tracked). MSBuild recognises the AdditionalFiles
+# entries; InspectCode does not read the csproj and re-flags every rule.
+dotnet_diagnostic.RS2008.severity = none
+
+# -----------------------------------------------------------------------
+# ReSharper-native rules with no dotnet_diagnostic ID
+# -----------------------------------------------------------------------
+
+# CheckNamespace — IsExternalInit.cs is a polyfill of the
+# System.Runtime.CompilerServices.IsExternalInit runtime marker; the
+# namespace is required by the C# 9 init-only setter feature and cannot
+# be renamed to match the folder.
+resharper_check_namespace_highlighting = none

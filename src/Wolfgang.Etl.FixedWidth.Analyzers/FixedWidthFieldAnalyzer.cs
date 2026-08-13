@@ -93,12 +93,11 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
                 {
                     AnalyzeField(context, known, property, attribute, indexed);
                 }
-                else if (known.SkipAttribute is not null && Matches(attribute, known.SkipAttribute))
+                else if (known.SkipAttribute is not null
+                         && Matches(attribute, known.SkipAttribute)
+                         && TryGetIndex(attribute, out var skipIndex))
                 {
-                    if (TryGetIndex(attribute, out var skipIndex))
-                    {
-                        indexed.Add((skipIndex, GetLocation(attribute, property, context.CancellationToken)));
-                    }
+                    indexed.Add((skipIndex, GetLocation(attribute, property, context.CancellationToken)));
                 }
             }
         }
@@ -281,7 +280,13 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
 
     private static string? GetFormat(AttributeData attribute)
     {
+        // foreach kept over LINQ Where — attribute.NamedArguments is a small
+        // ImmutableArray (typically 0-2 entries) and the analyzer runs on every
+        // symbol per compilation, so avoiding the LINQ allocation matters more
+        // than the syntactic sugar the S3267 hint would suggest.
+#pragma warning disable S3267
         foreach (var named in attribute.NamedArguments)
+#pragma warning restore S3267
         {
             if (string.Equals(named.Key, "Format", System.StringComparison.Ordinal))
             {

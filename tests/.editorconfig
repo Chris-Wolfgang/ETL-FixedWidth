@@ -46,3 +46,132 @@ dotnet_diagnostic.S1144.severity = none
 
 # xUnit2013: Use Assert.Single instead of Assert.Equal for collection size
 dotnet_diagnostic.xUnit2013.severity = none
+
+# -----------------------------------------------------------------------
+# InspectCode-only suppressions (rules already NoWarn'd in the tests csproj
+# but InspectCode doesn't read csproj <NoWarn>). Duplicating here so both
+# MSBuild-time analyzers and InspectCode agree on the test scope.
+# -----------------------------------------------------------------------
+
+# RS0016 / RS0037: PublicApiAnalyzer — the analyzer is opt-in per project
+# via <AdditionalFiles Condition="Exists('PublicAPI.Shipped.txt')" /> in
+# Directory.Build.props. Test projects have no PublicAPI.Shipped.txt and
+# should not be tracked as a public surface. MSBuild honors the Condition;
+# InspectCode doesn't, so we silence explicitly here.
+dotnet_diagnostic.RS0016.severity = none
+dotnet_diagnostic.RS0037.severity = none
+
+# S1751: Loops with at most one iteration — some tests use for/while as a
+# structured "run once" scaffold and exit early on assertion.
+dotnet_diagnostic.S1751.severity = none
+
+# S1905: Redundant cast — deliberate in tests that assert generic overload
+# resolution or check up-casts.
+dotnet_diagnostic.S1905.severity = none
+
+# S2325: Method should be static — test-fixture members deliberately keep
+# instance state; the "could be static" hint is not useful here.
+dotnet_diagnostic.S2325.severity = none
+
+# S2743: Static field in generic type — test doubles routinely park state
+# on the closed generic for readability.
+dotnet_diagnostic.S2743.severity = none
+
+# S125: Sections of code should not be commented out — test files
+# occasionally keep intent-showing comment blocks (repro shapes, sample
+# fixtures).
+dotnet_diagnostic.S125.severity = none
+
+# MA0009: Add regex evaluation timeout — regex use in tests is bounded
+# input, no ReDoS concern.
+dotnet_diagnostic.MA0009.severity = none
+
+# MA0012: NullReferenceException reserved — tests intentionally throw
+# NRE to exercise error-handling paths.
+dotnet_diagnostic.MA0012.severity = none
+
+# MA0023: Regex .NET-only options — test regex uses portable options only,
+# false-positive on multi-TFM test builds.
+dotnet_diagnostic.MA0023.severity = none
+
+# VSTHRD002: Synchronously waiting on tasks — some tests deliberately call
+# .Result / .Wait() to prove sync-over-async safety (or its absence).
+dotnet_diagnostic.VSTHRD002.severity = none
+
+# VSTHRD003: Awaiting Task started outside context — common test pattern
+# (Assert.ThrowsAsync captures the task before await).
+dotnet_diagnostic.VSTHRD003.severity = none
+
+# xUnit1031: Do not use blocking task operations in test method — see
+# VSTHRD002; the same behaviour is intentional in a handful of tests.
+dotnet_diagnostic.xUnit1031.severity = none
+
+# -----------------------------------------------------------------------
+# ReSharper-native inspections (no dotnet_diagnostic ID). These fire from
+# R#'s own rule engine, not from a Roslyn analyzer package, so they take
+# the `resharper_<snake_rule>_highlighting` form.
+# -----------------------------------------------------------------------
+
+# UnusedAutoPropertyAccessor.Local / UnusedMember.Local — test POCOs
+# have getters or private members exercised via reflection or serialization
+# that R# cannot see.
+resharper_unused_auto_property_accessor_local_highlighting = none
+resharper_unused_member_local_highlighting = none
+
+# RedundantTypeArgumentsOfMethod — tests deliberately spell out the
+# generic type argument to lock a specific overload under review.
+resharper_redundant_type_arguments_of_method_highlighting = none
+
+# UsingStatementResourceInitialization — tests occasionally construct
+# a disposable outside the `using` for readability (e.g. capturing the
+# instance for a later assertion).
+resharper_using_statement_resource_initialization_highlighting = none
+
+# RedundantArgumentDefaultValue — tests spell out defaulted arguments
+# to make the intent of a scenario explicit at the call-site.
+resharper_redundant_argument_default_value_highlighting = none
+
+# RedundantCast — deliberate to nail down overload resolution in tests.
+resharper_redundant_cast_highlighting = none
+
+# CollectionNeverQueried.Local — test scaffolding collections built
+# only for their size/reference-equality behaviour.
+resharper_collection_never_queried_local_highlighting = none
+
+# NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract — tests
+# intentionally probe null-input handling despite non-null API contracts.
+resharper_null_coalescing_condition_is_always_not_null_according_to_api_contract_highlighting = none
+
+# RedundantSuppressNullableWarningExpression — tests use `!` after
+# `Assert.NotNull` for chaining; R# flags it once flow analysis kicks in.
+resharper_redundant_suppress_nullable_warning_expression_highlighting = none
+
+# AccessToDisposedClosure — cancellation-token tests capture a CTS in a
+# local function that completes before the `using` block exits; R# can't
+# see the ordering.
+resharper_access_to_disposed_closure_highlighting = none
+
+# ReturnTypeCanBeNotNullable — test helpers deliberately return nullable
+# to exercise the wrapped pattern.
+resharper_return_type_can_be_not_nullable_highlighting = none
+
+# NotAccessedVariable / UnusedVariable — test locals used only for
+# their assignment side-effect (asserting a call succeeds, etc.).
+resharper_not_accessed_variable_highlighting = none
+resharper_unused_variable_highlighting = none
+
+# ConvertTypeCheckPatternToNullCheck — R# style; tests deliberately
+# spell out `is` patterns for clarity.
+resharper_convert_type_check_pattern_to_null_check_highlighting = none
+
+# UnassignedGetOnlyAutoProperty — test POCOs use `get; }` deliberately
+# to model read-only records.
+resharper_unassigned_get_only_auto_property_highlighting = none
+
+# MemberHidesStaticFromOuterClass — occurs when a test nested class
+# uses a member name shared with the outer test host; harmless in tests.
+resharper_member_hides_static_from_outer_class_highlighting = none
+
+# RedundantWithCancellation — tests spell out .WithCancellation(token)
+# to prove the token is propagated even when the compiler can infer it.
+resharper_redundant_with_cancellation_highlighting = none
