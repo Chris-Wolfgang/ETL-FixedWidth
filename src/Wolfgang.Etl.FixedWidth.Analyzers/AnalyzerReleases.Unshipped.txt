@@ -1,0 +1,12 @@
+; Unshipped analyzer release
+; https://github.com/dotnet/roslyn-analyzers/blob/main/src/Microsoft.CodeAnalysis.Analyzers/ReleaseTrackingAnalyzers.Help.md
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+FW003 | Wolfgang.Etl.FixedWidth | Error | Duplicate fixed-width column index
+FW004 | Wolfgang.Etl.FixedWidth | Warning | Date/time fixed-width field requires a Format
+FW005 | Wolfgang.Etl.FixedWidth | Warning | Format pattern is wider than the fixed-width field
+FW007 | Wolfgang.Etl.FixedWidth | Warning | Fixed-width field property has no public setter
+FW008 | Wolfgang.Etl.FixedWidth | Info | Fixed-width field property has no public getter

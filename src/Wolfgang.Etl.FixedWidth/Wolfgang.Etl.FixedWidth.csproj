@@ -4,7 +4,7 @@
     <TargetFrameworks>net462;net481;netstandard2.0;net8.0;net10.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
-    <Version>0.8.0</Version>
+    <Version>0.9.0</Version>
     <!-- Pin AssemblyVersion to a fixed binding-stability baseline so consumers
          do not need to recompile / add binding redirects on every minor/patch
          bump. Bump only on a deliberate breaking API change. FileVersion +
@@ -63,5 +63,27 @@
 
   <!-- Analyzer PackageReferences are centralized in Directory.Build.props -->
 
+  <!-- Source generator (#13): built alongside the runtime and packed into this same
+       NuGet under analyzers/dotnet/cs. OutputItemType=Analyzer runs it against this
+       project's own compilation; ReferenceOutputAssembly=false + PrivateAssets=all keep
+       it out of the runtime reference set and off consumers' transitive graph. -->
+  <ItemGroup>
+    <ProjectReference Include="..\Wolfgang.Etl.FixedWidth.Analyzers\Wolfgang.Etl.FixedWidth.Analyzers.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false"
+                      PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Embed the built generator DLL into the package under analyzers/dotnet/cs so that
+       consuming projects load it automatically. The generator always builds as the single
+       netstandard2.0 assembly regardless of this library's target framework. -->
+  <Target Name="PackAnalyzer" BeforeTargets="_GetPackageFiles">
+    <ItemGroup>
+      <None Include="..\Wolfgang.Etl.FixedWidth.Analyzers\bin\$(Configuration)\netstandard2.0\Wolfgang.Etl.FixedWidth.Analyzers.dll"
+            Pack="true"
+            PackagePath="analyzers/dotnet/cs"
+            Visible="false" />
+    </ItemGroup>
+  </Target>
 
 </Project>

@@ -40,12 +40,15 @@
   <Folder Name="/examples/">
     <Project Path="examples/BasicExtraction/BasicExtraction.csproj" />
     <Project Path="examples/BasicLoading/BasicLoading.csproj" />
+    <Project Path="examples/BinaryRecords/BinaryRecords.csproj" />
     <Project Path="examples/CompressedStreams/CompressedStreams.csproj" />
     <Project Path="examples/CustomParsersConverters/CustomParsersConverters.csproj" />
+    <Project Path="examples/DataReader/DataReader.csproj" />
     <Project Path="examples/ErrorHandling/ErrorHandling.csproj" />
     <Project Path="examples/FieldDelimiter/FieldDelimiter.csproj" />
     <Project Path="examples/HeadersAndSeparators/HeadersAndSeparators.csproj" />
     <Project Path="examples/Metrics/Metrics.csproj" />
+    <Project Path="examples/MultiRecordTrailer/MultiRecordTrailer.csproj" />
     <Project Path="examples/PipelineExtensions/PipelineExtensions.csproj" />
     <Project Path="examples/ProgressReporting/ProgressReporting.csproj" />
     <Project Path="examples/RoundTrip/RoundTrip.csproj" />
@@ -54,6 +57,7 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/Wolfgang.Etl.FixedWidth/Wolfgang.Etl.FixedWidth.csproj" />
+    <Project Path="src/Wolfgang.Etl.FixedWidth.Analyzers/Wolfgang.Etl.FixedWidth.Analyzers.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Wolfgang.Etl.FixedWidth.Tests.Concurrency/Wolfgang.Etl.FixedWidth.Tests.Concurrency.csproj" />

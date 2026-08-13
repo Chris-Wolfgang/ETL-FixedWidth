@@ -19,6 +19,95 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.9.0] - 2026-08-12
+
+Compile-time tooling (a source generator for Native-AOT-friendly field accessors and a
+Roslyn analyzer for layout mistakes), multi-record-type routing, an `IDataReader`,
+byte-offset checkpoint/resume, and COBOL binary field support. Additive public API — no
+breaking changes.
+
+### Added
+
+- Binary / mainframe field support ([#21]): `FixedWidthBinaryExtractor<TRecord>` and
+  `FixedWidthBinaryLoader<TRecord>` read and write fixed-length **binary** records (no newline
+  delimiters — each record is a fixed number of bytes) over a `Stream`, decoding/encoding COBOL
+  `COMP-3` packed-decimal and `COMP` binary-integer fields alongside text (a round-trip is
+  symmetric). Fields are declared with the new
+  `[FixedWidthBinaryField(index, byteLength, BinaryFieldType, Scale/Signed)]` attribute
+  (byte-based, type-driven); text fields use the extractor/loader's `Encoding` init property (ASCII
+  default; set a code-page encoding for EBCDIC). Both take an optional `ILogger` as the last ctor
+  argument. Unsigned `COMP` fields (`Signed = false`) decode over the
+  full unsigned range: an 8-byte value above `Int64.MaxValue` maps cleanly to a `ulong` property,
+  and overflows (throws) rather than wrapping negative if the target property is signed. A
+  `COMP-3` field with a fractional part (`Scale > 0`) mapped to an integral property throws rather
+  than silently rounding it away (map it to a `decimal`/floating-point property, or declare
+  `Scale = 0`). The existing text extractor and loader are unchanged.
+- `FixedWidthDataReader<TRecord>` — a forward-only, read-only `IDataReader` over a
+  fixed-width source, with the layout taken from `TRecord`'s `[FixedWidthField]`
+  attributes. It serves each field value directly from the parsed line — **no
+  `TRecord` is allocated per row** — the optimal shape for `SqlBulkCopy`,
+  `DataTable.Load`, and other ADO.NET consumers that would otherwise discard a POCO
+  per row. Supports the extractor's configuration (`HeaderLineCount`,
+  `SkipItemCount`, `MaximumItemCount`, `BlankLineHandling`, `MalformedLineHandling`,
+  `FieldDelimiter` — all `init`-only, set in the object initializer), typed accessors, and
+  `GetSchemaTable()` ([#26]).
+- Byte-offset checkpoint / resume on `FixedWidthExtractor<T>` ([#31]): opt in with
+  `TrackByteOffset = true` and read `CurrentByteOffset` after each record to persist a
+  checkpoint; on restart, set `StartByteOffset` to that value to seek straight to the next
+  unread line and skip the millions of records already processed. Terminators (`\n`, `\r`,
+  `\r\n`), multi-byte UTF-8, and a leading byte-order mark are all counted exactly, so a
+  saved offset is a precise byte position. Tracking is opt-in (it wraps the reader in a
+  byte-counting decoder) and requires the `Stream` constructor — a seekable stream for
+  resume; the default read path is unchanged. On resume, header lines are not re-skipped
+  and `SkipItemCount` applies from the resumed position. `CurrentLineNumber` is exposed for
+  diagnostics independent of checkpointing.
+- `FixedWidthMultiRecordExtractor` — reads a file that interleaves **multiple record types**
+  (a mainframe header/detail/trailer batch, for example) and yields each line as the
+  concrete POCO it maps to. Register one rule per type with
+  `.When(line => line[0] == 'D', typeof(DetailRecord))`; the first matching predicate
+  wins. Lines that match no rule are handled per `UnmatchedLineHandling` (throw or skip)
+  or routed to a fallback type via `.Otherwise(...)`. Each record type keeps its own
+  independent `[FixedWidthField]` layout, and the extractor shares the family's
+  `HeaderLineCount`, `FieldDelimiter`, `ValueParser`, `SkipItemCount`/`MaximumItemCount`,
+  malformed-line dead-lettering (`OnError`), and progress reporting. Its configuration
+  properties are `init`-only — set them in the object initializer, so config is fixed for
+  the run ([#19]).
+- Trailer record-count validation guidance and a runnable `MultiRecordTrailer` example —
+  once multiple record types can be routed ([#19]), verifying a trailer's declared record
+  count and control total against what was read is ordinary application logic, needing no
+  new API ([#25]).
+- Compile-time field-mapping source generator ([#13]): a new analyzer package,
+  `Wolfgang.Etl.FixedWidth.Analyzers`, ships inside this NuGet and — for every type with
+  `[FixedWidthField]` properties — emits a factory plus direct-access getter/setter
+  delegates and registers them from a module initializer. The runtime prefers these over
+  the previous `Expression.Compile`d delegates, removing the last `RequiresDynamicCode`
+  code path so extraction and loading are **Native AOT and trimming compatible**, with no
+  per-type startup JIT cost. It requires no code changes — keep decorating POCOs with
+  `[FixedWidthField]`. Types the generator cannot handle (generic, inaccessible, or on
+  `net462`/`netstandard2.0` where module initializers do not exist) transparently fall
+  back to the reflection path, so behaviour is identical either way. Groundwork for the
+  Native AOT support tracked by [#12].
+- Compile-time layout diagnostics ([#27]): the `Wolfgang.Etl.FixedWidth.Analyzers` package
+  now also ships a Roslyn analyzer that flags `[FixedWidthField]` mistakes in the IDE and
+  the build, before the code runs — **FW003** (error) duplicate column index, **FW004**
+  (warning) a `DateTime`/`DateTimeOffset`/`TimeSpan` field with no `Format` (which throws at
+  runtime), **FW005** (warning) a `Format` pattern wider than the field, **FW007** (warning)
+  a mapped property with no public setter, and **FW008** (info) one with no public getter.
+  (The issue's FW001/FW002 — overlapping/gapped byte positions — do not apply to this
+  library's index-based model, where positions are derived and contiguous by construction
+  and gaps are declared explicitly with `[FixedWidthSkip]`; FW006 is deferred as too
+  heuristic to flag without false positives.)
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
 ## [0.8.0] - 2026-08-07
 
 Code-first schema building, error dead-lettering, and zero-config metrics.
@@ -355,18 +444,27 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#162]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/162
 [#163]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/163
 [#14]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/14
+[#19]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/19
 [#22]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/22
 [#24]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/24
+[#25]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/25
 [#23]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/23
+[#21]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/21
 [#30]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/30
+[#31]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/31
+[#12]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/12
+[#13]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/13
+[#27]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/27
 [#140]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/140
 [#147]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/147
 [#152]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/152
 [#153]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/153
 [#165]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/165
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
+[#26]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/26
 [#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.5.1...v0.6.0

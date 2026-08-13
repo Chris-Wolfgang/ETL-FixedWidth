@@ -7,14 +7,32 @@
     <Version>0.2.0</Version>
     <IsPackable>false</IsPackable>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <!-- This project references its own analyzer package (for the generator + analyzer
+         tests), so the FW0NN diagnostics fire over the test fixtures. Test fixtures
+         deliberately exercise invalid layouts (duplicate index, no setter, unformatted
+         date), so suppress the build-time diagnostics here; FixedWidthFieldAnalyzerTests
+         verifies they fire correctly by driving the analyzer directly. -->
+    <NoWarn>$(NoWarn);FW003;FW004;FW005;FW007;FW008</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Wolfgang.Etl.FixedWidth\Wolfgang.Etl.FixedWidth.csproj" />
+    <!-- Reference the analyzer package project so the source generator AND the FW0NN
+         diagnostic analyzer run over this project's own [FixedWidthField] fixtures at
+         compile time (analyzers do not flow transitively through the runtime reference
+         above). ReferenceOutputAssembly=true also exposes the analyzer types so
+         FixedWidthFieldAnalyzerTests can drive the analyzer directly. -->
+    <ProjectReference Include="..\..\src\Wolfgang.Etl.FixedWidth.Analyzers\Wolfgang.Etl.FixedWidth.Analyzers.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="true"
+                      PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.10" />
+    <!-- Drives the FixedWidth analyzer directly over in-memory compilations in the
+         FixedWidthFieldAnalyzerTests (net8.0+ only — those tests are #if-scoped). -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" Condition="'$(TargetFramework)' == 'netcoreapp3.1' Or '$(TargetFramework)' == 'net5.0'" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0')) And '$(TargetFramework)' != 'netcoreapp3.1' And '$(TargetFramework)' != 'net5.0'" />

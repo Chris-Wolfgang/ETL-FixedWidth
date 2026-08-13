@@ -150,6 +150,28 @@ await loader.LoadAsync(records, CancellationToken.None);
 
 `NewLine` accepts any string (`"\n"`, `"\r\n"`, or a custom terminator). The default is `Environment.NewLine`.
 
+### Checkpoint and resume (large files)
+
+Processing a multi-GB fixed-width export can take a while; if the pipeline crashes at record 5,000,000 you don't want to re-read from the top. Opt in to byte-offset tracking, persist `CurrentByteOffset` after each record, and resume from the saved position with `StartByteOffset`:
+
+```csharp
+// First run — checkpoint after each record
+await using var stream = File.OpenRead("huge.dat");
+using var extractor = new FixedWidthExtractor<Record>(stream) { TrackByteOffset = true };
+await foreach (var record in extractor.ExtractAsync(token))
+{
+    Process(record);
+    SaveCheckpoint(extractor.CurrentByteOffset);   // byte position of the next unread line
+}
+
+// After a crash — seek straight to the next unread line, skipping everything already done
+await using var stream = File.OpenRead("huge.dat");
+using var extractor = new FixedWidthExtractor<Record>(stream) { StartByteOffset = LoadCheckpoint() };
+await foreach (var record in extractor.ExtractAsync(token)) { /* only the remainder */ }
+```
+
+Terminators (`\n`, `\r`, `\r\n`), multi-byte UTF-8, and a leading byte-order mark are all counted exactly, so a saved offset is a precise byte position. Tracking is **opt-in** — it wraps the reader in a byte-counting decoder, so the default read path keeps its throughput — and requires the `Stream` constructor (seekable for resume). On resume, header lines are not re-skipped and `SkipItemCount` applies from the resumed position. `CurrentLineNumber` is available for diagnostics independently of checkpointing.
+
 ### Inspecting the layout
 
 `FixedWidthSchema.For<T>()` exposes the resolved field layout as a read-only view — useful for generating documentation, building validation tooling, or debugging a mapping. It applies the same validation as extraction, so an invalid layout (duplicate column index, a mapped field with no public setter) throws here too.
@@ -205,6 +227,46 @@ The builder uses lambda expressions for type-safe, refactor-proof property refer
 
 See the [SchemaBuilder](examples/SchemaBuilder) example for a runnable walk-through.
 
+### Reading and writing binary / mainframe records
+
+Mainframe (COBOL) files mix text with binary-encoded numeric fields — `COMP` big-endian integers and `COMP-3` packed decimals — and are **not** newline-delimited: every record is a fixed number of *bytes*, written back-to-back. Because packed-decimal and binary bytes routinely contain `0x0A`/`0x0D`, they must never be split on newlines. `FixedWidthBinaryExtractor<T>` / `FixedWidthBinaryLoader<T>` read and write these records by byte count, decoding/encoding each field per its declared type.
+
+Declare the layout with `[FixedWidthBinaryField]` — widths are in **bytes**, and `BinaryFieldType` selects the decoding (`Text`, `Binary`, or `PackedDecimal`):
+
+```csharp
+using Wolfgang.Etl.FixedWidth;
+using Wolfgang.Etl.FixedWidth.Attributes;
+using Wolfgang.Etl.FixedWidth.Enums;
+
+public class AccountRecord
+{
+    [FixedWidthBinaryField(0, 8, BinaryFieldType.Text)]
+    public string AccountId { get; set; } = string.Empty;
+
+    [FixedWidthBinaryField(1, 4, BinaryFieldType.Binary)]              // COMP
+    public int TransactionCount { get; set; }
+
+    [FixedWidthBinaryField(2, 5, BinaryFieldType.PackedDecimal, Scale = 2)]   // PIC S9(7)V99 COMP-3
+    public decimal Balance { get; set; }
+}
+
+await using var stream = File.OpenRead("accounts.dat");
+using var extractor = new FixedWidthBinaryExtractor<AccountRecord>(stream);
+await foreach (var account in extractor.ExtractAsync(CancellationToken.None))
+{
+    // account.Balance decoded from COMP-3, account.TransactionCount from COMP
+}
+```
+
+Text fields decode with the extractor/loader's encoding — **ASCII by default**. For EBCDIC data, register the code-page provider and pass the encoding (the `System.Text.Encoding.CodePages` package is only needed by consumers who use it, so it is not bundled):
+
+```csharp
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+using var extractor = new FixedWidthBinaryExtractor<AccountRecord>(stream, Encoding.GetEncoding("IBM037"));
+```
+
+Writing is symmetric — `FixedWidthBinaryLoader<T>` encodes each field back to its `COMP`/`COMP-3`/text bytes. See the [BinaryRecords](examples/BinaryRecords) example for a runnable write → read round trip.
+
 ### Transforming between layouts
 
 To reformat a fixed-width file from one layout to another — reordering, adding/removing, or format-converting fields (a common mainframe-migration task) — `FixedWidthTransformer<TSource, TDestination>` is the projection stage between an extractor and a loader:
@@ -231,6 +293,38 @@ using var transformer = FixedWidthTransformer<LegacyRecord, ModernRecord>.ByMatc
 ```
 
 `ByMatchingProperties()` copies every source property to the destination property of the same name and an assignable type, and requires a public parameterless constructor on the destination.
+
+### Reading files with multiple record types
+
+Mainframe and EDI batch files often interleave several record layouts on different lines — a header, many detail rows, and a trailer — distinguished by a discriminator character. `FixedWidthMultiRecordExtractor` routes each line to the right POCO: register one rule per type, and the first matching predicate wins.
+
+```csharp
+using var extractor = new FixedWidthMultiRecordExtractor(reader)
+    .When(line => line[0] == 'H', typeof(HeaderRecord))
+    .When(line => line[0] == 'D', typeof(DetailRecord))
+    .When(line => line[0] == 'T', typeof(TrailerRecord));
+
+await foreach (var record in extractor.ExtractAsync(token))
+{
+    switch (record)
+    {
+        case HeaderRecord h: /* ... */ break;
+        case DetailRecord d: /* ... */ break;
+        case TrailerRecord t: /* ... */ break;
+    }
+}
+```
+
+Each record type keeps its own independent `[FixedWidthField]` layout. A line that matches no rule throws by default; set `UnmatchedLineHandling = UnmatchedLineHandling.Skip` to drop it, or register a catch-all type with `.Otherwise(typeof(UnknownRecord))`. Blank lines are skipped before predicates run (so a discriminator can index the line safely), and the extractor shares the family's `HeaderLineCount`, `FieldDelimiter`, `ValueParser`, `SkipItemCount`/`MaximumItemCount`, dead-letter `OnError`, and progress reporting.
+
+**Trailer record-count validation** falls out of this naturally: capture the trailer as it streams past, count the details, and compare — no extra API needed.
+
+```csharp
+if (trailer.RecordCount != detailCount)
+    throw new InvalidDataException($"Trailer says {trailer.RecordCount}, file has {detailCount}.");
+```
+
+See the [MultiRecordTrailer](examples/MultiRecordTrailer) example for a runnable header/detail/trailer walk-through that checks both the record count and a control total.
 
 ### Composing an ETL pipeline
 
@@ -307,19 +401,22 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 | **Malformed line handling** | `MalformedLineHandling` — `ThrowException`, `Skip`, or `ReturnDefault` |
 | **Line filtering** | `LineFilter` delegate for custom line-level control (`Process`, `Skip`, `Stop`) |
 | **Progress reporting** | Timer-based `IProgress<T>` reporting via `FixedWidthReport` (includes `CurrentLineNumber`) |
+| **Checkpoint / resume** | `TrackByteOffset` + `CurrentByteOffset` / `StartByteOffset` — persist a byte-offset checkpoint per record and resume a crashed run without re-reading the file |
 | **Zero-copy parsing** | `ReadOnlyMemory<char>` slicing avoids string allocations during field extraction |
 | **Span-based numerics** | `Span<char>`-based numeric parsing on net8.0+ for reduced allocation |
-| **Compiled delegates** | Field accessors use compiled delegates instead of reflection for fast property get/set |
+| **Source-generated accessors** | A bundled Roslyn generator emits direct-access factory/getter/setter delegates for `[FixedWidthField]` types at compile time — no reflection, no `Expression.Compile`, **Native AOT & trimming compatible**; falls back to compiled delegates on net462/netstandard2.0 |
 | **Schema introspection** | `FixedWidthSchema.For<T>()` exposes the resolved layout (positions, widths, types, skips); `ToDiagram()` renders it as a text table |
 | **Code-defined layout** | `FixedWidthSchemaBuilder<T>` defines a layout in fluent, type-safe code (no attributes required); assign it to the extractor/loader `Schema` property |
+| **Binary / mainframe** | `FixedWidthBinaryExtractor<T>` / `FixedWidthBinaryLoader<T>` read/write fixed-length binary records with COBOL `COMP` / `COMP-3` fields via `[FixedWidthBinaryField]` |
 | **Format transformation** | `FixedWidthTransformer<TSource, TDestination>` projects one layout to another in a single streaming pass, with optional `ByMatchingProperties()` auto-mapping |
+| **Multi-record-type files** | `FixedWidthMultiRecordExtractor` routes each line to a different POCO by a discriminator predicate (`.When(…)` / `.Otherwise(…)`), for header/detail/trailer batch files |
 | **Pipeline composition** | `EtlPipeline.Create().FixedWidthExtractor<T>(…).FixedWidthLoader<T>(…).RunAsync()` — fluent source factories and sink terminators over the generic `EtlPipeline` (requires `Wolfgang.Etl.Abstractions` 0.16.0) |
 | **Metrics** | Zero-config `System.Diagnostics.Metrics` instruments (throughput, skips, duration) from the `Wolfgang.Etl.FixedWidth` meter — OpenTelemetry / Prometheus / any `MeterListener` |
 | **Multi-TFM support** | net462, net481, netstandard2.0, net8.0, net10.0 |
 
 **Examples:**
 
-The [examples/](examples/) folder contains 13 runnable console projects demonstrating each feature:
+The [examples/](examples/) folder contains 16 runnable console projects demonstrating each feature:
 
 | Example | Description |
 |---------|-------------|
@@ -336,6 +433,21 @@ The [examples/](examples/) folder contains 13 runnable console projects demonstr
 | [PipelineExtensions](examples/PipelineExtensions) | Compose extract → transform → load as one `EtlPipeline` fluent chain |
 | [Metrics](examples/Metrics) | Subscribe to the `Wolfgang.Etl.FixedWidth` meter and read throughput/duration metrics |
 | [SchemaBuilder](examples/SchemaBuilder) | Define a layout in code with `FixedWidthSchemaBuilder<T>` instead of attributes |
+| [DataReader](examples/DataReader) | Expose a fixed-width source as an `IDataReader` for `SqlBulkCopy` / `DataTable` (no POCO per row) |
+| [BinaryRecords](examples/BinaryRecords) | Read/write fixed-length **binary** (mainframe) records with `COMP-3` / `COMP` fields |
+| [MultiRecordTrailer](examples/MultiRecordTrailer) | Route header/detail/trailer records with `FixedWidthMultiRecordExtractor` and validate the trailer's record count and control total |
+
+**Compile-time diagnostics:**
+
+The package ships a Roslyn analyzer that catches `[FixedWidthField]` layout mistakes in the IDE and the build — no configuration required:
+
+| ID | Severity | Flags |
+|----|----------|-------|
+| `FW003` | Error | Two columns declare the same `Index` (field mapping throws at runtime) |
+| `FW004` | Warning | A `DateTime` / `DateTimeOffset` / `TimeSpan` field with no `Format` (parsing and writing throw) |
+| `FW005` | Warning | A `Format` pattern wider than the field length (the value overflows on write) |
+| `FW007` | Warning | A mapped property with no public setter (extraction throws) |
+| `FW008` | Info | A mapped property with no public getter (loading throws) |
 
 ---
 

@@ -109,6 +109,28 @@ await loader.LoadAsync(recordsAsyncEnumerable, CancellationToken.None);
 
 `NewLine` accepts any string; the default is `Environment.NewLine`.
 
+### Checkpoint and resume
+
+For multi-GB files, opt in to byte-offset tracking so a crashed run can resume without re-reading. Persist `CurrentByteOffset` after each record and pass it back as `StartByteOffset` on restart:
+
+```csharp
+// First run
+await using var stream = File.OpenRead("huge.dat");
+using var extractor = new FixedWidthExtractor<Record>(stream) { TrackByteOffset = true };
+await foreach (var record in extractor.ExtractAsync(token))
+{
+    Process(record);
+    SaveCheckpoint(extractor.CurrentByteOffset);
+}
+
+// Resume after a crash
+await using var stream = File.OpenRead("huge.dat");
+using var extractor = new FixedWidthExtractor<Record>(stream) { StartByteOffset = LoadCheckpoint() };
+await foreach (var record in extractor.ExtractAsync(token)) { /* the remainder */ }
+```
+
+Terminators (`\n`/`\r`/`\r\n`), multi-byte UTF-8, and a leading BOM are counted exactly. Tracking is opt-in and requires the `Stream` constructor (seekable for resume); the default read path is unchanged. On resume, header lines are not re-skipped and `SkipItemCount` applies from the resumed position.
+
 ### Inspecting the layout
 
 `FixedWidthSchema.For<T>()` exposes the resolved field layout as a read-only view — handy for generating documentation, building validation tooling, or debugging a mapping. It runs the same validation as extraction, so an invalid layout throws here too.
@@ -156,6 +178,30 @@ using var extractor = new FixedWidthExtractor<CustomerRecord>(reader) { Schema =
 
 The lambda selectors are type-safe (no magic strings) and `index` is the zero-based column ordinal, matching `[FixedWidthField(index, length)]`. A built schema is equivalent to an attribute-resolved one — same validation and the same `Fields` / `ToDiagram()` introspection — and overrides any attributes on the type when set. See the [SchemaBuilder example](examples.md#schemabuilder).
 
+### Binary / mainframe records
+
+Mainframe (COBOL) files mix text with binary numeric fields — `COMP` big-endian integers and `COMP-3` packed decimals — and are **not** newline-delimited: each record is a fixed number of *bytes*. `FixedWidthBinaryExtractor<T>` / `FixedWidthBinaryLoader<T>` read and write them by byte count, so packed/binary bytes that happen to be `0x0A`/`0x0D` are never mistaken for separators. Declare the layout with `[FixedWidthBinaryField]` (widths in bytes; `BinaryFieldType` picks the decoding):
+
+```csharp
+public class AccountRecord
+{
+    [FixedWidthBinaryField(0, 8, BinaryFieldType.Text)]
+    public string AccountId { get; set; } = string.Empty;
+
+    [FixedWidthBinaryField(1, 4, BinaryFieldType.Binary)]              // COMP
+    public int TransactionCount { get; set; }
+
+    [FixedWidthBinaryField(2, 5, BinaryFieldType.PackedDecimal, Scale = 2)]   // PIC S9(7)V99 COMP-3
+    public decimal Balance { get; set; }
+}
+
+await using var stream = File.OpenRead("accounts.dat");
+using var extractor = new FixedWidthBinaryExtractor<AccountRecord>(stream);
+await foreach (var account in extractor.ExtractAsync(CancellationToken.None)) { /* … */ }
+```
+
+Text fields decode with the encoding (ASCII by default). For EBCDIC, register the code-page provider and pass the encoding: `Encoding.RegisterProvider(CodePagesEncodingProvider.Instance)` then `new FixedWidthBinaryExtractor<AccountRecord>(stream, Encoding.GetEncoding("IBM037"))`. Writing is symmetric via `FixedWidthBinaryLoader<T>`. See the [BinaryRecords example](examples.md#binaryrecords).
+
 ### Transforming between layouts
 
 `FixedWidthTransformer<TSource, TDestination>` reformats records from one layout to another (reorder, add/remove, or format-convert fields) as the projection stage between an extractor and a loader:
@@ -171,6 +217,29 @@ await loader.LoadAsync(modern, token);
 ```
 
 When source and destination share property names and compatible types, `FixedWidthTransformer<LegacyRecord, ModernRecord>.ByMatchingProperties()` builds the copy automatically (the destination needs a public parameterless constructor).
+
+### Reading files with multiple record types
+
+Mainframe and EDI batch files interleave several record layouts on different lines — a header, detail rows, and a trailer — distinguished by a discriminator character. `FixedWidthMultiRecordExtractor` routes each line to the right POCO. Register one rule per type; the first matching predicate wins.
+
+```csharp
+using var extractor = new FixedWidthMultiRecordExtractor(reader)
+    .When(line => line[0] == 'H', typeof(HeaderRecord))
+    .When(line => line[0] == 'D', typeof(DetailRecord))
+    .When(line => line[0] == 'T', typeof(TrailerRecord));
+
+await foreach (var record in extractor.ExtractAsync(token))
+{
+    switch (record)
+    {
+        case HeaderRecord h: /* ... */ break;
+        case DetailRecord d: /* ... */ break;
+        case TrailerRecord t: /* ... */ break;
+    }
+}
+```
+
+Each record type keeps its own independent `[FixedWidthField]` layout. A line matching no rule throws by default; set `UnmatchedLineHandling = UnmatchedLineHandling.Skip` to drop it or register a catch-all with `.Otherwise(typeof(UnknownRecord))`. The extractor shares the family's `HeaderLineCount`, `FieldDelimiter`, `ValueParser`, `SkipItemCount`/`MaximumItemCount`, dead-letter `OnError`, and progress reporting.
 
 ### Composing an ETL pipeline
 
