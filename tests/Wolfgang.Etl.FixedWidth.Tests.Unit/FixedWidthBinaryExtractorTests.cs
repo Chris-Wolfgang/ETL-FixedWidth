@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Binary;
@@ -86,6 +87,26 @@ public sealed class FixedWidthBinaryExtractorTests
         using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(Array.Empty<byte>()));
 
         Assert.Empty(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+    }
+
+
+
+    [Fact]
+    public async Task Extract_with_a_logger_writes_the_start_information_log()
+    {
+        var data = Concat(Record("ACCT0001", 42, Balance1234_56));
+        var logger = new SpyLogger<FixedWidthBinaryExtractor<Account>>();
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data), logger);
+
+        await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
+
+        Assert.Contains
+        (
+            logger.Entries,
+            e => e.Level == LogLevel.Information
+                && e.Message.Contains("Binary extraction started", StringComparison.Ordinal)
+                && e.Message.Contains("Account", StringComparison.Ordinal)
+        );
     }
 
 
