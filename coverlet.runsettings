@@ -7,11 +7,6 @@
           <Format>cobertura</Format>
           <ExcludeByFile>**/bin/**/*.cs;**/obj/**/*.cs</ExcludeByFile>
           <ExcludeByAttribute>ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
-          <!-- The Roslyn analyzer/source-generator assembly is compile-time tooling:
-               the generator runs during the build, not at test runtime, so coverlet
-               reports it as 0% even though its behaviour is verified by the analyzer /
-               conformance tests. Exclude it from the runtime-coverage gate. -->
-          <Exclude>[Wolfgang.Etl.FixedWidth.Analyzers]*</Exclude>
         </Configuration>
       </DataCollector>
     </DataCollectors>
