@@ -67,6 +67,30 @@ public sealed class FixedWidthFieldAnalyzerTests
 
 
     [Fact]
+    public async Task Reports_FW003_when_a_field_and_a_skip_share_an_index()
+    {
+        var diagnostics = await AnalyzeAsync(Wrap(
+            "    [FixedWidthField(0, 5)] public string A { get; set; } = \"\";\n" +
+            "    [FixedWidthSkip(0, 3)] [FixedWidthField(1, 5)] public string B { get; set; } = \"\";"));
+
+        Assert.Contains(diagnostics, d => string.Equals(d.Id, "FW003", StringComparison.Ordinal));
+    }
+
+
+
+    [Fact]
+    public async Task Reports_nothing_for_a_disjoint_field_and_skip_layout()
+    {
+        var diagnostics = await AnalyzeAsync(Wrap(
+            "    [FixedWidthField(0, 5)] public string A { get; set; } = \"\";\n" +
+            "    [FixedWidthSkip(1, 3)] [FixedWidthField(2, 5)] public string B { get; set; } = \"\";"));
+
+        Assert.Empty(diagnostics.Where(d => d.Id.StartsWith("FW", StringComparison.Ordinal)));
+    }
+
+
+
+    [Fact]
     public async Task Reports_FW004_for_a_DateTime_field_without_a_format()
     {
         var diagnostics = await AnalyzeAsync(Wrap(
