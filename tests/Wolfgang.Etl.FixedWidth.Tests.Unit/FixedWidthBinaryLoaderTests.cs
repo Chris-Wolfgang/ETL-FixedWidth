@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Enums;
@@ -73,6 +74,27 @@ public sealed class FixedWidthBinaryLoaderTests
         Assert.Equal(7, read[1].TransactionCount);
         Assert.Equal(-0.05m, read[1].Balance);
     }
+
+
+    [Fact]
+    public async Task Load_with_a_logger_writes_the_start_information_log()
+    {
+        var accounts = new[] { new Account { AccountId = "ACCT0001", TransactionCount = 42, Balance = 1234.56m } };
+        var logger = new SpyLogger<FixedWidthBinaryLoader<Account>>();
+        using var ms = new MemoryStream();
+        using var loader = new FixedWidthBinaryLoader<Account>(ms, logger);
+
+        await loader.LoadAsync(ToAsync(accounts), CancellationToken.None);
+
+        Assert.Contains
+        (
+            logger.Entries,
+            e => e.Level == LogLevel.Information
+                && e.Message.Contains("Binary load started", StringComparison.Ordinal)
+                && e.Message.Contains("Account", StringComparison.Ordinal)
+        );
+    }
+
 
 
     [Fact]
