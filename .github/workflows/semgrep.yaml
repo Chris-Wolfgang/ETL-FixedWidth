@@ -52,7 +52,12 @@ jobs:
           python-version: '3.x'
 
       - name: Install Semgrep
-        run: pip install semgrep
+        # Version-pinned so `pip install` picks a known-good release rather than
+        # whatever floats at scan time. Bump manually alongside the semgrep
+        # ruleset packs referenced in the Run step (no pip ecosystem in
+        # .github/dependabot.yml — the pin lives in a workflow `run:` step,
+        # not a requirements.txt Dependabot can parse).
+        run: pip install semgrep==1.173.0
 
       - name: Run Semgrep
         run: |
