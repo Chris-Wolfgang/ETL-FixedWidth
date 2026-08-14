@@ -35,19 +35,19 @@ jobs:
       PROJ: src/Wolfgang.Etl.FixedWidth/Wolfgang.Etl.FixedWidth.csproj
     steps:
       - name: Checkout (copy A)
-        uses: actions/checkout@v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           path: a
           persist-credentials: false
 
       - name: Checkout (copy B)
-        uses: actions/checkout@v7
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           path: b
           persist-credentials: false
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v6
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
         with:
           dotnet-version: '10.0.x'
 
