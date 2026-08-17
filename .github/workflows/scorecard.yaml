@@ -95,6 +95,10 @@ jobs:
             echo "::error::jq not available on the runner; cannot filter SARIF."
             exit 1
           fi
+          # Word-split SUPPRESSED_RULES intentionally — one rule per line for the
+          # jq -R/-s pipeline. shellcheck's default "quote to prevent globbing"
+          # rule (SC2086) would break this.
+          # shellcheck disable=SC2086
           rules_json=$(printf '%s\n' $SUPPRESSED_RULES | jq -R . | jq -s .)
           jq \
             --argjson suppressed "$rules_json" \
