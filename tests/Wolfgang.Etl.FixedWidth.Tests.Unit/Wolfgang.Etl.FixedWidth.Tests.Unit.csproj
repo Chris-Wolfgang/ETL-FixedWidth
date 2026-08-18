@@ -20,11 +20,18 @@
     <!-- Reference the analyzer package project so the source generator AND the FW0NN
          diagnostic analyzer run over this project's own [FixedWidthField] fixtures at
          compile time (analyzers do not flow transitively through the runtime reference
-         above). ReferenceOutputAssembly=true also exposes the analyzer types so
-         FixedWidthFieldAnalyzerTests can drive the analyzer directly. -->
+         above).
+         ReferenceOutputAssembly is TRUE only on net8.0+, where
+         FixedWidthFieldAnalyzerTests / FixedWidthAccessorGeneratorOutputTests
+         (both #if NET8_0_OR_GREATER) instantiate the analyzer / generator types
+         directly. On older TFMs (net6.0, netcoreapp3.1, netfx) the analyzer's
+         runtime closure (System.Collections.Immutable 8.x, from Roslyn) collides
+         with the framework's own 6.x reference and produces MSB3277 conflicts (#311)
+         — leaving ReferenceOutputAssembly=false there keeps the analyzer running
+         at compile time without pulling its runtime assemblies into the test host. -->
     <ProjectReference Include="..\..\src\Wolfgang.Etl.FixedWidth.Analyzers\Wolfgang.Etl.FixedWidth.Analyzers.csproj"
                       OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="true"
+                      ReferenceOutputAssembly="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))"
                       PrivateAssets="all" />
   </ItemGroup>
 
