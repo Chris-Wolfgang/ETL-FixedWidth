@@ -1,15 +1,40 @@
 # Analyzer rules relaxed for benchmark projects
+#
+# Mirrors the tests/.editorconfig pattern: each rule is suppressed with an
+# explicit reason, so when a new analyzer fires on benchmark code we can
+# decide whether to fix the benchmark or carve out the rule per-instance
+# rather than blanket-exempting benchmarks from TreatWarningsAsErrors.
 
 [*.cs]
 
-# AsyncFixer01: Remove async/await — benchmark methods use BenchmarkDotNet conventions
+# AsyncFixer01: Remove async/await — benchmark methods deliberately keep
+# async/await to measure the state-machine path.
 dotnet_diagnostic.AsyncFixer01.severity = none
 
-# MA0004: Use ConfigureAwait(false) — not needed in benchmark harness
-dotnet_diagnostic.MA0004.severity = none
+# ConfigureAwait — benchmarks run in console host, no SynchronizationContext
+# to deadlock against; the call-site noise is not useful.
+dotnet_diagnostic.MA0004.severity = none           # Meziantou: Use ConfigureAwait
+dotnet_diagnostic.CA2007.severity = none           # .NET:      ConfigureAwait
 
 # S1215: Remove use of GC.GetTotalMemory — required for memory benchmarks
 dotnet_diagnostic.S1215.severity = none
 
-# VSTHRD200: Use Async suffix — benchmark methods follow BenchmarkDotNet naming conventions
+# VSTHRD200: Use Async suffix — benchmark methods follow BenchmarkDotNet
+# naming conventions (chart-friendly names).
 dotnet_diagnostic.VSTHRD200.severity = none
+
+# RS0016 / RS0037: PublicApiAnalyzer — the analyzer is opt-in per project
+# via <AdditionalFiles Condition="Exists('PublicAPI.Shipped.txt')" /> in
+# Directory.Build.props. Benchmark projects have no PublicAPI.Shipped.txt.
+# MSBuild honors the Condition; InspectCode doesn't, so we silence
+# explicitly here.
+dotnet_diagnostic.RS0016.severity = none
+dotnet_diagnostic.RS0037.severity = none
+
+# -----------------------------------------------------------------------
+# ReSharper-native rules with no dotnet_diagnostic ID
+# -----------------------------------------------------------------------
+
+# NotAccessedVariable — benchmark locals captured only for their
+# allocation side-effect (measuring GC pressure).
+resharper_not_accessed_variable_highlighting = none

@@ -13,3 +13,35 @@ dotnet_diagnostic.VSTHRD200.severity = none
 
 # AsyncFixer01: Remove async/await — examples prioritize clarity
 dotnet_diagnostic.AsyncFixer01.severity = none
+
+# RS0016 / RS0037: PublicApiAnalyzer — example projects have no
+# PublicAPI.Shipped.txt and should not be tracked as a public surface.
+# MSBuild honors the Exists('PublicAPI.Shipped.txt') AdditionalFiles
+# condition in Directory.Build.props; InspectCode does not, so we silence
+# explicitly here.
+dotnet_diagnostic.RS0016.severity = none
+dotnet_diagnostic.RS0037.severity = none
+
+# -----------------------------------------------------------------------
+# ReSharper-native inspections (no dotnet_diagnostic ID). These fire from
+# R#'s own rule engine, not from a Roslyn analyzer package.
+# -----------------------------------------------------------------------
+
+# RedundantTypeArgumentsOfMethod — examples spell out generic type
+# arguments to make the intended overload obvious to the reader.
+resharper_redundant_type_arguments_of_method_highlighting = none
+
+# RedundantCast — examples spell out casts for pedagogical clarity.
+resharper_redundant_cast_highlighting = none
+
+# CollectionNeverQueried.Local — example fixtures build sample inputs
+# whose "unused" nature reflects the demo's simplicity, not a bug.
+resharper_collection_never_queried_local_highlighting = none
+
+# CheckNamespace — example projects use flat namespaces for readability;
+# the folder-vs-namespace mismatch is deliberate.
+resharper_check_namespace_highlighting = none
+
+# UnusedVariable — example progress handlers capture the reported
+# value for demonstration even when Main doesn't consume it further.
+resharper_unused_variable_highlighting = none

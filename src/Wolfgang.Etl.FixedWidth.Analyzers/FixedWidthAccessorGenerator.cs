@@ -61,6 +61,10 @@ public sealed class FixedWidthAccessorGenerator : IIncrementalGenerator
     // incremental cache works correctly across compilations).
     // ------------------------------------------------------------------
 
+    // AccessorModel.CanConstruct hides the outer FixedWidthAccessorGenerator.CanConstruct
+    // static — deliberate: the property caches the exact value that method computes for the
+    // captured type, so re-using the name keeps the model → check correspondence explicit.
+    // ReSharper disable once MemberHidesStaticFromOuterClass
     private sealed record AccessorModel
     (
         string TypeFullyQualified,
@@ -73,7 +77,7 @@ public sealed class FixedWidthAccessorGenerator : IIncrementalGenerator
 
     private static AccessorModel? BuildModel(GeneratorAttributeSyntaxContext context)
     {
-        if (context.TargetSymbol.ContainingType is not INamedTypeSymbol type)
+        if (context.TargetSymbol.ContainingType is not { } type)
         {
             return null;
         }
@@ -252,7 +256,12 @@ public sealed class FixedWidthAccessorGenerator : IIncrementalGenerator
     private static IEnumerable<AccessorModel> Distinct(ImmutableArray<AccessorModel> models)
     {
         var seen = new HashSet<string>(System.StringComparer.Ordinal);
+        // foreach kept over `Where(m => seen.Add(...))` — the LINQ form leans on the
+        // predicate's Add side-effect, which is an anti-pattern (order-of-evaluation
+        // dependency inside a query operator) even when it "works".
+#pragma warning disable S3267
         foreach (var model in models)
+#pragma warning restore S3267
         {
             if (seen.Add(model.TypeFullyQualified))
             {

@@ -188,7 +188,10 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
 
                 if (BlankLineHandling == BlankLineHandling.ThrowException)
                 {
+                    // Same TFM-conditional nullability as the FillRow path below.
+#pragma warning disable S8969 // Remove this null-forgiving operator
                     var delimiterWidth = string.IsNullOrEmpty(FieldDelimiter) ? 0 : FieldDelimiter!.Length;
+#pragma warning restore S8969
                     var expectedWidth = _fieldMap.ExpectedLineWidth + (delimiterWidth * Math.Max(0, _fieldMap.TotalColumnCount - 1));
                     throw new LineTooShortException($"Blank line encountered at line {_currentLineNumber}.", _currentLineNumber, string.Empty, expectedWidth, 0);
                 }
@@ -311,7 +314,13 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
             }
         }
 
+        // IDataReader.GetOrdinal contract: throw IndexOutOfRangeException when the
+        // named column doesn't exist. .NET's own SqlDataReader / DbDataReader throw
+        // exactly this exception type; MA0012 (reserved exception) and S112 (general
+        // exception) fire despite the ADO.NET convention.
+#pragma warning disable MA0012, S112
         throw new IndexOutOfRangeException($"No field named '{name}'.");
+#pragma warning restore MA0012, S112
     }
 
     /// <inheritdoc/>
@@ -528,7 +537,12 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
 
     private void FillRow(string line)
     {
+        // `!` needed on net462 / netstandard2.0 / net481 where string.IsNullOrEmpty
+        // lacks [NotNullWhen(false)]; nullable flow-analysis on modern TFMs sees it as
+        // redundant (S8969). Keep the `!` and silence on the newer TFMs.
+#pragma warning disable S8969 // Remove this null-forgiving operator
         var delimiterWidth = string.IsNullOrEmpty(FieldDelimiter) ? 0 : FieldDelimiter!.Length;
+#pragma warning restore S8969
         var delimiterCount = Math.Max(0, _fieldMap.TotalColumnCount - 1);
         var fullExpectedWidth = _fieldMap.ExpectedLineWidth + (delimiterWidth * delimiterCount);
 

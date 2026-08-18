@@ -605,6 +605,10 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// </summary>
     protected override ItemErrorAction OnItemError(ItemErrorContext context)
     {
+        // Defensive null check — the base contract declares non-null but Abstractions
+        // implementations have historically passed null through the hook on certain
+        // failure modes; keep the guard even when nullable analysis says it's redundant.
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (context != null)
         {
             OnError?.Invoke(new FixedWidthError(context.ItemNumber, context.RawContent?.Invoke(), context.Exception));

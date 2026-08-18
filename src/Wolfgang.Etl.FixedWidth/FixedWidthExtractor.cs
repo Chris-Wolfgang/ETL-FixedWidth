@@ -1221,6 +1221,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     {
         // Dead-letter capture (#29): report every failure to the sink — on Skip and on Abort — so the
         // failing record is always observable, then apply the give-up decision below.
+        // Defensive null check — see the sibling OnItemError in FixedWidthMultiRecordExtractor.
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (context != null)
         {
             OnError?.Invoke(new FixedWidthError(context.ItemNumber, context.RawContent?.Invoke(), context.Exception));
@@ -1415,7 +1417,10 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
                 return true;
 
             case BlankLineHandling.ThrowException:
+                // Same TFM-conditional nullability as the sibling paths.
+#pragma warning disable S8969 // Remove this null-forgiving operator
                 var delimiterWidth = string.IsNullOrEmpty(FieldDelimiter) ? 0 : FieldDelimiter!.Length;
+#pragma warning restore S8969
                 var delimiterCount = Math.Max(0, fieldMap.TotalColumnCount - 1);
                 var expectedWidth = fieldMap.ExpectedLineWidth + delimiterWidth * delimiterCount;
 

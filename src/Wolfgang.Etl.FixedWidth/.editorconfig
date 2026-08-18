@@ -1,0 +1,30 @@
+# Per-src-project overrides for Wolfgang.Etl.FixedWidth
+#
+# Solution-wide analyzer rules live in the root .editorconfig. Only add
+# entries here when the rule itself is genuinely wrong for THIS whole
+# project — not for individual call-sites (use `#pragma warning disable`
+# or [SuppressMessage] at the call-site instead).
+
+[*.cs]
+
+# CheckNamespace — this project ships two categories of files whose
+# namespace deliberately does NOT match the folder:
+#
+#   1. Properties/IsExternalInit.cs — polyfill of
+#      System.Runtime.CompilerServices.IsExternalInit for TFMs (net462,
+#      netstandard2.0) that lack the runtime type. The namespace is
+#      required by the C# 9 init-only setter feature and cannot be
+#      renamed.
+#
+#   2. Pipeline/*.cs (IFixedWidthExtractorBuilder, FixedWidthLoaderBuilder,
+#      EtlPipelineFixedWidthExtensions, etc.) — by design in the top-level
+#      Wolfgang.Etl.FixedWidth namespace so consumers pick them up with a
+#      single `using` directive alongside the extractors/loaders. Moving
+#      them to Wolfgang.Etl.FixedWidth.Pipeline would be a breaking
+#      public-API change.
+#
+# R# .DotSettings has no file-scoped severity override, so the rule is
+# silenced project-wide here rather than per-file. Everything else stays
+# active; per-call-site false positives get an inline `#pragma` or
+# [SuppressMessage] with the reason.
+resharper_check_namespace_highlighting = none

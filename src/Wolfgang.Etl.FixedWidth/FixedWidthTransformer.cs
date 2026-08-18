@@ -82,11 +82,20 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
 
 
     /// <inheritdoc/>
+    // Keep the descriptive `source` / `cancellationToken` names at the override site;
+    // the base class shortens them to `items` / `token` but the longer forms are the
+    // fleet-wide convention in this repo. S4456 also fires on the async-iterator
+    // pattern of "check args, then yield" — splitting the ArgumentNullException check
+    // into a separate non-iterator method would move the throw off the enumerator's
+    // MoveNextAsync path, breaking the "pre-yield throws surface at the call site"
+    // contract this override deliberately preserves.
+#pragma warning disable S927, S4456
     protected override async IAsyncEnumerable<TDestination> TransformWorkerAsync
     (
         IAsyncEnumerable<TSource> source,
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
+#pragma warning restore S927, S4456
     {
         if (source == null)
         {

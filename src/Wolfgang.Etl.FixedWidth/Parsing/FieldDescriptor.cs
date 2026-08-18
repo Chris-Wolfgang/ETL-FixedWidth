@@ -39,6 +39,9 @@ internal sealed class FieldDescriptor
             attribute.Format,
             attribute.Header ?? property.Name,
             attribute.NumberStyles == FixedWidthFieldAttribute.UnspecifiedNumberStyles
+                // Cast selects the NumberStyles? overload of the ctor; without it, the
+                // ternary would infer NumberStyles and drop the "unspecified" signal.
+                // ReSharper disable once RedundantCast
                 ? (NumberStyles?)null
                 : attribute.NumberStyles
         );
