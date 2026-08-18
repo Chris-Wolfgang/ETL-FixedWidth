@@ -19,6 +19,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.10.1] - 2026-08-18
+
+Maintenance release: dependency refresh, build cleanup, and CI-noise hardening. **No
+public-API change** — `PublicAPI.Shipped.txt` picks up nullability annotations that were
+missing on symbols shipped in 0.10.0, but the compiled surface itself is unchanged; this
+is a drop-in bump.
+
+### Changed
+
+- Bumped the `Wolfgang.Etl.Abstractions` family to **0.23.1**
+  (`Wolfgang.Etl.Abstractions` for `src/`, and the test-only
+  `Wolfgang.Etl.TestKit` / `Wolfgang.Etl.TestKit.Xunit` — including the `examples/`
+  projects). Security + test-code-hardening release; no shipped-API change.
+  Pinned at 0.23.1 rather than 0.23.2 pending the perf-regression investigation
+  tracked at Chris-Wolfgang/ETL-Abstractions#427 — downstream `LoaderBenchmarks`
+  file-write benchmarks regressed 2-4x on 0.23.2 (a bisect cleared at 0.23.1);
+  will bump back to 0.23.2 or later once the upstream fix lands.
+- Refreshed the remaining NuGet references to their latest patch/minor
+  (`Meziantou.Analyzer`, `Roslynator.Analyzers`, `SonarAnalyzer.CSharp`,
+  `Microsoft.SourceLink.GitHub`, `Microsoft.NET.Test.Sdk` net8.0+ pin,
+  `Microsoft.Bcl.AsyncInterfaces`, `Microsoft.Extensions.Logging.Abstractions`,
+  `System.Diagnostics.DiagnosticSource`).
+- Gated the `Microsoft.CodeAnalysis.PublicApiAnalyzers` PackageReference on
+  `Exists('PublicAPI.*.txt')` so the analyzer runs only in projects that opt in
+  (fleet parity with `repo-template`); test / example / benchmark projects no
+  longer pay for RS0016 / RS0037 they can't satisfy.
+- Filled in the missing nullability annotations on the ~108 shipped members in
+  `src/Wolfgang.Etl.FixedWidth/PublicAPI.Shipped.txt`. Metadata-only correction
+  — the compiled surface already had those annotations from 0.10.0; only the
+  tracking file was behind.
+
+### Fixed
+
+- MSB3277 `System.Collections.Immutable` conflict from the
+  `Wolfgang.Etl.FixedWidth.Analyzers` `ProjectReference` on `net6.0` /
+  `netcoreapp3.1` in the test project ([#311]). `ReferenceOutputAssembly` is
+  now conditional on the TFM: `true` only on `net8.0+` (where
+  `FixedWidthFieldAnalyzerTests` / `FixedWidthAccessorGeneratorOutputTests`
+  instantiate the analyzer / generator types directly), `false` on older TFMs
+  where those tests are `#if`'d out and the runtime closure would clash with
+  the framework's own 6.x reference. `OutputItemType="Analyzer"` still runs
+  the generator + FW0NN diagnostics at compile time on every TFM.
+
+### Security
+
+- Reduced the Scorecard code-scanning alert count from 95 → 0 ([#307]):
+  SHA-pinned every previously-tag-only GitHub Action across all 19 workflow
+  files (fleet convention `action@<sha> # vX`), version-pinned
+  `pip install semgrep`, and added a `jq`-based SARIF-filter step in
+  `scorecard.yaml` that drops `DangerousWorkflowID` /
+  `BranchProtectionID` / `CodeReviewID` / `CIIBestPracticesID` /
+  `FuzzingID` — plus the `PinnedDependenciesID` sub-checks for
+  `nugetCommand not pinned` and `pipCommand not pinned` — before the
+  code-scanning upload. Full rationale documented inline in `scorecard.yaml`.
+  The scorecard.dev score published to the transparency log (README badge)
+  still counts every check; only the code-scanning-tab noise is trimmed. A
+  regression to an unpinned `@vN` action ref (`gitHubAction not pinned by
+  hash`) still fires.
+- Reduced the InspectCode code-scanning alert count from 1,232 → 0 ([#307])
+  via scope-local `.editorconfig` files under `tests/`, `benchmarks/`,
+  `examples/`, `src/Wolfgang.Etl.FixedWidth/`, and
+  `src/Wolfgang.Etl.FixedWidth.Analyzers/` (each rule silenced with an
+  inline rationale, matching the Try-Pattern peer's noise-floor profile),
+  plus per-call-site `#pragma warning disable X` / `// ReSharper disable
+  once X` annotations at the ~30 legitimate src false-positives with the
+  rationale on the same line. No solution-wide `src/` silences.
+
 ## [0.10.0] - 2026-08-14
 
 ### Changed
@@ -477,7 +544,9 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
 [#26]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/26
 [#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.10.1...HEAD
+[0.10.1]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.10.0...v0.10.1
+[0.10.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.6.0...v0.7.0
@@ -505,3 +574,5 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#207]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/207
 [#208]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/208
 [#209]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/pull/209
+[#307]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/307
+[#311]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/311
