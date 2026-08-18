@@ -36,14 +36,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.11" />
     <!-- Drives the FixedWidth analyzer directly over in-memory compilations in the
          FixedWidthFieldAnalyzerTests (net8.0+ only — those tests are #if-scoped). -->
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" Condition="'$(TargetFramework)' == 'netcoreapp3.1' Or '$(TargetFramework)' == 'net5.0'" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0')) And '$(TargetFramework)' != 'netcoreapp3.1' And '$(TargetFramework)' != 'net5.0'" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))" />
     <PackageReference Include="System.Linq.Async" Version="7.0.1" />
     <PackageReference Include="Wolfgang.Etl.TestKit" Version="0.23.1" />
     <PackageReference Include="Wolfgang.Etl.TestKit.Xunit" Version="0.23.1" />
