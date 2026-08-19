@@ -83,7 +83,12 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
 
 
     /// <inheritdoc/>
+    // Keep the descriptive `cancellationToken` name at the override site; the base
+    // class shortens it to `token` but the longer form is the fleet-wide convention
+    // in this repo.
+#pragma warning disable S927 // Parameter names should match base declaration
     protected override async Task LoadWorkerAsync(IAsyncEnumerable<TRecord> items, CancellationToken cancellationToken)
+#pragma warning restore S927
     {
         // items is guaranteed non-null by the LoaderBase.LoadAsync entry point.
         cancellationToken.ThrowIfCancellationRequested();

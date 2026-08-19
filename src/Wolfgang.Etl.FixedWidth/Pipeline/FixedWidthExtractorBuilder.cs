@@ -230,7 +230,7 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
     {
         try
         {
-            await foreach (var item in extractor.ExtractAsync(token).WithCancellation(token).ConfigureAwait(false))
+            await foreach (var item in extractor.ExtractAsync(token).ConfigureAwait(false))
             {
                 yield return item;
             }

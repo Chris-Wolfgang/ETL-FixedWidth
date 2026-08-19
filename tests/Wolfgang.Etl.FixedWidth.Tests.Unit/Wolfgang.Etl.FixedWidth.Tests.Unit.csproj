@@ -20,26 +20,33 @@
     <!-- Reference the analyzer package project so the source generator AND the FW0NN
          diagnostic analyzer run over this project's own [FixedWidthField] fixtures at
          compile time (analyzers do not flow transitively through the runtime reference
-         above). ReferenceOutputAssembly=true also exposes the analyzer types so
-         FixedWidthFieldAnalyzerTests can drive the analyzer directly. -->
+         above).
+         ReferenceOutputAssembly is TRUE only on net8.0+, where
+         FixedWidthFieldAnalyzerTests / FixedWidthAccessorGeneratorOutputTests
+         (both #if NET8_0_OR_GREATER) instantiate the analyzer / generator types
+         directly. On older TFMs (net6.0, netcoreapp3.1, netfx) the analyzer's
+         runtime closure (System.Collections.Immutable 8.x, from Roslyn) collides
+         with the framework's own 6.x reference and produces MSB3277 conflicts (#311)
+         — leaving ReferenceOutputAssembly=false there keeps the analyzer running
+         at compile time without pulling its runtime assemblies into the test host. -->
     <ProjectReference Include="..\..\src\Wolfgang.Etl.FixedWidth.Analyzers\Wolfgang.Etl.FixedWidth.Analyzers.csproj"
                       OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="true"
+                      ReferenceOutputAssembly="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))"
                       PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.11" />
     <!-- Drives the FixedWidth analyzer directly over in-memory compilations in the
          FixedWidthFieldAnalyzerTests (net8.0+ only — those tests are #if-scoped). -->
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" Condition="'$(TargetFramework)' == 'netcoreapp3.1' Or '$(TargetFramework)' == 'net5.0'" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0')) And '$(TargetFramework)' != 'netcoreapp3.1' And '$(TargetFramework)' != 'net5.0'" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))" />
     <PackageReference Include="System.Linq.Async" Version="7.0.1" />
-    <PackageReference Include="Wolfgang.Etl.TestKit" Version="0.22.0" />
-    <PackageReference Include="Wolfgang.Etl.TestKit.Xunit" Version="0.22.0" />
+    <PackageReference Include="Wolfgang.Etl.TestKit" Version="0.23.1" />
+    <PackageReference Include="Wolfgang.Etl.TestKit.Xunit" Version="0.23.1" />
     <PackageReference Include="coverlet.collector" Version="10.0.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
