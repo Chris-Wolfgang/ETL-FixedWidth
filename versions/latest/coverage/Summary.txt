@@ -1,15 +1,15 @@
 Summary
-  Generated on: 8/14/2026 - 1:38:51 AM
-  Coverage date: 8/14/2026 - 1:38:46 AM
+  Generated on: 8/19/2026 - 12:26:48 PM
+  Coverage date: 8/19/2026 - 12:26:43 PM
   Parser: Cobertura
   Assemblies: 2
   Classes: 41
   Files: 41
   Line coverage: 97.1%
-  Covered lines: 2905
+  Covered lines: 2912
   Uncovered lines: 84
-  Coverable lines: 2989
-  Total lines: 9984
+  Coverable lines: 2996
+  Total lines: 10074
   Branch coverage: 88.8% (1113 of 1252)
   Covered branches: 1113
   Total branches: 1252
@@ -37,7 +37,7 @@ Wolfgang.Etl.FixedWidth                                               97.2%
   Wolfgang.Etl.FixedWidth.FieldContext                                 100%
   Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<T>                 100%
   Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<T>                    100%
-  Wolfgang.Etl.FixedWidth.FixedWidthConverter                         92.5%
+  Wolfgang.Etl.FixedWidth.FixedWidthConverter                         92.6%
   Wolfgang.Etl.FixedWidth.FixedWidthDataReader<T>                     92.9%
   Wolfgang.Etl.FixedWidth.FixedWidthError                              100%
   Wolfgang.Etl.FixedWidth.FixedWidthExtractor<T>                      95.3%
