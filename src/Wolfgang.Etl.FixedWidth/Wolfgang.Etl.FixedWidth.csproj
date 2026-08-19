@@ -57,7 +57,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.11" />
     <PackageReference Include="System.Memory" Version="4.6.3" />
-    <PackageReference Include="Wolfgang.Etl.Abstractions" Version="0.23.2" />
+    <PackageReference Include="Wolfgang.Etl.Abstractions" Version="0.23.1" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.11" />
   </ItemGroup>
 
