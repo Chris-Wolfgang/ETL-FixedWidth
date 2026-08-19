@@ -39,6 +39,85 @@ jobs:
           # Publish to the OpenSSF transparency log so the README badge resolves.
           publish_results: true
 
+      # Suppress Scorecard checks whose findings are known won't-fix or false
+      # positives for this repo, BEFORE the SARIF reaches code-scanning. Doing
+      # it here (rather than dismissing individual alerts) makes the suppression
+      # durable across weekly re-runs — Scorecard emits a fresh SARIF each run,
+      # and fingerprint drift means dismissals do not always survive.
+      #
+      # Suppressed rule IDs (whole rule):
+      #   DangerousWorkflowID  — pr.yaml deliberately uses pull_request_target
+      #                          for its config-file guard; the elevated token is
+      #                          contents:read only and the PR head is scan input.
+      #                          See pr.yaml SECURITY NOTE header.
+      #   BranchProtectionID   — solo-maintainer repo; approver / codeowner /
+      #                          last-push-approval would force admin-bypass on
+      #                          every PR without adding a real review gate.
+      #   CodeReviewID         — same underlying reason (solo maintainer).
+      #   CIIBestPracticesID   — external bestpractices.dev registration; not
+      #                          in scope for CI, tracked separately if pursued.
+      #   FuzzingID            — repo ships custom xunit-based fuzz tests
+      #                          (tests/Wolfgang.Etl.FixedWidth.Tests.Fuzz +
+      #                          fuzz.yaml); Scorecard heuristic detects only
+      #                          OSS-Fuzz / ClusterFuzzLite.
+      #
+      # Suppressed PinnedDependenciesID sub-checks (partial rule):
+      #   nugetCommand — `dotnet restore` is not hash-pinned. Every csproj in
+      #                  this repo already uses explicit PackageReference
+      #                  Versions ("no floating"), Dependabot's `nuget`
+      #                  ecosystem bumps transitives weekly, and no repo in
+      #                  the fleet ships packages.lock.json (Chris's convention
+      #                  is explicit-versions + Dependabot rather than a lock
+      #                  file). Adopting `--locked-mode` fleet-wide is a
+      #                  separate decision.
+      #   pipCommand   — only two pip installs remain: `semgrep==<version>`
+      #                  (semgrep.yaml, version-pinned) and `zizmor==<version>`
+      #                  (workflow-security.yaml, version-pinned). Both are
+      #                  dev-time SAST tooling, not shipped runtime code, and
+      #                  both install from PyPI over HTTPS with signed
+      #                  packages. Hash-pinning via `--require-hashes` needs
+      #                  requirements.txt files + a pip-tools workflow that
+      #                  Chris hasn't opted into fleet-wide.
+      # gitHubAction rows are NOT suppressed: any regression to an @vN action
+      # ref without a SHA pin should still fire on the next scan.
+      #
+      # The scorecard.dev score published to the transparency log (README badge)
+      # still counts every check; this only trims the code-scanning-tab noise.
+      - name: Filter suppressed findings from SARIF
+        shell: bash
+        env:
+          SUPPRESSED_RULES: 'DangerousWorkflowID BranchProtectionID CodeReviewID CIIBestPracticesID FuzzingID'
+          # Substrings matched against each PinnedDependenciesID result's
+          # message text. Order-independent; a single match suppresses.
+          SUPPRESSED_PIN_KINDS: 'nugetCommand not pinned|pipCommand not pinned'
+        run: |
+          if ! command -v jq >/dev/null 2>&1; then
+            echo "::error::jq not available on the runner; cannot filter SARIF."
+            exit 1
+          fi
+          # Word-split SUPPRESSED_RULES intentionally — one rule per line for the
+          # jq -R/-s pipeline. shellcheck's default "quote to prevent globbing"
+          # rule (SC2086) would break this.
+          # shellcheck disable=SC2086
+          rules_json=$(printf '%s\n' $SUPPRESSED_RULES | jq -R . | jq -s .)
+          jq \
+            --argjson suppressed "$rules_json" \
+            --arg pinKinds "$SUPPRESSED_PIN_KINDS" \
+            '
+              .runs |= map(
+                .results |= map(select(
+                  (.ruleId // "") as $r
+                  | (.message.text // "") as $t
+                  | (($suppressed | index($r)) == null)
+                    and not ($r == "PinnedDependenciesID" and ($t | test($pinKinds)))
+                ))
+              )
+            ' results.sarif > results.filtered.sarif
+          before=$(jq '[.runs[].results[]] | length' results.sarif)
+          after=$(jq '[.runs[].results[]] | length' results.filtered.sarif)
+          echo "Scorecard SARIF results: $before -> $after after suppression"
+          mv results.filtered.sarif results.sarif
+
       - name: Upload artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
