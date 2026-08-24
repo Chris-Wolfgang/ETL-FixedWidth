@@ -9,9 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Constructors with the logger as a trailing optional parameter** on `FixedWidthExtractor<T>` and
-  `FixedWidthLoader<T>`: `(Stream stream, Encoding? encoding, ILogger<T>? logger = null)`. A `null`
-  or omitted logger resolves to `NullLogger.Instance`.
+- **`FixedWidthExtractorOptions` and `FixedWidthLoaderOptions` records**, carrying an `Encoding`
+  property. Configuration travels in an options object rather than as a loose constructor
+  parameter, and defaults live on the property initializers so no constructor can diverge from them.
+- **Constructors taking an options record with the logger as a trailing optional parameter** on
+  `FixedWidthExtractor<T>` and `FixedWidthLoader<T>`:
+  `(Stream stream, FixedWidthExtractorOptions? options, ILogger<T>? logger = null)`. A `null` or
+  omitted logger resolves to `NullLogger.Instance`.
+
+  `options` is required positionally for now: giving it a default would make `new T(stream)`
+  ambiguous against the existing `(Stream, Encoding? = null)` constructor, since neither candidate
+  would have all parameters supplied. It gains its `= null` default once that constructor is
+  removed.
 
 ### Changed
 

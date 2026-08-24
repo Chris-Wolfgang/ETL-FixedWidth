@@ -72,19 +72,16 @@ public class FixedWidthExtractorStreamCtorTests
 
 
     [Fact]
-    public void Constructor_Stream_Encoding_Logger_when_logger_is_null_uses_NullLogger()
+    public void Constructor_Stream_Options_Logger_when_logger_is_null_uses_NullLogger()
     {
         using var stream = ToStream(PersonLine);
 
-        // A concrete Encoding is passed rather than null: while the [Obsolete]
-        // (Stream, ILogger, Encoding?) overload still exists, `encoding: null, logger: null`
-        // matches both overloads exactly and is ambiguous (CS0121). Supplying a real Encoding
-        // makes the obsolete overload inapplicable. The ambiguity disappears when that
-        // overload is removed.
+        // `options` is required positionally on this overload, which is what keeps it
+        // unambiguous against the still-present (Stream, Encoding? = null) constructor.
         var sut = new FixedWidthExtractor<PersonRecord>
         (
             stream,
-            Encoding.UTF8,
+            new FixedWidthExtractorOptions { Encoding = Encoding.UTF8 },
             logger: null
         );
 
@@ -204,19 +201,16 @@ public class FixedWidthLoaderStreamCtorTests
 
 
     [Fact]
-    public void Constructor_Stream_Encoding_Logger_when_logger_is_null_uses_NullLogger()
+    public void Constructor_Stream_Options_Logger_when_logger_is_null_uses_NullLogger()
     {
         using var stream = new MemoryStream();
 
-        // A concrete Encoding is passed rather than null: while the [Obsolete]
-        // (Stream, ILogger, Encoding?) overload still exists, `encoding: null, logger: null`
-        // matches both overloads exactly and is ambiguous (CS0121). Supplying a real Encoding
-        // makes the obsolete overload inapplicable. The ambiguity disappears when that
-        // overload is removed.
+        // `options` is required positionally on this overload, which is what keeps it
+        // unambiguous against the still-present (Stream, Encoding? = null) constructor.
         var sut = new FixedWidthLoader<PersonRecord>
         (
             stream,
-            Encoding.UTF8,
+            new FixedWidthLoaderOptions { Encoding = Encoding.UTF8 },
             logger: null
         );
 
