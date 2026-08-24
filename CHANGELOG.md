@@ -13,18 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `FixedWidthLoader<T>`: `(Stream stream, Encoding? encoding, ILogger<T>? logger = null)`. A `null`
   or omitted logger resolves to `NullLogger.Instance`.
 
-### Deprecated
-
-- **`(Stream, ILogger<T>, Encoding?)` on both types is now `[Obsolete]`** — the logger sits in the
-  middle of the parameter list, which is unique to this library across the ETL fleet. Use the new
-  `(Stream, Encoding?, ILogger<T>?)` overload instead. Behaviour of the obsolete overload is
-  unchanged while it exists, including its `ArgumentNullException` on a null logger.
-
-  Note: while both overloads coexist, calling with **named** arguments and two nulls
-  (`encoding: null, logger: null`) matches both exactly and is ambiguous (`CS0121`). Pass a concrete
-  `Encoding`, or use positional arguments. The ambiguity disappears when the obsolete overload is
-  removed.
-
 ### Changed
 
 - **`logger` is now optional on the `(TextReader, ILogger<T>)` / `(TextWriter, ILogger<T>)`

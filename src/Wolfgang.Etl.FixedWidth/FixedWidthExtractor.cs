@@ -208,7 +208,6 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <exception cref="ArgumentNullException">
     /// <paramref name="stream"/> or <paramref name="logger"/> is null.
     /// </exception>
-    [Obsolete("The logger parameter is not last on this overload. Use the (Stream, Encoding?, ILogger<FixedWidthExtractor<TRecord>>?) overload instead, which follows the fleet convention of a trailing optional logger. This overload will be removed in a future release.")]
     public FixedWidthExtractor
     (
         Stream stream,

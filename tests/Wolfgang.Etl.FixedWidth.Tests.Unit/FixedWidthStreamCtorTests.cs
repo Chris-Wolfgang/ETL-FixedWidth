@@ -56,10 +56,9 @@ public class FixedWidthExtractorStreamCtorTests
     {
         using var stream = ToStream(PersonLine);
 
-        // Deliberately exercises the [Obsolete] (Stream, ILogger, Encoding?) overload: its
-        // null-logger behaviour must stay unchanged for as long as it exists. The replacement
-        // overload treats a null logger as "no logging" — covered by the test below.
-#pragma warning disable CS0618 // Type or member is obsolete
+        // Exercises the (Stream, ILogger, Encoding?) overload: its null-logger behaviour must
+        // stay unchanged for as long as it exists. The replacement overload treats a null logger
+        // as "no logging" — covered by the test below.
         Assert.Throws<ArgumentNullException>
         (
             () => new FixedWidthExtractor<PersonRecord>
@@ -68,7 +67,6 @@ public class FixedWidthExtractorStreamCtorTests
                 logger: null!
             )
         );
-#pragma warning restore CS0618
     }
 
 
@@ -190,10 +188,9 @@ public class FixedWidthLoaderStreamCtorTests
     {
         using var stream = new MemoryStream();
 
-        // Deliberately exercises the [Obsolete] (Stream, ILogger, Encoding?) overload: its
-        // null-logger behaviour must stay unchanged for as long as it exists. The replacement
-        // overload treats a null logger as "no logging" — covered by the test below.
-#pragma warning disable CS0618 // Type or member is obsolete
+        // Exercises the (Stream, ILogger, Encoding?) overload: its null-logger behaviour must
+        // stay unchanged for as long as it exists. The replacement overload treats a null logger
+        // as "no logging" — covered by the test below.
         Assert.Throws<ArgumentNullException>
         (
             () => new FixedWidthLoader<PersonRecord>
@@ -202,7 +199,6 @@ public class FixedWidthLoaderStreamCtorTests
                 logger: null!
             )
         );
-#pragma warning restore CS0618
     }
 
 
