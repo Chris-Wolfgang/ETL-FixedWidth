@@ -151,8 +151,9 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <see cref="Stream"/>, with the logger as the trailing optional parameter.
     /// </summary>
     /// <param name="stream">The <see cref="Stream"/> to use.</param>
-    /// <param name="encoding">
-    /// The <see cref="Encoding"/> to use. Pass <see langword="null"/> for <see cref="Encoding.UTF8"/>.
+    /// <param name="options">
+    /// Options that control behaviour, including the <see cref="FixedWidthExtractorOptions.Encoding"/>
+    /// to use. When <c>null</c> — or omitted — the documented defaults apply.
     /// </param>
     /// <param name="logger">
     /// An optional logger for diagnostic output. When <c>null</c> — or omitted —
@@ -162,10 +163,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     public FixedWidthExtractor
     (
         Stream stream,
-        Encoding? encoding = null,
+        FixedWidthExtractorOptions? options = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
     {
+        var encoding = options?.Encoding;
         _reader = CreateBufferedReader(stream, encoding);
         _ownsReader = true;
         _offsetStream = stream;

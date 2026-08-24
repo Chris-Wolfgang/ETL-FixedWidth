@@ -27,11 +27,11 @@ public class FixedWidthEncodingTests
     {
         var stream = new MemoryStream();
 
-        var loader = new FixedWidthLoader<PersonRecord>(stream, Encoding.Unicode);
+        var loader = new FixedWidthLoader<PersonRecord>(stream, new FixedWidthLoaderOptions { Encoding = Encoding.Unicode });
         await loader.LoadAsync(People.ToAsyncEnumerable(), CancellationToken.None);
 
         stream.Position = 0;
-        var extractor = new FixedWidthExtractor<PersonRecord>(stream, Encoding.Unicode);
+        var extractor = new FixedWidthExtractor<PersonRecord>(stream, new FixedWidthExtractorOptions { Encoding = Encoding.Unicode });
         var readBack = new List<PersonRecord>();
         await foreach (var person in extractor.ExtractAsync(CancellationToken.None))
         {
@@ -48,7 +48,7 @@ public class FixedWidthEncodingTests
     {
         var stream = new MemoryStream();
 
-        using (var loader = new FixedWidthLoader<PersonRecord>(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false)))
+        using (var loader = new FixedWidthLoader<PersonRecord>(stream, new FixedWidthLoaderOptions { Encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false) }))
         {
             await loader.LoadAsync(People.ToAsyncEnumerable(), CancellationToken.None);
         }

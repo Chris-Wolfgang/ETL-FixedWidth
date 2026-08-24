@@ -9,9 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Constructors with the logger as a trailing optional parameter** on `FixedWidthExtractor<T>` and
-  `FixedWidthLoader<T>`: `(Stream stream, Encoding? encoding, ILogger<T>? logger = null)`. A `null`
-  or omitted logger resolves to `NullLogger.Instance`.
+- **`FixedWidthExtractorOptions` and `FixedWidthLoaderOptions` records**, carrying an `Encoding`
+  property. Configuration now travels in an options object rather than as a loose constructor
+  parameter, matching the rest of the ETL fleet. Defaults live on the property initializers, so no
+  constructor can diverge from them.
+- **Constructors with an options record and a trailing optional logger** on `FixedWidthExtractor<T>`
+  and `FixedWidthLoader<T>`: `(Stream stream, FixedWidthExtractorOptions? options = null,
+  ILogger<T>? logger = null)`. A `null` or omitted logger resolves to `NullLogger.Instance`; a
+  `null` or omitted options object uses the documented defaults.
 
 ### Removed
 
@@ -20,8 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `(Stream, ILogger<T>, Encoding?)` — the middle-logger overloads, the only constructors in the ETL
   fleet with the logger in a non-final position.
-- `(Stream, Encoding?)` — subsumed by `(Stream, Encoding?, ILogger<T>?)` now that `encoding` carries
-  a default.
+- `(Stream, Encoding?)` — replaced by the options-based `(Stream, FixedWidthExtractorOptions?,
+  ILogger<T>?)`. `Encoding` is now a property on the options record.
 - `(TextReader)` / `(TextWriter)` — subsumed by `(TextReader/TextWriter, ILogger<T>?)`.
 
 This is a **binary** break even where source still compiles: optional-argument defaults are baked in
@@ -37,8 +42,9 @@ this removal land in the same release, so no version exists in which they carry 
 ```csharp
 // before
 new FixedWidthExtractor<T>(stream, logger, encoding);
+new FixedWidthExtractor<T>(stream, encoding);
 // after
-new FixedWidthExtractor<T>(stream, encoding, logger);
+new FixedWidthExtractor<T>(stream, new FixedWidthExtractorOptions { Encoding = encoding }, logger);
 ```
 
 `new FixedWidthExtractor<T>(reader)` and `new FixedWidthExtractor<T>(stream)` continue to compile
@@ -46,9 +52,10 @@ unchanged — they now bind to the surviving overloads via their default argumen
 
 ### Changed
 
-- `encoding` on `(Stream, Encoding?, ILogger<T>?)` defaults to `null`. This could only be done once
-  the middle-logger overload was gone; defaulting it while both existed would have made
-  `(stream, encoding: null, logger: null)` ambiguous.
+- Encoding is supplied via `options.Encoding` rather than a positional `Encoding?` parameter. The
+  options object is optional and defaults to `null`, which could only be done once the
+  middle-logger overload was gone — defaulting a second parameter while both overloads existed
+  would have made `(stream, <null>, logger: null)` ambiguous.
 
 - **`logger` is now optional on the `(TextReader, ILogger<T>)` / `(TextWriter, ILogger<T>)`
   constructors**, defaulting to `NullLogger.Instance` rather than throwing `ArgumentNullException`.

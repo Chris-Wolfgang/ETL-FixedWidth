@@ -52,18 +52,18 @@ public class FixedWidthExtractorStreamCtorTests
 
 
     [Fact]
-    public void Constructor_Stream_named_encoding_and_logger_nulls_is_unambiguous()
+    public void Constructor_Stream_named_options_and_logger_nulls_is_unambiguous()
     {
-        // Regression guard. While the (Stream, ILogger, Encoding?) overload coexisted with
-        // (Stream, Encoding?, ILogger?), this call matched BOTH exactly, so neither won and it did
-        // not compile (CS0121). With a single candidate remaining it is unambiguous. If this stops
-        // compiling, a competing overload has been reintroduced.
+        // Regression guard. An earlier shape had (Stream, ILogger, Encoding?) coexisting with
+        // (Stream, Encoding?, ILogger?); this call matched BOTH exactly, so neither won and it did
+        // not compile (CS0121). There is now a single Stream overload taking an options record. If
+        // this stops compiling, a competing overload has been reintroduced.
         using var stream = ToStream(PersonLine);
 
         var sut = new FixedWidthExtractor<PersonRecord>
         (
             stream,
-            encoding: null,
+            options: null,
             logger: null
         );
 
@@ -73,19 +73,14 @@ public class FixedWidthExtractorStreamCtorTests
 
 
     [Fact]
-    public void Constructor_Stream_Encoding_Logger_when_logger_is_null_uses_NullLogger()
+    public void Constructor_Stream_Options_Logger_when_logger_is_null_uses_NullLogger()
     {
         using var stream = ToStream(PersonLine);
 
-        // A concrete Encoding is passed rather than null: while the [Obsolete]
-        // (Stream, ILogger, Encoding?) overload still exists, `encoding: null, logger: null`
-        // matches both overloads exactly and is ambiguous (CS0121). Supplying a real Encoding
-        // makes the obsolete overload inapplicable. The ambiguity disappears when that
-        // overload is removed.
         var sut = new FixedWidthExtractor<PersonRecord>
         (
             stream,
-            Encoding.UTF8,
+            new FixedWidthExtractorOptions { Encoding = Encoding.UTF8 },
             logger: null
         );
 
@@ -185,19 +180,14 @@ public class FixedWidthLoaderStreamCtorTests
 
 
     [Fact]
-    public void Constructor_Stream_Encoding_Logger_when_logger_is_null_uses_NullLogger()
+    public void Constructor_Stream_Options_Logger_when_logger_is_null_uses_NullLogger()
     {
         using var stream = new MemoryStream();
 
-        // A concrete Encoding is passed rather than null: while the [Obsolete]
-        // (Stream, ILogger, Encoding?) overload still exists, `encoding: null, logger: null`
-        // matches both overloads exactly and is ambiguous (CS0121). Supplying a real Encoding
-        // makes the obsolete overload inapplicable. The ambiguity disappears when that
-        // overload is removed.
         var sut = new FixedWidthLoader<PersonRecord>
         (
             stream,
-            Encoding.UTF8,
+            new FixedWidthLoaderOptions { Encoding = Encoding.UTF8 },
             logger: null
         );
 
