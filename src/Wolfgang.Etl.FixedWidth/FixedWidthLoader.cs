@@ -178,6 +178,10 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
     /// Pass <see langword="null"/> to disable logging.
     /// </param>
+    /// <param name="options">
+    /// Options that control behaviour. When <c>null</c> — or omitted — the documented
+    /// defaults apply.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="stream"/> or <paramref name="timer"/> is null.
     /// </exception>
@@ -185,10 +189,11 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     (
         Stream stream,
         IProgressTimer timer,
+        FixedWidthLoaderOptions? options = null,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
     {
-        _writer = CreateBufferedWriter(stream, encoding: null);
+        _writer = CreateBufferedWriter(stream, options?.Encoding);
         _ownsWriter = true;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
         _logger = logger ?? (ILogger)NullLogger.Instance;

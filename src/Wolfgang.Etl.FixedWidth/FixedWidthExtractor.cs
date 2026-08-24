@@ -192,6 +192,10 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
     /// Pass <see langword="null"/> to disable logging.
     /// </param>
+    /// <param name="options">
+    /// Options that control behaviour. When <c>null</c> — or omitted — the documented
+    /// defaults apply.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="stream"/> or <paramref name="timer"/> is null.
     /// </exception>
@@ -199,13 +203,15 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     (
         Stream stream,
         IProgressTimer timer,
+        FixedWidthExtractorOptions? options = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
     {
-        _reader = CreateBufferedReader(stream, encoding: null);
+        var encoding = options?.Encoding;
+        _reader = CreateBufferedReader(stream, encoding);
         _ownsReader = true;
         _offsetStream = stream;
-        _offsetEncoding = Encoding.UTF8;
+        _offsetEncoding = encoding ?? Encoding.UTF8;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
