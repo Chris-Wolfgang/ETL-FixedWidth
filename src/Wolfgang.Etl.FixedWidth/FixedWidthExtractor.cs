@@ -124,11 +124,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     public FixedWidthExtractor
     (
         TextReader reader,
-        ILogger<FixedWidthExtractor<TRecord>> logger
+        ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
     {
         _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -208,6 +208,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <exception cref="ArgumentNullException">
     /// <paramref name="stream"/> or <paramref name="logger"/> is null.
     /// </exception>
+    [Obsolete("The logger parameter is not last on this overload. Use the (Stream, Encoding?, ILogger<FixedWidthExtractor<TRecord>>?) overload instead, which follows the fleet convention of a trailing optional logger. This overload will be removed in a future release.")]
     public FixedWidthExtractor
     (
         Stream stream,
@@ -220,6 +221,34 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         _offsetStream = stream;
         _offsetEncoding = encoding ?? Encoding.UTF8;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> over the specified
+    /// <see cref="Stream"/>, with the logger as the trailing optional parameter.
+    /// </summary>
+    /// <param name="stream">The <see cref="Stream"/> to use.</param>
+    /// <param name="encoding">
+    /// The <see cref="Encoding"/> to use. Pass <see langword="null"/> for <see cref="Encoding.UTF8"/>.
+    /// </param>
+    /// <param name="logger">
+    /// An optional logger for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
+    public FixedWidthExtractor
+    (
+        Stream stream,
+        Encoding? encoding,
+        ILogger<FixedWidthExtractor<TRecord>>? logger = null
+    )
+    {
+        _reader = CreateBufferedReader(stream, encoding);
+        _ownsReader = true;
+        _offsetStream = stream;
+        _offsetEncoding = encoding ?? Encoding.UTF8;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 

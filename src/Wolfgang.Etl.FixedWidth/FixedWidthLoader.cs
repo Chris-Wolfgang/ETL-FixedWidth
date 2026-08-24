@@ -111,11 +111,11 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     public FixedWidthLoader
     (
         TextWriter writer,
-        ILogger<FixedWidthLoader<TRecord>> logger
+        ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
     {
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -195,6 +195,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     /// <exception cref="ArgumentNullException">
     /// <paramref name="stream"/> or <paramref name="logger"/> is null.
     /// </exception>
+    [Obsolete("The logger parameter is not last on this overload. Use the (Stream, Encoding?, ILogger<FixedWidthLoader<TRecord>>?) overload instead, which follows the fleet convention of a trailing optional logger. This overload will be removed in a future release.")]
     public FixedWidthLoader
     (
         Stream stream,
@@ -205,6 +206,32 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         _writer = CreateBufferedWriter(stream, encoding);
         _ownsWriter = true;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> over the specified
+    /// <see cref="Stream"/>, with the logger as the trailing optional parameter.
+    /// </summary>
+    /// <param name="stream">The <see cref="Stream"/> to use.</param>
+    /// <param name="encoding">
+    /// The <see cref="Encoding"/> to use. Pass <see langword="null"/> for <see cref="Encoding.UTF8"/>.
+    /// </param>
+    /// <param name="logger">
+    /// An optional logger for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
+    public FixedWidthLoader
+    (
+        Stream stream,
+        Encoding? encoding,
+        ILogger<FixedWidthLoader<TRecord>>? logger = null
+    )
+    {
+        _writer = CreateBufferedWriter(stream, encoding);
+        _ownsWriter = true;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 

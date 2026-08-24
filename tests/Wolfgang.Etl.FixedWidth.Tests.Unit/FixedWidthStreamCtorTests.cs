@@ -36,16 +36,17 @@ public class FixedWidthExtractorStreamCtorTests
 
 
     [Fact]
-    public void Constructor_TextReader_Logger_when_logger_is_null_throws_ArgumentNullException()
+    public void Constructor_TextReader_Logger_when_logger_is_null_uses_NullLogger()
     {
-        Assert.Throws<ArgumentNullException>
+        // logger is now an optional trailing parameter: null means "no logging"
+        // (NullLogger.Instance) rather than an argument error.
+        var sut = new FixedWidthExtractor<PersonRecord>
         (
-            () => new FixedWidthExtractor<PersonRecord>
-            (
-                new StringReader(PersonLine),
-                logger: null!
-            )
+            new StringReader(PersonLine),
+            logger: null
         );
+
+        Assert.NotNull(sut);
     }
 
 
@@ -55,6 +56,10 @@ public class FixedWidthExtractorStreamCtorTests
     {
         using var stream = ToStream(PersonLine);
 
+        // Deliberately exercises the [Obsolete] (Stream, ILogger, Encoding?) overload: its
+        // null-logger behaviour must stay unchanged for as long as it exists. The replacement
+        // overload treats a null logger as "no logging" — covered by the test below.
+#pragma warning disable CS0618 // Type or member is obsolete
         Assert.Throws<ArgumentNullException>
         (
             () => new FixedWidthExtractor<PersonRecord>
@@ -63,6 +68,29 @@ public class FixedWidthExtractorStreamCtorTests
                 logger: null!
             )
         );
+#pragma warning restore CS0618
+    }
+
+
+
+    [Fact]
+    public void Constructor_Stream_Encoding_Logger_when_logger_is_null_uses_NullLogger()
+    {
+        using var stream = ToStream(PersonLine);
+
+        // A concrete Encoding is passed rather than null: while the [Obsolete]
+        // (Stream, ILogger, Encoding?) overload still exists, `encoding: null, logger: null`
+        // matches both overloads exactly and is ambiguous (CS0121). Supplying a real Encoding
+        // makes the obsolete overload inapplicable. The ambiguity disappears when that
+        // overload is removed.
+        var sut = new FixedWidthExtractor<PersonRecord>
+        (
+            stream,
+            Encoding.UTF8,
+            logger: null
+        );
+
+        Assert.NotNull(sut);
     }
 
 
@@ -142,16 +170,17 @@ public class FixedWidthLoaderStreamCtorTests
 
 
     [Fact]
-    public void Constructor_TextWriter_Logger_when_logger_is_null_throws_ArgumentNullException()
+    public void Constructor_TextWriter_Logger_when_logger_is_null_uses_NullLogger()
     {
-        Assert.Throws<ArgumentNullException>
+        // logger is now an optional trailing parameter: null means "no logging"
+        // (NullLogger.Instance) rather than an argument error.
+        var sut = new FixedWidthLoader<PersonRecord>
         (
-            () => new FixedWidthLoader<PersonRecord>
-            (
-                new StringWriter(),
-                logger: null!
-            )
+            new StringWriter(),
+            logger: null
         );
+
+        Assert.NotNull(sut);
     }
 
 
@@ -161,6 +190,10 @@ public class FixedWidthLoaderStreamCtorTests
     {
         using var stream = new MemoryStream();
 
+        // Deliberately exercises the [Obsolete] (Stream, ILogger, Encoding?) overload: its
+        // null-logger behaviour must stay unchanged for as long as it exists. The replacement
+        // overload treats a null logger as "no logging" — covered by the test below.
+#pragma warning disable CS0618 // Type or member is obsolete
         Assert.Throws<ArgumentNullException>
         (
             () => new FixedWidthLoader<PersonRecord>
@@ -169,6 +202,29 @@ public class FixedWidthLoaderStreamCtorTests
                 logger: null!
             )
         );
+#pragma warning restore CS0618
+    }
+
+
+
+    [Fact]
+    public void Constructor_Stream_Encoding_Logger_when_logger_is_null_uses_NullLogger()
+    {
+        using var stream = new MemoryStream();
+
+        // A concrete Encoding is passed rather than null: while the [Obsolete]
+        // (Stream, ILogger, Encoding?) overload still exists, `encoding: null, logger: null`
+        // matches both overloads exactly and is ambiguous (CS0121). Supplying a real Encoding
+        // makes the obsolete overload inapplicable. The ambiguity disappears when that
+        // overload is removed.
+        var sut = new FixedWidthLoader<PersonRecord>
+        (
+            stream,
+            Encoding.UTF8,
+            logger: null
+        );
+
+        Assert.NotNull(sut);
     }
 
 
