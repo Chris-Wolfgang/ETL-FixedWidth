@@ -13,7 +13,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `FixedWidthLoader<T>`: `(Stream stream, Encoding? encoding, ILogger<T>? logger = null)`. A `null`
   or omitted logger resolves to `NullLogger.Instance`.
 
+### Removed
+
+**Breaking.** Six constructors were removed, leaving exactly one per input shape on
+`FixedWidthExtractor<T>` and `FixedWidthLoader<T>`:
+
+- `(Stream, ILogger<T>, Encoding?)` — the middle-logger overloads, the only constructors in the ETL
+  fleet with the logger in a non-final position.
+- `(Stream, Encoding?)` — subsumed by `(Stream, Encoding?, ILogger<T>?)` now that `encoding` carries
+  a default.
+- `(TextReader)` / `(TextWriter)` — subsumed by `(TextReader/TextWriter, ILogger<T>?)`.
+
+This is a **binary** break even where source still compiles: optional-argument defaults are baked in
+at the caller's compile time, so an already-compiled consumer calling a removed overload fails with
+`MissingMethodException`. Recompiling against 0.11.0 is required. The 30 resulting `CP0002`
+package-validation findings are recorded as intentional in `CompatibilitySuppressions.xml`.
+
+The removed overloads were never shipped in a deprecated state: the replacement constructors and
+this removal land in the same release, so no version exists in which they carry `[Obsolete]`.
+
+**Migration** — in every case, move the logger to the end:
+
+```csharp
+// before
+new FixedWidthExtractor<T>(stream, logger, encoding);
+// after
+new FixedWidthExtractor<T>(stream, encoding, logger);
+```
+
+`new FixedWidthExtractor<T>(reader)` and `new FixedWidthExtractor<T>(stream)` continue to compile
+unchanged — they now bind to the surviving overloads via their default arguments.
+
 ### Changed
+
+- `encoding` on `(Stream, Encoding?, ILogger<T>?)` defaults to `null`. This could only be done once
+  the middle-logger overload was gone; defaulting it while both existed would have made
+  `(stream, encoding: null, logger: null)` ambiguous.
 
 - **`logger` is now optional on the `(TextReader, ILogger<T>)` / `(TextWriter, ILogger<T>)`
   constructors**, defaulting to `NullLogger.Instance` rather than throwing `ArgumentNullException`.

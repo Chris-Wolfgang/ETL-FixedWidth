@@ -89,26 +89,6 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     // Constructor
     // ------------------------------------------------------------------
 
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> that reads
-    /// from the specified <see cref="TextReader"/>.
-    /// </summary>
-    /// <param name="reader">
-    /// The <see cref="TextReader"/> to read fixed-width records from. This can be a
-    /// <see cref="StreamReader"/> wrapping a file stream (local or network share), a
-    /// <see cref="StringReader"/> for in-memory content, or any other <see cref="TextReader"/>
-    /// implementation. Reading is performed synchronously for throughput; callers with
-    /// slow or non-buffered sources should pre-buffer into a <see cref="StringReader"/>.
-    /// The caller is responsible for the reader's lifetime.
-    /// </param>
-    /// <exception cref="ArgumentNullException"><paramref name="reader"/> is null.</exception>
-    public FixedWidthExtractor(TextReader reader)
-    {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _logger = NullLogger.Instance;
-    }
-
-
 
     /// <summary>
     /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> that reads
@@ -165,63 +145,6 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
 
 
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> that reads
-    /// from the specified <see cref="Stream"/> using an internal <see cref="StreamReader"/>
-    /// with a 64 KB buffer for improved throughput on large files.
-    /// </summary>
-    /// <param name="stream">
-    /// The <see cref="Stream"/> to read fixed-width records from. The stream must be
-    /// readable. The caller retains ownership — the extractor does not dispose the stream.
-    /// </param>
-    /// <param name="encoding">
-    /// The <see cref="Encoding"/> used to decode the stream. Pass <see langword="null"/>
-    /// (the default) to use <see cref="Encoding.UTF8"/>.
-    /// </param>
-    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
-    public FixedWidthExtractor(Stream stream, Encoding? encoding = null)
-    {
-        _reader = CreateBufferedReader(stream, encoding);
-        _ownsReader = true;
-        _offsetStream = stream;
-        _offsetEncoding = encoding ?? Encoding.UTF8;
-        _logger = NullLogger.Instance;
-    }
-
-
-
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> that reads
-    /// from the specified <see cref="Stream"/> with diagnostic logging.
-    /// The extractor creates an internal <see cref="StreamReader"/> with a 64 KB
-    /// buffer for improved throughput on large files.
-    /// </summary>
-    /// <param name="stream">
-    /// The <see cref="Stream"/> to read fixed-width records from. The stream must be
-    /// readable. The caller retains ownership — the extractor does not dispose the stream.
-    /// </param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
-    /// <param name="encoding">
-    /// The <see cref="Encoding"/> used to decode the stream. Pass <see langword="null"/>
-    /// (the default) to use <see cref="Encoding.UTF8"/>.
-    /// </param>
-    /// <exception cref="ArgumentNullException">
-    /// <paramref name="stream"/> or <paramref name="logger"/> is null.
-    /// </exception>
-    public FixedWidthExtractor
-    (
-        Stream stream,
-        ILogger<FixedWidthExtractor<TRecord>> logger,
-        Encoding? encoding = null
-    )
-    {
-        _reader = CreateBufferedReader(stream, encoding);
-        _ownsReader = true;
-        _offsetStream = stream;
-        _offsetEncoding = encoding ?? Encoding.UTF8;
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
 
     /// <summary>
     /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> over the specified
@@ -239,7 +162,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     public FixedWidthExtractor
     (
         Stream stream,
-        Encoding? encoding,
+        Encoding? encoding = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
     {
