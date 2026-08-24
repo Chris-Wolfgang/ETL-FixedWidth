@@ -229,8 +229,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
     {
-        var encoding = options?.Encoding;
-        _writer = CreateBufferedWriter(stream, encoding);
+        _writer = CreateBufferedWriter(stream, (options ?? new FixedWidthLoaderOptions()).Encoding);
         _ownsWriter = true;
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
@@ -267,7 +266,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
     {
-        _writer = CreateBufferedWriter(stream, options?.Encoding);
+        _writer = CreateBufferedWriter(stream, (options ?? new FixedWidthLoaderOptions()).Encoding);
         _ownsWriter = true;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
         _logger = logger ?? (ILogger)NullLogger.Instance;

@@ -23,11 +23,11 @@ public sealed record FixedWidthExtractorOptions
 {
     /// <summary>
     /// Gets the <see cref="System.Text.Encoding"/> used to decode the input stream.
-    /// Defaults to <see langword="null"/>, meaning <see cref="System.Text.Encoding.UTF8"/>.
+    /// Defaults to <see cref="System.Text.Encoding.UTF8"/>.
     /// </summary>
     /// <remarks>
     /// A <see cref="System.IO.TextReader"/> already carries its own encoding, which is why encoding is
     /// a property of the stream-shaped options rather than something every constructor accepts.
     /// </remarks>
-    public Encoding? Encoding { get; init; }
+    public Encoding Encoding { get; init; } = Encoding.UTF8;
 }

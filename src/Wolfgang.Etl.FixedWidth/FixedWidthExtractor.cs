@@ -244,11 +244,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
     {
-        var encoding = options?.Encoding;
-        _reader = CreateBufferedReader(stream, encoding);
+        var resolved = options ?? new FixedWidthExtractorOptions();
+        _reader = CreateBufferedReader(stream, resolved.Encoding);
         _ownsReader = true;
         _offsetStream = stream;
-        _offsetEncoding = encoding ?? Encoding.UTF8;
+        _offsetEncoding = resolved.Encoding;
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
@@ -284,11 +284,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
     {
-        var encoding = options?.Encoding;
-        _reader = CreateBufferedReader(stream, encoding);
+        var resolved = options ?? new FixedWidthExtractorOptions();
+        _reader = CreateBufferedReader(stream, resolved.Encoding);
         _ownsReader = true;
         _offsetStream = stream;
-        _offsetEncoding = encoding ?? Encoding.UTF8;
+        _offsetEncoding = resolved.Encoding;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }

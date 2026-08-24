@@ -9,9 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **`FixedWidthExtractorOptions` and `FixedWidthLoaderOptions` records**, carrying an `Encoding`
-  property. Configuration travels in an options object rather than as a loose constructor
-  parameter, and defaults live on the property initializers so no constructor can diverge from them.
+- **`FixedWidthExtractorOptions` and `FixedWidthLoaderOptions` records**, carrying a non-nullable
+  `Encoding` property that **defaults to `Encoding.UTF8`** on the property initializer.
+  Configuration travels in an options object rather than as a loose constructor parameter, and the
+  default is declared on the record rather than resolved in a constructor body, so no constructor
+  can diverge from it. Omitting the options object entirely gives the same result — the
+  constructors resolve `options ?? new FixedWidthXxxOptions()`.
 - **Constructors taking an options record with the logger as a trailing optional parameter** on
   `FixedWidthExtractor<T>` and `FixedWidthLoader<T>`:
   `(Stream stream, FixedWidthExtractorOptions? options, ILogger<T>? logger = null)`. A `null` or
