@@ -245,7 +245,7 @@ public sealed class FixedWidthExtractorCheckpointTests
     public async Task Tracking_with_a_bomless_encoding_reports_offsets_from_zero()
     {
         // ASCII has no byte-order-mark preamble, exercising the preamble short-circuit.
-        using var extractor = new FixedWidthExtractor<Rec>(new MemoryStream(Ascii(ThreeRecords)), Encoding.ASCII) { TrackByteOffset = true };
+        using var extractor = new FixedWidthExtractor<Rec>(new MemoryStream(Ascii(ThreeRecords)), new FixedWidthExtractorOptions { Encoding = Encoding.ASCII }) { TrackByteOffset = true };
 
         var offsets = new List<long>();
         await foreach (var _ in extractor.ExtractAsync(CancellationToken.None))

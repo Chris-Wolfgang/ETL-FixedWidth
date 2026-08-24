@@ -77,25 +77,6 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     // Constructor
     // ------------------------------------------------------------------
 
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> that writes
-    /// to the specified <see cref="TextWriter"/>.
-    /// </summary>
-    /// <param name="writer">
-    /// The <see cref="TextWriter"/> to write fixed-width records to. This can be a
-    /// <see cref="StreamWriter"/> wrapping a file or network stream, a
-    /// <see cref="StringWriter"/> for in-memory content, <see cref="Console.Out"/> for
-    /// formatted console table output, or any other <see cref="TextWriter"/> implementation.
-    /// The caller is responsible for the writer's lifetime — the loader does not dispose it.
-    /// </param>
-    /// <exception cref="ArgumentNullException"><paramref name="writer"/> is null.</exception>
-    public FixedWidthLoader(TextWriter writer)
-    {
-        _writer = writer ?? throw new ArgumentNullException(nameof(writer));
-        _logger = NullLogger.Instance;
-    }
-
-
 
     /// <summary>
     /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> that writes
@@ -152,61 +133,6 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
 
 
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> that writes
-    /// to the specified <see cref="Stream"/> using an internal <see cref="StreamWriter"/>
-    /// with a 64 KB buffer for improved throughput on large files.
-    /// </summary>
-    /// <param name="stream">
-    /// The <see cref="Stream"/> to write fixed-width records to. The stream must be
-    /// writable. The caller retains ownership — the loader does not dispose the stream.
-    /// </param>
-    /// <param name="encoding">
-    /// The <see cref="Encoding"/> used to encode the output. Pass <see langword="null"/>
-    /// (the default) to use <see cref="Encoding.UTF8"/>. Use <c>new UTF8Encoding(false)</c>
-    /// to write UTF-8 without a byte-order mark.
-    /// </param>
-    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
-    public FixedWidthLoader(Stream stream, Encoding? encoding = null)
-    {
-        _writer = CreateBufferedWriter(stream, encoding);
-        _ownsWriter = true;
-        _logger = NullLogger.Instance;
-    }
-
-
-
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> that writes
-    /// to the specified <see cref="Stream"/> with diagnostic logging.
-    /// The loader creates an internal <see cref="StreamWriter"/> with a 64 KB
-    /// buffer for improved throughput on large files.
-    /// </summary>
-    /// <param name="stream">
-    /// The <see cref="Stream"/> to write fixed-width records to. The stream must be
-    /// writable. The caller retains ownership — the loader does not dispose the stream.
-    /// </param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
-    /// <param name="encoding">
-    /// The <see cref="Encoding"/> used to encode the output. Pass <see langword="null"/>
-    /// (the default) to use <see cref="Encoding.UTF8"/>. Use <c>new UTF8Encoding(false)</c>
-    /// to write UTF-8 without a byte-order mark.
-    /// </param>
-    /// <exception cref="ArgumentNullException">
-    /// <paramref name="stream"/> or <paramref name="logger"/> is null.
-    /// </exception>
-    public FixedWidthLoader
-    (
-        Stream stream,
-        ILogger<FixedWidthLoader<TRecord>> logger,
-        Encoding? encoding = null
-    )
-    {
-        _writer = CreateBufferedWriter(stream, encoding);
-        _ownsWriter = true;
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
 
     /// <summary>
     /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> over the specified
@@ -225,7 +151,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     public FixedWidthLoader
     (
         Stream stream,
-        FixedWidthLoaderOptions? options,
+        FixedWidthLoaderOptions? options = null,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
     {

@@ -52,21 +52,22 @@ public class FixedWidthExtractorStreamCtorTests
 
 
     [Fact]
-    public void Constructor_Stream_Logger_when_logger_is_null_throws_ArgumentNullException()
+    public void Constructor_Stream_named_options_and_logger_nulls_is_unambiguous()
     {
+        // Regression guard. An earlier shape had (Stream, ILogger, Encoding?) coexisting with a
+        // second Stream overload; `<second arg>: null, logger: null` matched BOTH exactly, so
+        // neither won and it did not compile (CS0121). There is now a single Stream overload. If
+        // this stops compiling, a competing overload has been reintroduced.
         using var stream = ToStream(PersonLine);
 
-        // Exercises the (Stream, ILogger, Encoding?) overload: its null-logger behaviour must
-        // stay unchanged for as long as it exists. The replacement overload treats a null logger
-        // as "no logging" — covered by the test below.
-        Assert.Throws<ArgumentNullException>
+        var sut = new FixedWidthExtractor<PersonRecord>
         (
-            () => new FixedWidthExtractor<PersonRecord>
-            (
-                stream,
-                logger: null!
-            )
+            stream,
+            options: null,
+            logger: null
         );
+
+        Assert.NotNull(sut);
     }
 
 
@@ -176,26 +177,6 @@ public class FixedWidthLoaderStreamCtorTests
         );
 
         Assert.NotNull(sut);
-    }
-
-
-
-    [Fact]
-    public void Constructor_Stream_Logger_when_logger_is_null_throws_ArgumentNullException()
-    {
-        using var stream = new MemoryStream();
-
-        // Exercises the (Stream, ILogger, Encoding?) overload: its null-logger behaviour must
-        // stay unchanged for as long as it exists. The replacement overload treats a null logger
-        // as "no logging" — covered by the test below.
-        Assert.Throws<ArgumentNullException>
-        (
-            () => new FixedWidthLoader<PersonRecord>
-            (
-                stream,
-                logger: null!
-            )
-        );
     }
 
 
