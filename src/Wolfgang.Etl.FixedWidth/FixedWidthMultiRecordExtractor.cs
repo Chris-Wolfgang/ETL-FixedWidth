@@ -100,9 +100,8 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <see langword="null"/>.</exception>
     public FixedWidthMultiRecordExtractor(TextReader reader, ILogger<FixedWidthMultiRecordExtractor>? logger = null)
+        : this(reader: reader, stream: null, timer: null, logger: logger)
     {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -120,24 +119,67 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
     public FixedWidthMultiRecordExtractor(Stream stream, ILogger<FixedWidthMultiRecordExtractor>? logger = null)
+        : this(reader: null, stream: stream, timer: null, logger: logger)
     {
-        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-
-        // We create the internal StreamReader that wraps the caller's stream, so we own (and dispose)
-        // that reader. It is created with leaveOpen:true, so the caller's stream itself is never closed
-        // — the caller retains ownership of the Stream. (A caller-supplied TextReader leaves this false.)
-        _ownsReader = true;
-        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
 
     // Test-only constructor that injects a deterministic progress timer.
-    internal FixedWidthMultiRecordExtractor(TextReader reader, IProgressTimer timer)
+    internal FixedWidthMultiRecordExtractor
+    (
+        TextReader reader,
+        IProgressTimer timer,
+        ILogger<FixedWidthMultiRecordExtractor>? logger = null
+    )
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null,
+               timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
-        _logger = NullLogger.Instance;
+    }
+
+
+
+    // Stream-shaped counterpart of the timer-injecting constructor, so both input shapes are
+    // testable with a deterministic timer.
+    internal FixedWidthMultiRecordExtractor
+    (
+        Stream stream,
+        IProgressTimer timer,
+        ILogger<FixedWidthMultiRecordExtractor>? logger = null
+    )
+        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)),
+               timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
+    {
+    }
+
+
+
+    // The single initialization path. Every public and internal constructor delegates here, so
+    // there is exactly one place that assigns fields and one definition of each default.
+    // Exactly one of reader / stream is non-null; the caller-facing constructors enforce that by
+    // construction rather than by validation.
+    private FixedWidthMultiRecordExtractor
+    (
+        TextReader? reader,
+        Stream? stream,
+        IProgressTimer? timer,
+        ILogger<FixedWidthMultiRecordExtractor>? logger
+    )
+    {
+        if (reader is null && stream is null)
+        {
+            throw new ArgumentNullException(nameof(reader));
+        }
+
+        _reader = reader;
+        _stream = stream;
+
+        // The Stream shape wraps the caller's stream in a StreamReader we own (and dispose). It is
+        // created with leaveOpen:true, so the caller's stream itself is never closed — the caller
+        // retains ownership. A caller-supplied TextReader leaves this false.
+        _ownsReader = stream is not null;
+        _progressTimer = timer;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 

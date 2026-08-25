@@ -25,6 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   would have all parameters supplied. It gains its `= null` default once that constructor is
   removed.
 
+### Added
+
+- **`FixedWidthMultiRecordExtractor(Stream, IProgressTimer, ILogger<...>? = null)`** (internal).
+  The `Stream` shape previously had no timer-injecting constructor, so only the `TextReader` shape
+  could be tested with a deterministic timer.
+
 ### Changed
 
 - **`logger` is now optional on the `(TextReader, ILogger<T>)` / `(TextWriter, ILogger<T>)`

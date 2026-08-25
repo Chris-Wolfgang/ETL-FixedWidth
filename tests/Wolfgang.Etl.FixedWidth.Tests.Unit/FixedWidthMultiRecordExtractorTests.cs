@@ -374,6 +374,45 @@ public sealed class FixedWidthMultiRecordExtractorTests
 
 
     [Fact]
+    public async Task ExtractAsync_from_Stream_reports_progress_via_the_injected_timer()
+    {
+        // The Stream shape previously had no timer-injecting constructor, so only the TextReader
+        // shape was testable with a deterministic timer.
+        var timer = new ManualProgressTimer();
+        var sink = new CollectingProgress();
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(SampleFile));
+        using var extractor = new FixedWidthMultiRecordExtractor(stream, timer)
+            .When(l => l[0] == 'H', typeof(HeaderRecord))
+            .When(l => l[0] == 'D', typeof(DetailRecord))
+            .When(l => l[0] == 'T', typeof(TrailerRecord));
+
+        await foreach (var _ in extractor.ExtractAsync(sink, CancellationToken.None))
+        {
+            timer.Fire();
+        }
+
+        Assert.NotEmpty(sink.Reports);
+        Assert.Equal(4, (int)sink.Reports.Max(r => r.CurrentItemCount));
+    }
+
+
+    [Fact]
+    public void Internal_timer_ctor_accepts_a_logger_as_its_trailing_parameter()
+    {
+        // Rule 6: the logger is last on internal constructors too. This overload previously took
+        // no logger at all.
+        using var extractor = new FixedWidthMultiRecordExtractor
+        (
+            new StringReader(SampleFile),
+            new ManualProgressTimer(),
+            logger: null
+        );
+
+        Assert.NotNull(extractor);
+    }
+
+
+    [Fact]
     public async Task ExtractAsync_with_no_injected_timer_uses_the_base_timer()
     {
         using var extractor = NewExtractor(SampleFile);
