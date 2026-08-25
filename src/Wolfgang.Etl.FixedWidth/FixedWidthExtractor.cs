@@ -106,9 +106,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         TextReader reader,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
+        : this(reader: reader, stream: null, options: null, timer: null, logger: logger)
     {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -137,10 +136,9 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         IProgressTimer timer,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
+        : this(reader: reader, stream: null, options: null,
+               timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -166,13 +164,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         FixedWidthExtractorOptions? options = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
+        : this(reader: null, stream: stream, options: options, timer: null, logger: logger)
     {
-        var resolved = options ?? new FixedWidthExtractorOptions();
-        _reader = CreateBufferedReader(stream, resolved.Encoding);
-        _ownsReader = true;
-        _offsetStream = stream;
-        _offsetEncoding = resolved.Encoding;
-        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -206,13 +199,39 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         FixedWidthExtractorOptions? options = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
+        : this(reader: null, stream: stream, options: options,
+               timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
-        var resolved = options ?? new FixedWidthExtractorOptions();
-        _reader = CreateBufferedReader(stream, resolved.Encoding);
-        _ownsReader = true;
-        _offsetStream = stream;
-        _offsetEncoding = resolved.Encoding;
-        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
+    }
+
+
+    // The single initialization path. Every public and internal constructor delegates here,
+    // so there is exactly one place that assigns the shared fields. The two input shapes
+    // cannot chain to one another, which is why this takes the private-core form rather than
+    // one constructor chaining into another. Exactly one of reader / stream is non-null.
+    private FixedWidthExtractor
+    (
+        TextReader? reader,
+        Stream? stream,
+        FixedWidthExtractorOptions? options,
+        IProgressTimer? timer,
+        ILogger<FixedWidthExtractor<TRecord>>? logger
+    )
+    {
+        if (stream is not null)
+        {
+            var resolved = options ?? new FixedWidthExtractorOptions();
+            _reader = CreateBufferedReader(stream, resolved.Encoding);
+            _ownsReader = true;
+            _offsetStream = stream;
+            _offsetEncoding = resolved.Encoding;
+        }
+        else
+        {
+            _reader = reader ?? throw new ArgumentNullException(nameof(reader));
+        }
+
+        _progressTimer = timer;
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
