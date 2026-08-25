@@ -477,6 +477,22 @@ public sealed class FixedWidthBinaryExtractorTests
 
 
     [ExcludeFromCodeCoverage]
+    [Fact]
+    public void Internal_timer_ctor_accepts_a_logger_as_its_trailing_parameter()
+    {
+        // Rule 6: the logger is last on internal constructors too. This overload previously took
+        // a timer but no logger, so a test could inject one or the other, never both.
+        using var sut = new FixedWidthBinaryExtractor<Account>
+        (
+            new MemoryStream(Concat(Record("A", 1, Balance1234_56))),
+            new ManualProgressTimer(),
+            logger: null
+        );
+
+        Assert.NotNull(sut);
+    }
+
+
     private sealed class CollectingProgress : IProgress<FixedWidthReport>
     {
         public System.Collections.Generic.List<FixedWidthReport> Reports { get; } = new();

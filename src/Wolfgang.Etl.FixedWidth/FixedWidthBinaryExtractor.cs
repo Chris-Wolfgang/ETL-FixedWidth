@@ -81,8 +81,13 @@ public sealed class FixedWidthBinaryExtractor<TRecord> : ExtractorBase<TRecord, 
 
 
     // Test-only constructor that injects a deterministic progress timer.
-    internal FixedWidthBinaryExtractor(Stream stream, IProgressTimer timer)
-        : this(stream)
+    internal FixedWidthBinaryExtractor
+    (
+        Stream stream,
+        IProgressTimer timer,
+        ILogger<FixedWidthBinaryExtractor<TRecord>>? logger = null
+    )
+        : this(stream, logger)
     {
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }

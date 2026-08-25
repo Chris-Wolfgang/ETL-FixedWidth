@@ -69,8 +69,13 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
 
 
     // Test-only constructor that injects a deterministic progress timer.
-    internal FixedWidthBinaryLoader(Stream stream, IProgressTimer timer)
-        : this(stream)
+    internal FixedWidthBinaryLoader
+    (
+        Stream stream,
+        IProgressTimer timer,
+        ILogger<FixedWidthBinaryLoader<TRecord>>? logger = null
+    )
+        : this(stream, logger)
     {
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }

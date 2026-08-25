@@ -27,6 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **A trailing optional logger on the internal timer-injecting constructors** of
+  `FixedWidthBinaryExtractor<T>` and `FixedWidthBinaryLoader<T>`. They previously took a timer but
+  no logger, so a test could inject one or the other but not both.
 - **`FixedWidthMultiRecordExtractor(Stream, IProgressTimer, ILogger<...>? = null)`** (internal).
   The `Stream` shape previously had no timer-injecting constructor, so only the `TextReader` shape
   could be tested with a deterministic timer.
