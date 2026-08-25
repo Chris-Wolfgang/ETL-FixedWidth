@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`FixedWidthBinaryExtractorOptions`, `FixedWidthBinaryLoaderOptions` and
+  `FixedWidthMultiRecordExtractorOptions` records**, each carrying an `Encoding` property, so every
+  `Stream`-based constructor in the package configures encoding the same way. The
+  `TextReader`/`TextWriter` constructors deliberately take no options: a caller-supplied reader or
+  writer already carries its own encoding, so the setting would be inert there.
 - **`FixedWidthExtractorOptions` and `FixedWidthLoaderOptions` records**, carrying a non-nullable
   `Encoding` property that **defaults to `Encoding.UTF8`** on the property initializer.
   Configuration travels in an options object rather than as a loose constructor parameter, and the

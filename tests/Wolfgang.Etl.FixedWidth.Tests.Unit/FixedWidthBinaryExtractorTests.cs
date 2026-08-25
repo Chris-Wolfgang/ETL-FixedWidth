@@ -96,7 +96,7 @@ public sealed class FixedWidthBinaryExtractorTests
     {
         var data = Concat(Record("ACCT0001", 42, Balance1234_56));
         var logger = new SpyLogger<FixedWidthBinaryExtractor<Account>>();
-        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data), logger);
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data), logger: logger);
 
         await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
 
@@ -188,7 +188,7 @@ public sealed class FixedWidthBinaryExtractorTests
 
         Balance1234_56.CopyTo(record, 12);   // a valid packed value so decoding the record succeeds
         var latin1 = Encoding.GetEncoding("ISO-8859-1");
-        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(record)) { Encoding = latin1 };
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(record), new FixedWidthBinaryExtractorOptions { Encoding = latin1 });
 
         var account = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
 

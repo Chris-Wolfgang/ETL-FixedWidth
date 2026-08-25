@@ -70,6 +70,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
 
     private readonly Stream? _stream;   // set by the Stream constructor; wrapped lazily using Encoding
     private readonly bool _ownsReader;
+    private readonly Encoding _encoding;
     private readonly ILogger _logger;
     private TextReader? _reader;         // supplied directly (TextReader) or created from _stream at enumeration
     private readonly IProgressTimer? _progressTimer;
@@ -100,7 +101,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <see langword="null"/>.</exception>
     public FixedWidthMultiRecordExtractor(TextReader reader, ILogger<FixedWidthMultiRecordExtractor>? logger = null)
-        : this(reader: reader, stream: null, timer: null, logger: logger)
+        : this(reader: reader, stream: null, options: null, timer: null, logger: logger)
     {
     }
 
@@ -113,13 +114,22 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// specific encoding (defaults to <see cref="Encoding.UTF8"/>).
     /// </summary>
     /// <param name="stream">The readable source stream.</param>
+    /// <param name="options">
+    /// Options that control behaviour, including the encoding. When <c>null</c> — or omitted —
+    /// the documented defaults apply.
+    /// </param>
     /// <param name="logger">
     /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output. Pass
     /// <see langword="null"/> (the default) to disable logging.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    public FixedWidthMultiRecordExtractor(Stream stream, ILogger<FixedWidthMultiRecordExtractor>? logger = null)
-        : this(reader: null, stream: stream, timer: null, logger: logger)
+    public FixedWidthMultiRecordExtractor
+    (
+        Stream stream,
+        FixedWidthMultiRecordExtractorOptions? options = null,
+        ILogger<FixedWidthMultiRecordExtractor>? logger = null
+    )
+        : this(reader: null, stream: stream, options: options, timer: null, logger: logger)
     {
     }
 
@@ -132,7 +142,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
         IProgressTimer timer,
         ILogger<FixedWidthMultiRecordExtractor>? logger = null
     )
-        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null,
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null,
                timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
     }
@@ -145,9 +155,10 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     (
         Stream stream,
         IProgressTimer timer,
+        FixedWidthMultiRecordExtractorOptions? options = null,
         ILogger<FixedWidthMultiRecordExtractor>? logger = null
     )
-        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)),
+        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options,
                timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
     }
@@ -162,6 +173,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     (
         TextReader? reader,
         Stream? stream,
+        FixedWidthMultiRecordExtractorOptions? options,
         IProgressTimer? timer,
         ILogger<FixedWidthMultiRecordExtractor>? logger
     )
@@ -178,6 +190,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
         // created with leaveOpen:true, so the caller's stream itself is never closed — the caller
         // retains ownership. A caller-supplied TextReader leaves this false.
         _ownsReader = stream is not null;
+        _encoding = (options ?? new FixedWidthMultiRecordExtractorOptions()).Encoding;
         _progressTimer = timer;
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
@@ -261,13 +274,6 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     // Properties
     // ------------------------------------------------------------------
 
-    /// <summary>
-    /// The encoding used to decode the source when constructed from a <see cref="Stream"/>. Defaults
-    /// to <see cref="Encoding.UTF8"/>. Ignored when constructed from a <see cref="TextReader"/> (the
-    /// reader already decodes). The stream is wrapped lazily when extraction begins, so this value is
-    /// read then — set it in the object initializer.
-    /// </summary>
-    public Encoding Encoding { get; init; } = Encoding.UTF8;
 
 
 
@@ -464,7 +470,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
 
         // Wrap the stream lazily so the Encoding init property is read here (after the object
         // initializer has run), not in the constructor. A TextReader source is used as supplied.
-        var reader = _reader ??= CreateBufferedReader(_stream!, Encoding);
+        var reader = _reader ??= CreateBufferedReader(_stream!, _encoding);
 
         LogExtractionStarted();
         token.ThrowIfCancellationRequested();
