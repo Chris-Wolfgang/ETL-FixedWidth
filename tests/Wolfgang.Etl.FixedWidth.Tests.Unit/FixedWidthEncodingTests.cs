@@ -82,4 +82,15 @@ public class FixedWidthEncodingTests
             bytes.Take(utf8Bom.Length).SequenceEqual(utf8Bom)
         );
     }
+
+    [Fact]
+    public void Options_Encoding_defaults_to_Utf8()
+    {
+        // The default lives on the record's property initializer, not in a constructor body,
+        // so no constructor can diverge from it.
+        Assert.Same(Encoding.UTF8, new FixedWidthExtractorOptions().Encoding);
+        Assert.Same(Encoding.UTF8, new FixedWidthLoaderOptions().Encoding);
+    }
+
+
 }

@@ -111,11 +111,11 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     public FixedWidthLoader
     (
         TextWriter writer,
-        ILogger<FixedWidthLoader<TRecord>> logger
+        ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
     {
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -208,6 +208,33 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     }
 
 
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> over the specified
+    /// <see cref="Stream"/>, with the logger as the trailing optional parameter.
+    /// </summary>
+    /// <param name="stream">The <see cref="Stream"/> to use.</param>
+    /// <param name="options">
+    /// Options that control behaviour, including the <see cref="FixedWidthLoaderOptions.Encoding"/>
+    /// to use. When <c>null</c>, the documented defaults apply.
+    /// </param>
+    /// <param name="logger">
+    /// An optional logger for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
+    public FixedWidthLoader
+    (
+        Stream stream,
+        FixedWidthLoaderOptions? options,
+        ILogger<FixedWidthLoader<TRecord>>? logger = null
+    )
+    {
+        _writer = CreateBufferedWriter(stream, (options ?? new FixedWidthLoaderOptions()).Encoding);
+        _ownsWriter = true;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
+    }
+
+
 
     /// <summary>
     /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> that writes
@@ -224,6 +251,10 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
     /// Pass <see langword="null"/> to disable logging.
     /// </param>
+    /// <param name="options">
+    /// Options that control behaviour. When <c>null</c> — or omitted — the documented
+    /// defaults apply.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="stream"/> or <paramref name="timer"/> is null.
     /// </exception>
@@ -231,10 +262,11 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     (
         Stream stream,
         IProgressTimer timer,
+        FixedWidthLoaderOptions? options = null,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
     {
-        _writer = CreateBufferedWriter(stream, encoding: null);
+        _writer = CreateBufferedWriter(stream, (options ?? new FixedWidthLoaderOptions()).Encoding);
         _ownsWriter = true;
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
         _logger = logger ?? (ILogger)NullLogger.Instance;

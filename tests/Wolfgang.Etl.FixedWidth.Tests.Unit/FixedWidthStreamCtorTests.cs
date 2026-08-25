@@ -36,16 +36,17 @@ public class FixedWidthExtractorStreamCtorTests
 
 
     [Fact]
-    public void Constructor_TextReader_Logger_when_logger_is_null_throws_ArgumentNullException()
+    public void Constructor_TextReader_Logger_when_logger_is_null_uses_NullLogger()
     {
-        Assert.Throws<ArgumentNullException>
+        // logger is now an optional trailing parameter: null means "no logging"
+        // (NullLogger.Instance) rather than an argument error.
+        var sut = new FixedWidthExtractor<PersonRecord>
         (
-            () => new FixedWidthExtractor<PersonRecord>
-            (
-                new StringReader(PersonLine),
-                logger: null!
-            )
+            new StringReader(PersonLine),
+            logger: null
         );
+
+        Assert.NotNull(sut);
     }
 
 
@@ -55,6 +56,9 @@ public class FixedWidthExtractorStreamCtorTests
     {
         using var stream = ToStream(PersonLine);
 
+        // Exercises the (Stream, ILogger, Encoding?) overload: its null-logger behaviour must
+        // stay unchanged for as long as it exists. The replacement overload treats a null logger
+        // as "no logging" — covered by the test below.
         Assert.Throws<ArgumentNullException>
         (
             () => new FixedWidthExtractor<PersonRecord>
@@ -63,6 +67,25 @@ public class FixedWidthExtractorStreamCtorTests
                 logger: null!
             )
         );
+    }
+
+
+
+    [Fact]
+    public void Constructor_Stream_Options_Logger_when_logger_is_null_uses_NullLogger()
+    {
+        using var stream = ToStream(PersonLine);
+
+        // `options` is required positionally on this overload, which is what keeps it
+        // unambiguous against the still-present (Stream, Encoding? = null) constructor.
+        var sut = new FixedWidthExtractor<PersonRecord>
+        (
+            stream,
+            new FixedWidthExtractorOptions { Encoding = Encoding.UTF8 },
+            logger: null
+        );
+
+        Assert.NotNull(sut);
     }
 
 
@@ -142,16 +165,17 @@ public class FixedWidthLoaderStreamCtorTests
 
 
     [Fact]
-    public void Constructor_TextWriter_Logger_when_logger_is_null_throws_ArgumentNullException()
+    public void Constructor_TextWriter_Logger_when_logger_is_null_uses_NullLogger()
     {
-        Assert.Throws<ArgumentNullException>
+        // logger is now an optional trailing parameter: null means "no logging"
+        // (NullLogger.Instance) rather than an argument error.
+        var sut = new FixedWidthLoader<PersonRecord>
         (
-            () => new FixedWidthLoader<PersonRecord>
-            (
-                new StringWriter(),
-                logger: null!
-            )
+            new StringWriter(),
+            logger: null
         );
+
+        Assert.NotNull(sut);
     }
 
 
@@ -161,6 +185,9 @@ public class FixedWidthLoaderStreamCtorTests
     {
         using var stream = new MemoryStream();
 
+        // Exercises the (Stream, ILogger, Encoding?) overload: its null-logger behaviour must
+        // stay unchanged for as long as it exists. The replacement overload treats a null logger
+        // as "no logging" — covered by the test below.
         Assert.Throws<ArgumentNullException>
         (
             () => new FixedWidthLoader<PersonRecord>
@@ -169,6 +196,25 @@ public class FixedWidthLoaderStreamCtorTests
                 logger: null!
             )
         );
+    }
+
+
+
+    [Fact]
+    public void Constructor_Stream_Options_Logger_when_logger_is_null_uses_NullLogger()
+    {
+        using var stream = new MemoryStream();
+
+        // `options` is required positionally on this overload, which is what keeps it
+        // unambiguous against the still-present (Stream, Encoding? = null) constructor.
+        var sut = new FixedWidthLoader<PersonRecord>
+        (
+            stream,
+            new FixedWidthLoaderOptions { Encoding = Encoding.UTF8 },
+            logger: null
+        );
+
+        Assert.NotNull(sut);
     }
 
 
