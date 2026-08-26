@@ -52,7 +52,21 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" NoWarn="NU1701">
+    <!--
+      xunit.runner.visualstudio 2.8.2 ships build/lib assets for net462 and net6.0 ONLY, so the
+      netcoreapp3.1 and net5.0 slots resolve no test adapter and report "No test is available".
+      2.4.5 is the newest 2.x that still ships a netcoreapp3.1 asset, which net5.0 also consumes.
+      Both are capped below 3.0.0: runner 3.x drops these target frameworks entirely.
+    -->
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" NoWarn="NU1701"
+                      Condition="'$(TargetFramework)' == 'netcoreapp3.1' Or '$(TargetFramework)' == 'net5.0'"
+                      allowedVersions="(,3.0.0)">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" NoWarn="NU1701"
+                      Condition="'$(TargetFramework)' != 'netcoreapp3.1' And '$(TargetFramework)' != 'net5.0'"
+                      allowedVersions="(,3.0.0)">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
