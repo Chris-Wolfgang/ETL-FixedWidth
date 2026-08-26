@@ -7,34 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-- **`FixedWidthBinaryExtractorOptions`, `FixedWidthBinaryLoaderOptions` and
-  `FixedWidthMultiRecordExtractorOptions` records**, each carrying an `Encoding` property, so every
-  `Stream`-based constructor in the package configures encoding the same way. The
-  `TextReader`/`TextWriter` constructors deliberately take no options: a caller-supplied reader or
-  writer already carries its own encoding, so the setting would be inert there.
-- **`FixedWidthExtractorOptions` and `FixedWidthLoaderOptions` records**, carrying a non-nullable
-  `Encoding` property that **defaults to `Encoding.UTF8`** on the property initializer.
-  Configuration travels in an options object rather than as a loose constructor parameter, and the
-  default is declared on the record rather than resolved in a constructor body, so no constructor
-  can diverge from it. Omitting the options object entirely gives the same result — the
-  constructors resolve `options ?? new FixedWidthXxxOptions()`.
-- **Constructors taking an options record with the logger as a trailing optional parameter** on
-  `FixedWidthExtractor<T>` and `FixedWidthLoader<T>`:
-  `(Stream stream, FixedWidthExtractorOptions? options, ILogger<T>? logger = null)`. A `null` or
-  omitted logger resolves to `NullLogger.Instance`.
-
-  `options` is required positionally for now: giving it a default would make `new T(stream)`
-  ambiguous against the existing `(Stream, Encoding? = null)` constructor, since neither candidate
-  would have all parameters supplied. It gains its `= null` default once that constructor is
-  removed.
+**Breaking release.** Constructor configuration is now uniform across the package: every
+`Stream`-based constructor takes an options record, and the logger is always the last, optional
+parameter. Six superseded constructors and four public `Encoding` properties are gone.
 
 ### Added
+
+- **Options records for every `Stream`-based constructor** — `FixedWidthExtractorOptions`,
+  `FixedWidthLoaderOptions`, `FixedWidthBinaryExtractorOptions`, `FixedWidthBinaryLoaderOptions`,
+  `FixedWidthMultiRecordExtractorOptions` and `FixedWidthDataReaderOptions`, each carrying an
+  `Encoding` property. Defaults are declared on the property initializers — `Encoding.UTF8`
+  everywhere except the binary types, which keep `Encoding.ASCII` — so no constructor body can
+  diverge from them. Omitting the options object gives the same result: the constructors resolve
+  `options ?? new FixedWidthXxxOptions()`.
+
+  The `TextReader`/`TextWriter` constructors deliberately take **no** options. A caller-supplied
+  reader or writer already carries its own encoding, so the setting would be inert there.
 
 - **A trailing optional logger on the internal timer-injecting constructors** of
   `FixedWidthBinaryExtractor<T>` and `FixedWidthBinaryLoader<T>`. They previously took a timer but
   no logger, so a test could inject one or the other but not both.
+
 - **`FixedWidthMultiRecordExtractor(Stream, IProgressTimer, ILogger<...>? = null)`** (internal).
   The `Stream` shape previously had no timer-injecting constructor, so only the `TextReader` shape
   could be tested with a deterministic timer.
@@ -46,13 +39,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   The parameter list is unchanged, so the emitted signature is identical and this is not a binary
   breaking change.
 
-### Added
-
-### Changed
-
-### Deprecated
+- **Every type now has a single initialization path.** `FixedWidthExtractor<T>`,
+  `FixedWidthLoader<T>`, `FixedWidthMultiRecordExtractor` and `FixedWidthDataReader<T>` previously
+  assigned their shared fields independently in each constructor. They now chain into one private
+  constructor that assigns them in exactly one place. No API or behavior change — this closes the
+  gap that produced two shipped defects elsewhere in the fleet, including this package's own
+  internal constructor that hard-coded UTF-8 while its public counterpart honored the caller's
+  encoding.
 
 ### Removed
+
+- **Breaking.** The public `Encoding` properties on `FixedWidthBinaryExtractor<T>`,
+  `FixedWidthBinaryLoader<T>`, `FixedWidthMultiRecordExtractor` and `FixedWidthDataReader<T>` are
+  replaced by the `Encoding` property on their options records.
+
+  ```diff
+  - new FixedWidthBinaryExtractor<T>(stream) { Encoding = Encoding.Latin1 }
+  + new FixedWidthBinaryExtractor<T>(stream, new FixedWidthBinaryExtractorOptions { Encoding = Encoding.Latin1 })
+  ```
+
+  Two of these were inert on part of their own surface. `FixedWidthDataReader<T>` said so in its
+  XML doc — `Encoding` was *"ignored when constructed from a `TextReader`"* — and
+  `FixedWidthMultiRecordExtractor` had the same silent gap. Scoping the setting to the `Stream`
+  constructor removes it from the path where it did nothing. Defaults are unchanged.
+
+- **Breaking.** Six superseded constructors on `FixedWidthExtractor<T>` and `FixedWidthLoader<T>`
+  (#332):
+
+  - `(Stream, ILogger<T>, Encoding? = null)` — logger in the middle
+  - `(Stream, Encoding? = null)` — loose encoding parameter
+  - `(TextReader)` / `(TextWriter)` — subsumed by the optional-logger overload
+
+  Deleting them is **source-compatible**: existing calls rebind to the surviving constructors.
+  It is a **binary** break, because optional-argument defaults are baked in at the caller's compile
+  time, so already-compiled consumers must be recompiled.
+
+  They were briefly marked `[Obsolete]` instead. That was reverted: the superseded constructor won
+  overload resolution for the simplest call, so obsoleting it warned every caller writing perfectly
+  correct new code, and — with `TreatWarningsAsErrors` — broke them outright.
 
 ### Fixed
 
