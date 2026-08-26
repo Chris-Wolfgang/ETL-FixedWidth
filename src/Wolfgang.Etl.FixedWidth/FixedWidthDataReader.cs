@@ -36,7 +36,8 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
 {
     private const int DefaultBufferSize = 65536;
 
-    private readonly Stream? _stream;   // set by the Stream constructor; wrapped lazily using Encoding
+    private readonly Stream? _stream;   // set by the Stream constructor; wrapped lazily using _encoding
+    private readonly Encoding _encoding;
     private readonly bool _ownsReader;
     private readonly ILogger _logger;
     private readonly FieldMapResult _fieldMap;
@@ -65,12 +66,8 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <see langword="null"/>.</exception>
     public FixedWidthDataReader(TextReader reader, ILogger<FixedWidthDataReader<TRecord>>? logger = null)
+        : this(reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null, logger)
     {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
-        _fieldMap = FieldMap.GetResult<TRecord>();
-        _names = BuildNames(_fieldMap);
-        _current = new object?[_fieldMap.Descriptors.Count];
     }
 
 
@@ -79,19 +76,72 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     /// Initializes a new <see cref="FixedWidthDataReader{TRecord}"/> reading from a
     /// <see cref="Stream"/> via an internal 64 KB-buffered <see cref="StreamReader"/>. The caller
     /// retains ownership of the stream (it is not closed), but <see cref="Dispose"/> must be called
-    /// to release the internal reader. Set <see cref="Encoding"/> to decode with a specific encoding
-    /// (defaults to <see cref="Encoding.UTF8"/>).
+    /// to release the internal reader. Pass <see cref="FixedWidthDataReaderOptions.Encoding"/> to
+    /// decode with a specific encoding (defaults to <see cref="Encoding.UTF8"/>).
     /// </summary>
     /// <param name="stream">The readable fixed-width stream.</param>
+    /// <param name="options">
+    /// Optional stream-decoding options. When <see langword="null"/> (the default), the documented
+    /// defaults on <see cref="FixedWidthDataReaderOptions"/> apply.
+    /// </param>
     /// <param name="logger">
     /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output. Pass
     /// <see langword="null"/> (the default) to disable logging.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    public FixedWidthDataReader(Stream stream, ILogger<FixedWidthDataReader<TRecord>>? logger = null)
+    public FixedWidthDataReader
+    (
+        Stream stream,
+        FixedWidthDataReaderOptions? options = null,
+        ILogger<FixedWidthDataReader<TRecord>>? logger = null
+    )
+        : this(reader: null, stream ?? throw new ArgumentNullException(nameof(stream)), options, logger)
     {
-        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-        _ownsReader = true;
+    }
+
+
+
+    /// <summary>
+    /// The single initialization path for <see cref="FixedWidthDataReader{TRecord}"/>. Every other
+    /// constructor chains into this one, so the shared fields are assigned in exactly one place.
+    /// </summary>
+    /// <param name="reader">The supplied <see cref="TextReader"/>, or <see langword="null"/> when constructed from a stream.</param>
+    /// <param name="stream">The supplied <see cref="Stream"/>, or <see langword="null"/> when constructed from a reader.</param>
+    /// <param name="options">Stream-decoding options; ignored on the reader path, where they cannot be supplied.</param>
+    /// <param name="logger">The logger to use, or <see langword="null"/> for <see cref="NullLogger.Instance"/>.</param>
+    private FixedWidthDataReader
+    (
+        TextReader? reader,
+        Stream? stream,
+        FixedWidthDataReaderOptions? options,
+        ILogger<FixedWidthDataReader<TRecord>>? logger
+    )
+    {
+        // Defensive invariant guard. Every caller-facing constructor null-checks its own source
+        // before delegating here, so this cannot fire today — it exists so that a constructor added
+        // later which forgets that check fails loudly at construction instead of NullReferencing
+        // somewhere downstream. It deliberately does NOT throw ArgumentNullException: neither
+        // parameter name would be the one the caller actually passed, which is the exact defect
+        // this class of guard is here to prevent.
+        if (reader is null && stream is null)
+        {
+            throw new InvalidOperationException
+            (
+                "Exactly one of reader or stream must be supplied."
+            );
+        }
+
+        if (stream is not null)
+        {
+            _stream = stream;
+            _ownsReader = true;
+        }
+        else
+        {
+            _reader = reader;
+        }
+
+        _encoding = (options ?? new FixedWidthDataReaderOptions()).Encoding;
         _logger = logger ?? (ILogger)NullLogger.Instance;
         _fieldMap = FieldMap.GetResult<TRecord>();
         _names = BuildNames(_fieldMap);
@@ -103,14 +153,6 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     // ------------------------------------------------------------------
     // Configuration (mirrors FixedWidthExtractor<TRecord>)
     // ------------------------------------------------------------------
-
-    /// <summary>
-    /// The encoding used to decode the source when constructed from a <see cref="Stream"/>. Defaults
-    /// to <see cref="Encoding.UTF8"/>. Ignored when constructed from a <see cref="TextReader"/>. The
-    /// stream is wrapped lazily on the first <see cref="Read"/>, so this value is read then — set it
-    /// in the object initializer.
-    /// </summary>
-    public Encoding Encoding { get; init; } = Encoding.UTF8;
 
     /// <summary>The number of leading lines to treat as a header and skip. Default 0.</summary>
     public int HeaderLineCount { get; init; }
@@ -145,9 +187,9 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
             throw new InvalidOperationException("The data reader is closed.");
         }
 
-        // Wrap the stream lazily so the Encoding init property is read here (after the object
-        // initializer has run), not in the constructor. A TextReader source is used as supplied.
-        var reader = _reader ??= new StreamReader(_stream!, Encoding, detectEncodingFromByteOrderMarks: true, DefaultBufferSize, leaveOpen: true);
+        // Wrap the stream on first use rather than in the constructor, so a reader that is never
+        // read allocates nothing. A TextReader source is used as supplied.
+        var reader = _reader ??= new StreamReader(_stream!, _encoding, detectEncodingFromByteOrderMarks: true, DefaultBufferSize, leaveOpen: true);
 
         if (!_startedLogged)
         {

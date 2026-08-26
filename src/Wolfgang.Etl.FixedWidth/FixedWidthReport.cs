@@ -1,3 +1,4 @@
+using System;
 using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Enums;
 
@@ -24,26 +25,51 @@ namespace Wolfgang.Etl.FixedWidth;
 public record FixedWidthReport : Report
 {
     // ------------------------------------------------------------------
-    // Constructor
+    // Constructors
     // ------------------------------------------------------------------
 
     /// <summary>
+    /// Initializes a new instance of <see cref="FixedWidthReport"/> from a
+    /// <see cref="FixedWidthReportOptions"/>, naming each count at the call site.
+    /// </summary>
+    /// <param name="options">The counts to report. Unset members default to zero.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options"/> is <see langword="null"/>.</exception>
+    public FixedWidthReport(FixedWidthReportOptions options)
+        : base((options ?? throw new ArgumentNullException(nameof(options))).CurrentCount)
+    {
+        CurrentSkippedItemCount = options.CurrentSkippedItemCount;
+        CurrentRejectedItemCount = options.CurrentRejectedItemCount;
+        CurrentFilteredLineCount = options.CurrentFilteredLineCount;
+        CurrentLineNumber = options.CurrentLineNumber;
+    }
+
+
+
+    /// <summary>
     /// Initializes a new instance of <see cref="FixedWidthReport"/> with the
-    /// rejected and filtered counts defaulted to zero. Retained for backward
-    /// compatibility; prefer the five-parameter overload.
+    /// rejected and filtered counts defaulted to zero.
     /// </summary>
     /// <param name="currentCount">The number of data records processed so far.</param>
     /// <param name="currentSkippedItemCount">The number of records skipped by the skip budget so far.</param>
     /// <param name="currentLineNumber">
     /// The 1-based physical line number currently being processed in the file.
     /// </param>
+    [Obsolete("Use the FixedWidthReportOptions constructor, which names each count at the call site. This overload will be removed in a future release.")]
     public FixedWidthReport
     (
         int currentCount,
         int currentSkippedItemCount,
         long currentLineNumber
     )
-        : this(currentCount, currentSkippedItemCount, 0, 0, currentLineNumber)
+        : this
+        (
+            new FixedWidthReportOptions
+            {
+                CurrentCount = currentCount,
+                CurrentSkippedItemCount = currentSkippedItemCount,
+                CurrentLineNumber = currentLineNumber
+            }
+        )
     {
     }
 
@@ -59,6 +85,7 @@ public record FixedWidthReport : Report
     /// <param name="currentLineNumber">
     /// The 1-based physical line number currently being processed in the file.
     /// </param>
+    [Obsolete("Use the FixedWidthReportOptions constructor, which names each count at the call site. This overload will be removed in a future release.")]
     public FixedWidthReport
     (
         int currentCount,
@@ -67,12 +94,18 @@ public record FixedWidthReport : Report
         int currentFilteredLineCount,
         long currentLineNumber
     )
-        : base(currentCount)
+        : this
+        (
+            new FixedWidthReportOptions
+            {
+                CurrentCount = currentCount,
+                CurrentSkippedItemCount = currentSkippedItemCount,
+                CurrentRejectedItemCount = currentRejectedItemCount,
+                CurrentFilteredLineCount = currentFilteredLineCount,
+                CurrentLineNumber = currentLineNumber
+            }
+        )
     {
-        CurrentSkippedItemCount = currentSkippedItemCount;
-        CurrentRejectedItemCount = currentRejectedItemCount;
-        CurrentFilteredLineCount = currentFilteredLineCount;
-        CurrentLineNumber = currentLineNumber;
     }
 
 

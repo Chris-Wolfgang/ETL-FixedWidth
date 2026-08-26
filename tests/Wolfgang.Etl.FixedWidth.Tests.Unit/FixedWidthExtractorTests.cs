@@ -1054,5 +1054,4 @@ public class FixedWidthExtractorTests
             results[0].FirstName
         );
     }
-
 }

@@ -94,9 +94,8 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         TextWriter writer,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
+        : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null, options: null, timer: null, logger: logger)
     {
-        _writer = writer ?? throw new ArgumentNullException(nameof(writer));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -125,10 +124,9 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         IProgressTimer timer,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
+        : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null, options: null,
+               timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
-        _writer = writer ?? throw new ArgumentNullException(nameof(writer));
-        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -154,10 +152,8 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         FixedWidthLoaderOptions? options = null,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
+        : this(writer: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, timer: null, logger: logger)
     {
-        _writer = CreateBufferedWriter(stream, (options ?? new FixedWidthLoaderOptions()).Encoding);
-        _ownsWriter = true;
-        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -191,10 +187,53 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         FixedWidthLoaderOptions? options = null,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
+        : this(writer: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options,
+               timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
-        _writer = CreateBufferedWriter(stream, (options ?? new FixedWidthLoaderOptions()).Encoding);
-        _ownsWriter = true;
-        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
+    }
+
+
+    // The single initialization path. Every public and internal constructor delegates here,
+    // so there is exactly one place that assigns the shared fields. The two input shapes
+    // cannot chain to one another, which is why this takes the private-core form rather than
+    // one constructor chaining into another. Exactly one of writer / stream is non-null:
+    // each boundary constructor null-checks its own source before delegating, so the
+    // ArgumentNullException names the parameter the caller actually passed.
+    private FixedWidthLoader
+    (
+        TextWriter? writer,
+        Stream? stream,
+        FixedWidthLoaderOptions? options,
+        IProgressTimer? timer,
+        ILogger<FixedWidthLoader<TRecord>>? logger
+    )
+    {
+        // Defensive invariant guard. Every caller-facing constructor null-checks its own source
+        // before delegating here, so this cannot fire today — it exists so that a constructor added
+        // later which forgets that check fails loudly at construction instead of NullReferencing
+        // somewhere downstream. It deliberately does NOT throw ArgumentNullException: neither
+        // parameter name would be the one the caller actually passed, which is the exact defect
+        // this class of guard is here to prevent.
+        if (writer is null && stream is null)
+        {
+            throw new InvalidOperationException
+            (
+                "Exactly one of writer or stream must be supplied."
+            );
+        }
+
+        if (stream is not null)
+        {
+            var resolved = options ?? new FixedWidthLoaderOptions();
+            _writer = CreateBufferedWriter(stream, resolved.Encoding);
+            _ownsWriter = true;
+        }
+        else
+        {
+            _writer = writer!;
+        }
+
+        _progressTimer = timer;
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
@@ -382,11 +421,12 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     {
         return new FixedWidthReport
         (
-            CurrentItemCount,
-            CurrentSkippedItemCount,
-            currentRejectedItemCount: 0,
-            currentFilteredLineCount: 0,
-            Interlocked.Read(ref _currentLineNumber)
+            new FixedWidthReportOptions
+            {
+                CurrentCount = CurrentItemCount,
+                CurrentSkippedItemCount = CurrentSkippedItemCount,
+                CurrentLineNumber = Interlocked.Read(ref _currentLineNumber)
+            }
         );
     }
 

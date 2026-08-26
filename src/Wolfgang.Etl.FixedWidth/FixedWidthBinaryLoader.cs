@@ -26,6 +26,7 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
     where TRecord : notnull
 {
     private readonly Stream _stream;
+    private readonly Encoding _encoding;
     private readonly ILogger _logger;
     private readonly BinaryRecordMap _map;
     private readonly IProgressTimer? _progressTimer;
@@ -34,12 +35,6 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
 
 
 
-    /// <summary>
-    /// The encoding used to write <see cref="Enums.BinaryFieldType.Text"/> fields. Defaults to
-    /// <see cref="Encoding.ASCII"/>; set a code-page encoding for EBCDIC output. Read when loading
-    /// begins — set it in the object initializer.
-    /// </summary>
-    public Encoding Encoding { get; init; } = Encoding.ASCII;
 
 
 
@@ -48,13 +43,22 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
     /// binary records to <paramref name="stream"/>. The caller retains ownership of the stream.
     /// </summary>
     /// <param name="stream">The writable destination stream.</param>
+    /// <param name="options">
+    /// Options that control behaviour, including the encoding. When <c>null</c> — or omitted —
+    /// the documented defaults apply.
+    /// </param>
     /// <param name="logger">
     /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output. Pass
     /// <see langword="null"/> (the default) to disable logging.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentException"><paramref name="stream"/> is not writable.</exception>
-    public FixedWidthBinaryLoader(Stream stream, ILogger<FixedWidthBinaryLoader<TRecord>>? logger = null)
+    public FixedWidthBinaryLoader
+    (
+        Stream stream,
+        FixedWidthBinaryLoaderOptions? options = null,
+        ILogger<FixedWidthBinaryLoader<TRecord>>? logger = null
+    )
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         if (!stream.CanWrite)
@@ -62,6 +66,7 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
             throw new ArgumentException("Stream must be writable.", nameof(stream));
         }
 
+        _encoding = (options ?? new FixedWidthBinaryLoaderOptions()).Encoding;
         _logger = logger ?? (ILogger)NullLogger.Instance;
         _map = BinaryFieldMap.GetResult<TRecord>();
     }
@@ -69,8 +74,14 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
 
 
     // Test-only constructor that injects a deterministic progress timer.
-    internal FixedWidthBinaryLoader(Stream stream, IProgressTimer timer)
-        : this(stream)
+    internal FixedWidthBinaryLoader
+    (
+        Stream stream,
+        IProgressTimer timer,
+        FixedWidthBinaryLoaderOptions? options = null,
+        ILogger<FixedWidthBinaryLoader<TRecord>>? logger = null
+    )
+        : this(stream, options, logger)
     {
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }
@@ -112,7 +123,7 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
             Array.Clear(buffer, 0, buffer.Length);
             foreach (var descriptor in _map.Descriptors)
             {
-                descriptor.Encode(item, buffer, Encoding);
+                descriptor.Encode(item, buffer, _encoding);
             }
 
             await _stream.WriteAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false);
@@ -131,11 +142,12 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
     {
         return new FixedWidthReport
         (
-            CurrentItemCount,
-            CurrentSkippedItemCount,
-            currentRejectedItemCount: 0,
-            currentFilteredLineCount: 0,
-            currentLineNumber: Interlocked.Read(ref _currentRecordNumber)
+            new FixedWidthReportOptions
+            {
+                CurrentCount = CurrentItemCount,
+                CurrentSkippedItemCount = CurrentSkippedItemCount,
+                CurrentLineNumber = Interlocked.Read(ref _currentRecordNumber)
+            }
         );
     }
 

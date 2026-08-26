@@ -1,15 +1,62 @@
 #nullable enable
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>.Encoding.get -> System.Text.Encoding!
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>.Encoding.init -> void
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>.FixedWidthBinaryExtractor(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>!>? logger = null) -> void
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.Encoding.get -> System.Text.Encoding!
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.Encoding.init -> void
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.FixedWidthBinaryLoader(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>!>? logger = null) -> void
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.Encoding.get -> System.Text.Encoding!
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.Encoding.init -> void
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FixedWidthDataReader(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>!>? logger = null) -> void
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>!>! logger, System.Text.Encoding? encoding = null) -> void
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream! stream, System.Text.Encoding? encoding = null) -> void
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.TextReader! reader) -> void
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>!>! logger, System.Text.Encoding? encoding = null) -> void
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream! stream, System.Text.Encoding? encoding = null) -> void
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.TextWriter! writer) -> void
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.Encoding.get -> System.Text.Encoding!
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.Encoding.init -> void
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor!>? logger = null) -> void
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination>! transform) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>.FixedWidthBinaryExtractor(System.IO.Stream! stream, Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions? options = null, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.Encoding.get -> System.Text.Encoding!
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.Encoding.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.FixedWidthBinaryExtractorOptions() -> void
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.FixedWidthBinaryLoader(System.IO.Stream! stream, Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions? options = null, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.Encoding.get -> System.Text.Encoding!
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.Encoding.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.FixedWidthBinaryLoaderOptions() -> void
+Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FixedWidthDataReader(System.IO.Stream! stream, Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions? options = null, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions
+Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.Encoding.get -> System.Text.Encoding!
+Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.Encoding.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.FixedWidthDataReaderOptions() -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream! stream, Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions? options = null, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>!>? logger = null) -> void
-Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream! stream, Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions? options = null, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>!>? logger = null) -> void
-Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.FixedWidthExtractorOptions() -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.Encoding.get -> System.Text.Encoding!
 Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.Encoding.init -> void
-Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.FixedWidthLoaderOptions() -> void
+Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.FixedWidthExtractorOptions() -> void
+Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream! stream, Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions? options = null, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.Encoding.get -> System.Text.Encoding!
 Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.Encoding.init -> void
-*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.TextReader! reader) -> void
-*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream! stream, System.Text.Encoding? encoding = null) -> void
-*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>!>! logger, System.Text.Encoding? encoding = null) -> void
-*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.TextWriter! writer) -> void
-*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream! stream, System.Text.Encoding? encoding = null) -> void
-*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>!>! logger, System.Text.Encoding? encoding = null) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.FixedWidthLoaderOptions() -> void
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(System.IO.Stream! stream, Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions? options = null, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor!>? logger = null) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.Encoding.get -> System.Text.Encoding!
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.Encoding.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.FixedWidthMultiRecordExtractorOptions() -> void
+Wolfgang.Etl.FixedWidth.FixedWidthReport.FixedWidthReport(Wolfgang.Etl.FixedWidth.FixedWidthReportOptions! options) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentCount.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentFilteredLineCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentFilteredLineCount.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentLineNumber.get -> long
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentLineNumber.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentRejectedItemCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentRejectedItemCount.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentSkippedItemCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentSkippedItemCount.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.FixedWidthReportOptions() -> void
+Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination>! transform, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>!>? logger = null) -> void

@@ -106,9 +106,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         TextReader reader,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null, timer: null, logger: logger)
     {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -137,10 +136,9 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         IProgressTimer timer,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null,
+               timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -166,13 +164,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         FixedWidthExtractorOptions? options = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
+        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, timer: null, logger: logger)
     {
-        var resolved = options ?? new FixedWidthExtractorOptions();
-        _reader = CreateBufferedReader(stream, resolved.Encoding);
-        _ownsReader = true;
-        _offsetStream = stream;
-        _offsetEncoding = resolved.Encoding;
-        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
@@ -206,13 +199,55 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         FixedWidthExtractorOptions? options = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
+        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options,
+               timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
-        var resolved = options ?? new FixedWidthExtractorOptions();
-        _reader = CreateBufferedReader(stream, resolved.Encoding);
-        _ownsReader = true;
-        _offsetStream = stream;
-        _offsetEncoding = resolved.Encoding;
-        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
+    }
+
+
+    // The single initialization path. Every public and internal constructor delegates here,
+    // so there is exactly one place that assigns the shared fields. The two input shapes
+    // cannot chain to one another, which is why this takes the private-core form rather than
+    // one constructor chaining into another. Exactly one of reader / stream is non-null:
+    // each boundary constructor null-checks its own source before delegating, so the
+    // ArgumentNullException names the parameter the caller actually passed.
+    private FixedWidthExtractor
+    (
+        TextReader? reader,
+        Stream? stream,
+        FixedWidthExtractorOptions? options,
+        IProgressTimer? timer,
+        ILogger<FixedWidthExtractor<TRecord>>? logger
+    )
+    {
+        // Defensive invariant guard. Every caller-facing constructor null-checks its own source
+        // before delegating here, so this cannot fire today — it exists so that a constructor added
+        // later which forgets that check fails loudly at construction instead of NullReferencing
+        // somewhere downstream. It deliberately does NOT throw ArgumentNullException: neither
+        // parameter name would be the one the caller actually passed, which is the exact defect
+        // this class of guard is here to prevent.
+        if (reader is null && stream is null)
+        {
+            throw new InvalidOperationException
+            (
+                "Exactly one of reader or stream must be supplied."
+            );
+        }
+
+        if (stream is not null)
+        {
+            var resolved = options ?? new FixedWidthExtractorOptions();
+            _reader = CreateBufferedReader(stream, resolved.Encoding);
+            _ownsReader = true;
+            _offsetStream = stream;
+            _offsetEncoding = resolved.Encoding;
+        }
+        else
+        {
+            _reader = reader!;
+        }
+
+        _progressTimer = timer;
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
@@ -646,11 +681,14 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     {
         return new FixedWidthReport
         (
-            CurrentItemCount,
-            CurrentSkippedItemCount,
-            CurrentRejectedItemCount,
-            CurrentFilteredLineCount,
-            Interlocked.Read(ref _currentLineNumber)
+            new FixedWidthReportOptions
+            {
+                CurrentCount = CurrentItemCount,
+                CurrentSkippedItemCount = CurrentSkippedItemCount,
+                CurrentRejectedItemCount = CurrentRejectedItemCount,
+                CurrentFilteredLineCount = CurrentFilteredLineCount,
+                CurrentLineNumber = Interlocked.Read(ref _currentLineNumber)
+            }
         );
     }
 

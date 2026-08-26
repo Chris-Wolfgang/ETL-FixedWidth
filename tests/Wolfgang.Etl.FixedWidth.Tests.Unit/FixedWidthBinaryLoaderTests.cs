@@ -82,7 +82,7 @@ public sealed class FixedWidthBinaryLoaderTests
         var accounts = new[] { new Account { AccountId = "ACCT0001", TransactionCount = 42, Balance = 1234.56m } };
         var logger = new SpyLogger<FixedWidthBinaryLoader<Account>>();
         using var ms = new MemoryStream();
-        using var loader = new FixedWidthBinaryLoader<Account>(ms, logger);
+        using var loader = new FixedWidthBinaryLoader<Account>(ms, logger: logger);
 
         await loader.LoadAsync(ToAsync(accounts), CancellationToken.None);
 
@@ -180,7 +180,7 @@ public sealed class FixedWidthBinaryLoaderTests
         // "€" is one char but three UTF-8 bytes; padded to 8 chars it encodes to more than 8 bytes.
         var accounts = new[] { new Account { AccountId = "€", TransactionCount = 1, Balance = 0m } };
         using var ms = new MemoryStream();
-        using var loader = new FixedWidthBinaryLoader<Account>(ms) { Encoding = System.Text.Encoding.UTF8 };
+        using var loader = new FixedWidthBinaryLoader<Account>(ms, new FixedWidthBinaryLoaderOptions { Encoding = System.Text.Encoding.UTF8 });
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await loader.LoadAsync(ToAsync(accounts), CancellationToken.None));
@@ -263,6 +263,22 @@ public sealed class FixedWidthBinaryLoaderTests
 
 
     [ExcludeFromCodeCoverage]
+    [Fact]
+    public void Internal_timer_ctor_accepts_a_logger_as_its_trailing_parameter()
+    {
+        // Rule 6: the logger is last on internal constructors too. This overload previously took
+        // a timer but no logger, so a test could inject one or the other, never both.
+        using var sut = new FixedWidthBinaryLoader<Account>
+        (
+            new MemoryStream(),
+            new ManualProgressTimer(),
+            logger: null
+        );
+
+        Assert.NotNull(sut);
+    }
+
+
     private sealed class CollectingProgress : IProgress<FixedWidthReport>
     {
         public List<FixedWidthReport> Reports { get; } = new();

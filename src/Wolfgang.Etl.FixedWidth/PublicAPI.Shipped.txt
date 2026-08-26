@@ -86,14 +86,8 @@ Wolfgang.Etl.FixedWidth.FieldContext.Pad.get -> char
 Wolfgang.Etl.FixedWidth.FieldContext.PropertyName.get -> string!
 Wolfgang.Etl.FixedWidth.FieldContext.PropertyType.get -> System.Type!
 Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>
-Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>.Encoding.get -> System.Text.Encoding!
-Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>.Encoding.init -> void
-Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>.FixedWidthBinaryExtractor(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>.RecordByteLength.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>
-Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.Encoding.get -> System.Text.Encoding!
-Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.Encoding.init -> void
-Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.FixedWidthBinaryLoader(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.RecordByteLength.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthConverter
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>
@@ -102,12 +96,9 @@ Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.BlankLineHandling.init -> 
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.Close() -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.Depth.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.Dispose() -> void
-Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.Encoding.get -> System.Text.Encoding!
-Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.Encoding.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FieldCount.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FieldDelimiter.get -> string?
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FieldDelimiter.init -> void
-Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FixedWidthDataReader(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FixedWidthDataReader(System.IO.TextReader! reader, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.GetBoolean(int i) -> bool
 Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.GetByte(int i) -> byte
@@ -218,11 +209,8 @@ Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.CurrentFilteredLineCount.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.CurrentLineNumber.get -> long
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.CurrentRejectedItemCount.get -> int
-Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.Encoding.get -> System.Text.Encoding!
-Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.Encoding.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FieldDelimiter.get -> string?
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FieldDelimiter.init -> void
-Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor!>? logger = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(System.IO.TextReader! reader, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor!>? logger = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.HasHeader.get -> bool
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.HasHeader.init -> void
@@ -261,7 +249,6 @@ Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.Field<TProperty>(System.Linq.
 Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.FixedWidthSchemaBuilder() -> void
 Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.Skip(int index, int length, string? message = null) -> Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>!
 Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>
-Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination>! transform) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthValueParser
 Wolfgang.Etl.FixedWidth.Generated.GeneratedAccessorRegistry
 Wolfgang.Etl.FixedWidth.IFixedWidthExtractorBuilder<T>

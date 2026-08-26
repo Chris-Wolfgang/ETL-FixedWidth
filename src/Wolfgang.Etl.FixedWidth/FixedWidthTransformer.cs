@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System.Threading;
 using System.Threading.Tasks;
 using Wolfgang.Etl.Abstractions;
@@ -36,6 +38,8 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
 {
     private readonly Func<TSource, TDestination> _transform;
 
+    private readonly ILogger _logger;
+
     private readonly IProgressTimer? _progressTimer;
 
     private bool _progressTimerWired;
@@ -50,17 +54,32 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
     /// format-converted fields.
     /// </summary>
     /// <param name="transform">The per-record projection.</param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output. When
+    /// <see langword="null"/> — or omitted — <see cref="NullLogger.Instance"/> is used and logging
+    /// is disabled.
+    /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="transform"/> is <see langword="null"/>.</exception>
-    public FixedWidthTransformer(Func<TSource, TDestination> transform)
+    public FixedWidthTransformer
+    (
+        Func<TSource, TDestination> transform,
+        ILogger<FixedWidthTransformer<TSource, TDestination>>? logger = null
+    )
     {
         _transform = transform ?? throw new ArgumentNullException(nameof(transform));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
 
     // Test-only constructor that injects a deterministic progress timer.
-    internal FixedWidthTransformer(Func<TSource, TDestination> transform, IProgressTimer timer)
-        : this(transform)
+    internal FixedWidthTransformer
+    (
+        Func<TSource, TDestination> transform,
+        IProgressTimer timer,
+        ILogger<FixedWidthTransformer<TSource, TDestination>>? logger = null
+    )
+        : this(transform, logger)
     {
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }
@@ -106,6 +125,8 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
         // reads nothing (TestKit TransformerBase cancellation contract).
         cancellationToken.ThrowIfCancellationRequested();
 
+        LogTransformationStarted();
+
         await foreach (var item in source.WithCancellation(cancellationToken).ConfigureAwait(false))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -130,6 +151,48 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
             IncrementCurrentItemCount();
             yield return result;
         }
+
+        LogTransformationCompleted();
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // Logging helpers
+    // ------------------------------------------------------------------
+
+    private void LogTransformationStarted()
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation
+            (
+                "Transformation started for {SourceType} -> {DestinationType}. " +
+                "SkipItemCount={SkipItemCount}, MaximumItemCount={MaximumItemCount}",
+                typeof(TSource).Name,
+                typeof(TDestination).Name,
+                SkipItemCount,
+                MaximumItemCount
+            );
+        }
+    }
+
+
+
+    private void LogTransformationCompleted()
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation
+            (
+                "Transformation completed for {SourceType} -> {DestinationType}: " +
+                "{ItemCount} items transformed, {SkippedCount} skipped",
+                typeof(TSource).Name,
+                typeof(TDestination).Name,
+                CurrentItemCount,
+                CurrentSkippedItemCount
+            );
+        }
     }
 
 
@@ -139,11 +202,12 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
     {
         return new FixedWidthReport
         (
-            CurrentItemCount,
-            CurrentSkippedItemCount,
-            currentRejectedItemCount: 0,
-            currentFilteredLineCount: 0,
-            currentLineNumber: CurrentItemCount + CurrentSkippedItemCount
+            new FixedWidthReportOptions
+            {
+                CurrentCount = CurrentItemCount,
+                CurrentSkippedItemCount = CurrentSkippedItemCount,
+                CurrentLineNumber = CurrentItemCount + CurrentSkippedItemCount
+            }
         );
     }
 

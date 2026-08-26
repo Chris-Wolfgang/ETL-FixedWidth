@@ -7,23 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+**Breaking release.** Constructor configuration is now uniform across the package: every
+`Stream`-based constructor takes an options record, and the logger is always the last, optional
+parameter. Six superseded constructors and four public `Encoding` properties are gone.
+
 ### Added
 
-- **`FixedWidthExtractorOptions` and `FixedWidthLoaderOptions` records**, carrying a non-nullable
-  `Encoding` property that **defaults to `Encoding.UTF8`** on the property initializer.
-  Configuration travels in an options object rather than as a loose constructor parameter, and the
-  default is declared on the record rather than resolved in a constructor body, so no constructor
-  can diverge from it. Omitting the options object entirely gives the same result — the
-  constructors resolve `options ?? new FixedWidthXxxOptions()`.
-- **Constructors taking an options record with the logger as a trailing optional parameter** on
-  `FixedWidthExtractor<T>` and `FixedWidthLoader<T>`:
-  `(Stream stream, FixedWidthExtractorOptions? options, ILogger<T>? logger = null)`. A `null` or
-  omitted logger resolves to `NullLogger.Instance`.
+- **Options records for every `Stream`-based constructor** — `FixedWidthExtractorOptions`,
+  `FixedWidthLoaderOptions`, `FixedWidthBinaryExtractorOptions`, `FixedWidthBinaryLoaderOptions`,
+  `FixedWidthMultiRecordExtractorOptions` and `FixedWidthDataReaderOptions`, each carrying an
+  `Encoding` property. Defaults are declared on the property initializers — `Encoding.UTF8`
+  everywhere except the binary types, which keep `Encoding.ASCII` — so no constructor body can
+  diverge from them. Omitting the options object gives the same result: the constructors resolve
+  `options ?? new FixedWidthXxxOptions()`.
 
-  `options` is required positionally for now: giving it a default would make `new T(stream)`
-  ambiguous against the existing `(Stream, Encoding? = null)` constructor, since neither candidate
-  would have all parameters supplied. It gains its `= null` default once that constructor is
-  removed.
+  The `TextReader`/`TextWriter` constructors deliberately take **no** options. A caller-supplied
+  reader or writer already carries its own encoding, so the setting would be inert there.
+
+- **`FixedWidthReportOptions` record and a `FixedWidthReport(FixedWidthReportOptions)`
+  constructor.** The two positional constructors differed only by whether the two extractor-only
+  counts appeared *in the middle* of the argument list, and four of the five parameters are `int`.
+  Naming each count at the call site removes the standing risk of transposing them. Every member
+  defaults to zero, so a loader states three counts instead of passing two explicit zeroes
+  positionally.
+
+- **A trailing optional logger on `FixedWidthTransformer<TSource, TDestination>`**, both on the
+  public constructor and on the internal timer-injecting one. It was the only type in the package
+  that accepted no logger at all. The transformer now emits Information-level started/completed
+  records mirroring `FixedWidthExtractor<T>`, so a pipeline's middle stage is no longer silent in
+  logs that show its extract and load stages.
+
+  Adding the parameter changes the emitted signature, so this is a binary — not source — break,
+  recorded as intentional alongside the others in this release.
+
+- **A trailing optional logger on the internal timer-injecting constructors** of
+  `FixedWidthBinaryExtractor<T>` and `FixedWidthBinaryLoader<T>`. They previously took a timer but
+  no logger, so a test could inject one or the other but not both.
+
+- **`FixedWidthMultiRecordExtractor(Stream, IProgressTimer, ILogger<...>? = null)`** (internal).
+  The `Stream` shape previously had no timer-injecting constructor, so only the `TextReader` shape
+  could be tested with a deterministic timer.
 
 ### Changed
 
@@ -32,15 +55,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   The parameter list is unchanged, so the emitted signature is identical and this is not a binary
   breaking change.
 
-### Added
-
-### Changed
+- **Every type now has a single initialization path.** `FixedWidthExtractor<T>`,
+  `FixedWidthLoader<T>`, `FixedWidthMultiRecordExtractor` and `FixedWidthDataReader<T>` previously
+  assigned their shared fields independently in each constructor. They now chain into one private
+  constructor that assigns them in exactly one place. No API or behavior change — this closes the
+  gap that produced two shipped defects elsewhere in the fleet, including this package's own
+  internal constructor that hard-coded UTF-8 while its public counterpart honored the caller's
+  encoding.
 
 ### Deprecated
 
+- **The two positional `FixedWidthReport` constructors** — `(int, int, long)` and
+  `(int, int, int, int, long)` — are `[Obsolete]` in favour of the `FixedWidthReportOptions`
+  overload. They still work and remain under test; they are scheduled for removal in a future
+  release. All six in-package call sites have moved to the new constructor.
+
 ### Removed
 
+- **Breaking.** The public `Encoding` properties on `FixedWidthBinaryExtractor<T>`,
+  `FixedWidthBinaryLoader<T>`, `FixedWidthMultiRecordExtractor` and `FixedWidthDataReader<T>` are
+  replaced by the `Encoding` property on their options records.
+
+  ```diff
+  - new FixedWidthBinaryExtractor<T>(stream) { Encoding = Encoding.Latin1 }
+  + new FixedWidthBinaryExtractor<T>(stream, new FixedWidthBinaryExtractorOptions { Encoding = Encoding.Latin1 })
+  ```
+
+  Two of these were inert on part of their own surface. `FixedWidthDataReader<T>` said so in its
+  XML doc — `Encoding` was *"ignored when constructed from a `TextReader`"* — and
+  `FixedWidthMultiRecordExtractor` had the same silent gap. Scoping the setting to the `Stream`
+  constructor removes it from the path where it did nothing. Defaults are unchanged.
+
+- **Breaking.** Six superseded constructors on `FixedWidthExtractor<T>` and `FixedWidthLoader<T>`
+  (#332):
+
+  - `(Stream, ILogger<T>, Encoding? = null)` — logger in the middle
+  - `(Stream, Encoding? = null)` — loose encoding parameter
+  - `(TextReader)` / `(TextWriter)` — subsumed by the optional-logger overload
+
+  Deleting them is **source-compatible**: existing calls rebind to the surviving constructors.
+  It is a **binary** break, because optional-argument defaults are baked in at the caller's compile
+  time, so already-compiled consumers must be recompiled.
+
+  They were briefly marked `[Obsolete]` instead. That was reverted: the superseded constructor won
+  overload resolution for the simplest call, so obsoleting it warned every caller writing perfectly
+  correct new code, and — with `TreatWarningsAsErrors` — broke them outright.
+
 ### Fixed
+
+- **A null `Stream` passed to `FixedWidthExtractor<T>` or `FixedWidthLoader<T>` reported the wrong
+  parameter name.** Both types route their two input shapes through one private constructor, and a
+  null stream fell through to the reader/writer branch — so the `ArgumentNullException` named
+  `reader` or `writer`, parameters the caller never passed, contradicting the documented contract.
+
+  Each constructor now null-checks its own source before delegating. Caught in review of the
+  single-initialization-path change earlier in this release, which introduced it;
+  `FixedWidthDataReader<T>` already did this correctly.
+
+- **`FixedWidthMultiRecordExtractor` had the same defect by a different route.** Its private core
+  checked for both sources being null and reported `reader` unconditionally, so a null `Stream`
+  was misnamed there too. Fixed the same way.
+
+  Each private core also keeps an explicit both-sources-null guard, throwing
+  `InvalidOperationException` rather than `ArgumentNullException` — at that point neither parameter
+  name is the one the caller passed, and naming one arbitrarily is the defect being guarded against.
+  It cannot fire through the public or internal surface; it exists so a constructor added later that
+  forgets its own null check fails loudly at construction. Reached by reflection in tests so the
+  guard is verified rather than merely asserted.
 
 ### Security
 
