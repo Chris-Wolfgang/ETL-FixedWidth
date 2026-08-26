@@ -24,6 +24,15 @@ parameter. Six superseded constructors and four public `Encoding` properties are
   The `TextReader`/`TextWriter` constructors deliberately take **no** options. A caller-supplied
   reader or writer already carries its own encoding, so the setting would be inert there.
 
+- **A trailing optional logger on `FixedWidthTransformer<TSource, TDestination>`**, both on the
+  public constructor and on the internal timer-injecting one. It was the only type in the package
+  that accepted no logger at all. The transformer now emits Information-level started/completed
+  records mirroring `FixedWidthExtractor<T>`, so a pipeline's middle stage is no longer silent in
+  logs that show its extract and load stages.
+
+  Adding the parameter changes the emitted signature, so this is a binary — not source — break,
+  recorded as intentional alongside the others in this release.
+
 - **A trailing optional logger on the internal timer-injecting constructors** of
   `FixedWidthBinaryExtractor<T>` and `FixedWidthBinaryLoader<T>`. They previously took a timer but
   no logger, so a test could inject one or the other but not both.

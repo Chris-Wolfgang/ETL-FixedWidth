@@ -17,6 +17,7 @@
 *REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.Encoding.get -> System.Text.Encoding!
 *REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.Encoding.init -> void
 *REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor!>? logger = null) -> void
+*REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination>! transform) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>.FixedWidthBinaryExtractor(System.IO.Stream! stream, Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions? options = null, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions
 Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.Encoding.get -> System.Text.Encoding!
@@ -45,3 +46,4 @@ Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.Encoding.get -> System.Text.Encoding!
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.Encoding.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.FixedWidthMultiRecordExtractorOptions() -> void
+Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination>! transform, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>!>? logger = null) -> void
