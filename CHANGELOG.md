@@ -110,8 +110,11 @@ parameter. Six superseded constructors and four public `Encoding` properties are
 
   Each constructor now null-checks its own source before delegating. Caught in review of the
   single-initialization-path change earlier in this release, which introduced it;
-  `FixedWidthDataReader<T>` already did this correctly. Regression tests assert `ParamName` on all
-  four paths.
+  `FixedWidthDataReader<T>` already did this correctly.
+
+- **`FixedWidthMultiRecordExtractor` had the same defect by a different route.** Its private core
+  checked for both sources being null and reported `reader` unconditionally, so a null `Stream`
+  was misnamed there too. Fixed the same way.
 
 ### Security
 

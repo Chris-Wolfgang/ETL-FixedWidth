@@ -101,7 +101,8 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <see langword="null"/>.</exception>
     public FixedWidthMultiRecordExtractor(TextReader reader, ILogger<FixedWidthMultiRecordExtractor>? logger = null)
-        : this(reader: reader, stream: null, options: null, timer: null, logger: logger)
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null,
+               options: null, timer: null, logger: logger)
     {
     }
 
@@ -129,7 +130,8 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
         FixedWidthMultiRecordExtractorOptions? options = null,
         ILogger<FixedWidthMultiRecordExtractor>? logger = null
     )
-        : this(reader: null, stream: stream, options: options, timer: null, logger: logger)
+        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)),
+               options: options, timer: null, logger: logger)
     {
     }
 
@@ -167,8 +169,9 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
 
     // The single initialization path. Every public and internal constructor delegates here, so
     // there is exactly one place that assigns fields and one definition of each default.
-    // Exactly one of reader / stream is non-null; the caller-facing constructors enforce that by
-    // construction rather than by validation.
+    // Exactly one of reader / stream is non-null: each caller-facing constructor null-checks its
+    // own source before delegating, so the ArgumentNullException names the parameter the caller
+    // actually passed rather than whichever branch this core happens to fall into.
     private FixedWidthMultiRecordExtractor
     (
         TextReader? reader,
@@ -178,11 +181,6 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
         ILogger<FixedWidthMultiRecordExtractor>? logger
     )
     {
-        if (reader is null && stream is null)
-        {
-            throw new ArgumentNullException(nameof(reader));
-        }
-
         _reader = reader;
         _stream = stream;
 

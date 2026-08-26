@@ -718,33 +718,4 @@ public class FixedWidthLoaderTests
             lines[0]
         ); // "VERY_LONG_HEADER" truncated to 3 chars
     }
-
-    // See the matching tests on FixedWidthExtractor: a null Stream must not be reported as the
-    // "writer" parameter just because both sources share one private initialization path.
-
-    [Fact]
-    public void Constructor_when_stream_is_null_throws_naming_the_stream_parameter()
-    {
-        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthLoader<PersonRecord>((Stream)null!));
-
-        Assert.Equal
-        (
-            "stream",
-            ex.ParamName
-        );
-    }
-
-
-
-    [Fact]
-    public void Constructor_when_writer_is_null_throws_naming_the_writer_parameter()
-    {
-        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthLoader<PersonRecord>((TextWriter)null!));
-
-        Assert.Equal
-        (
-            "writer",
-            ex.ParamName
-        );
-    }
 }

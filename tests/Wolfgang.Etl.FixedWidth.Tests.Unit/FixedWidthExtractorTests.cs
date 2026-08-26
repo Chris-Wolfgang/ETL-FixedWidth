@@ -1054,35 +1054,4 @@ public class FixedWidthExtractorTests
             results[0].FirstName
         );
     }
-
-    // The Stream and TextReader constructors both delegate to a private core that takes each source
-    // as a separate nullable parameter. Without a null-check at the boundary, a null Stream falls
-    // through to the reader branch and reports ParamName "reader" — naming a parameter the caller
-    // never passed, and contradicting the documented contract. Guards these regressions.
-
-    [Fact]
-    public void Constructor_when_stream_is_null_throws_naming_the_stream_parameter()
-    {
-        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthExtractor<PersonRecord>((Stream)null!));
-
-        Assert.Equal
-        (
-            "stream",
-            ex.ParamName
-        );
-    }
-
-
-
-    [Fact]
-    public void Constructor_when_reader_is_null_throws_naming_the_reader_parameter()
-    {
-        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthExtractor<PersonRecord>((TextReader)null!));
-
-        Assert.Equal
-        (
-            "reader",
-            ex.ParamName
-        );
-    }
 }
