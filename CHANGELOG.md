@@ -116,6 +116,13 @@ parameter. Six superseded constructors and four public `Encoding` properties are
   checked for both sources being null and reported `reader` unconditionally, so a null `Stream`
   was misnamed there too. Fixed the same way.
 
+  Each private core also keeps an explicit both-sources-null guard, throwing
+  `InvalidOperationException` rather than `ArgumentNullException` — at that point neither parameter
+  name is the one the caller passed, and naming one arbitrarily is the defect being guarded against.
+  It cannot fire through the public or internal surface; it exists so a constructor added later that
+  forgets its own null check fails loudly at construction. Reached by reflection in tests so the
+  guard is verified rather than merely asserted.
+
 ### Security
 
 ## [0.10.1] - 2026-08-18

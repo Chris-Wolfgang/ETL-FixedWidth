@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Enums;
@@ -582,5 +584,56 @@ public class ConstructorArgumentTests
         var sut = new FixedWidthError(1, null, new InvalidOperationException());
 
         Assert.NotNull(sut);
+    }
+
+    // ------------------------------------------------------------------
+    // The private-core invariant guard
+    // ------------------------------------------------------------------
+
+    // Every caller-facing constructor null-checks its own source before delegating, so the
+    // both-sources-null branch inside each private core cannot be reached through the public or
+    // internal surface. It is reached here by reflection so the guard is actually verified rather
+    // than merely asserted in a comment — and so it does not sit as a permanently uncovered branch.
+    private static void AssertBothNullSourcesThrow(Type type, int parameterCount)
+    {
+        var core = type
+            .GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)
+            .Single(c => c.IsPrivate && c.GetParameters().Length == parameterCount);
+
+        var ex = Assert.Throws<TargetInvocationException>(() => core.Invoke(new object?[parameterCount]));
+
+        Assert.IsType<InvalidOperationException>(ex.InnerException);
+    }
+
+
+
+    [Fact]
+    public void Extractor_private_core_when_both_sources_are_null_throws()
+    {
+        AssertBothNullSourcesThrow(typeof(FixedWidthExtractor<PersonRecord>), 5);
+    }
+
+
+
+    [Fact]
+    public void Loader_private_core_when_both_sources_are_null_throws()
+    {
+        AssertBothNullSourcesThrow(typeof(FixedWidthLoader<PersonRecord>), 5);
+    }
+
+
+
+    [Fact]
+    public void MultiRecord_private_core_when_both_sources_are_null_throws()
+    {
+        AssertBothNullSourcesThrow(typeof(FixedWidthMultiRecordExtractor), 5);
+    }
+
+
+
+    [Fact]
+    public void DataReader_private_core_when_both_sources_are_null_throws()
+    {
+        AssertBothNullSourcesThrow(typeof(FixedWidthDataReader<PersonRecord>), 4);
     }
 }

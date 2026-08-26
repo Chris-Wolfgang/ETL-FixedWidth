@@ -208,6 +208,20 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         ILogger<FixedWidthLoader<TRecord>>? logger
     )
     {
+        // Defensive invariant guard. Every caller-facing constructor null-checks its own source
+        // before delegating here, so this cannot fire today — it exists so that a constructor added
+        // later which forgets that check fails loudly at construction instead of NullReferencing
+        // somewhere downstream. It deliberately does NOT throw ArgumentNullException: neither
+        // parameter name would be the one the caller actually passed, which is the exact defect
+        // this class of guard is here to prevent.
+        if (writer is null && stream is null)
+        {
+            throw new InvalidOperationException
+            (
+                "Exactly one of writer or stream must be supplied."
+            );
+        }
+
         if (stream is not null)
         {
             var resolved = options ?? new FixedWidthLoaderOptions();
