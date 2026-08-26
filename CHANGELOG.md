@@ -103,6 +103,18 @@ parameter. Six superseded constructors and four public `Encoding` properties are
 
 ### Fixed
 
+- **`netcoreapp3.1` and `net5.0` were running zero tests.** Both slots reported
+  *"No test is available"* and contributed nothing, while `dotnet test` exited non-zero with **no
+  reported failures** — so a green-looking local run said nothing about those two frameworks.
+
+  `xunit.runner.visualstudio` **2.8.2 ships `build`/`lib` assets for `net462` and `net6.0` only**, so
+  neither slot resolved a test adapter. The runner is now pinned per slot: **2.4.5** (the newest 2.x
+  that still ships a `netcoreapp3.1` asset, which `net5.0` also consumes) for those two frameworks,
+  2.8.2 everywhere else, both capped below `3.0.0` since runner 3.x drops these frameworks outright.
+
+  Restores **695** tests on `netcoreapp3.1` and **700** on `net5.0`. Test-infrastructure only — no
+  product code, no API change.
+
 - **A null `Stream` passed to `FixedWidthExtractor<T>` or `FixedWidthLoader<T>` reported the wrong
   parameter name.** Both types route their two input shapes through one private constructor, and a
   null stream fell through to the reader/writer branch — so the `ArgumentNullException` named
