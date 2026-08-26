@@ -103,6 +103,16 @@ parameter. Six superseded constructors and four public `Encoding` properties are
 
 ### Fixed
 
+- **A null `Stream` passed to `FixedWidthExtractor<T>` or `FixedWidthLoader<T>` reported the wrong
+  parameter name.** Both types route their two input shapes through one private constructor, and a
+  null stream fell through to the reader/writer branch — so the `ArgumentNullException` named
+  `reader` or `writer`, parameters the caller never passed, contradicting the documented contract.
+
+  Each constructor now null-checks its own source before delegating. Caught in review of the
+  single-initialization-path change earlier in this release, which introduced it;
+  `FixedWidthDataReader<T>` already did this correctly. Regression tests assert `ParamName` on all
+  four paths.
+
 ### Security
 
 ## [0.10.1] - 2026-08-18

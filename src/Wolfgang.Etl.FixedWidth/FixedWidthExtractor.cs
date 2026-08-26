@@ -106,7 +106,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         TextReader reader,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
-        : this(reader: reader, stream: null, options: null, timer: null, logger: logger)
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null, timer: null, logger: logger)
     {
     }
 
@@ -136,7 +136,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         IProgressTimer timer,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
-        : this(reader: reader, stream: null, options: null,
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null,
                timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
     }
@@ -164,7 +164,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         FixedWidthExtractorOptions? options = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
-        : this(reader: null, stream: stream, options: options, timer: null, logger: logger)
+        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, timer: null, logger: logger)
     {
     }
 
@@ -199,7 +199,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         FixedWidthExtractorOptions? options = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
-        : this(reader: null, stream: stream, options: options,
+        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options,
                timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
     }
@@ -208,7 +208,9 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     // The single initialization path. Every public and internal constructor delegates here,
     // so there is exactly one place that assigns the shared fields. The two input shapes
     // cannot chain to one another, which is why this takes the private-core form rather than
-    // one constructor chaining into another. Exactly one of reader / stream is non-null.
+    // one constructor chaining into another. Exactly one of reader / stream is non-null:
+    // each boundary constructor null-checks its own source before delegating, so the
+    // ArgumentNullException names the parameter the caller actually passed.
     private FixedWidthExtractor
     (
         TextReader? reader,
@@ -228,7 +230,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         }
         else
         {
-            _reader = reader ?? throw new ArgumentNullException(nameof(reader));
+            _reader = reader!;
         }
 
         _progressTimer = timer;

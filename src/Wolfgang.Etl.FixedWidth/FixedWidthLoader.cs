@@ -94,7 +94,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         TextWriter writer,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
-        : this(writer: writer, stream: null, options: null, timer: null, logger: logger)
+        : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null, options: null, timer: null, logger: logger)
     {
     }
 
@@ -124,7 +124,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         IProgressTimer timer,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
-        : this(writer: writer, stream: null, options: null,
+        : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null, options: null,
                timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
     }
@@ -152,7 +152,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         FixedWidthLoaderOptions? options = null,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
-        : this(writer: null, stream: stream, options: options, timer: null, logger: logger)
+        : this(writer: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, timer: null, logger: logger)
     {
     }
 
@@ -187,7 +187,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         FixedWidthLoaderOptions? options = null,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
-        : this(writer: null, stream: stream, options: options,
+        : this(writer: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options,
                timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
     }
@@ -196,7 +196,9 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     // The single initialization path. Every public and internal constructor delegates here,
     // so there is exactly one place that assigns the shared fields. The two input shapes
     // cannot chain to one another, which is why this takes the private-core form rather than
-    // one constructor chaining into another. Exactly one of writer / stream is non-null.
+    // one constructor chaining into another. Exactly one of writer / stream is non-null:
+    // each boundary constructor null-checks its own source before delegating, so the
+    // ArgumentNullException names the parameter the caller actually passed.
     private FixedWidthLoader
     (
         TextWriter? writer,
@@ -214,7 +216,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         }
         else
         {
-            _writer = writer ?? throw new ArgumentNullException(nameof(writer));
+            _writer = writer!;
         }
 
         _progressTimer = timer;
