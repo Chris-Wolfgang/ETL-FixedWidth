@@ -202,11 +202,12 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
     {
         return new FixedWidthReport
         (
-            CurrentItemCount,
-            CurrentSkippedItemCount,
-            currentRejectedItemCount: 0,
-            currentFilteredLineCount: 0,
-            currentLineNumber: CurrentItemCount + CurrentSkippedItemCount
+            new FixedWidthReportOptions
+            {
+                CurrentCount = CurrentItemCount,
+                CurrentSkippedItemCount = CurrentSkippedItemCount,
+                CurrentLineNumber = CurrentItemCount + CurrentSkippedItemCount
+            }
         );
     }
 

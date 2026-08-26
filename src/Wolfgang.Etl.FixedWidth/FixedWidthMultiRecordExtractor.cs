@@ -389,11 +389,14 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     {
         return new FixedWidthReport
         (
-            CurrentItemCount,
-            CurrentSkippedItemCount,
-            CurrentRejectedItemCount,
-            CurrentFilteredLineCount,
-            Interlocked.Read(ref _currentLineNumber)
+            new FixedWidthReportOptions
+            {
+                CurrentCount = CurrentItemCount,
+                CurrentSkippedItemCount = CurrentSkippedItemCount,
+                CurrentRejectedItemCount = CurrentRejectedItemCount,
+                CurrentFilteredLineCount = CurrentFilteredLineCount,
+                CurrentLineNumber = Interlocked.Read(ref _currentLineNumber)
+            }
         );
     }
 

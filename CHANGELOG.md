@@ -24,6 +24,13 @@ parameter. Six superseded constructors and four public `Encoding` properties are
   The `TextReader`/`TextWriter` constructors deliberately take **no** options. A caller-supplied
   reader or writer already carries its own encoding, so the setting would be inert there.
 
+- **`FixedWidthReportOptions` record and a `FixedWidthReport(FixedWidthReportOptions)`
+  constructor.** The two positional constructors differed only by whether the two extractor-only
+  counts appeared *in the middle* of the argument list, and four of the five parameters are `int`.
+  Naming each count at the call site removes the standing risk of transposing them. Every member
+  defaults to zero, so a loader states three counts instead of passing two explicit zeroes
+  positionally.
+
 - **A trailing optional logger on `FixedWidthTransformer<TSource, TDestination>`**, both on the
   public constructor and on the internal timer-injecting one. It was the only type in the package
   that accepted no logger at all. The transformer now emits Information-level started/completed
@@ -55,6 +62,13 @@ parameter. Six superseded constructors and four public `Encoding` properties are
   gap that produced two shipped defects elsewhere in the fleet, including this package's own
   internal constructor that hard-coded UTF-8 while its public counterpart honored the caller's
   encoding.
+
+### Deprecated
+
+- **The two positional `FixedWidthReport` constructors** — `(int, int, long)` and
+  `(int, int, int, int, long)` — are `[Obsolete]` in favour of the `FixedWidthReportOptions`
+  overload. They still work and remain under test; they are scheduled for removal in a future
+  release. All six in-package call sites have moved to the new constructor.
 
 ### Removed
 

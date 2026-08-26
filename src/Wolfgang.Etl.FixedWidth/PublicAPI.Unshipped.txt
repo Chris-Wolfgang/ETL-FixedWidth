@@ -46,4 +46,17 @@ Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.Encoding.get -> System.Text.Encoding!
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.Encoding.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.FixedWidthMultiRecordExtractorOptions() -> void
+Wolfgang.Etl.FixedWidth.FixedWidthReport.FixedWidthReport(Wolfgang.Etl.FixedWidth.FixedWidthReportOptions! options) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentCount.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentFilteredLineCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentFilteredLineCount.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentLineNumber.get -> long
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentLineNumber.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentRejectedItemCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentRejectedItemCount.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentSkippedItemCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentSkippedItemCount.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.FixedWidthReportOptions() -> void
 Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination>! transform, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>!>? logger = null) -> void
