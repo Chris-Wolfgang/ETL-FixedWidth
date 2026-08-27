@@ -302,6 +302,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.yml\" sourcestartlinenumber=\"1\">Options for the <xref href=\"System.IO.Stream\" data-throw-if-not-resolved=\"false\"></xref>-based <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor%601\" data-throw-if-not-resolved=\"false\"></xref> constructors.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader-1.yml",
       "output": {
         ".html": {
@@ -313,6 +327,20 @@
       "IsMRef": true,
       "Title": "Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>",
       "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader-1.yml\" sourcestartlinenumber=\"1\">Writes records of type <code class=\"typeparamref\">TRecord</code> to a fixed-length <b>binary</b> record\nstream (mainframe / COBOL, #21) — the write counterpart of\n<xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor%601\" data-throw-if-not-resolved=\"false\"></xref>. Each record is encoded to a fixed number of\nbytes (the field byte widths) and written back-to-back with no delimiters, encoding\n<code>COMP-3</code> packed-decimal and <code>COMP</code> binary-integer fields alongside text.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.yml\" sourcestartlinenumber=\"1\">Options for the <xref href=\"System.IO.Stream\" data-throw-if-not-resolved=\"false\"></xref>-based <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader%601\" data-throw-if-not-resolved=\"false\"></xref> constructors.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -344,6 +372,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.yml\" sourcestartlinenumber=\"1\">Options for the <xref href=\"System.IO.Stream\" data-throw-if-not-resolved=\"false\"></xref>-based <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthDataReader%601\" data-throw-if-not-resolved=\"false\"></xref> constructor.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthError.yml",
       "output": {
         ".html": {
@@ -369,6 +411,20 @@
       "IsMRef": true,
       "Title": "Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>",
       "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.yml\" sourcestartlinenumber=\"1\">Reads a fixed-width text file and yields records of type <code class=\"typeparamref\">TRecord</code>\nas an asynchronous stream.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.yml\" sourcestartlinenumber=\"1\">Options for the <xref href=\"System.IO.Stream\" data-throw-if-not-resolved=\"false\"></xref>-based <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601\" data-throw-if-not-resolved=\"false\"></xref>\nconstructors.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -400,6 +456,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.yml\" sourcestartlinenumber=\"1\">Options for the <xref href=\"System.IO.Stream\" data-throw-if-not-resolved=\"false\"></xref>-based <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthLoader%601\" data-throw-if-not-resolved=\"false\"></xref>\nconstructors.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.yml",
       "output": {
         ".html": {
@@ -414,6 +484,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.yml\" sourcestartlinenumber=\"1\">Options for the <xref href=\"System.IO.Stream\" data-throw-if-not-resolved=\"false\"></xref>-based <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor\" data-throw-if-not-resolved=\"false\"></xref> constructors.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthReport.yml",
       "output": {
         ".html": {
@@ -425,6 +509,20 @@
       "IsMRef": true,
       "Title": "Wolfgang.Etl.FixedWidth.FixedWidthReport",
       "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthReport.yml\" sourcestartlinenumber=\"1\">A progress report for fixed-width extract and load operations. Extends\n<xref href=\"Wolfgang.Etl.Abstractions.Report\" data-throw-if-not-resolved=\"false\"></xref> with additional diagnostic properties specific to\nfixed-width file processing.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthReportOptions",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.yml\" sourcestartlinenumber=\"1\">The counts that make up a <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthReport\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
     },
     {
       "type": "ManagedReference",

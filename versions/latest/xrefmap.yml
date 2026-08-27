@@ -896,6 +896,25 @@ references:
   isSpec: "True"
   fullName: Wolfgang.Etl.FixedWidth.FieldContext.PropertyType
   nameWithType: FieldContext.PropertyType
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions
+  name: FixedWidthBinaryExtractorOptions
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.html
+  commentId: T:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions
+  nameWithType: FixedWidthBinaryExtractorOptions
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.Encoding
+  name: Encoding
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_Encoding
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.Encoding
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.Encoding
+  nameWithType: FixedWidthBinaryExtractorOptions.Encoding
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.Encoding*
+  name: Encoding
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_Encoding_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.Encoding
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.Encoding
+  nameWithType: FixedWidthBinaryExtractorOptions.Encoding
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1
   name: FixedWidthBinaryExtractor<TRecord>
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor-1.html
@@ -906,14 +925,23 @@ references:
   nameWithType: FixedWidthBinaryExtractor<TRecord>
   nameWithType.vb: FixedWidthBinaryExtractor(Of TRecord)
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor{`0}})
-  name: FixedWidthBinaryExtractor(Stream, ILogger<FixedWidthBinaryExtractor<TRecord>>?)
+  name: FixedWidthBinaryExtractor(Stream, ILogger<FixedWidthBinaryExtractor<TRecord>>)
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor_1__ctor_System_IO_Stream_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor__0___
   commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor{`0}})
   name.vb: New(Stream, ILogger(Of FixedWidthBinaryExtractor(Of TRecord)))
-  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>.FixedWidthBinaryExtractor(System.IO.Stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>>?)
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>.FixedWidthBinaryExtractor(System.IO.Stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>>)
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor(Of TRecord).New(System.IO.Stream, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor(Of TRecord)))
-  nameWithType: FixedWidthBinaryExtractor<TRecord>.FixedWidthBinaryExtractor(Stream, ILogger<FixedWidthBinaryExtractor<TRecord>>?)
+  nameWithType: FixedWidthBinaryExtractor<TRecord>.FixedWidthBinaryExtractor(Stream, ILogger<FixedWidthBinaryExtractor<TRecord>>)
   nameWithType.vb: FixedWidthBinaryExtractor(Of TRecord).New(Stream, ILogger(Of FixedWidthBinaryExtractor(Of TRecord)))
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.#ctor(System.IO.Stream,Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor{`0}})
+  name: FixedWidthBinaryExtractor(Stream, FixedWidthBinaryExtractorOptions?, ILogger<FixedWidthBinaryExtractor<TRecord>>?)
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor_1__ctor_System_IO_Stream_Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor__0___
+  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.#ctor(System.IO.Stream,Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor{`0}})
+  name.vb: New(Stream, FixedWidthBinaryExtractorOptions, ILogger(Of FixedWidthBinaryExtractor(Of TRecord)))
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>.FixedWidthBinaryExtractor(System.IO.Stream, Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions?, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<TRecord>>?)
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor(Of TRecord).New(System.IO.Stream, Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor(Of TRecord)))
+  nameWithType: FixedWidthBinaryExtractor<TRecord>.FixedWidthBinaryExtractor(Stream, FixedWidthBinaryExtractorOptions?, ILogger<FixedWidthBinaryExtractor<TRecord>>?)
+  nameWithType.vb: FixedWidthBinaryExtractor(Of TRecord).New(Stream, FixedWidthBinaryExtractorOptions, ILogger(Of FixedWidthBinaryExtractor(Of TRecord)))
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.#ctor*
   name: FixedWidthBinaryExtractor
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor_1__ctor_
@@ -1010,6 +1038,25 @@ references:
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor(Of TRecord).RecordByteLength
   nameWithType: FixedWidthBinaryExtractor<TRecord>.RecordByteLength
   nameWithType.vb: FixedWidthBinaryExtractor(Of TRecord).RecordByteLength
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions
+  name: FixedWidthBinaryLoaderOptions
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.html
+  commentId: T:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions
+  nameWithType: FixedWidthBinaryLoaderOptions
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.Encoding
+  name: Encoding
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryLoaderOptions_Encoding
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.Encoding
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.Encoding
+  nameWithType: FixedWidthBinaryLoaderOptions.Encoding
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.Encoding*
+  name: Encoding
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryLoaderOptions_Encoding_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.Encoding
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.Encoding
+  nameWithType: FixedWidthBinaryLoaderOptions.Encoding
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1
   name: FixedWidthBinaryLoader<TRecord>
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader-1.html
@@ -1020,14 +1067,23 @@ references:
   nameWithType: FixedWidthBinaryLoader<TRecord>
   nameWithType.vb: FixedWidthBinaryLoader(Of TRecord)
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader{`0}})
-  name: FixedWidthBinaryLoader(Stream, ILogger<FixedWidthBinaryLoader<TRecord>>?)
+  name: FixedWidthBinaryLoader(Stream, ILogger<FixedWidthBinaryLoader<TRecord>>)
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryLoader_1__ctor_System_IO_Stream_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthBinaryLoader__0___
   commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader{`0}})
   name.vb: New(Stream, ILogger(Of FixedWidthBinaryLoader(Of TRecord)))
-  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.FixedWidthBinaryLoader(System.IO.Stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>>?)
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.FixedWidthBinaryLoader(System.IO.Stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>>)
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader(Of TRecord).New(System.IO.Stream, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader(Of TRecord)))
-  nameWithType: FixedWidthBinaryLoader<TRecord>.FixedWidthBinaryLoader(Stream, ILogger<FixedWidthBinaryLoader<TRecord>>?)
+  nameWithType: FixedWidthBinaryLoader<TRecord>.FixedWidthBinaryLoader(Stream, ILogger<FixedWidthBinaryLoader<TRecord>>)
   nameWithType.vb: FixedWidthBinaryLoader(Of TRecord).New(Stream, ILogger(Of FixedWidthBinaryLoader(Of TRecord)))
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1.#ctor(System.IO.Stream,Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader{`0}})
+  name: FixedWidthBinaryLoader(Stream, FixedWidthBinaryLoaderOptions?, ILogger<FixedWidthBinaryLoader<TRecord>>?)
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryLoader_1__ctor_System_IO_Stream_Wolfgang_Etl_FixedWidth_FixedWidthBinaryLoaderOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthBinaryLoader__0___
+  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1.#ctor(System.IO.Stream,Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader{`0}})
+  name.vb: New(Stream, FixedWidthBinaryLoaderOptions, ILogger(Of FixedWidthBinaryLoader(Of TRecord)))
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>.FixedWidthBinaryLoader(System.IO.Stream, Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions?, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<TRecord>>?)
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader(Of TRecord).New(System.IO.Stream, Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader(Of TRecord)))
+  nameWithType: FixedWidthBinaryLoader<TRecord>.FixedWidthBinaryLoader(Stream, FixedWidthBinaryLoaderOptions?, ILogger<FixedWidthBinaryLoader<TRecord>>?)
+  nameWithType.vb: FixedWidthBinaryLoader(Of TRecord).New(Stream, FixedWidthBinaryLoaderOptions, ILogger(Of FixedWidthBinaryLoader(Of TRecord)))
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1.#ctor*
   name: FixedWidthBinaryLoader
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryLoader_1__ctor_
@@ -1161,6 +1217,25 @@ references:
   commentId: F:Wolfgang.Etl.FixedWidth.FixedWidthConverter.TruncateHeader
   fullName: Wolfgang.Etl.FixedWidth.FixedWidthConverter.TruncateHeader
   nameWithType: FixedWidthConverter.TruncateHeader
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions
+  name: FixedWidthDataReaderOptions
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.html
+  commentId: T:Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions
+  nameWithType: FixedWidthDataReaderOptions
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.Encoding
+  name: Encoding
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthDataReaderOptions_Encoding
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.Encoding
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.Encoding
+  nameWithType: FixedWidthDataReaderOptions.Encoding
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.Encoding*
+  name: Encoding
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthDataReaderOptions_Encoding_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.Encoding
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.Encoding
+  nameWithType: FixedWidthDataReaderOptions.Encoding
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthDataReader`1
   name: FixedWidthDataReader<TRecord>
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthDataReader-1.html
@@ -1171,14 +1246,23 @@ references:
   nameWithType: FixedWidthDataReader<TRecord>
   nameWithType.vb: FixedWidthDataReader(Of TRecord)
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthDataReader`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthDataReader{`0}})
-  name: FixedWidthDataReader(Stream, ILogger<FixedWidthDataReader<TRecord>>?)
+  name: FixedWidthDataReader(Stream, ILogger<FixedWidthDataReader<TRecord>>)
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthDataReader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthDataReader_1__ctor_System_IO_Stream_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthDataReader__0___
   commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthDataReader`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthDataReader{`0}})
   name.vb: New(Stream, ILogger(Of FixedWidthDataReader(Of TRecord)))
-  fullName: Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FixedWidthDataReader(System.IO.Stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>>?)
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FixedWidthDataReader(System.IO.Stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>>)
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthDataReader(Of TRecord).New(System.IO.Stream, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthDataReader(Of TRecord)))
-  nameWithType: FixedWidthDataReader<TRecord>.FixedWidthDataReader(Stream, ILogger<FixedWidthDataReader<TRecord>>?)
+  nameWithType: FixedWidthDataReader<TRecord>.FixedWidthDataReader(Stream, ILogger<FixedWidthDataReader<TRecord>>)
   nameWithType.vb: FixedWidthDataReader(Of TRecord).New(Stream, ILogger(Of FixedWidthDataReader(Of TRecord)))
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthDataReader`1.#ctor(System.IO.Stream,Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthDataReader{`0}})
+  name: FixedWidthDataReader(Stream, FixedWidthDataReaderOptions?, ILogger<FixedWidthDataReader<TRecord>>?)
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthDataReader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthDataReader_1__ctor_System_IO_Stream_Wolfgang_Etl_FixedWidth_FixedWidthDataReaderOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthDataReader__0___
+  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthDataReader`1.#ctor(System.IO.Stream,Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthDataReader{`0}})
+  name.vb: New(Stream, FixedWidthDataReaderOptions, ILogger(Of FixedWidthDataReader(Of TRecord)))
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>.FixedWidthDataReader(System.IO.Stream, Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions?, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthDataReader<TRecord>>?)
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthDataReader(Of TRecord).New(System.IO.Stream, Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthDataReader(Of TRecord)))
+  nameWithType: FixedWidthDataReader<TRecord>.FixedWidthDataReader(Stream, FixedWidthDataReaderOptions?, ILogger<FixedWidthDataReader<TRecord>>?)
+  nameWithType.vb: FixedWidthDataReader(Of TRecord).New(Stream, FixedWidthDataReaderOptions, ILogger(Of FixedWidthDataReader(Of TRecord)))
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthDataReader`1.#ctor(System.IO.TextReader,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthDataReader{`0}})
   name: FixedWidthDataReader(TextReader, ILogger<FixedWidthDataReader<TRecord>>?)
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthDataReader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthDataReader_1__ctor_System_IO_TextReader_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthDataReader__0___
@@ -1958,6 +2042,25 @@ references:
   isSpec: "True"
   fullName: Wolfgang.Etl.FixedWidth.FixedWidthError.RawContent
   nameWithType: FixedWidthError.RawContent
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions
+  name: FixedWidthExtractorOptions
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.html
+  commentId: T:Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions
+  nameWithType: FixedWidthExtractorOptions
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.Encoding
+  name: Encoding
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_Encoding
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.Encoding
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.Encoding
+  nameWithType: FixedWidthExtractorOptions.Encoding
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.Encoding*
+  name: Encoding
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_Encoding_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.Encoding
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.Encoding
+  nameWithType: FixedWidthExtractorOptions.Encoding
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1
   name: FixedWidthExtractor<TRecord>
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html
@@ -1968,40 +2071,40 @@ references:
   nameWithType: FixedWidthExtractor<TRecord>
   nameWithType.vb: FixedWidthExtractor(Of TRecord)
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthExtractor{`0}},System.Text.Encoding)
-  name: FixedWidthExtractor(Stream, ILogger<FixedWidthExtractor<TRecord>>, Encoding?)
+  name: FixedWidthExtractor(Stream, ILogger<FixedWidthExtractor<TRecord>>, Encoding)
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_System_IO_Stream_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthExtractor__0___System_Text_Encoding_
   commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthExtractor{`0}},System.Text.Encoding)
   name.vb: New(Stream, ILogger(Of FixedWidthExtractor(Of TRecord)), Encoding)
-  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>>, System.Text.Encoding?)
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>>, System.Text.Encoding)
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord).New(System.IO.Stream, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord)), System.Text.Encoding)
-  nameWithType: FixedWidthExtractor<TRecord>.FixedWidthExtractor(Stream, ILogger<FixedWidthExtractor<TRecord>>, Encoding?)
+  nameWithType: FixedWidthExtractor<TRecord>.FixedWidthExtractor(Stream, ILogger<FixedWidthExtractor<TRecord>>, Encoding)
   nameWithType.vb: FixedWidthExtractor(Of TRecord).New(Stream, ILogger(Of FixedWidthExtractor(Of TRecord)), Encoding)
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.Stream,System.Text.Encoding)
-  name: FixedWidthExtractor(Stream, Encoding?)
+  name: FixedWidthExtractor(Stream, Encoding)
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_System_IO_Stream_System_Text_Encoding_
   commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.Stream,System.Text.Encoding)
   name.vb: New(Stream, Encoding)
-  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream, System.Text.Encoding?)
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream, System.Text.Encoding)
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord).New(System.IO.Stream, System.Text.Encoding)
-  nameWithType: FixedWidthExtractor<TRecord>.FixedWidthExtractor(Stream, Encoding?)
+  nameWithType: FixedWidthExtractor<TRecord>.FixedWidthExtractor(Stream, Encoding)
   nameWithType.vb: FixedWidthExtractor(Of TRecord).New(Stream, Encoding)
-- uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.TextReader)
-  name: FixedWidthExtractor(TextReader)
-  href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_System_IO_TextReader_
-  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.TextReader)
-  name.vb: New(TextReader)
-  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.TextReader)
-  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord).New(System.IO.TextReader)
-  nameWithType: FixedWidthExtractor<TRecord>.FixedWidthExtractor(TextReader)
-  nameWithType.vb: FixedWidthExtractor(Of TRecord).New(TextReader)
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.Stream,Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthExtractor{`0}})
+  name: FixedWidthExtractor(Stream, FixedWidthExtractorOptions?, ILogger<FixedWidthExtractor<TRecord>>?)
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_System_IO_Stream_Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthExtractor__0___
+  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.Stream,Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthExtractor{`0}})
+  name.vb: New(Stream, FixedWidthExtractorOptions, ILogger(Of FixedWidthExtractor(Of TRecord)))
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream, Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions?, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>>?)
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord).New(System.IO.Stream, Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord)))
+  nameWithType: FixedWidthExtractor<TRecord>.FixedWidthExtractor(Stream, FixedWidthExtractorOptions?, ILogger<FixedWidthExtractor<TRecord>>?)
+  nameWithType.vb: FixedWidthExtractor(Of TRecord).New(Stream, FixedWidthExtractorOptions, ILogger(Of FixedWidthExtractor(Of TRecord)))
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.TextReader,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthExtractor{`0}})
-  name: FixedWidthExtractor(TextReader, ILogger<FixedWidthExtractor<TRecord>>)
+  name: FixedWidthExtractor(TextReader, ILogger<FixedWidthExtractor<TRecord>>?)
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1__ctor_System_IO_TextReader_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthExtractor__0___
   commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.TextReader,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthExtractor{`0}})
   name.vb: New(TextReader, ILogger(Of FixedWidthExtractor(Of TRecord)))
-  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.TextReader, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>>)
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.TextReader, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>>?)
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord).New(System.IO.TextReader, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthExtractor(Of TRecord)))
-  nameWithType: FixedWidthExtractor<TRecord>.FixedWidthExtractor(TextReader, ILogger<FixedWidthExtractor<TRecord>>)
+  nameWithType: FixedWidthExtractor<TRecord>.FixedWidthExtractor(TextReader, ILogger<FixedWidthExtractor<TRecord>>?)
   nameWithType.vb: FixedWidthExtractor(Of TRecord).New(TextReader, ILogger(Of FixedWidthExtractor(Of TRecord)))
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor*
   name: FixedWidthExtractor
@@ -2564,6 +2667,25 @@ references:
   isSpec: "True"
   fullName: Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo.StartPosition
   nameWithType: FixedWidthFieldInfo.StartPosition
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions
+  name: FixedWidthLoaderOptions
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.html
+  commentId: T:Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions
+  nameWithType: FixedWidthLoaderOptions
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.Encoding
+  name: Encoding
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthLoaderOptions_Encoding
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.Encoding
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.Encoding
+  nameWithType: FixedWidthLoaderOptions.Encoding
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.Encoding*
+  name: Encoding
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthLoaderOptions_Encoding_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.Encoding
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.Encoding
+  nameWithType: FixedWidthLoaderOptions.Encoding
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthLoader`1
   name: FixedWidthLoader<TRecord>
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html
@@ -2574,40 +2696,40 @@ references:
   nameWithType: FixedWidthLoader<TRecord>
   nameWithType.vb: FixedWidthLoader(Of TRecord)
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthLoader{`0}},System.Text.Encoding)
-  name: FixedWidthLoader(Stream, ILogger<FixedWidthLoader<TRecord>>, Encoding?)
+  name: FixedWidthLoader(Stream, ILogger<FixedWidthLoader<TRecord>>, Encoding)
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_System_IO_Stream_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthLoader__0___System_Text_Encoding_
   commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthLoader{`0}},System.Text.Encoding)
   name.vb: New(Stream, ILogger(Of FixedWidthLoader(Of TRecord)), Encoding)
-  fullName: Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>>, System.Text.Encoding?)
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>>, System.Text.Encoding)
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthLoader(Of TRecord).New(System.IO.Stream, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthLoader(Of TRecord)), System.Text.Encoding)
-  nameWithType: FixedWidthLoader<TRecord>.FixedWidthLoader(Stream, ILogger<FixedWidthLoader<TRecord>>, Encoding?)
+  nameWithType: FixedWidthLoader<TRecord>.FixedWidthLoader(Stream, ILogger<FixedWidthLoader<TRecord>>, Encoding)
   nameWithType.vb: FixedWidthLoader(Of TRecord).New(Stream, ILogger(Of FixedWidthLoader(Of TRecord)), Encoding)
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.Stream,System.Text.Encoding)
-  name: FixedWidthLoader(Stream, Encoding?)
+  name: FixedWidthLoader(Stream, Encoding)
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_System_IO_Stream_System_Text_Encoding_
   commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.Stream,System.Text.Encoding)
   name.vb: New(Stream, Encoding)
-  fullName: Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream, System.Text.Encoding?)
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream, System.Text.Encoding)
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthLoader(Of TRecord).New(System.IO.Stream, System.Text.Encoding)
-  nameWithType: FixedWidthLoader<TRecord>.FixedWidthLoader(Stream, Encoding?)
+  nameWithType: FixedWidthLoader<TRecord>.FixedWidthLoader(Stream, Encoding)
   nameWithType.vb: FixedWidthLoader(Of TRecord).New(Stream, Encoding)
-- uid: Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.TextWriter)
-  name: FixedWidthLoader(TextWriter)
-  href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_System_IO_TextWriter_
-  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.TextWriter)
-  name.vb: New(TextWriter)
-  fullName: Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.TextWriter)
-  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthLoader(Of TRecord).New(System.IO.TextWriter)
-  nameWithType: FixedWidthLoader<TRecord>.FixedWidthLoader(TextWriter)
-  nameWithType.vb: FixedWidthLoader(Of TRecord).New(TextWriter)
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.Stream,Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthLoader{`0}})
+  name: FixedWidthLoader(Stream, FixedWidthLoaderOptions?, ILogger<FixedWidthLoader<TRecord>>?)
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_System_IO_Stream_Wolfgang_Etl_FixedWidth_FixedWidthLoaderOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthLoader__0___
+  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.Stream,Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthLoader{`0}})
+  name.vb: New(Stream, FixedWidthLoaderOptions, ILogger(Of FixedWidthLoader(Of TRecord)))
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream, Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions?, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>>?)
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthLoader(Of TRecord).New(System.IO.Stream, Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthLoader(Of TRecord)))
+  nameWithType: FixedWidthLoader<TRecord>.FixedWidthLoader(Stream, FixedWidthLoaderOptions?, ILogger<FixedWidthLoader<TRecord>>?)
+  nameWithType.vb: FixedWidthLoader(Of TRecord).New(Stream, FixedWidthLoaderOptions, ILogger(Of FixedWidthLoader(Of TRecord)))
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.TextWriter,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthLoader{`0}})
-  name: FixedWidthLoader(TextWriter, ILogger<FixedWidthLoader<TRecord>>)
+  name: FixedWidthLoader(TextWriter, ILogger<FixedWidthLoader<TRecord>>?)
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_System_IO_TextWriter_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthLoader__0___
   commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.TextWriter,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthLoader{`0}})
   name.vb: New(TextWriter, ILogger(Of FixedWidthLoader(Of TRecord)))
-  fullName: Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.TextWriter, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>>)
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.TextWriter, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>>?)
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthLoader(Of TRecord).New(System.IO.TextWriter, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthLoader(Of TRecord)))
-  nameWithType: FixedWidthLoader<TRecord>.FixedWidthLoader(TextWriter, ILogger<FixedWidthLoader<TRecord>>)
+  nameWithType: FixedWidthLoader<TRecord>.FixedWidthLoader(TextWriter, ILogger<FixedWidthLoader<TRecord>>?)
   nameWithType.vb: FixedWidthLoader(Of TRecord).New(TextWriter, ILogger(Of FixedWidthLoader(Of TRecord)))
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor*
   name: FixedWidthLoader
@@ -2833,14 +2955,23 @@ references:
   fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor
   nameWithType: FixedWidthMultiRecordExtractor
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor})
-  name: FixedWidthMultiRecordExtractor(Stream, ILogger<FixedWidthMultiRecordExtractor>?)
+  name: FixedWidthMultiRecordExtractor(Stream, ILogger<FixedWidthMultiRecordExtractor>)
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.html#Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractor__ctor_System_IO_Stream_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractor__
   commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor})
   name.vb: New(Stream, ILogger(Of FixedWidthMultiRecordExtractor))
-  fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(System.IO.Stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor>?)
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(System.IO.Stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor>)
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.New(System.IO.Stream, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor))
-  nameWithType: FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(Stream, ILogger<FixedWidthMultiRecordExtractor>?)
+  nameWithType: FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(Stream, ILogger<FixedWidthMultiRecordExtractor>)
   nameWithType.vb: FixedWidthMultiRecordExtractor.New(Stream, ILogger(Of FixedWidthMultiRecordExtractor))
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.#ctor(System.IO.Stream,Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor})
+  name: FixedWidthMultiRecordExtractor(Stream, FixedWidthMultiRecordExtractorOptions?, ILogger<FixedWidthMultiRecordExtractor>?)
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.html#Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractor__ctor_System_IO_Stream_Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractor__
+  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.#ctor(System.IO.Stream,Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor})
+  name.vb: New(Stream, FixedWidthMultiRecordExtractorOptions, ILogger(Of FixedWidthMultiRecordExtractor))
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(System.IO.Stream, Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions?, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor>?)
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.New(System.IO.Stream, Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor))
+  nameWithType: FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(Stream, FixedWidthMultiRecordExtractorOptions?, ILogger<FixedWidthMultiRecordExtractor>?)
+  nameWithType.vb: FixedWidthMultiRecordExtractor.New(Stream, FixedWidthMultiRecordExtractorOptions, ILogger(Of FixedWidthMultiRecordExtractor))
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.#ctor(System.IO.TextReader,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor})
   name: FixedWidthMultiRecordExtractor(TextReader, ILogger<FixedWidthMultiRecordExtractor>?)
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.html#Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractor__ctor_System_IO_TextReader_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractor__
@@ -3116,6 +3247,25 @@ references:
   isSpec: "True"
   fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.When
   nameWithType: FixedWidthMultiRecordExtractor.When
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions
+  name: FixedWidthMultiRecordExtractorOptions
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.html
+  commentId: T:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions
+  nameWithType: FixedWidthMultiRecordExtractorOptions
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.Encoding
+  name: Encoding
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_Encoding
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.Encoding
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.Encoding
+  nameWithType: FixedWidthMultiRecordExtractorOptions.Encoding
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.Encoding*
+  name: Encoding
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_Encoding_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.Encoding
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.Encoding
+  nameWithType: FixedWidthMultiRecordExtractorOptions.Encoding
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthReport
   name: FixedWidthReport
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthReport.html
@@ -3140,6 +3290,15 @@ references:
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthReport.New(Integer, Integer, Long)
   nameWithType: FixedWidthReport.FixedWidthReport(int, int, long)
   nameWithType.vb: FixedWidthReport.New(Integer, Integer, Long)
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthReport.#ctor(Wolfgang.Etl.FixedWidth.FixedWidthReportOptions)
+  name: FixedWidthReport(FixedWidthReportOptions)
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthReport.html#Wolfgang_Etl_FixedWidth_FixedWidthReport__ctor_Wolfgang_Etl_FixedWidth_FixedWidthReportOptions_
+  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthReport.#ctor(Wolfgang.Etl.FixedWidth.FixedWidthReportOptions)
+  name.vb: New(FixedWidthReportOptions)
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthReport.FixedWidthReport(Wolfgang.Etl.FixedWidth.FixedWidthReportOptions)
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthReport.New(Wolfgang.Etl.FixedWidth.FixedWidthReportOptions)
+  nameWithType: FixedWidthReport.FixedWidthReport(FixedWidthReportOptions)
+  nameWithType.vb: FixedWidthReport.New(FixedWidthReportOptions)
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthReport.#ctor*
   name: FixedWidthReport
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthReport.html#Wolfgang_Etl_FixedWidth_FixedWidthReport__ctor_
@@ -3202,6 +3361,77 @@ references:
   isSpec: "True"
   fullName: Wolfgang.Etl.FixedWidth.FixedWidthReport.CurrentSkippedItemCount
   nameWithType: FixedWidthReport.CurrentSkippedItemCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions
+  name: FixedWidthReportOptions
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.html
+  commentId: T:Wolfgang.Etl.FixedWidth.FixedWidthReportOptions
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions
+  nameWithType: FixedWidthReportOptions
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentCount
+  name: CurrentCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthReportOptions_CurrentCount
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentCount
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentCount
+  nameWithType: FixedWidthReportOptions.CurrentCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentCount*
+  name: CurrentCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthReportOptions_CurrentCount_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentCount
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentCount
+  nameWithType: FixedWidthReportOptions.CurrentCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentFilteredLineCount
+  name: CurrentFilteredLineCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthReportOptions_CurrentFilteredLineCount
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentFilteredLineCount
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentFilteredLineCount
+  nameWithType: FixedWidthReportOptions.CurrentFilteredLineCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentFilteredLineCount*
+  name: CurrentFilteredLineCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthReportOptions_CurrentFilteredLineCount_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentFilteredLineCount
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentFilteredLineCount
+  nameWithType: FixedWidthReportOptions.CurrentFilteredLineCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentLineNumber
+  name: CurrentLineNumber
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthReportOptions_CurrentLineNumber
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentLineNumber
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentLineNumber
+  nameWithType: FixedWidthReportOptions.CurrentLineNumber
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentLineNumber*
+  name: CurrentLineNumber
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthReportOptions_CurrentLineNumber_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentLineNumber
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentLineNumber
+  nameWithType: FixedWidthReportOptions.CurrentLineNumber
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentRejectedItemCount
+  name: CurrentRejectedItemCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthReportOptions_CurrentRejectedItemCount
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentRejectedItemCount
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentRejectedItemCount
+  nameWithType: FixedWidthReportOptions.CurrentRejectedItemCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentRejectedItemCount*
+  name: CurrentRejectedItemCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthReportOptions_CurrentRejectedItemCount_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentRejectedItemCount
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentRejectedItemCount
+  nameWithType: FixedWidthReportOptions.CurrentRejectedItemCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentSkippedItemCount
+  name: CurrentSkippedItemCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthReportOptions_CurrentSkippedItemCount
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentSkippedItemCount
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentSkippedItemCount
+  nameWithType: FixedWidthReportOptions.CurrentSkippedItemCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentSkippedItemCount*
+  name: CurrentSkippedItemCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthReportOptions_CurrentSkippedItemCount_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentSkippedItemCount
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.CurrentSkippedItemCount
+  nameWithType: FixedWidthReportOptions.CurrentSkippedItemCount
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthSchema
   name: FixedWidthSchema
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthSchema.html
@@ -3392,15 +3622,15 @@ references:
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthTransformer(Of TSource, TDestination)
   nameWithType: FixedWidthTransformer<TSource, TDestination>
   nameWithType.vb: FixedWidthTransformer(Of TSource, TDestination)
-- uid: Wolfgang.Etl.FixedWidth.FixedWidthTransformer`2.#ctor(System.Func{`0,`1})
-  name: FixedWidthTransformer(Func<TSource, TDestination>)
-  href: api/Wolfgang.Etl.FixedWidth.FixedWidthTransformer-2.html#Wolfgang_Etl_FixedWidth_FixedWidthTransformer_2__ctor_System_Func__0__1__
-  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthTransformer`2.#ctor(System.Func{`0,`1})
-  name.vb: New(Func(Of TSource, TDestination))
-  fullName: Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination>)
-  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthTransformer(Of TSource, TDestination).New(System.Func(Of TSource, TDestination))
-  nameWithType: FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(Func<TSource, TDestination>)
-  nameWithType.vb: FixedWidthTransformer(Of TSource, TDestination).New(Func(Of TSource, TDestination))
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthTransformer`2.#ctor(System.Func{`0,`1},Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthTransformer{`0,`1}})
+  name: FixedWidthTransformer(Func<TSource, TDestination>, ILogger<FixedWidthTransformer<TSource, TDestination>>?)
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthTransformer-2.html#Wolfgang_Etl_FixedWidth_FixedWidthTransformer_2__ctor_System_Func__0__1__Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthTransformer__0__1___
+  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthTransformer`2.#ctor(System.Func{`0,`1},Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthTransformer{`0,`1}})
+  name.vb: New(Func(Of TSource, TDestination), ILogger(Of FixedWidthTransformer(Of TSource, TDestination)))
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination>, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>>?)
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthTransformer(Of TSource, TDestination).New(System.Func(Of TSource, TDestination), Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthTransformer(Of TSource, TDestination)))
+  nameWithType: FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(Func<TSource, TDestination>, ILogger<FixedWidthTransformer<TSource, TDestination>>?)
+  nameWithType.vb: FixedWidthTransformer(Of TSource, TDestination).New(Func(Of TSource, TDestination), ILogger(Of FixedWidthTransformer(Of TSource, TDestination)))
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthTransformer`2.#ctor*
   name: FixedWidthTransformer
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthTransformer-2.html#Wolfgang_Etl_FixedWidth_FixedWidthTransformer_2__ctor_

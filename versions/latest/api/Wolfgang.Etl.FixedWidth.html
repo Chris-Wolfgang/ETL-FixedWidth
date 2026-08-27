@@ -97,6 +97,11 @@ chain (issue #253). Source factories hang off <span class="xref">Wolfgang.Etl.Ab
 </dd>
     </dl>
     <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.html">FixedWidthBinaryExtractorOptions</a></dt>
+      <dd><p>Options for the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a>-based <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor-1.html">FixedWidthBinaryExtractor&lt;TRecord&gt;</a> constructors.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor-1.html">FixedWidthBinaryExtractor&lt;TRecord&gt;</a></dt>
       <dd><p>Reads a fixed-length <b>binary</b> record file (mainframe / COBOL, #21) and yields records of
 type <code class="typeparamref">TRecord</code>. Unlike <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a>, records
@@ -104,6 +109,11 @@ are <b>not</b> newline-delimited — each record is a fixed number of bytes (the
 <a class="xref" href="Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.html#Wolfgang_Etl_FixedWidth_Attributes_FixedWidthBinaryFieldAttribute_ByteLength">ByteLength</a> of every field), read directly
 from the stream, so packed-decimal and binary bytes that happen to be <code>0x0A</code>/<code>0x0D</code> are
 never mistaken for record separators.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.html">FixedWidthBinaryLoaderOptions</a></dt>
+      <dd><p>Options for the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a>-based <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader-1.html">FixedWidthBinaryLoader&lt;TRecord&gt;</a> constructors.</p>
 </dd>
     </dl>
     <dl class="jumplist">
@@ -120,6 +130,11 @@ bytes (the field byte widths) and written back-to-back with no delimiters, encod
       <dd><p>Provides built-in value converter, header converter, and value parser functions
 for use with <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a> and
 <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a>.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.html">FixedWidthDataReaderOptions</a></dt>
+      <dd><p>Options for the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a>-based <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthDataReader-1.html">FixedWidthDataReader&lt;TRecord&gt;</a> constructor.</p>
 </dd>
     </dl>
     <dl class="jumplist">
@@ -142,6 +157,12 @@ them for logging, a dead-letter queue, or post-run inspection (#29).</p>
 </dd>
     </dl>
     <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.html">FixedWidthExtractorOptions</a></dt>
+      <dd><p>Options for the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a>-based <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a>
+constructors.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a></dt>
       <dd><p>Reads a fixed-width text file and yields records of type <code class="typeparamref">TRecord</code>
 as an asynchronous stream.</p>
@@ -152,6 +173,12 @@ as an asynchronous stream.</p>
       <dd><p>Read-only metadata for a single resolved column in a fixed-width record layout —
 either a mapped field or a skipped column — exposed by
 <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchema.html">FixedWidthSchema</a> (#22).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.html">FixedWidthLoaderOptions</a></dt>
+      <dd><p>Options for the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a>-based <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a>
+constructors.</p>
 </dd>
     </dl>
     <dl class="jumplist">
@@ -168,10 +195,20 @@ yields each line as the <a class="xref" href="https://learn.microsoft.com/dotnet
 </dd>
     </dl>
     <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.html">FixedWidthMultiRecordExtractorOptions</a></dt>
+      <dd><p>Options for the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a>-based <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.html">FixedWidthMultiRecordExtractor</a> constructors.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a></dt>
       <dd><p>A progress report for fixed-width extract and load operations. Extends
 <span class="xref">Wolfgang.Etl.Abstractions.Report</span> with additional diagnostic properties specific to
 fixed-width file processing.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.html">FixedWidthReportOptions</a></dt>
+      <dd><p>The counts that make up a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a>.</p>
 </dd>
     </dl>
     <dl class="jumplist">

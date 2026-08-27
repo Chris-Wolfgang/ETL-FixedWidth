@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.10.1/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthLoader_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthLoader%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.11.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthLoader_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthLoader%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,7 +75,7 @@
 
 
   <h1 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1" class="text-break">
-Class FixedWidthLoader&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L50"><i class="bi bi-code-slash"></i></a>
+Class FixedWidthLoader&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L51"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -261,34 +261,30 @@ loader.FieldDelimiter = &quot; | &quot;;</p></code></pre>
   <a id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor*"></a>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_System_IO_Stream_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthLoader__0___System_Text_Encoding_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthLoader{`0}},System.Text.Encoding)">
-  FixedWidthLoader(Stream, ILogger&lt;FixedWidthLoader&lt;TRecord&gt;&gt;, Encoding?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L198"><i class="bi bi-code-slash"></i></a>
+  FixedWidthLoader(Stream, ILogger&lt;FixedWidthLoader&lt;TRecord&gt;&gt;, Encoding)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L160"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a> that writes
-to the specified <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> with diagnostic logging.
-The loader creates an internal <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.streamwriter">StreamWriter</a> with a 64 KB
-buffer for improved throughput on large files.</p>
+  <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a> from a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> decoded with the
+supplied <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.encoding">Encoding</a>, with diagnostic logging.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FixedWidthLoader(Stream stream, ILogger&lt;FixedWidthLoader&lt;TRecord&gt;&gt; logger, Encoding? encoding = null)</code></pre>
+    <pre><code class="lang-csharp hljs">[Obsolete(&quot;Use the constructor that takes FixedWidthLoaderOptions. This overload will be removed in a future release.&quot;)]
+public FixedWidthLoader(Stream stream, ILogger&lt;FixedWidthLoader&lt;TRecord&gt;&gt; logger, Encoding encoding)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>stream</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
-    <dd><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> to write fixed-width records to. The stream must be
-writable. The caller retains ownership — the loader does not dispose the stream.</p>
+    <dd><p>The stream to use.</p>
 </dd>
     <dt><code>logger</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader</a>&lt;TRecord&gt;&gt;</dt>
-    <dd><p>The logger instance for diagnostic output.</p>
+    <dd><p>The logger to use for diagnostic output.</p>
 </dd>
     <dt><code>encoding</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.encoding">Encoding</a></dt>
-    <dd><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.encoding">Encoding</a> used to encode the output. Pass <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>
-(the default) to use <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.encoding.utf8">UTF8</a>. Use <code>new UTF8Encoding(false)</code>
-to write UTF-8 without a byte-order mark.</p>
+    <dd><p>The encoding to decode with, or <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> for the documented default.</p>
 </dd>
   </dl>
 
@@ -303,7 +299,7 @@ to write UTF-8 without a byte-order mark.</p>
   <h4 class="section">Exceptions</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
-    <dd><p><code class="paramref">stream</code> or <code class="paramref">logger</code> is null.</p>
+    <dd><p><code class="paramref">stream</code> is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>.</p>
 </dd>
   </dl>
 
@@ -312,30 +308,75 @@ to write UTF-8 without a byte-order mark.</p>
   <a id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor*"></a>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_System_IO_Stream_System_Text_Encoding_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.Stream,System.Text.Encoding)">
-  FixedWidthLoader(Stream, Encoding?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L170"><i class="bi bi-code-slash"></i></a>
+  FixedWidthLoader(Stream, Encoding)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L142"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a> that writes
-to the specified <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> using an internal <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.streamwriter">StreamWriter</a>
-with a 64 KB buffer for improved throughput on large files.</p>
+  <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a> from a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> decoded with the
+supplied <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.encoding">Encoding</a>.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FixedWidthLoader(Stream stream, Encoding? encoding = null)</code></pre>
+    <pre><code class="lang-csharp hljs">[Obsolete(&quot;Use the constructor that takes FixedWidthLoaderOptions. This overload will be removed in a future release.&quot;)]
+public FixedWidthLoader(Stream stream, Encoding encoding)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>stream</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
-    <dd><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> to write fixed-width records to. The stream must be
-writable. The caller retains ownership — the loader does not dispose the stream.</p>
+    <dd><p>The stream to use.</p>
 </dd>
     <dt><code>encoding</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.encoding">Encoding</a></dt>
-    <dd><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.encoding">Encoding</a> used to encode the output. Pass <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>
-(the default) to use <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.encoding.utf8">UTF8</a>. Use <code>new UTF8Encoding(false)</code>
-to write UTF-8 without a byte-order mark.</p>
+    <dd><p>The encoding to decode with, or <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> for the documented default.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
+    <dd><p><code class="paramref">stream</code> is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_System_IO_Stream_Wolfgang_Etl_FixedWidth_FixedWidthLoaderOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthLoader__0___" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.Stream,Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthLoader{`0}})">
+  FixedWidthLoader(Stream, FixedWidthLoaderOptions?, ILogger&lt;FixedWidthLoader&lt;TRecord&gt;&gt;?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L186"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a> over the specified
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a>, with the logger as the trailing optional parameter.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FixedWidthLoader(Stream stream, FixedWidthLoaderOptions? options = null, ILogger&lt;FixedWidthLoader&lt;TRecord&gt;&gt;? logger = null)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>stream</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
+    <dd><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> to use.</p>
+</dd>
+    <dt><code>options</code> <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.html">FixedWidthLoaderOptions</a></dt>
+    <dd><p>Options that control behaviour, including the <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthLoaderOptions_Encoding">Encoding</a>
+to use. When <code>null</code>, the documented defaults apply.</p>
+</dd>
+    <dt><code>logger</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader</a>&lt;TRecord&gt;&gt;</dt>
+    <dd><p>An optional logger for diagnostic output. When <code>null</code> — or omitted —
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.abstractions.nulllogger.instance">Instance</a> is used and logging is disabled.</p>
 </dd>
   </dl>
 
@@ -358,53 +399,9 @@ to write UTF-8 without a byte-order mark.</p>
 
   <a id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor*"></a>
 
-  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_System_IO_TextWriter_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.TextWriter)">
-  FixedWidthLoader(TextWriter)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L92"><i class="bi bi-code-slash"></i></a>
-  </h3>
-
-  <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a> that writes
-to the specified <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textwriter">TextWriter</a>.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FixedWidthLoader(TextWriter writer)</code></pre>
-  </div>
-
-  <h4 class="section">Parameters</h4>
-  <dl class="parameters">
-    <dt><code>writer</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textwriter">TextWriter</a></dt>
-    <dd><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textwriter">TextWriter</a> to write fixed-width records to. This can be a
-<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.streamwriter">StreamWriter</a> wrapping a file or network stream, a
-<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stringwriter">StringWriter</a> for in-memory content, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.console.out">Out</a> for
-formatted console table output, or any other <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textwriter">TextWriter</a> implementation.
-The caller is responsible for the writer's lifetime — the loader does not dispose it.</p>
-</dd>
-  </dl>
-
-
-
-
-
-
-
-
-
-  <h4 class="section">Exceptions</h4>
-  <dl class="parameters">
-    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
-    <dd><p><code class="paramref">writer</code> is null.</p>
-</dd>
-  </dl>
-
-
-
-  <a id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor*"></a>
-
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1__ctor_System_IO_TextWriter_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthLoader__0___" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.TextWriter,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthLoader{`0}})">
-  FixedWidthLoader(TextWriter, ILogger&lt;FixedWidthLoader&lt;TRecord&gt;&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L111"><i class="bi bi-code-slash"></i></a>
+  FixedWidthLoader(TextWriter, ILogger&lt;FixedWidthLoader&lt;TRecord&gt;&gt;?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L93"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a> that writes
@@ -413,7 +410,7 @@ to the specified <a class="xref" href="https://learn.microsoft.com/dotnet/api/sy
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FixedWidthLoader(TextWriter writer, ILogger&lt;FixedWidthLoader&lt;TRecord&gt;&gt; logger)</code></pre>
+    <pre><code class="lang-csharp hljs">public FixedWidthLoader(TextWriter writer, ILogger&lt;FixedWidthLoader&lt;TRecord&gt;&gt;? logger = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -451,7 +448,7 @@ to the specified <a class="xref" href="https://learn.microsoft.com/dotnet/api/sy
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_CurrentLineNumber" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.CurrentLineNumber">
   CurrentLineNumber
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L412"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L476"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The 1-based physical line number of the line most recently written to the output.
@@ -490,7 +487,7 @@ without a data race.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_FieldDelimiter" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.FieldDelimiter">
   FieldDelimiter
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L387"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L451"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>An optional string written between fields on every line including headers,
@@ -536,7 +533,7 @@ are correctly identified during extraction.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_FieldSeparator" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.FieldSeparator">
   FieldSeparator
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L364"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L428"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>When non-null, a separator line is written after the header, consisting of
@@ -577,7 +574,7 @@ loader.FieldSeparator = null; // no separator (default)</code></pre>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_HeaderConverter" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.HeaderConverter">
   HeaderConverter
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L311"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L375"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The function used to convert a header label to its string representation.
@@ -624,7 +621,7 @@ ensure the returned string is not longer than the field width.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_IsDryRun" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.IsDryRun">
   IsDryRun
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L346"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L410"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets or sets a value indicating whether the stage runs in dry-run mode.</p>
@@ -669,7 +666,7 @@ Defaults to <a href="https://learn.microsoft.com/dotnet/csharp/language-referenc
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_Schema" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.Schema">
   Schema
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L398"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L462"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>An optional layout that overrides the <code>[FixedWidthField]</code> / <code>[FixedWidthSkip]</code> attributes
@@ -705,7 +702,7 @@ must be <code class="typeparamref">TRecord</code>.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_ValueConverter" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.ValueConverter">
   ValueConverter
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L287"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L351"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The function used to convert a field value to its string representation
@@ -755,7 +752,7 @@ safety-net will throw a
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_WriteHeader" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.WriteHeader">
   WriteHeader
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L331"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L395"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>When <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>, a header line is written before any records.
@@ -802,7 +799,7 @@ property name otherwise. Labels are passed through
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_CreateProgressReport" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.CreateProgressReport">
   CreateProgressReport()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L423"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L487"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates a progress report snapshot for the current loader state.</p>
@@ -838,7 +835,7 @@ and <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfga
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_CreateProgressTimer_System_IProgress_Wolfgang_Etl_FixedWidth_FixedWidthReport__" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.CreateProgressTimer(System.IProgress{Wolfgang.Etl.FixedWidth.FixedWidthReport})">
   CreateProgressTimer(IProgress&lt;FixedWidthReport&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L445"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L510"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the <span class="xref">Wolfgang.Etl.Abstractions.IProgressTimer</span> used to drive progress callbacks.
@@ -879,7 +876,7 @@ Override this method in a derived class to inject a custom timer
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_Dispose_System_Boolean_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.Dispose(System.Boolean)">
   Dispose(bool)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L472"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L537"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Releases the internal <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.streamwriter">StreamWriter</a> when this instance was
@@ -915,7 +912,7 @@ Has no effect on a caller-owned <a class="xref" href="https://learn.microsoft.co
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_LoadWorkerAsync_System_Collections_Generic_IAsyncEnumerable__0__System_Threading_CancellationToken_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.LoadWorkerAsync(System.Collections.Generic.IAsyncEnumerable{`0},System.Threading.CancellationToken)">
   LoadWorkerAsync(IAsyncEnumerable&lt;TRecord&gt;, CancellationToken)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L514"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L579"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>This method is the core implementation of the loading logic and should be
@@ -967,7 +964,7 @@ overridden by derived classes.</p>
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L50" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthLoader.cs/#L51" class="edit-link">Edit this page</a>
         </div>
 
 

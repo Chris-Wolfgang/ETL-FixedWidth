@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.10.1/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthReport.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthReport%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.11.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthReport.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthReport%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,7 +75,7 @@
 
 
   <h1 id="Wolfgang_Etl_FixedWidth_FixedWidthReport" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthReport" class="text-break">
-Class FixedWidthReport  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L24"><i class="bi bi-code-slash"></i></a>
+Class FixedWidthReport  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L25"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -199,7 +199,7 @@ line, the separator line, and all data lines written so far.
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthReport__ctor_System_Int32_System_Int32_System_Int32_System_Int32_System_Int64_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthReport.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.Int64)">
   FixedWidthReport(int, int, int, int, long)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L62"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L88"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a>.</p>
@@ -207,7 +207,8 @@ line, the separator line, and all data lines written so far.
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FixedWidthReport(int currentCount, int currentSkippedItemCount, int currentRejectedItemCount, int currentFilteredLineCount, long currentLineNumber)</code></pre>
+    <pre><code class="lang-csharp hljs">[Obsolete(&quot;Use the FixedWidthReportOptions constructor, which names each count at the call site. This overload will be removed in a future release.&quot;)]
+public FixedWidthReport(int currentCount, int currentSkippedItemCount, int currentRejectedItemCount, int currentFilteredLineCount, long currentLineNumber)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -244,17 +245,17 @@ line, the separator line, and all data lines written so far.
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthReport__ctor_System_Int32_System_Int32_System_Int64_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthReport.#ctor(System.Int32,System.Int32,System.Int64)">
   FixedWidthReport(int, int, long)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L40"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L57"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a> with the
-rejected and filtered counts defaulted to zero. Retained for backward
-compatibility; prefer the five-parameter overload.</p>
+rejected and filtered counts defaulted to zero.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FixedWidthReport(int currentCount, int currentSkippedItemCount, long currentLineNumber)</code></pre>
+    <pre><code class="lang-csharp hljs">[Obsolete(&quot;Use the FixedWidthReportOptions constructor, which names each count at the call site. This overload will be removed in a future release.&quot;)]
+public FixedWidthReport(int currentCount, int currentSkippedItemCount, long currentLineNumber)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -281,6 +282,46 @@ compatibility; prefer the five-parameter overload.</p>
 
 
 
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthReport__ctor_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthReport.#ctor*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthReport__ctor_Wolfgang_Etl_FixedWidth_FixedWidthReportOptions_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthReport.#ctor(Wolfgang.Etl.FixedWidth.FixedWidthReportOptions)">
+  FixedWidthReport(FixedWidthReportOptions)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a new instance of <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReport.html">FixedWidthReport</a> from a
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.html">FixedWidthReportOptions</a>, naming each count at the call site.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FixedWidthReport(FixedWidthReportOptions options)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>options</code> <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.html">FixedWidthReportOptions</a></dt>
+    <dd><p>The counts to report. Unset members default to zero.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
+    <dd><p><code class="paramref">options</code> is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>.</p>
+</dd>
+  </dl>
+
+
+
   <h2 class="section" id="properties">Properties
 </h2>
 
@@ -289,7 +330,7 @@ compatibility; prefer the five-parameter overload.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthReport_CurrentFilteredLineCount" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthReport.CurrentFilteredLineCount">
   CurrentFilteredLineCount
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L113"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L146"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>(Extractor only.) The number of physical lines read that did not produce a
@@ -327,7 +368,7 @@ CurrentRejectedItemCount + CurrentFilteredLineCount</code>. Always <code>0</code
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthReport_CurrentLineNumber" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthReport.CurrentLineNumber">
   CurrentLineNumber
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L123"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L156"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The 1-based physical line number of the line currently being processed.
@@ -362,7 +403,7 @@ this value points to the line that caused it.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthReport_CurrentRejectedItemCount" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthReport.CurrentRejectedItemCount">
   CurrentRejectedItemCount
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L100"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L133"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>(Extractor only.) The number of parsed records rejected so far: records
@@ -396,7 +437,7 @@ by <code>RecordValidator</code>. Always <code>0</code> for the loader.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthReport_CurrentSkippedItemCount" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthReport.CurrentSkippedItemCount">
   CurrentSkippedItemCount
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L91"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L124"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The number of records skipped by the <code>SkipItemCount</code> budget (pagination)
@@ -432,7 +473,7 @@ skipped by the skip budget.</p>
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L24" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthReport.cs/#L25" class="edit-link">Edit this page</a>
         </div>
 
 

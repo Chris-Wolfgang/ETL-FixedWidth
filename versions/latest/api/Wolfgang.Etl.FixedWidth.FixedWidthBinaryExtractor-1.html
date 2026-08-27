@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.10.1/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.11.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,7 +75,7 @@
 
 
   <h1 id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor_1" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1" class="text-break">
-Class FixedWidthBinaryExtractor&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L37"><i class="bi bi-code-slash"></i></a>
+Class FixedWidthBinaryExtractor&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L37"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -214,8 +214,52 @@ await foreach (var account in extractor.ExtractAsync(token))
   <a id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor_1__ctor_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.#ctor*"></a>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor_1__ctor_System_IO_Stream_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor__0___" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.#ctor(System.IO.Stream,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor{`0}})">
-  FixedWidthBinaryExtractor(Stream, ILogger&lt;FixedWidthBinaryExtractor&lt;TRecord&gt;&gt;?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L69"><i class="bi bi-code-slash"></i></a>
+  FixedWidthBinaryExtractor(Stream, ILogger&lt;FixedWidthBinaryExtractor&lt;TRecord&gt;&gt;)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor-1.html">FixedWidthBinaryExtractor&lt;TRecord&gt;</a> from a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> using the
+default options, with diagnostic logging.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[Obsolete(&quot;Use the constructor that takes FixedWidthBinaryExtractorOptions. This overload will be removed in a future release.&quot;)]
+public FixedWidthBinaryExtractor(Stream stream, ILogger&lt;FixedWidthBinaryExtractor&lt;TRecord&gt;&gt; logger)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>stream</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
+    <dd><p>The stream to use.</p>
+</dd>
+    <dt><code>logger</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor-1.html">FixedWidthBinaryExtractor</a>&lt;TRecord&gt;&gt;</dt>
+    <dd><p>The logger to use for diagnostic output.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
+    <dd><p><code class="paramref">stream</code> is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor_1__ctor_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.#ctor*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor_1__ctor_System_IO_Stream_Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor__0___" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.#ctor(System.IO.Stream,Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor{`0}})">
+  FixedWidthBinaryExtractor(Stream, FixedWidthBinaryExtractorOptions?, ILogger&lt;FixedWidthBinaryExtractor&lt;TRecord&gt;&gt;?)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L86"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor-1.html">FixedWidthBinaryExtractor&lt;TRecord&gt;</a> that reads fixed-length
@@ -224,13 +268,17 @@ binary records from <code class="paramref">stream</code>. The caller retains own
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public FixedWidthBinaryExtractor(Stream stream, ILogger&lt;FixedWidthBinaryExtractor&lt;TRecord&gt;&gt;? logger = null)</code></pre>
+    <pre><code class="lang-csharp hljs">public FixedWidthBinaryExtractor(Stream stream, FixedWidthBinaryExtractorOptions? options = null, ILogger&lt;FixedWidthBinaryExtractor&lt;TRecord&gt;&gt;? logger = null)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
   <dl class="parameters">
     <dt><code>stream</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></dt>
     <dd><p>The readable binary record stream.</p>
+</dd>
+    <dt><code>options</code> <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.html">FixedWidthBinaryExtractorOptions</a></dt>
+    <dd><p>Options that control behaviour, including the encoding. When <code>null</code> — or omitted —
+the documented defaults apply.</p>
 </dd>
     <dt><code>logger</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger</a>&lt;<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor-1.html">FixedWidthBinaryExtractor</a>&lt;TRecord&gt;&gt;</dt>
     <dd><p>An optional <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.extensions.logging.ilogger-1">ILogger&lt;TCategoryName&gt;</a> for diagnostic output. Pass
@@ -266,17 +314,17 @@ binary records from <code class="paramref">stream</code>. The caller retains own
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor_1_Encoding" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.Encoding">
   Encoding
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L54"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L130"><i class="bi bi-code-slash"></i></a>
   </h3>
 
-  <div class="markdown level1 summary"><p>The encoding used to decode <a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.BinaryFieldType.html#Wolfgang_Etl_FixedWidth_Enums_BinaryFieldType_Text">Text</a> fields. Defaults to
-<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.encoding.ascii">ASCII</a>; set a code-page encoding (e.g. IBM037) for EBCDIC data. Read
-when extraction begins — set it in the object initializer.</p>
+  <div class="markdown level1 summary"><p>The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.encoding">Encoding</a> used by this instance. Superseded by
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_Encoding">Encoding</a>.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Encoding Encoding { get; init; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Obsolete(&quot;Set Encoding on FixedWidthBinaryExtractorOptions and pass it to the constructor instead. This property will be removed in a future release.&quot;)]
+public Encoding Encoding { get; init; }</code></pre>
   </div>
 
 
@@ -292,6 +340,12 @@ when extraction begins — set it in the object initializer.</p>
 
 
 
+  <h4 class="section" id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor_1_Encoding_remarks">Remarks</h4>
+  <div class="markdown level1 remarks"><p>Retained for source compatibility with 0.10.x. It is honoured only when the constructor was
+given no options object; a caller who passes options is using the supported route and that
+value wins. The two cannot conflict in existing code, because the options constructor did
+not exist before 0.11.0.</p>
+</div>
 
 
 
@@ -300,7 +354,7 @@ when extraction begins — set it in the object initializer.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor_1_RecordByteLength" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.RecordByteLength">
   RecordByteLength
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L93"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L146"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The number of bytes in one record, derived from the field layout.</p>
@@ -336,7 +390,7 @@ when extraction begins — set it in the object initializer.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor_1_CreateProgressReport" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.CreateProgressReport">
   CreateProgressReport()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L187"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L240"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates a progress report of type TProgress. This gives the derived class the opportunity to
@@ -370,7 +424,7 @@ implement a custom progress report that is specific to the extraction process.</
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor_1_CreateProgressTimer_System_IProgress_Wolfgang_Etl_FixedWidth_FixedWidthReport__" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.CreateProgressTimer(System.IProgress{Wolfgang.Etl.FixedWidth.FixedWidthReport})">
   CreateProgressTimer(IProgress&lt;FixedWidthReport&gt;)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L202"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L256"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Creates the <span class="xref">Wolfgang.Etl.Abstractions.IProgressTimer</span> used to drive progress callbacks.
@@ -411,7 +465,7 @@ Override this method in a derived class to inject a custom timer
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractor_1_ExtractWorkerAsync_System_Threading_CancellationToken_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.ExtractWorkerAsync(System.Threading.CancellationToken)">
   ExtractWorkerAsync(CancellationToken)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L102"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L155"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>This method is the core implementation of the extraction logic and should be
@@ -451,7 +505,7 @@ The result may be an empty sequence if no data is available or if the extraction
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.10.1/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L37" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractor.cs/#L37" class="edit-link">Edit this page</a>
         </div>
 
 
