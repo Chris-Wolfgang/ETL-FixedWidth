@@ -26,7 +26,9 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
     where TRecord : notnull
 {
     private readonly Stream _stream;
-    private readonly Encoding _encoding;
+    // Null when the caller supplied no options - the signal to fall back to the
+    // [Obsolete] Encoding property.
+    private readonly Encoding? _optionsEncoding;
     private readonly ILogger _logger;
     private readonly BinaryRecordMap _map;
     private readonly IProgressTimer? _progressTimer;
@@ -82,7 +84,7 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
             throw new ArgumentException("Stream must be writable.", nameof(stream));
         }
 
-        _encoding = (options ?? new FixedWidthBinaryLoaderOptions()).Encoding;
+        _optionsEncoding = options?.Encoding;
         _logger = logger ?? (ILogger)NullLogger.Instance;
         _map = BinaryFieldMap.GetResult<TRecord>();
     }
@@ -101,6 +103,30 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
     {
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }
+
+
+    /// <summary>
+    /// The <see cref="System.Text.Encoding"/> used by this instance. Superseded by
+    /// <see cref="FixedWidthBinaryLoaderOptions.Encoding"/>.
+    /// </summary>
+    /// <remarks>
+    /// Retained for source compatibility with 0.10.x. It is honoured only when the constructor was
+    /// given no options object; a caller who passes options is using the supported route and that
+    /// value wins. The two cannot conflict in existing code, because the options constructor did
+    /// not exist before 0.11.0.
+    /// </remarks>
+    [Obsolete("Set Encoding on FixedWidthBinaryLoaderOptions and pass it to the constructor instead. This property will be removed in a future release.")]
+    public Encoding Encoding { get; init; } = Encoding.ASCII;
+
+
+
+    // Options win when supplied; otherwise fall back to the obsolete property. Resolved at the
+    // point of use rather than in the constructor: an init property is assigned AFTER the
+    // constructor body runs, so capturing it there would always read the default.
+#pragma warning disable CS0618 // reading the obsolete property is the entire point of this member
+    private Encoding ResolvedEncoding => _optionsEncoding ?? Encoding;
+#pragma warning restore CS0618
+
 
 
 
@@ -139,7 +165,7 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
             Array.Clear(buffer, 0, buffer.Length);
             foreach (var descriptor in _map.Descriptors)
             {
-                descriptor.Encode(item, buffer, _encoding);
+                descriptor.Encode(item, buffer, ResolvedEncoding);
             }
 
             await _stream.WriteAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false);

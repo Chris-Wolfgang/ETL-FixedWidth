@@ -196,6 +196,76 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
+    // The Encoding property is [Obsolete] in 0.11.0 but still honoured, so that 0.10.x source
+    // keeps working. These pin the resolution rule: options win when supplied, the property is the
+    // fallback when they are not, and the property must be read AFTER the object initializer runs
+    // rather than captured in the constructor.
+#pragma warning disable CS0618 // Type or member is obsolete
+
+    private static byte[] AccentedRecord()
+    {
+        var record = new byte[17];
+        record[0] = 0xE9;
+        for (var i = 1; i < 8; i++)
+        {
+            record[i] = (byte)' ';
+        }
+
+        Balance1234_56.CopyTo(record, 12);
+        return record;
+    }
+
+
+
+    [Fact]
+    public async Task Obsolete_Encoding_property_is_honoured_when_no_options_are_supplied()
+    {
+        var latin1 = Encoding.GetEncoding("ISO-8859-1");
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(AccentedRecord()))
+        {
+            Encoding = latin1,
+        };
+
+        var account = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+
+        Assert.Equal("é", account.AccountId);
+    }
+
+
+
+    [Fact]
+    public async Task Options_win_over_the_obsolete_Encoding_property()
+    {
+        var latin1 = Encoding.GetEncoding("ISO-8859-1");
+        using var extractor = new FixedWidthBinaryExtractor<Account>
+        (
+            new MemoryStream(AccentedRecord()),
+            new FixedWidthBinaryExtractorOptions { Encoding = latin1 }
+        )
+        {
+            Encoding = Encoding.ASCII,   // ignored: the constructor was given options
+        };
+
+        var account = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+
+        Assert.Equal("é", account.AccountId);
+    }
+
+
+
+    [Fact]
+    public async Task With_neither_options_nor_the_property_the_documented_default_applies()
+    {
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(AccentedRecord()), options: null);
+
+        var account = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+
+        Assert.Equal("?", account.AccountId);   // ASCII, the default for the binary types
+    }
+
+#pragma warning restore CS0618
+
+
     [ExcludeFromCodeCoverage]
     private sealed class WriteOnlyStream : MemoryStream
     {

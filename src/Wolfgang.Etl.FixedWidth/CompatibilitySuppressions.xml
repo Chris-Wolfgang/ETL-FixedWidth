@@ -3,48 +3,6 @@
 <Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.get_Encoding</Target>
-    <Left>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.set_Encoding(System.Text.Encoding)</Target>
-    <Left>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1.get_Encoding</Target>
-    <Left>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1.set_Encoding(System.Text.Encoding)</Target>
-    <Left>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthDataReader`1.get_Encoding</Target>
-    <Left>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthDataReader`1.set_Encoding(System.Text.Encoding)</Target>
-    <Left>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.TextReader)</Target>
     <Left>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Left>
     <Right>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Right>
@@ -53,20 +11,6 @@
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.TextWriter)</Target>
-    <Left>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.get_Encoding</Target>
-    <Left>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.set_Encoding(System.Text.Encoding)</Target>
     <Left>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Left>
     <Right>lib/net10.0/Wolfgang.Etl.FixedWidth.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -80,48 +24,6 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.get_Encoding</Target>
-    <Left>lib/net462/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net462/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.set_Encoding(System.Text.Encoding)</Target>
-    <Left>lib/net462/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net462/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1.get_Encoding</Target>
-    <Left>lib/net462/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net462/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1.set_Encoding(System.Text.Encoding)</Target>
-    <Left>lib/net462/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net462/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthDataReader`1.get_Encoding</Target>
-    <Left>lib/net462/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net462/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthDataReader`1.set_Encoding(System.Text.Encoding)</Target>
-    <Left>lib/net462/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net462/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.TextReader)</Target>
     <Left>lib/net462/Wolfgang.Etl.FixedWidth.dll</Left>
     <Right>lib/net462/Wolfgang.Etl.FixedWidth.dll</Right>
@@ -130,20 +32,6 @@
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.TextWriter)</Target>
-    <Left>lib/net462/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net462/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.get_Encoding</Target>
-    <Left>lib/net462/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net462/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.set_Encoding(System.Text.Encoding)</Target>
     <Left>lib/net462/Wolfgang.Etl.FixedWidth.dll</Left>
     <Right>lib/net462/Wolfgang.Etl.FixedWidth.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -157,48 +45,6 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.get_Encoding</Target>
-    <Left>lib/net481/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net481/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.set_Encoding(System.Text.Encoding)</Target>
-    <Left>lib/net481/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net481/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1.get_Encoding</Target>
-    <Left>lib/net481/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net481/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1.set_Encoding(System.Text.Encoding)</Target>
-    <Left>lib/net481/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net481/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthDataReader`1.get_Encoding</Target>
-    <Left>lib/net481/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net481/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthDataReader`1.set_Encoding(System.Text.Encoding)</Target>
-    <Left>lib/net481/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net481/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.TextReader)</Target>
     <Left>lib/net481/Wolfgang.Etl.FixedWidth.dll</Left>
     <Right>lib/net481/Wolfgang.Etl.FixedWidth.dll</Right>
@@ -207,20 +53,6 @@
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.TextWriter)</Target>
-    <Left>lib/net481/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net481/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.get_Encoding</Target>
-    <Left>lib/net481/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net481/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.set_Encoding(System.Text.Encoding)</Target>
     <Left>lib/net481/Wolfgang.Etl.FixedWidth.dll</Left>
     <Right>lib/net481/Wolfgang.Etl.FixedWidth.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -234,48 +66,6 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.get_Encoding</Target>
-    <Left>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.set_Encoding(System.Text.Encoding)</Target>
-    <Left>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1.get_Encoding</Target>
-    <Left>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1.set_Encoding(System.Text.Encoding)</Target>
-    <Left>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthDataReader`1.get_Encoding</Target>
-    <Left>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthDataReader`1.set_Encoding(System.Text.Encoding)</Target>
-    <Left>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.TextReader)</Target>
     <Left>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Left>
     <Right>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Right>
@@ -284,20 +74,6 @@
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.TextWriter)</Target>
-    <Left>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.get_Encoding</Target>
-    <Left>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.set_Encoding(System.Text.Encoding)</Target>
     <Left>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Left>
     <Right>lib/net8.0/Wolfgang.Etl.FixedWidth.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -311,48 +87,6 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.get_Encoding</Target>
-    <Left>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1.set_Encoding(System.Text.Encoding)</Target>
-    <Left>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1.get_Encoding</Target>
-    <Left>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1.set_Encoding(System.Text.Encoding)</Target>
-    <Left>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthDataReader`1.get_Encoding</Target>
-    <Left>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthDataReader`1.set_Encoding(System.Text.Encoding)</Target>
-    <Left>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1.#ctor(System.IO.TextReader)</Target>
     <Left>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Left>
     <Right>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Right>
@@ -361,20 +95,6 @@
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthLoader`1.#ctor(System.IO.TextWriter)</Target>
-    <Left>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.get_Encoding</Target>
-    <Left>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Left>
-    <Right>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.set_Encoding(System.Text.Encoding)</Target>
     <Left>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Left>
     <Right>lib/netstandard2.0/Wolfgang.Etl.FixedWidth.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
