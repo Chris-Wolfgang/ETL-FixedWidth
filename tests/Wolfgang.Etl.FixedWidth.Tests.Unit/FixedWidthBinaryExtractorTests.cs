@@ -65,7 +65,7 @@ public sealed class FixedWidthBinaryExtractorTests
     public async Task Extract_decodes_text_binary_and_packed_decimal_fields()
     {
         var data = Concat(Record("ACCT0001", 42, Balance1234_56), Record("ACCT0002", 7, BalanceNeg0_05));
-        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data));
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data), options: null);
 
         Assert.Equal(17, extractor.RecordByteLength);
 
@@ -84,7 +84,7 @@ public sealed class FixedWidthBinaryExtractorTests
     [Fact]
     public async Task Empty_stream_yields_no_records()
     {
-        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(Array.Empty<byte>()));
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(Array.Empty<byte>()), options: null);
 
         Assert.Empty(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
     }
@@ -96,7 +96,7 @@ public sealed class FixedWidthBinaryExtractorTests
     {
         var data = Concat(Record("ACCT0001", 42, Balance1234_56));
         var logger = new SpyLogger<FixedWidthBinaryExtractor<Account>>();
-        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data), logger: logger);
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data), options: null, logger: logger);
 
         await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
 
@@ -118,7 +118,7 @@ public sealed class FixedWidthBinaryExtractorTests
             Record("B", 2, Balance1234_56),
             Record("C", 3, Balance1234_56),
             Record("D", 4, Balance1234_56));
-        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data))
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data), options: null)
         {
             SkipItemCount = 1,
             MaximumItemCount = 2,
@@ -134,7 +134,7 @@ public sealed class FixedWidthBinaryExtractorTests
     public async Task A_partial_trailing_record_throws_EndOfStreamException()
     {
         var data = Concat(Record("ACCT0001", 42, Balance1234_56), new byte[] { 0x01, 0x02, 0x03 });   // 3 stray bytes
-        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data));
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data), options: null);
 
         await Assert.ThrowsAsync<EndOfStreamException>(async () =>
             await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
@@ -145,7 +145,7 @@ public sealed class FixedWidthBinaryExtractorTests
     public async Task ExtractAsync_when_token_already_cancelled_throws_OperationCanceledException()
     {
         var data = Record("ACCT0001", 42, Balance1234_56);
-        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data));
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data), options: null);
         using var cts = new CancellationTokenSource();
         cts.Cancel();
 
@@ -158,7 +158,7 @@ public sealed class FixedWidthBinaryExtractorTests
     public async Task ExtractAsync_cancelled_after_the_first_record_stops_iterating()
     {
         var data = Concat(Record("A", 1, Balance1234_56), Record("B", 2, Balance1234_56));
-        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data));
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data), options: null);
         using var cts = new CancellationTokenSource();
         var seen = 0;
 
@@ -206,8 +206,8 @@ public sealed class FixedWidthBinaryExtractorTests
     [Fact]
     public void Constructor_validates_stream_and_layout()
     {
-        Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryExtractor<Account>(null!));
-        Assert.Throws<ArgumentException>(() => new FixedWidthBinaryExtractor<Account>(new WriteOnlyStream()));
+        Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryExtractor<Account>(null!, options: null));
+        Assert.Throws<ArgumentException>(() => new FixedWidthBinaryExtractor<Account>(new WriteOnlyStream(), options: null));
     }
 
 
@@ -221,7 +221,7 @@ public sealed class FixedWidthBinaryExtractorTests
     [Fact]
     public void A_record_type_without_binary_fields_throws()
     {
-        Assert.Throws<InvalidOperationException>(() => new FixedWidthBinaryExtractor<NoBinaryFields>(new MemoryStream()));
+        Assert.Throws<InvalidOperationException>(() => new FixedWidthBinaryExtractor<NoBinaryFields>(new MemoryStream(), options: null));
     }
 
 
@@ -240,7 +240,7 @@ public sealed class FixedWidthBinaryExtractorTests
     public async Task Nullable_numeric_fields_are_decoded()
     {
         var data = Concat(new byte[] { 0x00, 0x01, 0x23, 0x45, 0x6C, 0x00, 0x00, 0x00, 0x2A });   // 1234.56 + 42
-        using var extractor = new FixedWidthBinaryExtractor<NullableAccount>(new MemoryStream(data));
+        using var extractor = new FixedWidthBinaryExtractor<NullableAccount>(new MemoryStream(data), options: null);
 
         var record = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
 
@@ -262,7 +262,7 @@ public sealed class FixedWidthBinaryExtractorTests
 
     [Fact]
     public void Duplicate_field_index_throws()
-        => Assert.Throws<InvalidOperationException>(() => new FixedWidthBinaryExtractor<DuplicateIndex>(new MemoryStream()));
+        => Assert.Throws<InvalidOperationException>(() => new FixedWidthBinaryExtractor<DuplicateIndex>(new MemoryStream(), options: null));
 
 
     [Fact]
@@ -280,7 +280,7 @@ public sealed class FixedWidthBinaryExtractorTests
     [Fact]
     public async Task ExtractAsync_with_progress_and_no_injected_timer_uses_the_base_timer()
     {
-        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(Record("A", 1, Balance1234_56)));
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(Record("A", 1, Balance1234_56)), options: null);
         var sink = new CollectingProgress();
 
         var result = await extractor.ExtractAsync(sink, CancellationToken.None).ToListAsync();
@@ -295,7 +295,7 @@ public sealed class FixedWidthBinaryExtractorTests
         var data = Concat(Record("A", 1, Balance1234_56), Record("B", 2, Balance1234_56));
         var timer = new ManualProgressTimer();
         var sink = new CollectingProgress();
-        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data), timer);
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data), timer, options: null);
 
         await foreach (var _ in extractor.ExtractAsync(sink, CancellationToken.None))
         {
@@ -353,7 +353,7 @@ public sealed class FixedWidthBinaryExtractorTests
     public async Task Eight_byte_unsigned_field_maps_its_full_range_to_a_ulong_property()
     {
         var data = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };   // ulong.MaxValue
-        using var extractor = new FixedWidthBinaryExtractor<UnsignedBig>(new MemoryStream(data));
+        using var extractor = new FixedWidthBinaryExtractor<UnsignedBig>(new MemoryStream(data), options: null);
 
         var record = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
 
@@ -366,7 +366,7 @@ public sealed class FixedWidthBinaryExtractorTests
     {
         var data = new byte[] { 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };   // 2^63, one past long.MaxValue
 
-        using var extractor = new FixedWidthBinaryExtractor<SignedBig>(new MemoryStream(data));
+        using var extractor = new FixedWidthBinaryExtractor<SignedBig>(new MemoryStream(data), options: null);
 
         await Assert.ThrowsAnyAsync<OverflowException>(async () =>
             await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
@@ -377,13 +377,13 @@ public sealed class FixedWidthBinaryExtractorTests
     public async Task Unsigned_binary_value_round_trips_through_the_loader()
     {
         using var ms = new MemoryStream();
-        using (var loader = new FixedWidthBinaryLoader<UnsignedBig>(ms))
+        using (var loader = new FixedWidthBinaryLoader<UnsignedBig>(ms, options: null))
         {
             await loader.LoadAsync(ToAsync(new[] { new UnsignedBig { Value = ulong.MaxValue } }), CancellationToken.None);
         }
 
         ms.Position = 0;
-        using var extractor = new FixedWidthBinaryExtractor<UnsignedBig>(ms);
+        using var extractor = new FixedWidthBinaryExtractor<UnsignedBig>(ms, options: null);
         var read = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
 
         Assert.Equal(ulong.MaxValue, read.Value);
@@ -418,7 +418,7 @@ public sealed class FixedWidthBinaryExtractorTests
     public async Task Fractional_packed_decimal_into_an_integer_property_throws()
     {
         var data = new byte[] { 0x01, 0x23, 0x45, 0x6C };   // 0123456 @ Scale 2 = 1234.56 (fractional)
-        using var extractor = new FixedWidthBinaryExtractor<FractionalToInt>(new MemoryStream(data));
+        using var extractor = new FixedWidthBinaryExtractor<FractionalToInt>(new MemoryStream(data), options: null);
 
         await Assert.ThrowsAnyAsync<OverflowException>(async () =>
             await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
@@ -429,7 +429,7 @@ public sealed class FixedWidthBinaryExtractorTests
     public async Task Whole_packed_decimal_into_an_integer_property_succeeds()
     {
         var data = new byte[] { 0x00, 0x01, 0x23, 0x4C };   // 0001234 @ Scale 0 = 1234 (exact)
-        using var extractor = new FixedWidthBinaryExtractor<WholeToInt>(new MemoryStream(data));
+        using var extractor = new FixedWidthBinaryExtractor<WholeToInt>(new MemoryStream(data), options: null);
 
         var record = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
 
@@ -441,7 +441,7 @@ public sealed class FixedWidthBinaryExtractorTests
     public async Task Fractional_packed_decimal_into_a_floating_point_property_is_allowed()
     {
         var data = new byte[] { 0x01, 0x23, 0x45, 0x6C };   // 1234.56
-        using var extractor = new FixedWidthBinaryExtractor<FractionalToDouble>(new MemoryStream(data));
+        using var extractor = new FixedWidthBinaryExtractor<FractionalToDouble>(new MemoryStream(data), options: null);
 
         var record = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
 
@@ -487,7 +487,7 @@ public sealed class FixedWidthBinaryExtractorTests
             new MemoryStream(Concat(Record("A", 1, Balance1234_56))),
             new ManualProgressTimer(),
             logger: null
-        );
+        , options: null);
 
         Assert.NotNull(sut);
     }

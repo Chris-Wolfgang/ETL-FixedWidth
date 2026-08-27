@@ -275,7 +275,7 @@ public class ConstructorArgumentTests
     [Fact]
     public void MultiRecord_stream_ctor_when_stream_is_null_throws()
     {
-        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((Stream)null!));
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((Stream)null!, options: null));
 
         Assert.Equal("stream", ex.ParamName);
     }
@@ -379,7 +379,7 @@ public class ConstructorArgumentTests
     [Fact]
     public void DataReader_stream_ctor_when_stream_is_null_throws()
     {
-        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthDataReader<PersonRecord>((Stream)null!));
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthDataReader<PersonRecord>((Stream)null!, options: null));
 
         Assert.Equal("stream", ex.ParamName);
     }
@@ -413,7 +413,7 @@ public class ConstructorArgumentTests
     [Fact]
     public void BinaryExtractor_stream_ctor_when_stream_is_null_throws()
     {
-        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryExtractor<BinaryAccount>(null!));
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryExtractor<BinaryAccount>(null!, options: null));
 
         Assert.Equal("stream", ex.ParamName);
     }
@@ -453,7 +453,7 @@ public class ConstructorArgumentTests
     [Fact]
     public void BinaryLoader_stream_ctor_when_stream_is_null_throws()
     {
-        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryLoader<BinaryAccount>(null!));
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryLoader<BinaryAccount>(null!, options: null));
 
         Assert.Equal("stream", ex.ParamName);
     }
@@ -636,4 +636,69 @@ public class ConstructorArgumentTests
     {
         AssertBothNullSourcesThrow(typeof(FixedWidthDataReader<PersonRecord>), 4);
     }
+
+    // ------------------------------------------------------------------
+    // The [Obsolete] compatibility constructors
+    // ------------------------------------------------------------------
+
+    // These overloads preserve the pre-0.11.0 binary signature so existing consumers keep working
+    // with a deprecation warning rather than a break. They are still shipped public API, so they
+    // are still argument-tested. CS0618 is suppressed for exactly that reason.
+#pragma warning disable CS0618 // Type or member is obsolete
+
+    [Fact]
+    public void MultiRecord_obsolete_stream_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((Stream)null!));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void DataReader_obsolete_stream_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthDataReader<PersonRecord>((Stream)null!));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void BinaryExtractor_obsolete_stream_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryExtractor<BinaryAccount>((Stream)null!));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void BinaryLoader_obsolete_stream_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryLoader<BinaryAccount>((Stream)null!));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Obsolete_stream_and_logger_ctors_construct_with_default_options()
+    {
+        using var a = new FixedWidthMultiRecordExtractor(NewStream(), new SpyLogger<FixedWidthMultiRecordExtractor>());
+        using var b = new FixedWidthDataReader<PersonRecord>(NewStream(), new SpyLogger<FixedWidthDataReader<PersonRecord>>());
+        using var c = new FixedWidthBinaryExtractor<BinaryAccount>(NewStream(), new SpyLogger<FixedWidthBinaryExtractor<BinaryAccount>>());
+        using var d = new FixedWidthBinaryLoader<BinaryAccount>(NewStream(), new SpyLogger<FixedWidthBinaryLoader<BinaryAccount>>());
+
+        Assert.NotNull(a);
+        Assert.NotNull(b);
+        Assert.NotNull(c);
+        Assert.NotNull(d);
+    }
+
+#pragma warning restore CS0618
 }

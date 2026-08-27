@@ -33,6 +33,35 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
     private bool _progressTimerWired;
     private long _currentRecordNumber;
 
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthBinaryLoader{TRecord}"/> from a <see cref="Stream"/> using the
+    /// default options.
+    /// </summary>
+    /// <param name="stream">The stream to use.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
+    [Obsolete("Use the constructor that takes FixedWidthBinaryLoaderOptions. This overload will be removed in a future release.")]
+    public FixedWidthBinaryLoader(Stream stream)
+        : this(stream, options: null, logger: null)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthBinaryLoader{TRecord}"/> from a <see cref="Stream"/> using the
+    /// default options, with diagnostic logging.
+    /// </summary>
+    /// <param name="stream">The stream to use.</param>
+    /// <param name="logger">The logger to use for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
+    [Obsolete("Use the constructor that takes FixedWidthBinaryLoaderOptions. This overload will be removed in a future release.")]
+    public FixedWidthBinaryLoader(Stream stream, ILogger<FixedWidthBinaryLoader<TRecord>> logger)
+        : this(stream, options: null, logger: logger)
+    {
+    }
+
+
+
 
 
 

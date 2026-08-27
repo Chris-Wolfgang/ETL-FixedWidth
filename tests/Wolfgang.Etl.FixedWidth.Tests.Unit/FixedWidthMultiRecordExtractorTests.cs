@@ -281,11 +281,11 @@ public sealed class FixedWidthMultiRecordExtractorTests
     public void Constructor_validates_arguments()
     {
         Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((TextReader)null!));
-        Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((Stream)null!));
+        Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((Stream)null!, options: null));
 
         // The logger is optional — a null logger is tolerated (defaults to NullLogger), not rejected.
         using var withNullReaderLogger = new FixedWidthMultiRecordExtractor(new StringReader(""), logger: null);
-        using var withNullStreamLogger = new FixedWidthMultiRecordExtractor(new MemoryStream(), logger: null);
+        using var withNullStreamLogger = new FixedWidthMultiRecordExtractor(new MemoryStream(), options: null, logger: null);
     }
 
 
@@ -322,7 +322,7 @@ public sealed class FixedWidthMultiRecordExtractorTests
     {
         var bytes = Encoding.UTF8.GetBytes(SampleFile);
         using var stream = new MemoryStream(bytes);
-        var extractor = new FixedWidthMultiRecordExtractor(stream)
+        var extractor = new FixedWidthMultiRecordExtractor(stream, options: null)
             .When(l => l[0] == 'H', typeof(HeaderRecord))
             .When(l => l[0] == 'D', typeof(DetailRecord))
             .When(l => l[0] == 'T', typeof(TrailerRecord));
@@ -381,7 +381,7 @@ public sealed class FixedWidthMultiRecordExtractorTests
         var timer = new ManualProgressTimer();
         var sink = new CollectingProgress();
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(SampleFile));
-        using var extractor = new FixedWidthMultiRecordExtractor(stream, timer)
+        using var extractor = new FixedWidthMultiRecordExtractor(stream, timer, options: null)
             .When(l => l[0] == 'H', typeof(HeaderRecord))
             .When(l => l[0] == 'D', typeof(DetailRecord))
             .When(l => l[0] == 'T', typeof(TrailerRecord));
@@ -478,7 +478,7 @@ public sealed class FixedWidthMultiRecordExtractorTests
     {
         var logger = new CapturingLogger<FixedWidthMultiRecordExtractor>();
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(SampleFile));
-        using var extractor = new FixedWidthMultiRecordExtractor(stream, logger: logger)
+        using var extractor = new FixedWidthMultiRecordExtractor(stream, options: null, logger: logger)
             .When(l => l[0] == 'H', typeof(HeaderRecord))
             .When(l => l[0] == 'D', typeof(DetailRecord))
             .When(l => l[0] == 'T', typeof(TrailerRecord));

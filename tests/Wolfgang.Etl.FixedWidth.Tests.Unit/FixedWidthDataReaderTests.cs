@@ -233,7 +233,7 @@ public sealed class FixedWidthDataReaderTests
     {
         var bytes = Encoding.UTF8.GetBytes(Line("Alice", "Smith", 30, "7"));
         using var stream = new MemoryStream(bytes);
-        using var reader = new FixedWidthDataReader<Person>(stream);
+        using var reader = new FixedWidthDataReader<Person>(stream, options: null);
 
         Assert.True(reader.Read());
         Assert.Equal("Alice", reader.GetString(0));

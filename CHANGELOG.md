@@ -13,6 +13,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
+- **The `Stream`-only constructors on `FixedWidthBinaryExtractor<T>`, `FixedWidthBinaryLoader<T>`,
+  `FixedWidthMultiRecordExtractor` and `FixedWidthDataReader<T>`** are `[Obsolete]` rather than
+  removed:
+
+  ```csharp
+  X(Stream stream)                              // obsolete
+  X(Stream stream, ILogger<X> logger)           // obsolete
+  X(Stream stream, XOptions? options = null, ILogger<X>? logger = null)   // use this
+  ```
+
+  These carry the **pre-0.11.0 binary signature**, so already-compiled consumers keep working and
+  get a deprecation warning instead of a break. That removed 20 PackageValidation suppressions
+  (four constructors across five target frameworks).
+
+  The obsolete overloads deliberately declare **no default arguments**. That is what keeps
+  `new X(stream)` unambiguous: an exact-arity candidate beats one that needs default-argument
+  substitution, so the call binds the obsolete overload with a warning. Giving them defaults
+  instead produces `CS0121` and breaks `new X(stream)` outright — worse than removing them.
+
+  One consequence while they exist: `new X(stream, logger: log)` binds the obsolete overload. Pass
+  `options: null` explicitly to reach the new constructor. Both go away when these are removed.
+
 ### Removed
 
 ### Fixed
