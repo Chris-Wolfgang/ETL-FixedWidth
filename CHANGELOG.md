@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [0.11.0] - 2026-08-26
+
 **Breaking release.** Constructor configuration is now uniform across the package: every
 `Stream`-based constructor takes an options record, and the logger is always the last, optional
 parameter. Six superseded constructors and four public `Encoding` properties are gone.
