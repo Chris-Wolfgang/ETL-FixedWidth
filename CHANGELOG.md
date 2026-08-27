@@ -13,19 +13,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
-- **The `Stream`-only constructors on `FixedWidthBinaryExtractor<T>`, `FixedWidthBinaryLoader<T>`,
-  `FixedWidthMultiRecordExtractor` and `FixedWidthDataReader<T>`** are `[Obsolete]` rather than
-  removed:
+- **The pre-0.11.0 `Stream` constructors are `[Obsolete]` rather than removed.** On
+  `FixedWidthBinaryExtractor<T>`, `FixedWidthBinaryLoader<T>`, `FixedWidthMultiRecordExtractor` and
+  `FixedWidthDataReader<T>`:
 
   ```csharp
-  X(Stream stream)                              // obsolete
-  X(Stream stream, ILogger<X> logger)           // obsolete
-  X(Stream stream, XOptions? options = null, ILogger<X>? logger = null)   // use this
+  X(Stream stream, ILogger<X> logger)                                    // obsolete
+  X(Stream stream, XOptions? options = null, ILogger<X>? logger = null)  // use this
   ```
 
-  These carry the **pre-0.11.0 binary signature**, so already-compiled consumers keep working and
-  get a deprecation warning instead of a break. That removed 20 PackageValidation suppressions
-  (four constructors across five target frameworks).
+  and on `FixedWidthExtractor<T>` / `FixedWidthLoader<T>`, which additionally took a loose encoding:
+
+  ```csharp
+  X(Stream stream, Encoding encoding)                                    // obsolete
+  X(Stream stream, ILogger<X> logger, Encoding encoding)                 // obsolete
+  X(Stream stream, XOptions? options = null, ILogger<X>? logger = null)  // use this
+  ```
+
+  Passing a `null` encoding to the obsolete overloads still means "use the default", as it did when
+  the parameter was declared `Encoding? encoding = null`.
+
+  These carry the **pre-0.11.0 binary signatures**, so already-compiled consumers keep working and
+  get a deprecation warning instead of a `MissingMethodException`. PackageValidation suppressions
+  drop from **95 to 55**.
+
+  Note there is deliberately no one-argument `X(Stream)` overload: 0.10.1 never emitted such a
+  signature. `new X(stream)` compiled to `.ctor(Stream, ILogger)` with `null` baked in at the
+  caller's compile time, so the two-argument shim is what restores compatibility. Adding a
+  one-argument overload would carry no compatibility value and would make `new X(stream)` — still
+  the correct call — emit a deprecation warning.
+
+  For the same reason `(TextReader)` / `(TextWriter)` are **not** restored: reinstating them would
+  make `new X(reader)` warn. Those two signatures, the replaced `Encoding` properties, and
+  `FixedWidthTransformer<TSource, TDestination>(Func<TSource, TDestination>)` remain recorded as
+  intentional breaks.
 
   The obsolete overloads deliberately declare **no default arguments**. That is what keeps
   `new X(stream)` unambiguous: an exact-arity candidate beats one that needs default-argument

@@ -70,19 +70,6 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     {
     }
 
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthDataReader{TRecord}"/> from a <see cref="Stream"/> using the
-    /// default options.
-    /// </summary>
-    /// <param name="stream">The stream to use.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    [Obsolete("Use the constructor that takes FixedWidthDataReaderOptions. This overload will be removed in a future release.")]
-    public FixedWidthDataReader(Stream stream)
-        : this(stream, options: null, logger: null)
-    {
-    }
-
-
 
     /// <summary>
     /// Initializes a new <see cref="FixedWidthDataReader{TRecord}"/> from a <see cref="Stream"/> using the

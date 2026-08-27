@@ -45,19 +45,6 @@ public sealed class FixedWidthBinaryExtractor<TRecord> : ExtractorBase<TRecord, 
     private bool _progressTimerWired;
     private long _currentRecordNumber;
 
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthBinaryExtractor{TRecord}"/> from a <see cref="Stream"/> using the
-    /// default options.
-    /// </summary>
-    /// <param name="stream">The stream to use.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    [Obsolete("Use the constructor that takes FixedWidthBinaryExtractorOptions. This overload will be removed in a future release.")]
-    public FixedWidthBinaryExtractor(Stream stream)
-        : this(stream, options: null, logger: null)
-    {
-    }
-
-
 
     /// <summary>
     /// Initializes a new <see cref="FixedWidthBinaryExtractor{TRecord}"/> from a <see cref="Stream"/> using the

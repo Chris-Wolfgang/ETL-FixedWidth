@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Linq;
 using System.Reflection;
 using Wolfgang.Etl.Abstractions;
@@ -647,9 +648,9 @@ public class ConstructorArgumentTests
 #pragma warning disable CS0618 // Type or member is obsolete
 
     [Fact]
-    public void MultiRecord_obsolete_stream_ctor_when_stream_is_null_throws()
+    public void MultiRecord_obsolete_stream_logger_ctor_when_stream_is_null_throws()
     {
-        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((Stream)null!));
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((Stream)null!, new SpyLogger<FixedWidthMultiRecordExtractor>()));
 
         Assert.Equal("stream", ex.ParamName);
     }
@@ -657,9 +658,9 @@ public class ConstructorArgumentTests
 
 
     [Fact]
-    public void DataReader_obsolete_stream_ctor_when_stream_is_null_throws()
+    public void DataReader_obsolete_stream_logger_ctor_when_stream_is_null_throws()
     {
-        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthDataReader<PersonRecord>((Stream)null!));
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthDataReader<PersonRecord>((Stream)null!, new SpyLogger<FixedWidthDataReader<PersonRecord>>()));
 
         Assert.Equal("stream", ex.ParamName);
     }
@@ -667,9 +668,9 @@ public class ConstructorArgumentTests
 
 
     [Fact]
-    public void BinaryExtractor_obsolete_stream_ctor_when_stream_is_null_throws()
+    public void BinaryExtractor_obsolete_stream_logger_ctor_when_stream_is_null_throws()
     {
-        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryExtractor<BinaryAccount>((Stream)null!));
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryExtractor<BinaryAccount>((Stream)null!, new SpyLogger<FixedWidthBinaryExtractor<BinaryAccount>>()));
 
         Assert.Equal("stream", ex.ParamName);
     }
@@ -677,9 +678,9 @@ public class ConstructorArgumentTests
 
 
     [Fact]
-    public void BinaryLoader_obsolete_stream_ctor_when_stream_is_null_throws()
+    public void BinaryLoader_obsolete_stream_logger_ctor_when_stream_is_null_throws()
     {
-        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryLoader<BinaryAccount>((Stream)null!));
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryLoader<BinaryAccount>((Stream)null!, new SpyLogger<FixedWidthBinaryLoader<BinaryAccount>>()));
 
         Assert.Equal("stream", ex.ParamName);
     }
@@ -698,6 +699,62 @@ public class ConstructorArgumentTests
         Assert.NotNull(b);
         Assert.NotNull(c);
         Assert.NotNull(d);
+    }
+
+    [Fact]
+    public void Extractor_obsolete_encoding_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthExtractor<PersonRecord>((Stream)null!, Encoding.UTF8));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Loader_obsolete_encoding_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthLoader<PersonRecord>((Stream)null!, Encoding.UTF8));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Obsolete_encoding_ctors_apply_the_supplied_encoding()
+    {
+        using var extractor = new FixedWidthExtractor<PersonRecord>(NewStream(), Encoding.Unicode);
+        using var loader = new FixedWidthLoader<PersonRecord>(NewStream(), Encoding.Unicode);
+
+        Assert.NotNull(extractor);
+        Assert.NotNull(loader);
+    }
+
+
+
+    [Fact]
+    public void Obsolete_encoding_ctors_treat_a_null_encoding_as_the_default()
+    {
+        // The removed constructors declared Encoding? encoding = null, so null was a legal value
+        // meaning "use the default" - it must not produce an options record with a null Encoding.
+        using var extractor = new FixedWidthExtractor<PersonRecord>(NewStream(), (Encoding)null!);
+        using var loader = new FixedWidthLoader<PersonRecord>(NewStream(), (Encoding)null!);
+
+        Assert.NotNull(extractor);
+        Assert.NotNull(loader);
+    }
+
+
+
+    [Fact]
+    public void Obsolete_logger_encoding_ctors_construct()
+    {
+        using var extractor = new FixedWidthExtractor<PersonRecord>(NewStream(), new SpyLogger<FixedWidthExtractor<PersonRecord>>(), Encoding.UTF8);
+        using var loader = new FixedWidthLoader<PersonRecord>(NewStream(), new SpyLogger<FixedWidthLoader<PersonRecord>>(), Encoding.UTF8);
+
+        Assert.NotNull(extractor);
+        Assert.NotNull(loader);
     }
 
 #pragma warning restore CS0618
