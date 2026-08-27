@@ -36,10 +36,8 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
 {
     private const int DefaultBufferSize = 65536;
 
-    private readonly Stream? _stream;   // set by the Stream constructor; wrapped lazily using ResolvedEncoding
-    // Null when the caller supplied no options - the signal to fall back to the
-    // [Obsolete] Encoding property.
-    private readonly Encoding? _optionsEncoding;
+    private readonly Stream? _stream;   // set by the Stream constructor; wrapped lazily using _encoding
+    private readonly Encoding _encoding;
     private readonly bool _ownsReader;
     private readonly ILogger _logger;
     private readonly FieldMapResult _fieldMap;
@@ -71,26 +69,7 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
         : this(reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null, logger)
     {
     }
-
-
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthDataReader{TRecord}"/> from a <see cref="Stream"/> using the
-    /// default options, with diagnostic logging.
-    /// </summary>
-    /// <param name="stream">The stream to use.</param>
-    /// <param name="logger">The logger to use for diagnostic output.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    [Obsolete("Use the constructor that takes FixedWidthDataReaderOptions. This overload will be removed in a future release.")]
-    public FixedWidthDataReader(Stream stream, ILogger<FixedWidthDataReader<TRecord>> logger)
-        : this(stream, options: null, logger: logger)
-    {
-    }
-
-
-
-
-
-    /// <summary>
+/// <summary>
     /// Initializes a new <see cref="FixedWidthDataReader{TRecord}"/> reading from a
     /// <see cref="Stream"/> via an internal 64 KB-buffered <see cref="StreamReader"/>. The caller
     /// retains ownership of the stream (it is not closed), but <see cref="Dispose"/> must be called
@@ -159,35 +138,12 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
             _reader = reader;
         }
 
-        _optionsEncoding = options?.Encoding;
+        _encoding = (options ?? new FixedWidthDataReaderOptions()).Encoding;
         _logger = logger ?? (ILogger)NullLogger.Instance;
         _fieldMap = FieldMap.GetResult<TRecord>();
         _names = BuildNames(_fieldMap);
         _current = new object?[_fieldMap.Descriptors.Count];
     }
-
-
-    /// <summary>
-    /// The <see cref="System.Text.Encoding"/> used by this instance. Superseded by
-    /// <see cref="FixedWidthDataReaderOptions.Encoding"/>.
-    /// </summary>
-    /// <remarks>
-    /// Retained for source compatibility with 0.10.x. It is honoured only when the constructor was
-    /// given no options object; a caller who passes options is using the supported route and that
-    /// value wins. The two cannot conflict in existing code, because the options constructor did
-    /// not exist before 0.11.0.
-    /// </remarks>
-    [Obsolete("Set Encoding on FixedWidthDataReaderOptions and pass it to the constructor instead. This property will be removed in a future release.")]
-    public Encoding Encoding { get; init; } = Encoding.UTF8;
-
-
-
-    // Options win when supplied; otherwise fall back to the obsolete property. Resolved at the
-    // point of use rather than in the constructor: an init property is assigned AFTER the
-    // constructor body runs, so capturing it there would always read the default.
-#pragma warning disable CS0618 // reading the obsolete property is the entire point of this member
-    private Encoding ResolvedEncoding => _optionsEncoding ?? Encoding;
-#pragma warning restore CS0618
 
 
 
@@ -231,7 +187,7 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
 
         // Wrap the stream on first use rather than in the constructor, so a reader that is never
         // read allocates nothing. A TextReader source is used as supplied.
-        var reader = _reader ??= new StreamReader(_stream!, ResolvedEncoding, detectEncodingFromByteOrderMarks: true, DefaultBufferSize, leaveOpen: true);
+        var reader = _reader ??= new StreamReader(_stream!, _encoding, detectEncodingFromByteOrderMarks: true, DefaultBufferSize, leaveOpen: true);
 
         if (!_startedLogged)
         {

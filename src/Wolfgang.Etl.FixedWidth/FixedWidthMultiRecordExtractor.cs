@@ -70,9 +70,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
 
     private readonly Stream? _stream;   // set by the Stream constructor; wrapped lazily using Encoding
     private readonly bool _ownsReader;
-    // Null when the caller supplied no options - the signal to fall back to the
-    // [Obsolete] Encoding property.
-    private readonly Encoding? _optionsEncoding;
+    private readonly Encoding _encoding;
     private readonly ILogger _logger;
     private TextReader? _reader;         // supplied directly (TextReader) or created from _stream at enumeration
     private readonly IProgressTimer? _progressTimer;
@@ -107,26 +105,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
                options: null, timer: null, logger: logger)
     {
     }
-
-
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthMultiRecordExtractor"/> from a <see cref="Stream"/> using the
-    /// default options, with diagnostic logging.
-    /// </summary>
-    /// <param name="stream">The stream to use.</param>
-    /// <param name="logger">The logger to use for diagnostic output.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    [Obsolete("Use the constructor that takes FixedWidthMultiRecordExtractorOptions. This overload will be removed in a future release.")]
-    public FixedWidthMultiRecordExtractor(Stream stream, ILogger<FixedWidthMultiRecordExtractor> logger)
-        : this(stream, options: null, logger: logger)
-    {
-    }
-
-
-
-
-
-    /// <summary>
+/// <summary>
     /// Initializes a new <see cref="FixedWidthMultiRecordExtractor"/> that reads from the specified
     /// <see cref="Stream"/> using an internal <see cref="StreamReader"/> with a 64&#160;KB buffer.
     /// The caller retains ownership of the stream. Set <see cref="Encoding"/> to decode with a
@@ -220,33 +199,10 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
         // created with leaveOpen:true, so the caller's stream itself is never closed — the caller
         // retains ownership. A caller-supplied TextReader leaves this false.
         _ownsReader = stream is not null;
-        _optionsEncoding = options?.Encoding;
+        _encoding = (options ?? new FixedWidthMultiRecordExtractorOptions()).Encoding;
         _progressTimer = timer;
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
-
-
-    /// <summary>
-    /// The <see cref="System.Text.Encoding"/> used by this instance. Superseded by
-    /// <see cref="FixedWidthMultiRecordExtractorOptions.Encoding"/>.
-    /// </summary>
-    /// <remarks>
-    /// Retained for source compatibility with 0.10.x. It is honoured only when the constructor was
-    /// given no options object; a caller who passes options is using the supported route and that
-    /// value wins. The two cannot conflict in existing code, because the options constructor did
-    /// not exist before 0.11.0.
-    /// </remarks>
-    [Obsolete("Set Encoding on FixedWidthMultiRecordExtractorOptions and pass it to the constructor instead. This property will be removed in a future release.")]
-    public Encoding Encoding { get; init; } = Encoding.UTF8;
-
-
-
-    // Options win when supplied; otherwise fall back to the obsolete property. Resolved at the
-    // point of use rather than in the constructor: an init property is assigned AFTER the
-    // constructor body runs, so capturing it there would always read the default.
-#pragma warning disable CS0618 // reading the obsolete property is the entire point of this member
-    private Encoding ResolvedEncoding => _optionsEncoding ?? Encoding;
-#pragma warning restore CS0618
 
 
 
@@ -527,7 +483,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
 
         // Wrap the stream lazily so the Encoding init property is read here (after the object
         // initializer has run), not in the constructor. A TextReader source is used as supplied.
-        var reader = _reader ??= CreateBufferedReader(_stream!, ResolvedEncoding);
+        var reader = _reader ??= CreateBufferedReader(_stream!, _encoding);
 
         LogExtractionStarted();
         token.ThrowIfCancellationRequested();

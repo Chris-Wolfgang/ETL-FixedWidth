@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- **Breaking. The members deprecated in 0.11.0 are gone**, completing that deprecation cycle:
+
+  | removed | use instead |
+  |---|---|
+  | `Encoding` property on `FixedWidthBinaryExtractor<T>`, `FixedWidthBinaryLoader<T>`, `FixedWidthDataReader<T>`, `FixedWidthMultiRecordExtractor` | the `Encoding` property on each type's options record |
+  | `X(Stream, ILogger<X>)` on those same four types | `X(Stream, XOptions?, ILogger<X>?)` |
+  | `FixedWidthExtractor<T>(Stream, Encoding)` and `(Stream, ILogger<T>, Encoding)` | `(Stream, FixedWidthExtractorOptions?, ILogger<T>?)` |
+  | `FixedWidthLoader<T>(Stream, Encoding)` and `(Stream, ILogger<T>, Encoding)` | `(Stream, FixedWidthLoaderOptions?, ILogger<T>?)` |
+  | `FixedWidthReport(int, int, long)` and `(int, int, int, int, long)` | `FixedWidthReport(FixedWidthReportOptions)` |
+
+  Fourteen members, eighteen API entries — each `Encoding` property contributes a `get` and an
+  `init`. Recorded as intentional breaks; PackageValidation suppressions rise from 0 to 90
+  (18 x 5 target frameworks).
+
+  Every one of these carried an `[Obsolete]` message naming its replacement throughout 0.11.0, so
+  callers have had a release in which their code compiled with a warning pointing at the fix.
+
+  The supporting machinery goes with them: `ResolvedEncoding` — which existed only to let options
+  win over the obsolete property — and the `ToOptions` helpers that fed the `Encoding` shims. With
+  the properties gone the options are fully known at construction time, so each type captures its
+  encoding in the constructor again.
+
+  The three `[EditorBrowsable(EditorBrowsableState.Never)]` overloads are **not** affected. They are
+  not deprecated; each preserves a 0.10.1 binary signature and serves a call that is still correct
+  code. Their fate is tracked separately.
+
 ### Added
 
 ### Changed

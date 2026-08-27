@@ -129,47 +129,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
                timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
     }
-
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> from a <see cref="Stream"/> decoded with the
-    /// supplied <see cref="Encoding"/>.
-    /// </summary>
-    /// <param name="stream">The stream to use.</param>
-    /// <param name="encoding">
-    /// The encoding to decode with, or <see langword="null"/> for the documented default.
-    /// </param>
-    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    [Obsolete("Use the constructor that takes FixedWidthLoaderOptions. This overload will be removed in a future release.")]
-    public FixedWidthLoader(Stream stream, Encoding encoding)
-        : this(stream, options: ToOptions(encoding), logger: null)
-    {
-    }
-
-
-
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> from a <see cref="Stream"/> decoded with the
-    /// supplied <see cref="Encoding"/>, with diagnostic logging.
-    /// </summary>
-    /// <param name="stream">The stream to use.</param>
-    /// <param name="logger">The logger to use for diagnostic output.</param>
-    /// <param name="encoding">
-    /// The encoding to decode with, or <see langword="null"/> for the documented default.
-    /// </param>
-    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    [Obsolete("Use the constructor that takes FixedWidthLoaderOptions. This overload will be removed in a future release.")]
-    public FixedWidthLoader(Stream stream, ILogger<FixedWidthLoader<TRecord>> logger, Encoding encoding)
-        : this(stream, options: ToOptions(encoding), logger: logger)
-    {
-    }
-
-
-
-
-
-
-
-    /// <summary>
+/// <summary>
     /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> over the specified
     /// <see cref="Stream"/>, with the logger as the trailing optional parameter.
     /// </summary>
@@ -296,11 +256,6 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     }
 
 
-    // The removed constructors took a loose Encoding. Callers reaching them through the obsolete
-    // overloads above could legitimately pass null, which meant "use the default" - so null must
-    // map to no options rather than to an options record carrying a null Encoding.
-    private static FixedWidthLoaderOptions? ToOptions(Encoding? encoding)
-        => encoding is null ? null : new FixedWidthLoaderOptions { Encoding = encoding };
 
 
 
