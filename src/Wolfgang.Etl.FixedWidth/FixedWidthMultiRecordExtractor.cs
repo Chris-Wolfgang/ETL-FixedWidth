@@ -70,6 +70,9 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
 
     private readonly Stream? _stream;   // set by the Stream constructor; wrapped lazily using Encoding
     private readonly bool _ownsReader;
+    // Null when the caller supplied no options - the signal to fall back to the
+    // [Obsolete] Encoding property.
+    private readonly Encoding? _optionsEncoding;
     private readonly ILogger _logger;
     private TextReader? _reader;         // supplied directly (TextReader) or created from _stream at enumeration
     private readonly IProgressTimer? _progressTimer;
@@ -100,10 +103,26 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <see langword="null"/>.</exception>
     public FixedWidthMultiRecordExtractor(TextReader reader, ILogger<FixedWidthMultiRecordExtractor>? logger = null)
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null,
+               options: null, timer: null, logger: logger)
     {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthMultiRecordExtractor"/> from a <see cref="Stream"/> using the
+    /// default options, with diagnostic logging.
+    /// </summary>
+    /// <param name="stream">The stream to use.</param>
+    /// <param name="logger">The logger to use for diagnostic output.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
+    [Obsolete("Use the constructor that takes FixedWidthMultiRecordExtractorOptions. This overload will be removed in a future release.")]
+    public FixedWidthMultiRecordExtractor(Stream stream, ILogger<FixedWidthMultiRecordExtractor> logger)
+        : this(stream, options: null, logger: logger)
+    {
+    }
+
+
 
 
 
@@ -114,31 +133,121 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// specific encoding (defaults to <see cref="Encoding.UTF8"/>).
     /// </summary>
     /// <param name="stream">The readable source stream.</param>
+    /// <param name="options">
+    /// Options that control behaviour, including the encoding. When <c>null</c> — or omitted —
+    /// the documented defaults apply.
+    /// </param>
     /// <param name="logger">
     /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output. Pass
     /// <see langword="null"/> (the default) to disable logging.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    public FixedWidthMultiRecordExtractor(Stream stream, ILogger<FixedWidthMultiRecordExtractor>? logger = null)
+    public FixedWidthMultiRecordExtractor
+    (
+        Stream stream,
+        FixedWidthMultiRecordExtractorOptions? options = null,
+        ILogger<FixedWidthMultiRecordExtractor>? logger = null
+    )
+        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)),
+               options: options, timer: null, logger: logger)
     {
-        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-
-        // We create the internal StreamReader that wraps the caller's stream, so we own (and dispose)
-        // that reader. It is created with leaveOpen:true, so the caller's stream itself is never closed
-        // — the caller retains ownership of the Stream. (A caller-supplied TextReader leaves this false.)
-        _ownsReader = true;
-        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
 
     // Test-only constructor that injects a deterministic progress timer.
-    internal FixedWidthMultiRecordExtractor(TextReader reader, IProgressTimer timer)
+    internal FixedWidthMultiRecordExtractor
+    (
+        TextReader reader,
+        IProgressTimer timer,
+        ILogger<FixedWidthMultiRecordExtractor>? logger = null
+    )
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null,
+               timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
-        _logger = NullLogger.Instance;
     }
+
+
+
+    // Stream-shaped counterpart of the timer-injecting constructor, so both input shapes are
+    // testable with a deterministic timer.
+    internal FixedWidthMultiRecordExtractor
+    (
+        Stream stream,
+        IProgressTimer timer,
+        FixedWidthMultiRecordExtractorOptions? options = null,
+        ILogger<FixedWidthMultiRecordExtractor>? logger = null
+    )
+        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options,
+               timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
+    {
+    }
+
+
+
+    // The single initialization path. Every public and internal constructor delegates here, so
+    // there is exactly one place that assigns fields and one definition of each default.
+    // Exactly one of reader / stream is non-null: each caller-facing constructor null-checks its
+    // own source before delegating, so the ArgumentNullException names the parameter the caller
+    // actually passed rather than whichever branch this core happens to fall into.
+    private FixedWidthMultiRecordExtractor
+    (
+        TextReader? reader,
+        Stream? stream,
+        FixedWidthMultiRecordExtractorOptions? options,
+        IProgressTimer? timer,
+        ILogger<FixedWidthMultiRecordExtractor>? logger
+    )
+    {
+        // Defensive invariant guard. Every caller-facing constructor null-checks its own source
+        // before delegating here, so this cannot fire today — it exists so that a constructor added
+        // later which forgets that check fails loudly at construction instead of NullReferencing
+        // somewhere downstream. It deliberately does NOT throw ArgumentNullException: neither
+        // parameter name would be the one the caller actually passed, which is the exact defect
+        // this class of guard is here to prevent.
+        if (reader is null && stream is null)
+        {
+            throw new InvalidOperationException
+            (
+                "Exactly one of reader or stream must be supplied."
+            );
+        }
+
+        _reader = reader;
+        _stream = stream;
+
+        // The Stream shape wraps the caller's stream in a StreamReader we own (and dispose). It is
+        // created with leaveOpen:true, so the caller's stream itself is never closed — the caller
+        // retains ownership. A caller-supplied TextReader leaves this false.
+        _ownsReader = stream is not null;
+        _optionsEncoding = options?.Encoding;
+        _progressTimer = timer;
+        _logger = logger ?? (ILogger)NullLogger.Instance;
+    }
+
+
+    /// <summary>
+    /// The <see cref="System.Text.Encoding"/> used by this instance. Superseded by
+    /// <see cref="FixedWidthMultiRecordExtractorOptions.Encoding"/>.
+    /// </summary>
+    /// <remarks>
+    /// Retained for source compatibility with 0.10.x. It is honoured only when the constructor was
+    /// given no options object; a caller who passes options is using the supported route and that
+    /// value wins. The two cannot conflict in existing code, because the options constructor did
+    /// not exist before 0.11.0.
+    /// </remarks>
+    [Obsolete("Set Encoding on FixedWidthMultiRecordExtractorOptions and pass it to the constructor instead. This property will be removed in a future release.")]
+    public Encoding Encoding { get; init; } = Encoding.UTF8;
+
+
+
+    // Options win when supplied; otherwise fall back to the obsolete property. Resolved at the
+    // point of use rather than in the constructor: an init property is assigned AFTER the
+    // constructor body runs, so capturing it there would always read the default.
+#pragma warning disable CS0618 // reading the obsolete property is the entire point of this member
+    private Encoding ResolvedEncoding => _optionsEncoding ?? Encoding;
+#pragma warning restore CS0618
+
 
 
 
@@ -219,13 +328,6 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     // Properties
     // ------------------------------------------------------------------
 
-    /// <summary>
-    /// The encoding used to decode the source when constructed from a <see cref="Stream"/>. Defaults
-    /// to <see cref="Encoding.UTF8"/>. Ignored when constructed from a <see cref="TextReader"/> (the
-    /// reader already decodes). The stream is wrapped lazily when extraction begins, so this value is
-    /// read then — set it in the object initializer.
-    /// </summary>
-    public Encoding Encoding { get; init; } = Encoding.UTF8;
 
 
 
@@ -341,11 +443,14 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     {
         return new FixedWidthReport
         (
-            CurrentItemCount,
-            CurrentSkippedItemCount,
-            CurrentRejectedItemCount,
-            CurrentFilteredLineCount,
-            Interlocked.Read(ref _currentLineNumber)
+            new FixedWidthReportOptions
+            {
+                CurrentCount = CurrentItemCount,
+                CurrentSkippedItemCount = CurrentSkippedItemCount,
+                CurrentRejectedItemCount = CurrentRejectedItemCount,
+                CurrentFilteredLineCount = CurrentFilteredLineCount,
+                CurrentLineNumber = Interlocked.Read(ref _currentLineNumber)
+            }
         );
     }
 
@@ -422,7 +527,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
 
         // Wrap the stream lazily so the Encoding init property is read here (after the object
         // initializer has run), not in the constructor. A TextReader source is used as supplied.
-        var reader = _reader ??= CreateBufferedReader(_stream!, Encoding);
+        var reader = _reader ??= CreateBufferedReader(_stream!, ResolvedEncoding);
 
         LogExtractionStarted();
         token.ThrowIfCancellationRequested();

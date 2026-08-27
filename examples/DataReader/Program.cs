@@ -38,7 +38,7 @@ foreach (DataRow row in table.Rows)
 
 // In production the reader flows straight into SqlBulkCopy — same object, zero POCO allocation:
 //
-//     using var reader = new FixedWidthDataReader<Customer>(File.OpenRead("customers.dat"));
+//     using var reader = new FixedWidthDataReader<Customer>(File.OpenRead("customers.dat"), options: null);
 //     using var bulkCopy = new SqlBulkCopy(connectionString) { DestinationTableName = "Customers" };
 //     await bulkCopy.WriteToServerAsync(reader);
 

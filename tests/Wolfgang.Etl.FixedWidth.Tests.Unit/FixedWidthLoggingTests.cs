@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -808,5 +809,69 @@ public class FixedWidthLoaderLoggingTests
         await loader.LoadAsync(OneRecord.ToAsyncEnumerable());
 
         Assert.Equal(1, loader.CurrentItemCount);
+    }
+
+    // FixedWidthTransformer gained a logger in 0.11.0; without these its logging helpers are never
+    // executed, which is what dropped the type under the 90% coverage gate.
+
+    [Fact]
+    public async Task TransformAsync_logs_Information_at_start_and_completion()
+    {
+        var logger = new SpyLogger<FixedWidthTransformer<PersonRecord, PersonRecord>>();
+        var transformer = new FixedWidthTransformer<PersonRecord, PersonRecord>(r => r, logger);
+
+        await transformer.TransformAsync(Source(2), CancellationToken.None).ToListAsync();
+
+        var infoEntries = logger.Entries
+            .Where(e => e.Level == LogLevel.Information)
+            .ToList();
+
+        Assert.Equal(2, infoEntries.Count);
+        Assert.Contains("Transformation started", infoEntries[0].Message, StringComparison.Ordinal);
+        Assert.Contains("PersonRecord", infoEntries[0].Message, StringComparison.Ordinal);
+        Assert.Contains("Transformation completed", infoEntries[1].Message, StringComparison.Ordinal);
+        Assert.Contains("2 items transformed", infoEntries[1].Message, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public async Task TransformAsync_completion_log_reports_the_skipped_count()
+    {
+        var logger = new SpyLogger<FixedWidthTransformer<PersonRecord, PersonRecord>>();
+        var transformer = new FixedWidthTransformer<PersonRecord, PersonRecord>(r => r, logger)
+        {
+            SkipItemCount = 1,
+        };
+
+        await transformer.TransformAsync(Source(3), CancellationToken.None).ToListAsync();
+
+        var completed = logger.Entries.Last(e => e.Level == LogLevel.Information);
+
+        Assert.Contains("2 items transformed", completed.Message, StringComparison.Ordinal);
+        Assert.Contains("1 skipped", completed.Message, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public async Task TransformAsync_with_no_logger_does_not_throw()
+    {
+        var transformer = new FixedWidthTransformer<PersonRecord, PersonRecord>(r => r);
+
+        var results = await transformer.TransformAsync(Source(1), CancellationToken.None).ToListAsync();
+
+        Assert.Single(results);
+    }
+
+
+
+    private static async IAsyncEnumerable<PersonRecord> Source(int count)
+    {
+        for (var i = 0; i < count; i++)
+        {
+            yield return new PersonRecord { FirstName = "A", LastName = "B", Age = 30 };
+            await Task.Yield();
+        }
     }
 }

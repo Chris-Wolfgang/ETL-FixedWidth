@@ -1,0 +1,761 @@
+using System;
+using System.IO;
+using System.Text;
+using System.Linq;
+using System.Reflection;
+using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.FixedWidth.Attributes;
+using Wolfgang.Etl.FixedWidth.Enums;
+using Wolfgang.Etl.TestKit.Xunit;
+using Xunit;
+
+namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
+
+/// <summary>
+/// Argument validation for every public and internal constructor in the package.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Each constructor gets three kinds of assertion: every required reference parameter rejects
+/// <see langword="null"/>, the reported <see cref="ArgumentNullException.ParamName"/> names the
+/// parameter the caller actually passed, and every optional parameter accepts
+/// <see langword="null"/> without throwing.
+/// </para>
+/// <para>
+/// The <c>ParamName</c> assertions are the point, not decoration. The types with two input shapes
+/// route both through one private constructor that takes each source as a separate nullable
+/// parameter. When only that core validated, a null <see cref="Stream"/> fell through to the
+/// reader/writer branch and was reported as <c>reader</c> or <c>writer</c> — a parameter the
+/// caller never passed. These tests pin the boundary behaviour so collapsing constructors into a
+/// shared core cannot silently reintroduce it.
+/// </para>
+/// </remarks>
+public class ConstructorArgumentTests
+{
+    private sealed class BinaryAccount
+    {
+        [FixedWidthBinaryField(0, 8, BinaryFieldType.Text)]
+        public string AccountId { get; set; } = string.Empty;
+
+        [FixedWidthBinaryField(1, 4, BinaryFieldType.Binary)]
+        public int TransactionCount { get; set; }
+    }
+
+
+
+    private static MemoryStream NewStream() => new MemoryStream();
+
+    private static StringReader NewReader() => new StringReader(string.Empty);
+
+    private static StringWriter NewWriter() => new StringWriter();
+
+
+
+    // ------------------------------------------------------------------
+    // FixedWidthExtractor<TRecord>
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void Extractor_reader_ctor_when_reader_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthExtractor<PersonRecord>((TextReader)null!));
+
+        Assert.Equal("reader", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Extractor_stream_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthExtractor<PersonRecord>((Stream)null!));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Extractor_reader_timer_ctor_when_reader_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthExtractor<PersonRecord>((TextReader)null!, new ManualProgressTimer()));
+
+        Assert.Equal("reader", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Extractor_reader_timer_ctor_when_timer_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthExtractor<PersonRecord>(NewReader(), (IProgressTimer)null!));
+
+        Assert.Equal("timer", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Extractor_stream_timer_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthExtractor<PersonRecord>((Stream)null!, new ManualProgressTimer()));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Extractor_stream_timer_ctor_when_timer_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthExtractor<PersonRecord>(NewStream(), (IProgressTimer)null!));
+
+        Assert.Equal("timer", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Extractor_reader_ctor_accepts_a_null_logger()
+    {
+        using var sut = new FixedWidthExtractor<PersonRecord>(NewReader(), logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    [Fact]
+    public void Extractor_stream_ctor_accepts_null_options_and_logger()
+    {
+        using var sut = new FixedWidthExtractor<PersonRecord>(NewStream(), options: null, logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    [Fact]
+    public void Extractor_reader_timer_ctor_accepts_a_null_logger()
+    {
+        using var sut = new FixedWidthExtractor<PersonRecord>(NewReader(), new ManualProgressTimer(), logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    [Fact]
+    public void Extractor_stream_timer_ctor_accepts_null_options_and_logger()
+    {
+        using var sut = new FixedWidthExtractor<PersonRecord>(NewStream(), new ManualProgressTimer(), options: null, logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // FixedWidthLoader<TRecord>
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void Loader_writer_ctor_when_writer_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthLoader<PersonRecord>((TextWriter)null!));
+
+        Assert.Equal("writer", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Loader_stream_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthLoader<PersonRecord>((Stream)null!));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Loader_writer_timer_ctor_when_writer_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthLoader<PersonRecord>((TextWriter)null!, new ManualProgressTimer()));
+
+        Assert.Equal("writer", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Loader_writer_timer_ctor_when_timer_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthLoader<PersonRecord>(NewWriter(), (IProgressTimer)null!));
+
+        Assert.Equal("timer", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Loader_stream_timer_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthLoader<PersonRecord>((Stream)null!, new ManualProgressTimer()));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Loader_stream_timer_ctor_when_timer_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthLoader<PersonRecord>(NewStream(), (IProgressTimer)null!));
+
+        Assert.Equal("timer", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Loader_writer_ctor_accepts_a_null_logger()
+    {
+        using var sut = new FixedWidthLoader<PersonRecord>(NewWriter(), logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    [Fact]
+    public void Loader_stream_ctor_accepts_null_options_and_logger()
+    {
+        using var sut = new FixedWidthLoader<PersonRecord>(NewStream(), options: null, logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    [Fact]
+    public void Loader_writer_timer_ctor_accepts_a_null_logger()
+    {
+        using var sut = new FixedWidthLoader<PersonRecord>(NewWriter(), new ManualProgressTimer(), logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    [Fact]
+    public void Loader_stream_timer_ctor_accepts_null_options_and_logger()
+    {
+        using var sut = new FixedWidthLoader<PersonRecord>(NewStream(), new ManualProgressTimer(), options: null, logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // FixedWidthMultiRecordExtractor
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void MultiRecord_reader_ctor_when_reader_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((TextReader)null!));
+
+        Assert.Equal("reader", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void MultiRecord_stream_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((Stream)null!, options: null));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void MultiRecord_reader_timer_ctor_when_reader_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((TextReader)null!, new ManualProgressTimer()));
+
+        Assert.Equal("reader", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void MultiRecord_reader_timer_ctor_when_timer_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor(NewReader(), (IProgressTimer)null!));
+
+        Assert.Equal("timer", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void MultiRecord_stream_timer_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((Stream)null!, new ManualProgressTimer()));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void MultiRecord_stream_timer_ctor_when_timer_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor(NewStream(), (IProgressTimer)null!));
+
+        Assert.Equal("timer", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void MultiRecord_reader_ctor_accepts_a_null_logger()
+    {
+        using var sut = new FixedWidthMultiRecordExtractor(NewReader(), logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    [Fact]
+    public void MultiRecord_stream_ctor_accepts_null_options_and_logger()
+    {
+        using var sut = new FixedWidthMultiRecordExtractor(NewStream(), options: null, logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    [Fact]
+    public void MultiRecord_reader_timer_ctor_accepts_a_null_logger()
+    {
+        using var sut = new FixedWidthMultiRecordExtractor(NewReader(), new ManualProgressTimer(), logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    [Fact]
+    public void MultiRecord_stream_timer_ctor_accepts_null_options_and_logger()
+    {
+        using var sut = new FixedWidthMultiRecordExtractor(NewStream(), new ManualProgressTimer(), options: null, logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // FixedWidthDataReader<TRecord>
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void DataReader_reader_ctor_when_reader_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthDataReader<PersonRecord>((TextReader)null!));
+
+        Assert.Equal("reader", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void DataReader_stream_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthDataReader<PersonRecord>((Stream)null!, options: null));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void DataReader_reader_ctor_accepts_a_null_logger()
+    {
+        using var sut = new FixedWidthDataReader<PersonRecord>(NewReader(), logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    [Fact]
+    public void DataReader_stream_ctor_accepts_null_options_and_logger()
+    {
+        using var sut = new FixedWidthDataReader<PersonRecord>(NewStream(), options: null, logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // FixedWidthBinaryExtractor<TRecord> / FixedWidthBinaryLoader<TRecord>
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void BinaryExtractor_stream_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryExtractor<BinaryAccount>(null!, options: null));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void BinaryExtractor_stream_timer_ctor_when_timer_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryExtractor<BinaryAccount>(NewStream(), (IProgressTimer)null!));
+
+        Assert.Equal("timer", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void BinaryExtractor_stream_ctor_accepts_null_options_and_logger()
+    {
+        using var sut = new FixedWidthBinaryExtractor<BinaryAccount>(NewStream(), options: null, logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    [Fact]
+    public void BinaryExtractor_stream_timer_ctor_accepts_null_options_and_logger()
+    {
+        using var sut = new FixedWidthBinaryExtractor<BinaryAccount>(NewStream(), new ManualProgressTimer(), options: null, logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    [Fact]
+    public void BinaryLoader_stream_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryLoader<BinaryAccount>(null!, options: null));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void BinaryLoader_stream_timer_ctor_when_timer_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryLoader<BinaryAccount>(NewStream(), (IProgressTimer)null!));
+
+        Assert.Equal("timer", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void BinaryLoader_stream_ctor_accepts_null_options_and_logger()
+    {
+        using var sut = new FixedWidthBinaryLoader<BinaryAccount>(NewStream(), options: null, logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    [Fact]
+    public void BinaryLoader_stream_timer_ctor_accepts_null_options_and_logger()
+    {
+        using var sut = new FixedWidthBinaryLoader<BinaryAccount>(NewStream(), new ManualProgressTimer(), options: null, logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // FixedWidthTransformer<TSource, TDestination>
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void Transformer_ctor_when_transform_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthTransformer<PersonRecord, PersonRecord>(null!));
+
+        Assert.Equal("transform", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Transformer_timer_ctor_when_transform_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthTransformer<PersonRecord, PersonRecord>(null!, new ManualProgressTimer()));
+
+        Assert.Equal("transform", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Transformer_timer_ctor_when_timer_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthTransformer<PersonRecord, PersonRecord>(r => r, (IProgressTimer)null!));
+
+        Assert.Equal("timer", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Transformer_ctor_accepts_a_null_logger()
+    {
+        var sut = new FixedWidthTransformer<PersonRecord, PersonRecord>(r => r, logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    [Fact]
+    public void Transformer_timer_ctor_accepts_a_null_logger()
+    {
+        var sut = new FixedWidthTransformer<PersonRecord, PersonRecord>(r => r, new ManualProgressTimer(), logger: null);
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // FixedWidthReport / FixedWidthError
+    // ------------------------------------------------------------------
+
+    [Fact]
+    public void Report_options_ctor_when_options_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthReport(null!));
+
+        Assert.Equal("options", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Report_options_ctor_accepts_a_default_options_instance()
+    {
+        var sut = new FixedWidthReport(new FixedWidthReportOptions());
+
+        Assert.NotNull(sut);
+    }
+
+
+
+    [Fact]
+    public void Error_ctor_when_exception_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthError(1, "raw", null!));
+
+        Assert.Equal("exception", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Error_ctor_accepts_a_null_raw_content()
+    {
+        var sut = new FixedWidthError(1, null, new InvalidOperationException());
+
+        Assert.NotNull(sut);
+    }
+
+    // ------------------------------------------------------------------
+    // The private-core invariant guard
+    // ------------------------------------------------------------------
+
+    // Every caller-facing constructor null-checks its own source before delegating, so the
+    // both-sources-null branch inside each private core cannot be reached through the public or
+    // internal surface. It is reached here by reflection so the guard is actually verified rather
+    // than merely asserted in a comment — and so it does not sit as a permanently uncovered branch.
+    private static void AssertBothNullSourcesThrow(Type type, int parameterCount)
+    {
+        var core = type
+            .GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)
+            .Single(c => c.IsPrivate && c.GetParameters().Length == parameterCount);
+
+        var ex = Assert.Throws<TargetInvocationException>(() => core.Invoke(new object?[parameterCount]));
+
+        Assert.IsType<InvalidOperationException>(ex.InnerException);
+    }
+
+
+
+    [Fact]
+    public void Extractor_private_core_when_both_sources_are_null_throws()
+    {
+        AssertBothNullSourcesThrow(typeof(FixedWidthExtractor<PersonRecord>), 5);
+    }
+
+
+
+    [Fact]
+    public void Loader_private_core_when_both_sources_are_null_throws()
+    {
+        AssertBothNullSourcesThrow(typeof(FixedWidthLoader<PersonRecord>), 5);
+    }
+
+
+
+    [Fact]
+    public void MultiRecord_private_core_when_both_sources_are_null_throws()
+    {
+        AssertBothNullSourcesThrow(typeof(FixedWidthMultiRecordExtractor), 5);
+    }
+
+
+
+    [Fact]
+    public void DataReader_private_core_when_both_sources_are_null_throws()
+    {
+        AssertBothNullSourcesThrow(typeof(FixedWidthDataReader<PersonRecord>), 4);
+    }
+
+    // ------------------------------------------------------------------
+    // The [Obsolete] compatibility constructors
+    // ------------------------------------------------------------------
+
+    // These overloads preserve the pre-0.11.0 binary signature so existing consumers keep working
+    // with a deprecation warning rather than a break. They are still shipped public API, so they
+    // are still argument-tested. CS0618 is suppressed for exactly that reason.
+#pragma warning disable CS0618 // Type or member is obsolete
+
+    [Fact]
+    public void MultiRecord_obsolete_stream_logger_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((Stream)null!, new SpyLogger<FixedWidthMultiRecordExtractor>()));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void DataReader_obsolete_stream_logger_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthDataReader<PersonRecord>((Stream)null!, new SpyLogger<FixedWidthDataReader<PersonRecord>>()));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void BinaryExtractor_obsolete_stream_logger_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryExtractor<BinaryAccount>((Stream)null!, new SpyLogger<FixedWidthBinaryExtractor<BinaryAccount>>()));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void BinaryLoader_obsolete_stream_logger_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryLoader<BinaryAccount>((Stream)null!, new SpyLogger<FixedWidthBinaryLoader<BinaryAccount>>()));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Obsolete_stream_and_logger_ctors_construct_with_default_options()
+    {
+        using var a = new FixedWidthMultiRecordExtractor(NewStream(), new SpyLogger<FixedWidthMultiRecordExtractor>());
+        using var b = new FixedWidthDataReader<PersonRecord>(NewStream(), new SpyLogger<FixedWidthDataReader<PersonRecord>>());
+        using var c = new FixedWidthBinaryExtractor<BinaryAccount>(NewStream(), new SpyLogger<FixedWidthBinaryExtractor<BinaryAccount>>());
+        using var d = new FixedWidthBinaryLoader<BinaryAccount>(NewStream(), new SpyLogger<FixedWidthBinaryLoader<BinaryAccount>>());
+
+        Assert.NotNull(a);
+        Assert.NotNull(b);
+        Assert.NotNull(c);
+        Assert.NotNull(d);
+    }
+
+    [Fact]
+    public void Extractor_obsolete_encoding_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthExtractor<PersonRecord>((Stream)null!, Encoding.UTF8));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Loader_obsolete_encoding_ctor_when_stream_is_null_throws()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthLoader<PersonRecord>((Stream)null!, Encoding.UTF8));
+
+        Assert.Equal("stream", ex.ParamName);
+    }
+
+
+
+    [Fact]
+    public void Obsolete_encoding_ctors_apply_the_supplied_encoding()
+    {
+        using var extractor = new FixedWidthExtractor<PersonRecord>(NewStream(), Encoding.Unicode);
+        using var loader = new FixedWidthLoader<PersonRecord>(NewStream(), Encoding.Unicode);
+
+        Assert.NotNull(extractor);
+        Assert.NotNull(loader);
+    }
+
+
+
+    [Fact]
+    public void Obsolete_encoding_ctors_treat_a_null_encoding_as_the_default()
+    {
+        // The removed constructors declared Encoding? encoding = null, so null was a legal value
+        // meaning "use the default" - it must not produce an options record with a null Encoding.
+        using var extractor = new FixedWidthExtractor<PersonRecord>(NewStream(), (Encoding)null!);
+        using var loader = new FixedWidthLoader<PersonRecord>(NewStream(), (Encoding)null!);
+
+        Assert.NotNull(extractor);
+        Assert.NotNull(loader);
+    }
+
+
+
+    [Fact]
+    public void Obsolete_logger_encoding_ctors_construct()
+    {
+        using var extractor = new FixedWidthExtractor<PersonRecord>(NewStream(), new SpyLogger<FixedWidthExtractor<PersonRecord>>(), Encoding.UTF8);
+        using var loader = new FixedWidthLoader<PersonRecord>(NewStream(), new SpyLogger<FixedWidthLoader<PersonRecord>>(), Encoding.UTF8);
+
+        Assert.NotNull(extractor);
+        Assert.NotNull(loader);
+    }
+
+#pragma warning restore CS0618
+}

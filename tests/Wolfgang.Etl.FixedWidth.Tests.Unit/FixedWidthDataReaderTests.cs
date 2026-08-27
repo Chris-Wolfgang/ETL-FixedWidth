@@ -233,7 +233,7 @@ public sealed class FixedWidthDataReaderTests
     {
         var bytes = Encoding.UTF8.GetBytes(Line("Alice", "Smith", 30, "7"));
         using var stream = new MemoryStream(bytes);
-        using var reader = new FixedWidthDataReader<Person>(stream);
+        using var reader = new FixedWidthDataReader<Person>(stream, options: null);
 
         Assert.True(reader.Read());
         Assert.Equal("Alice", reader.GetString(0));
@@ -422,7 +422,7 @@ public sealed class FixedWidthDataReaderTests
         // 0xE9 is 'é' in Latin-1 but an invalid lead byte under the default UTF-8.
         var latin1 = Encoding.GetEncoding("ISO-8859-1");
         var data = latin1.GetBytes(Line("é", "X", 1, "1"));
-        using var reader = new FixedWidthDataReader<Person>(new MemoryStream(data)) { Encoding = latin1 };
+        using var reader = new FixedWidthDataReader<Person>(new MemoryStream(data), new FixedWidthDataReaderOptions { Encoding = latin1 });
 
         Assert.True(reader.Read());
         Assert.Equal("é", reader.GetString(0));   // UTF-8 (the default) would have mis-decoded 0xE9

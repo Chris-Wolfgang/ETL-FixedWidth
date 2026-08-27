@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -77,25 +78,6 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     // Constructor
     // ------------------------------------------------------------------
 
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> that writes
-    /// to the specified <see cref="TextWriter"/>.
-    /// </summary>
-    /// <param name="writer">
-    /// The <see cref="TextWriter"/> to write fixed-width records to. This can be a
-    /// <see cref="StreamWriter"/> wrapping a file or network stream, a
-    /// <see cref="StringWriter"/> for in-memory content, <see cref="Console.Out"/> for
-    /// formatted console table output, or any other <see cref="TextWriter"/> implementation.
-    /// The caller is responsible for the writer's lifetime — the loader does not dispose it.
-    /// </param>
-    /// <exception cref="ArgumentNullException"><paramref name="writer"/> is null.</exception>
-    public FixedWidthLoader(TextWriter writer)
-    {
-        _writer = writer ?? throw new ArgumentNullException(nameof(writer));
-        _logger = NullLogger.Instance;
-    }
-
-
 
     /// <summary>
     /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> that writes
@@ -111,11 +93,10 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     public FixedWidthLoader
     (
         TextWriter writer,
-        ILogger<FixedWidthLoader<TRecord>> logger
+        ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
+        : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null, options: null, timer: null, logger: logger)
     {
-        _writer = writer ?? throw new ArgumentNullException(nameof(writer));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
 
@@ -144,67 +125,72 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         IProgressTimer timer,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
+        : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null, options: null,
+               timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
-        _writer = writer ?? throw new ArgumentNullException(nameof(writer));
-        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
+    }
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> from a <see cref="Stream"/> decoded with the
+    /// supplied <see cref="Encoding"/>.
+    /// </summary>
+    /// <param name="stream">The stream to use.</param>
+    /// <param name="encoding">
+    /// The encoding to decode with, or <see langword="null"/> for the documented default.
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
+    [Obsolete("Use the constructor that takes FixedWidthLoaderOptions. This overload will be removed in a future release.")]
+    public FixedWidthLoader(Stream stream, Encoding encoding)
+        : this(stream, options: ToOptions(encoding), logger: null)
+    {
     }
 
 
 
     /// <summary>
-    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> that writes
-    /// to the specified <see cref="Stream"/> using an internal <see cref="StreamWriter"/>
-    /// with a 64 KB buffer for improved throughput on large files.
+    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> from a <see cref="Stream"/> decoded with the
+    /// supplied <see cref="Encoding"/>, with diagnostic logging.
     /// </summary>
-    /// <param name="stream">
-    /// The <see cref="Stream"/> to write fixed-width records to. The stream must be
-    /// writable. The caller retains ownership — the loader does not dispose the stream.
-    /// </param>
+    /// <param name="stream">The stream to use.</param>
+    /// <param name="logger">The logger to use for diagnostic output.</param>
     /// <param name="encoding">
-    /// The <see cref="Encoding"/> used to encode the output. Pass <see langword="null"/>
-    /// (the default) to use <see cref="Encoding.UTF8"/>. Use <c>new UTF8Encoding(false)</c>
-    /// to write UTF-8 without a byte-order mark.
+    /// The encoding to decode with, or <see langword="null"/> for the documented default.
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
+    [Obsolete("Use the constructor that takes FixedWidthLoaderOptions. This overload will be removed in a future release.")]
+    public FixedWidthLoader(Stream stream, ILogger<FixedWidthLoader<TRecord>> logger, Encoding encoding)
+        : this(stream, options: ToOptions(encoding), logger: logger)
+    {
+    }
+
+
+
+
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> over the specified
+    /// <see cref="Stream"/>, with the logger as the trailing optional parameter.
+    /// </summary>
+    /// <param name="stream">The <see cref="Stream"/> to use.</param>
+    /// <param name="options">
+    /// Options that control behaviour, including the <see cref="FixedWidthLoaderOptions.Encoding"/>
+    /// to use. When <c>null</c>, the documented defaults apply.
+    /// </param>
+    /// <param name="logger">
+    /// An optional logger for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
-    public FixedWidthLoader(Stream stream, Encoding? encoding = null)
-    {
-        _writer = CreateBufferedWriter(stream, encoding);
-        _ownsWriter = true;
-        _logger = NullLogger.Instance;
-    }
-
-
-
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> that writes
-    /// to the specified <see cref="Stream"/> with diagnostic logging.
-    /// The loader creates an internal <see cref="StreamWriter"/> with a 64 KB
-    /// buffer for improved throughput on large files.
-    /// </summary>
-    /// <param name="stream">
-    /// The <see cref="Stream"/> to write fixed-width records to. The stream must be
-    /// writable. The caller retains ownership — the loader does not dispose the stream.
-    /// </param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
-    /// <param name="encoding">
-    /// The <see cref="Encoding"/> used to encode the output. Pass <see langword="null"/>
-    /// (the default) to use <see cref="Encoding.UTF8"/>. Use <c>new UTF8Encoding(false)</c>
-    /// to write UTF-8 without a byte-order mark.
-    /// </param>
-    /// <exception cref="ArgumentNullException">
-    /// <paramref name="stream"/> or <paramref name="logger"/> is null.
-    /// </exception>
     public FixedWidthLoader
     (
         Stream stream,
-        ILogger<FixedWidthLoader<TRecord>> logger,
-        Encoding? encoding = null
+        FixedWidthLoaderOptions? options = null,
+        ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
+        : this(writer: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, timer: null, logger: logger)
     {
-        _writer = CreateBufferedWriter(stream, encoding);
-        _ownsWriter = true;
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
 
@@ -224,6 +210,10 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
     /// Pass <see langword="null"/> to disable logging.
     /// </param>
+    /// <param name="options">
+    /// Options that control behaviour. When <c>null</c> — or omitted — the documented
+    /// defaults apply.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="stream"/> or <paramref name="timer"/> is null.
     /// </exception>
@@ -231,14 +221,88 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     (
         Stream stream,
         IProgressTimer timer,
+        FixedWidthLoaderOptions? options = null,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
+        : this(writer: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options,
+               timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
-        _writer = CreateBufferedWriter(stream, encoding: null);
-        _ownsWriter = true;
-        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
+    }
+
+
+    // The single initialization path. Every public and internal constructor delegates here,
+    // so there is exactly one place that assigns the shared fields. The two input shapes
+    // cannot chain to one another, which is why this takes the private-core form rather than
+    // one constructor chaining into another. Exactly one of writer / stream is non-null:
+    // each boundary constructor null-checks its own source before delegating, so the
+    // ArgumentNullException names the parameter the caller actually passed.
+    private FixedWidthLoader
+    (
+        TextWriter? writer,
+        Stream? stream,
+        FixedWidthLoaderOptions? options,
+        IProgressTimer? timer,
+        ILogger<FixedWidthLoader<TRecord>>? logger
+    )
+    {
+        // Defensive invariant guard. Every caller-facing constructor null-checks its own source
+        // before delegating here, so this cannot fire today — it exists so that a constructor added
+        // later which forgets that check fails loudly at construction instead of NullReferencing
+        // somewhere downstream. It deliberately does NOT throw ArgumentNullException: neither
+        // parameter name would be the one the caller actually passed, which is the exact defect
+        // this class of guard is here to prevent.
+        if (writer is null && stream is null)
+        {
+            throw new InvalidOperationException
+            (
+                "Exactly one of writer or stream must be supplied."
+            );
+        }
+
+        if (stream is not null)
+        {
+            var resolved = options ?? new FixedWidthLoaderOptions();
+            _writer = CreateBufferedWriter(stream, resolved.Encoding);
+            _ownsWriter = true;
+        }
+        else
+        {
+            _writer = writer!;
+        }
+
+        _progressTimer = timer;
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
+
+
+    /// <summary>
+    /// Binary-compatibility overload for 0.10.x callers. Equivalent to the constructor above with
+    /// no logger.
+    /// </summary>
+    /// <param name="writer">The source to use.</param>
+    /// <remarks>
+    /// 0.10.1 declared this as a separate constructor, so compiled assemblies reference
+    /// <c>.ctor(TextWriter)</c> directly and would fail with <see cref="MissingMethodException"/>
+    /// without it. It is deliberately <b>not</b> <c>[Obsolete]</c>: unlike the other compatibility
+    /// overloads in this release, the call it serves — <c>new FixedWidthLoader(writer)</c> — is still
+    /// correct, idiomatic code with nothing to migrate to, so warning on it would be noise. It is
+    /// hidden from IntelliSense instead, which is the usual treatment for an overload that exists
+    /// only to keep old binaries loading.
+    /// </remarks>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public FixedWidthLoader(TextWriter writer)
+        : this(writer, logger: null)
+    {
+    }
+
+
+    // The removed constructors took a loose Encoding. Callers reaching them through the obsolete
+    // overloads above could legitimately pass null, which meant "use the default" - so null must
+    // map to no options rather than to an options record carrying a null Encoding.
+    private static FixedWidthLoaderOptions? ToOptions(Encoding? encoding)
+        => encoding is null ? null : new FixedWidthLoaderOptions { Encoding = encoding };
+
+
 
 
 
@@ -424,11 +488,12 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     {
         return new FixedWidthReport
         (
-            CurrentItemCount,
-            CurrentSkippedItemCount,
-            currentRejectedItemCount: 0,
-            currentFilteredLineCount: 0,
-            Interlocked.Read(ref _currentLineNumber)
+            new FixedWidthReportOptions
+            {
+                CurrentCount = CurrentItemCount,
+                CurrentSkippedItemCount = CurrentSkippedItemCount,
+                CurrentLineNumber = Interlocked.Read(ref _currentLineNumber)
+            }
         );
     }
 

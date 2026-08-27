@@ -13,9 +13,208 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
+- **Binary-compatibility overloads without deprecation.**
+  `FixedWidthExtractor<T>(TextReader)`, `FixedWidthLoader<T>(TextWriter)` and
+  `FixedWidthTransformer<TSource, TDestination>(Func<TSource, TDestination>)` are restored, but
+  deliberately **not** `[Obsolete]`. Unlike the other compatibility overloads here, the call each
+  one serves — `new X(reader)` — is still correct, idiomatic code with nothing to migrate to, so a
+  deprecation warning would be noise. They are marked
+  `[EditorBrowsable(EditorBrowsableState.Never)]` instead, the usual treatment for an overload that
+  exists only to keep already-compiled assemblies loading.
+
+- **The `Encoding` properties on `FixedWidthBinaryExtractor<T>`, `FixedWidthBinaryLoader<T>`,
+  `FixedWidthMultiRecordExtractor` and `FixedWidthDataReader<T>`** are `[Obsolete]` rather than
+  removed, so 0.10.x source keeps compiling.
+
+  Resolution rule: **options win when supplied; the property is the fallback when they are not.**
+  The two cannot conflict in existing code, because the options constructor did not exist before
+  0.11.0 — a caller was necessarily using the property.
+
+  ```csharp
+  new X(stream) { Encoding = latin1 }                 // property honoured
+  new X(stream, new XOptions { Encoding = latin1 })   // supported route
+  new X(stream, new XOptions { Encoding = latin1 }) { Encoding = Encoding.ASCII }   // options win
+  ```
+
+  The value is resolved at the point of use, not captured in the constructor. That is load-bearing:
+  an `init` property is assigned *after* the constructor body runs, so capturing it there would read
+  the default and silently ignore whatever the caller set — the exact inert-property failure this
+  release set out to remove. Two of these properties were already inert on part of their own
+  surface: `FixedWidthDataReader<T>` said so in its XML doc, and `FixedWidthMultiRecordExtractor`
+  had the same silent gap. They are now honoured only where they mean something.
+
+  Three tests pin the rule, including the case that fails if the value is captured early.
+
+- **The pre-0.11.0 `Stream` constructors are `[Obsolete]` rather than removed.** On
+  `FixedWidthBinaryExtractor<T>`, `FixedWidthBinaryLoader<T>`, `FixedWidthMultiRecordExtractor` and
+  `FixedWidthDataReader<T>`:
+
+  ```csharp
+  X(Stream stream, ILogger<X> logger)                                    // obsolete
+  X(Stream stream, XOptions? options = null, ILogger<X>? logger = null)  // use this
+  ```
+
+  and on `FixedWidthExtractor<T>` / `FixedWidthLoader<T>`, which additionally took a loose encoding:
+
+  ```csharp
+  X(Stream stream, Encoding encoding)                                    // obsolete
+  X(Stream stream, ILogger<X> logger, Encoding encoding)                 // obsolete
+  X(Stream stream, XOptions? options = null, ILogger<X>? logger = null)  // use this
+  ```
+
+  Passing a `null` encoding to the obsolete overloads still means "use the default", as it did when
+  the parameter was declared `Encoding? encoding = null`.
+
+  These carry the **pre-0.11.0 binary signatures**, so already-compiled consumers keep working and
+  get a deprecation warning instead of a `MissingMethodException`. PackageValidation suppressions
+  drop from **95 to 55**.
+
+  Note there is deliberately no one-argument `X(Stream)` overload: 0.10.1 never emitted such a
+  signature. `new X(stream)` compiled to `.ctor(Stream, ILogger)` with `null` baked in at the
+  caller's compile time, so the two-argument shim is what restores compatibility. Adding a
+  one-argument overload would carry no compatibility value and would make `new X(stream)` — still
+  the correct call — emit a deprecation warning.
+
+  For the same reason `(TextReader)` / `(TextWriter)` are **not** restored: reinstating them would
+  make `new X(reader)` warn. Those two signatures, the replaced `Encoding` properties, and
+  `FixedWidthTransformer<TSource, TDestination>(Func<TSource, TDestination>)` remain recorded as
+  intentional breaks.
+
+  The obsolete overloads deliberately declare **no default arguments**. That is what keeps
+  `new X(stream)` unambiguous: an exact-arity candidate beats one that needs default-argument
+  substitution, so the call binds the obsolete overload with a warning. Giving them defaults
+  instead produces `CS0121` and breaks `new X(stream)` outright — worse than removing them.
+
+  One consequence while they exist: `new X(stream, logger: log)` binds the obsolete overload. Pass
+  `options: null` explicitly to reach the new constructor. Both go away when these are removed.
+
 ### Removed
 
 ### Fixed
+
+### Security
+
+## [0.11.0] - 2026-08-27
+
+Constructor configuration is now uniform across the package: every `Stream`-based constructor takes
+an options record, and the logger is always the last, optional parameter.
+
+**This release is binary-compatible with 0.10.1.** It began as a breaking change — nineteen removed
+members — and every one of them was subsequently restored as a compatibility overload or a
+deprecated property. `dotnet pack` records **zero** `PackageValidation` suppressions against the
+0.10.1 baseline, and `CompatibilitySuppressions.xml` has been deleted because there is nothing left
+to suppress. Existing compiled assemblies continue to load; existing source continues to compile,
+with deprecation warnings where an old style has a supported replacement.
+
+### Added
+
+- **Options records for every `Stream`-based constructor** — `FixedWidthExtractorOptions`,
+  `FixedWidthLoaderOptions`, `FixedWidthBinaryExtractorOptions`, `FixedWidthBinaryLoaderOptions`,
+  `FixedWidthMultiRecordExtractorOptions` and `FixedWidthDataReaderOptions`, each carrying an
+  `Encoding` property. Defaults are declared on the property initializers — `Encoding.UTF8`
+  everywhere except the binary types, which keep `Encoding.ASCII` — so no constructor body can
+  diverge from them. Omitting the options object gives the same result: the constructors resolve
+  `options ?? new FixedWidthXxxOptions()`.
+
+  The `TextReader`/`TextWriter` constructors deliberately take **no** options. A caller-supplied
+  reader or writer already carries its own encoding, so the setting would be inert there.
+
+- **`FixedWidthReportOptions` record and a `FixedWidthReport(FixedWidthReportOptions)`
+  constructor.** The two positional constructors differed only by whether the two extractor-only
+  counts appeared *in the middle* of the argument list, and four of the five parameters are `int`.
+  Naming each count at the call site removes the standing risk of transposing them. Every member
+  defaults to zero, so a loader states three counts instead of passing two explicit zeroes
+  positionally.
+
+- **A trailing optional logger on `FixedWidthTransformer<TSource, TDestination>`**, both on the
+  public constructor and on the internal timer-injecting one. It was the only type in the package
+  that accepted no logger at all. The transformer now emits Information-level started/completed
+  records mirroring `FixedWidthExtractor<T>`, so a pipeline's middle stage is no longer silent in
+  logs that show its extract and load stages.
+
+  Adding the parameter changes the emitted signature, so this is a binary — not source — break,
+  recorded as intentional alongside the others in this release.
+
+- **A trailing optional logger on the internal timer-injecting constructors** of
+  `FixedWidthBinaryExtractor<T>` and `FixedWidthBinaryLoader<T>`. They previously took a timer but
+  no logger, so a test could inject one or the other but not both.
+
+- **`FixedWidthMultiRecordExtractor(Stream, IProgressTimer, ILogger<...>? = null)`** (internal).
+  The `Stream` shape previously had no timer-injecting constructor, so only the `TextReader` shape
+  could be tested with a deterministic timer.
+
+### Changed
+
+- **`logger` is now optional on the `(TextReader, ILogger<T>)` / `(TextWriter, ILogger<T>)`
+  constructors**, defaulting to `NullLogger.Instance` rather than throwing `ArgumentNullException`.
+  The parameter list is unchanged, so the emitted signature is identical and this is not a binary
+  breaking change.
+
+- **Every type now has a single initialization path.** `FixedWidthExtractor<T>`,
+  `FixedWidthLoader<T>`, `FixedWidthMultiRecordExtractor` and `FixedWidthDataReader<T>` previously
+  assigned their shared fields independently in each constructor. They now chain into one private
+  constructor that assigns them in exactly one place. No API or behavior change — this closes the
+  gap that produced two shipped defects elsewhere in the fleet, including this package's own
+  internal constructor that hard-coded UTF-8 while its public counterpart honored the caller's
+  encoding.
+
+### Deprecated
+
+- **The two positional `FixedWidthReport` constructors** — `(int, int, long)` and
+  `(int, int, int, int, long)` — are `[Obsolete]` in favour of the `FixedWidthReportOptions`
+  overload. They still work and remain under test; they are scheduled for removal in a future
+  release. All six in-package call sites have moved to the new constructor.
+
+### Removed
+
+- **Breaking.** Six superseded constructors on `FixedWidthExtractor<T>` and `FixedWidthLoader<T>`
+  (#332):
+
+  - `(Stream, ILogger<T>, Encoding? = null)` — logger in the middle
+  - `(Stream, Encoding? = null)` — loose encoding parameter
+  - `(TextReader)` / `(TextWriter)` — subsumed by the optional-logger overload
+
+  Deleting them is **source-compatible**: existing calls rebind to the surviving constructors.
+  It is a **binary** break, because optional-argument defaults are baked in at the caller's compile
+  time, so already-compiled consumers must be recompiled.
+
+  They were briefly marked `[Obsolete]` instead. That was reverted: the superseded constructor won
+  overload resolution for the simplest call, so obsoleting it warned every caller writing perfectly
+  correct new code, and — with `TreatWarningsAsErrors` — broke them outright.
+
+### Fixed
+
+- **`netcoreapp3.1` and `net5.0` were running zero tests.** Both slots reported
+  *"No test is available"* and contributed nothing, while `dotnet test` exited non-zero with **no
+  reported failures** — so a green-looking local run said nothing about those two frameworks.
+
+  `xunit.runner.visualstudio` **2.8.2 ships `build`/`lib` assets for `net462` and `net6.0` only**, so
+  neither slot resolved a test adapter. The runner is now pinned per slot: **2.4.5** (the newest 2.x
+  that still ships a `netcoreapp3.1` asset, which `net5.0` also consumes) for those two frameworks,
+  2.8.2 everywhere else, both capped below `3.0.0` since runner 3.x drops these frameworks outright.
+
+  Restores **695** tests on `netcoreapp3.1` and **700** on `net5.0`. Test-infrastructure only — no
+  product code, no API change.
+
+- **A null `Stream` passed to `FixedWidthExtractor<T>` or `FixedWidthLoader<T>` reported the wrong
+  parameter name.** Both types route their two input shapes through one private constructor, and a
+  null stream fell through to the reader/writer branch — so the `ArgumentNullException` named
+  `reader` or `writer`, parameters the caller never passed, contradicting the documented contract.
+
+  Each constructor now null-checks its own source before delegating. Caught in review of the
+  single-initialization-path change earlier in this release, which introduced it;
+  `FixedWidthDataReader<T>` already did this correctly.
+
+- **`FixedWidthMultiRecordExtractor` had the same defect by a different route.** Its private core
+  checked for both sources being null and reported `reader` unconditionally, so a null `Stream`
+  was misnamed there too. Fixed the same way.
+
+  Each private core also keeps an explicit both-sources-null guard, throwing
+  `InvalidOperationException` rather than `ArgumentNullException` — at that point neither parameter
+  name is the one the caller passed, and naming one arbitrarily is the defect being guarded against.
+  It cannot fire through the public or internal surface; it exists so a constructor added later that
+  forgets its own null check fails loudly at construction. Reached by reflection in tests so the
+  guard is verified rather than merely asserted.
 
 ### Security
 

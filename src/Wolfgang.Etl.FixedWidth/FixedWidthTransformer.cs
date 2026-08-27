@@ -1,8 +1,11 @@
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using System.Threading;
 using System.Threading.Tasks;
 using Wolfgang.Etl.Abstractions;
@@ -36,6 +39,8 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
 {
     private readonly Func<TSource, TDestination> _transform;
 
+    private readonly ILogger _logger;
+
     private readonly IProgressTimer? _progressTimer;
 
     private bool _progressTimerWired;
@@ -50,20 +55,57 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
     /// format-converted fields.
     /// </summary>
     /// <param name="transform">The per-record projection.</param>
+    /// <param name="logger">
+    /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output. When
+    /// <see langword="null"/> — or omitted — <see cref="NullLogger.Instance"/> is used and logging
+    /// is disabled.
+    /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="transform"/> is <see langword="null"/>.</exception>
-    public FixedWidthTransformer(Func<TSource, TDestination> transform)
+    public FixedWidthTransformer
+    (
+        Func<TSource, TDestination> transform,
+        ILogger<FixedWidthTransformer<TSource, TDestination>>? logger = null
+    )
     {
         _transform = transform ?? throw new ArgumentNullException(nameof(transform));
+        _logger = logger ?? (ILogger)NullLogger.Instance;
     }
 
 
 
     // Test-only constructor that injects a deterministic progress timer.
-    internal FixedWidthTransformer(Func<TSource, TDestination> transform, IProgressTimer timer)
-        : this(transform)
+    internal FixedWidthTransformer
+    (
+        Func<TSource, TDestination> transform,
+        IProgressTimer timer,
+        ILogger<FixedWidthTransformer<TSource, TDestination>>? logger = null
+    )
+        : this(transform, logger)
     {
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }
+
+
+    /// <summary>
+    /// Binary-compatibility overload for 0.10.x callers. Equivalent to the constructor above with
+    /// no logger.
+    /// </summary>
+    /// <param name="transform">The source to use.</param>
+    /// <remarks>
+    /// 0.10.1 declared this as a separate constructor, so compiled assemblies reference
+    /// <c>.ctor(Func)</c> directly and would fail with <see cref="MissingMethodException"/>
+    /// without it. It is deliberately <b>not</b> <c>[Obsolete]</c>: unlike the other compatibility
+    /// overloads in this release, the call it serves — <c>new FixedWidthTransformer&lt;TSource, TDestination&gt;(transform)</c> — is still
+    /// correct, idiomatic code with nothing to migrate to, so warning on it would be noise. It is
+    /// hidden from IntelliSense instead, which is the usual treatment for an overload that exists
+    /// only to keep old binaries loading.
+    /// </remarks>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public FixedWidthTransformer(Func<TSource, TDestination> transform)
+        : this(transform, logger: null)
+    {
+    }
+
 
 
 
@@ -106,6 +148,8 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
         // reads nothing (TestKit TransformerBase cancellation contract).
         cancellationToken.ThrowIfCancellationRequested();
 
+        LogTransformationStarted();
+
         await foreach (var item in source.WithCancellation(cancellationToken).ConfigureAwait(false))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -130,6 +174,48 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
             IncrementCurrentItemCount();
             yield return result;
         }
+
+        LogTransformationCompleted();
+    }
+
+
+
+    // ------------------------------------------------------------------
+    // Logging helpers
+    // ------------------------------------------------------------------
+
+    private void LogTransformationStarted()
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation
+            (
+                "Transformation started for {SourceType} -> {DestinationType}. " +
+                "SkipItemCount={SkipItemCount}, MaximumItemCount={MaximumItemCount}",
+                typeof(TSource).Name,
+                typeof(TDestination).Name,
+                SkipItemCount,
+                MaximumItemCount
+            );
+        }
+    }
+
+
+
+    private void LogTransformationCompleted()
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation
+            (
+                "Transformation completed for {SourceType} -> {DestinationType}: " +
+                "{ItemCount} items transformed, {SkippedCount} skipped",
+                typeof(TSource).Name,
+                typeof(TDestination).Name,
+                CurrentItemCount,
+                CurrentSkippedItemCount
+            );
+        }
     }
 
 
@@ -139,11 +225,12 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
     {
         return new FixedWidthReport
         (
-            CurrentItemCount,
-            CurrentSkippedItemCount,
-            currentRejectedItemCount: 0,
-            currentFilteredLineCount: 0,
-            currentLineNumber: CurrentItemCount + CurrentSkippedItemCount
+            new FixedWidthReportOptions
+            {
+                CurrentCount = CurrentItemCount,
+                CurrentSkippedItemCount = CurrentSkippedItemCount,
+                CurrentLineNumber = CurrentItemCount + CurrentSkippedItemCount
+            }
         );
     }
 

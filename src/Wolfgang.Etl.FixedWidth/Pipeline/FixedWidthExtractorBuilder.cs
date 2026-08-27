@@ -196,7 +196,7 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
         {
             // The extractor wraps the caller's stream with leaveOpen:true, so dispose only the
             // extractor (to release its internal reader); the caller retains the stream.
-            extractor = new FixedWidthExtractor<T>(_stream, _encoding);
+            extractor = new FixedWidthExtractor<T>(_stream, new FixedWidthExtractorOptions { Encoding = _encoding });
             ownedResources = new object?[] { extractor };
         }
         else

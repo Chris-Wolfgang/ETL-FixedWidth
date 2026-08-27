@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -89,26 +90,6 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     // Constructor
     // ------------------------------------------------------------------
 
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> that reads
-    /// from the specified <see cref="TextReader"/>.
-    /// </summary>
-    /// <param name="reader">
-    /// The <see cref="TextReader"/> to read fixed-width records from. This can be a
-    /// <see cref="StreamReader"/> wrapping a file stream (local or network share), a
-    /// <see cref="StringReader"/> for in-memory content, or any other <see cref="TextReader"/>
-    /// implementation. Reading is performed synchronously for throughput; callers with
-    /// slow or non-buffered sources should pre-buffer into a <see cref="StringReader"/>.
-    /// The caller is responsible for the reader's lifetime.
-    /// </param>
-    /// <exception cref="ArgumentNullException"><paramref name="reader"/> is null.</exception>
-    public FixedWidthExtractor(TextReader reader)
-    {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _logger = NullLogger.Instance;
-    }
-
-
 
     /// <summary>
     /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> that reads
@@ -124,11 +105,10 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     public FixedWidthExtractor
     (
         TextReader reader,
-        ILogger<FixedWidthExtractor<TRecord>> logger
+        ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null, timer: null, logger: logger)
     {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
 
@@ -157,69 +137,72 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         IProgressTimer timer,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null,
+               timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
-        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
-        _logger = logger ?? (ILogger)NullLogger.Instance;
+    }
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> from a <see cref="Stream"/> decoded with the
+    /// supplied <see cref="Encoding"/>.
+    /// </summary>
+    /// <param name="stream">The stream to use.</param>
+    /// <param name="encoding">
+    /// The encoding to decode with, or <see langword="null"/> for the documented default.
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
+    [Obsolete("Use the constructor that takes FixedWidthExtractorOptions. This overload will be removed in a future release.")]
+    public FixedWidthExtractor(Stream stream, Encoding encoding)
+        : this(stream, options: ToOptions(encoding), logger: null)
+    {
     }
 
 
 
     /// <summary>
-    /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> that reads
-    /// from the specified <see cref="Stream"/> using an internal <see cref="StreamReader"/>
-    /// with a 64 KB buffer for improved throughput on large files.
+    /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> from a <see cref="Stream"/> decoded with the
+    /// supplied <see cref="Encoding"/>, with diagnostic logging.
     /// </summary>
-    /// <param name="stream">
-    /// The <see cref="Stream"/> to read fixed-width records from. The stream must be
-    /// readable. The caller retains ownership — the extractor does not dispose the stream.
-    /// </param>
+    /// <param name="stream">The stream to use.</param>
+    /// <param name="logger">The logger to use for diagnostic output.</param>
     /// <param name="encoding">
-    /// The <see cref="Encoding"/> used to decode the stream. Pass <see langword="null"/>
-    /// (the default) to use <see cref="Encoding.UTF8"/>.
+    /// The encoding to decode with, or <see langword="null"/> for the documented default.
+    /// </param>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
+    [Obsolete("Use the constructor that takes FixedWidthExtractorOptions. This overload will be removed in a future release.")]
+    public FixedWidthExtractor(Stream stream, ILogger<FixedWidthExtractor<TRecord>> logger, Encoding encoding)
+        : this(stream, options: ToOptions(encoding), logger: logger)
+    {
+    }
+
+
+
+
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> over the specified
+    /// <see cref="Stream"/>, with the logger as the trailing optional parameter.
+    /// </summary>
+    /// <param name="stream">The <see cref="Stream"/> to use.</param>
+    /// <param name="options">
+    /// Options that control behaviour, including the <see cref="FixedWidthExtractorOptions.Encoding"/>
+    /// to use. When <c>null</c>, the documented defaults apply.
+    /// </param>
+    /// <param name="logger">
+    /// An optional logger for diagnostic output. When <c>null</c> — or omitted —
+    /// <see cref="NullLogger.Instance"/> is used and logging is disabled.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
-    public FixedWidthExtractor(Stream stream, Encoding? encoding = null)
-    {
-        _reader = CreateBufferedReader(stream, encoding);
-        _ownsReader = true;
-        _offsetStream = stream;
-        _offsetEncoding = encoding ?? Encoding.UTF8;
-        _logger = NullLogger.Instance;
-    }
-
-
-
-    /// <summary>
-    /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> that reads
-    /// from the specified <see cref="Stream"/> with diagnostic logging.
-    /// The extractor creates an internal <see cref="StreamReader"/> with a 64 KB
-    /// buffer for improved throughput on large files.
-    /// </summary>
-    /// <param name="stream">
-    /// The <see cref="Stream"/> to read fixed-width records from. The stream must be
-    /// readable. The caller retains ownership — the extractor does not dispose the stream.
-    /// </param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
-    /// <param name="encoding">
-    /// The <see cref="Encoding"/> used to decode the stream. Pass <see langword="null"/>
-    /// (the default) to use <see cref="Encoding.UTF8"/>.
-    /// </param>
-    /// <exception cref="ArgumentNullException">
-    /// <paramref name="stream"/> or <paramref name="logger"/> is null.
-    /// </exception>
     public FixedWidthExtractor
     (
         Stream stream,
-        ILogger<FixedWidthExtractor<TRecord>> logger,
-        Encoding? encoding = null
+        FixedWidthExtractorOptions? options = null,
+        ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
+        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, timer: null, logger: logger)
     {
-        _reader = CreateBufferedReader(stream, encoding);
-        _ownsReader = true;
-        _offsetStream = stream;
-        _offsetEncoding = encoding ?? Encoding.UTF8;
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
 
@@ -239,6 +222,10 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// An optional <see cref="ILogger{TCategoryName}"/> for diagnostic output.
     /// Pass <see langword="null"/> to disable logging.
     /// </param>
+    /// <param name="options">
+    /// Options that control behaviour. When <c>null</c> — or omitted — the documented
+    /// defaults apply.
+    /// </param>
     /// <exception cref="ArgumentNullException">
     /// <paramref name="stream"/> or <paramref name="timer"/> is null.
     /// </exception>
@@ -246,16 +233,90 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     (
         Stream stream,
         IProgressTimer timer,
+        FixedWidthExtractorOptions? options = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
+        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options,
+               timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
-        _reader = CreateBufferedReader(stream, encoding: null);
-        _ownsReader = true;
-        _offsetStream = stream;
-        _offsetEncoding = Encoding.UTF8;
-        _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
+    }
+
+
+    // The single initialization path. Every public and internal constructor delegates here,
+    // so there is exactly one place that assigns the shared fields. The two input shapes
+    // cannot chain to one another, which is why this takes the private-core form rather than
+    // one constructor chaining into another. Exactly one of reader / stream is non-null:
+    // each boundary constructor null-checks its own source before delegating, so the
+    // ArgumentNullException names the parameter the caller actually passed.
+    private FixedWidthExtractor
+    (
+        TextReader? reader,
+        Stream? stream,
+        FixedWidthExtractorOptions? options,
+        IProgressTimer? timer,
+        ILogger<FixedWidthExtractor<TRecord>>? logger
+    )
+    {
+        // Defensive invariant guard. Every caller-facing constructor null-checks its own source
+        // before delegating here, so this cannot fire today — it exists so that a constructor added
+        // later which forgets that check fails loudly at construction instead of NullReferencing
+        // somewhere downstream. It deliberately does NOT throw ArgumentNullException: neither
+        // parameter name would be the one the caller actually passed, which is the exact defect
+        // this class of guard is here to prevent.
+        if (reader is null && stream is null)
+        {
+            throw new InvalidOperationException
+            (
+                "Exactly one of reader or stream must be supplied."
+            );
+        }
+
+        if (stream is not null)
+        {
+            var resolved = options ?? new FixedWidthExtractorOptions();
+            _reader = CreateBufferedReader(stream, resolved.Encoding);
+            _ownsReader = true;
+            _offsetStream = stream;
+            _offsetEncoding = resolved.Encoding;
+        }
+        else
+        {
+            _reader = reader!;
+        }
+
+        _progressTimer = timer;
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
+
+
+    /// <summary>
+    /// Binary-compatibility overload for 0.10.x callers. Equivalent to the constructor above with
+    /// no logger.
+    /// </summary>
+    /// <param name="reader">The source to use.</param>
+    /// <remarks>
+    /// 0.10.1 declared this as a separate constructor, so compiled assemblies reference
+    /// <c>.ctor(TextReader)</c> directly and would fail with <see cref="MissingMethodException"/>
+    /// without it. It is deliberately <b>not</b> <c>[Obsolete]</c>: unlike the other compatibility
+    /// overloads in this release, the call it serves — <c>new FixedWidthExtractor(reader)</c> — is still
+    /// correct, idiomatic code with nothing to migrate to, so warning on it would be noise. It is
+    /// hidden from IntelliSense instead, which is the usual treatment for an overload that exists
+    /// only to keep old binaries loading.
+    /// </remarks>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public FixedWidthExtractor(TextReader reader)
+        : this(reader, logger: null)
+    {
+    }
+
+
+    // The removed constructors took a loose Encoding. Callers reaching them through the obsolete
+    // overloads above could legitimately pass null, which meant "use the default" - so null must
+    // map to no options rather than to an options record carrying a null Encoding.
+    private static FixedWidthExtractorOptions? ToOptions(Encoding? encoding)
+        => encoding is null ? null : new FixedWidthExtractorOptions { Encoding = encoding };
+
+
 
 
 
@@ -687,11 +748,14 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     {
         return new FixedWidthReport
         (
-            CurrentItemCount,
-            CurrentSkippedItemCount,
-            CurrentRejectedItemCount,
-            CurrentFilteredLineCount,
-            Interlocked.Read(ref _currentLineNumber)
+            new FixedWidthReportOptions
+            {
+                CurrentCount = CurrentItemCount,
+                CurrentSkippedItemCount = CurrentSkippedItemCount,
+                CurrentRejectedItemCount = CurrentRejectedItemCount,
+                CurrentFilteredLineCount = CurrentFilteredLineCount,
+                CurrentLineNumber = Interlocked.Read(ref _currentLineNumber)
+            }
         );
     }
 

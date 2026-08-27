@@ -22,7 +22,7 @@ var accounts = new[]
 
 using var buffer = new MemoryStream();
 int recordBytes;
-using (var loader = new FixedWidthBinaryLoader<Account>(buffer))
+using (var loader = new FixedWidthBinaryLoader<Account>(buffer, options: null))
 {
     recordBytes = loader.RecordByteLength;
     await loader.LoadAsync(ToAsync(accounts), CancellationToken.None);
@@ -32,7 +32,7 @@ Console.WriteLine($"Wrote {accounts.Length} records = {buffer.Length} bytes ({re
 Console.WriteLine();
 
 buffer.Position = 0;
-using var extractor = new FixedWidthBinaryExtractor<Account>(buffer);
+using var extractor = new FixedWidthBinaryExtractor<Account>(buffer, options: null);
 
 Console.WriteLine($"  {"AccountId",-10} {"Txns",5} {"Balance",12}");
 Console.WriteLine($"  {new string('-', 10)} {new string('-', 5)} {new string('-', 12)}");
@@ -44,7 +44,7 @@ await foreach (var account in extractor.ExtractAsync(CancellationToken.None))
 // Real mainframe data is usually EBCDIC — register the code-page provider and pass the encoding:
 //
 //     System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);   // System.Text.Encoding.CodePages
-//     var extractor = new FixedWidthBinaryExtractor<Account>(stream, System.Text.Encoding.GetEncoding("IBM037"));
+//     var extractor = new FixedWidthBinaryExtractor<Account>(stream, System.Text.Encoding.GetEncoding("IBM037"), options: null);
 
 #pragma warning disable CS1998 // synchronous sample sequence
 static async IAsyncEnumerable<Account> ToAsync(IEnumerable<Account> items)

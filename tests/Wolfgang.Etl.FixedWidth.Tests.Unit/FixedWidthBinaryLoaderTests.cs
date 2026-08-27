@@ -54,7 +54,7 @@ public sealed class FixedWidthBinaryLoaderTests
         };
 
         using var ms = new MemoryStream();
-        using (var loader = new FixedWidthBinaryLoader<Account>(ms))
+        using (var loader = new FixedWidthBinaryLoader<Account>(ms, options: null))
         {
             Assert.Equal(17, loader.RecordByteLength);
             await loader.LoadAsync(ToAsync(accounts), CancellationToken.None);
@@ -63,7 +63,7 @@ public sealed class FixedWidthBinaryLoaderTests
         Assert.Equal(34, ms.Length);   // 2 × 17-byte records, no delimiters
 
         ms.Position = 0;
-        using var extractor = new FixedWidthBinaryExtractor<Account>(ms);
+        using var extractor = new FixedWidthBinaryExtractor<Account>(ms, options: null);
         var read = await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
 
         Assert.Equal(2, read.Count);
@@ -82,7 +82,7 @@ public sealed class FixedWidthBinaryLoaderTests
         var accounts = new[] { new Account { AccountId = "ACCT0001", TransactionCount = 42, Balance = 1234.56m } };
         var logger = new SpyLogger<FixedWidthBinaryLoader<Account>>();
         using var ms = new MemoryStream();
-        using var loader = new FixedWidthBinaryLoader<Account>(ms, logger);
+        using var loader = new FixedWidthBinaryLoader<Account>(ms, options: null, logger: logger);
 
         await loader.LoadAsync(ToAsync(accounts), CancellationToken.None);
 
@@ -102,7 +102,7 @@ public sealed class FixedWidthBinaryLoaderTests
     {
         var accounts = new[] { new Account { AccountId = "TOO-LONG-ACCOUNT-ID", TransactionCount = 1, Balance = 0m } };
         using var ms = new MemoryStream();
-        using var loader = new FixedWidthBinaryLoader<Account>(ms);
+        using var loader = new FixedWidthBinaryLoader<Account>(ms, options: null);
 
         await Assert.ThrowsAsync<Exceptions.FieldOverflowException>(async () =>
             await loader.LoadAsync(ToAsync(accounts), CancellationToken.None));
@@ -119,8 +119,8 @@ public sealed class FixedWidthBinaryLoaderTests
     [Fact]
     public void Constructor_validates_the_stream()
     {
-        Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryLoader<Account>(null!));
-        Assert.Throws<ArgumentException>(() => new FixedWidthBinaryLoader<Account>(new ReadOnlyStream()));
+        Assert.Throws<ArgumentNullException>(() => new FixedWidthBinaryLoader<Account>(null!, options: null));
+        Assert.Throws<ArgumentException>(() => new FixedWidthBinaryLoader<Account>(new ReadOnlyStream(), options: null));
     }
 
 
@@ -128,7 +128,7 @@ public sealed class FixedWidthBinaryLoaderTests
     public async Task LoadAsync_rejects_a_null_source()
     {
         using var ms = new MemoryStream();
-        using var loader = new FixedWidthBinaryLoader<Account>(ms);
+        using var loader = new FixedWidthBinaryLoader<Account>(ms, options: null);
 
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await loader.LoadAsync(null!, CancellationToken.None));
     }
@@ -139,7 +139,7 @@ public sealed class FixedWidthBinaryLoaderTests
     {
         var accounts = new[] { new Account { AccountId = "A", TransactionCount = 1, Balance = 1m } };
         using var ms = new MemoryStream();
-        using var loader = new FixedWidthBinaryLoader<Account>(ms);
+        using var loader = new FixedWidthBinaryLoader<Account>(ms, options: null);
         using var cts = new CancellationTokenSource();
         cts.Cancel();
 
@@ -154,7 +154,7 @@ public sealed class FixedWidthBinaryLoaderTests
     public async Task LoadAsync_cancelled_mid_stream_stops_writing_the_next_record()
     {
         using var ms = new MemoryStream();
-        using var loader = new FixedWidthBinaryLoader<Account>(ms);
+        using var loader = new FixedWidthBinaryLoader<Account>(ms, options: null);
         using var cts = new CancellationTokenSource();
 
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
@@ -180,7 +180,7 @@ public sealed class FixedWidthBinaryLoaderTests
         // "€" is one char but three UTF-8 bytes; padded to 8 chars it encodes to more than 8 bytes.
         var accounts = new[] { new Account { AccountId = "€", TransactionCount = 1, Balance = 0m } };
         using var ms = new MemoryStream();
-        using var loader = new FixedWidthBinaryLoader<Account>(ms) { Encoding = System.Text.Encoding.UTF8 };
+        using var loader = new FixedWidthBinaryLoader<Account>(ms, new FixedWidthBinaryLoaderOptions { Encoding = System.Text.Encoding.UTF8 });
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await loader.LoadAsync(ToAsync(accounts), CancellationToken.None));
@@ -192,7 +192,7 @@ public sealed class FixedWidthBinaryLoaderTests
     {
         var accounts = new[] { new Account { AccountId = "A", TransactionCount = 1, Balance = 1m } };
         using var ms = new MemoryStream();
-        using var loader = new FixedWidthBinaryLoader<Account>(ms);
+        using var loader = new FixedWidthBinaryLoader<Account>(ms, options: null);
         var sink = new CollectingProgress();
 
         await loader.LoadAsync(ToAsync(accounts), sink, CancellationToken.None);
@@ -212,7 +212,7 @@ public sealed class FixedWidthBinaryLoaderTests
         using var ms = new MemoryStream();
         var timer = new ManualProgressTimer();
         var sink = new CollectingProgress();
-        using var loader = new FixedWidthBinaryLoader<Account>(ms, timer);
+        using var loader = new FixedWidthBinaryLoader<Account>(ms, timer, options: null);
 
         // The loader consumes the sequence internally; fire the timer from the source as each item flows.
         await loader.LoadAsync(Fired(accounts, timer), sink, CancellationToken.None);
@@ -263,6 +263,22 @@ public sealed class FixedWidthBinaryLoaderTests
 
 
     [ExcludeFromCodeCoverage]
+    [Fact]
+    public void Internal_timer_ctor_accepts_a_logger_as_its_trailing_parameter()
+    {
+        // Rule 6: the logger is last on internal constructors too. This overload previously took
+        // a timer but no logger, so a test could inject one or the other, never both.
+        using var sut = new FixedWidthBinaryLoader<Account>
+        (
+            new MemoryStream(),
+            new ManualProgressTimer(),
+            logger: null
+        , options: null);
+
+        Assert.NotNull(sut);
+    }
+
+
     private sealed class CollectingProgress : IProgress<FixedWidthReport>
     {
         public List<FixedWidthReport> Reports { get; } = new();
