@@ -94,7 +94,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
-## [0.11.0] - 2026-08-26
+## [0.11.0] - 2026-08-27
 
 Constructor configuration is now uniform across the package: every `Stream`-based constructor takes
 an options record, and the logger is always the last, optional parameter.
