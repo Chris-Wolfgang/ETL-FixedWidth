@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -286,6 +287,28 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         _progressTimer = timer;
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
+
+
+    /// <summary>
+    /// Binary-compatibility overload for 0.10.x callers. Equivalent to the constructor above with
+    /// no logger.
+    /// </summary>
+    /// <param name="reader">The source to use.</param>
+    /// <remarks>
+    /// 0.10.1 declared this as a separate constructor, so compiled assemblies reference
+    /// <c>.ctor(TextReader)</c> directly and would fail with <see cref="MissingMethodException"/>
+    /// without it. It is deliberately <b>not</b> <c>[Obsolete]</c>: unlike the other compatibility
+    /// overloads in this release, the call it serves — <c>new FixedWidthExtractor(reader)</c> — is still
+    /// correct, idiomatic code with nothing to migrate to, so warning on it would be noise. It is
+    /// hidden from IntelliSense instead, which is the usual treatment for an overload that exists
+    /// only to keep old binaries loading.
+    /// </remarks>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public FixedWidthExtractor(TextReader reader)
+        : this(reader, logger: null)
+    {
+    }
+
 
     // The removed constructors took a loose Encoding. Callers reaching them through the obsolete
     // overloads above could legitimately pass null, which meant "use the default" - so null must

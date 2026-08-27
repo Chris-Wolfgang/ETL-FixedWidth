@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
+- **Binary-compatibility overloads without deprecation.**
+  `FixedWidthExtractor<T>(TextReader)`, `FixedWidthLoader<T>(TextWriter)` and
+  `FixedWidthTransformer<TSource, TDestination>(Func<TSource, TDestination>)` are restored, but
+  deliberately **not** `[Obsolete]`. Unlike the other compatibility overloads here, the call each
+  one serves — `new X(reader)` — is still correct, idiomatic code with nothing to migrate to, so a
+  deprecation warning would be noise. They are marked
+  `[EditorBrowsable(EditorBrowsableState.Never)]` instead, the usual treatment for an overload that
+  exists only to keep already-compiled assemblies loading.
+
 - **The `Encoding` properties on `FixedWidthBinaryExtractor<T>`, `FixedWidthBinaryLoader<T>`,
   `FixedWidthMultiRecordExtractor` and `FixedWidthDataReader<T>`** are `[Obsolete]` rather than
   removed, so 0.10.x source keeps compiling.
@@ -87,9 +96,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.11.0] - 2026-08-26
 
-**Breaking release.** Constructor configuration is now uniform across the package: every
-`Stream`-based constructor takes an options record, and the logger is always the last, optional
-parameter. Six superseded constructors and four public `Encoding` properties are gone.
+Constructor configuration is now uniform across the package: every `Stream`-based constructor takes
+an options record, and the logger is always the last, optional parameter.
+
+**This release is binary-compatible with 0.10.1.** It began as a breaking change — nineteen removed
+members — and every one of them was subsequently restored as a compatibility overload or a
+deprecated property. `dotnet pack` records **zero** `PackageValidation` suppressions against the
+0.10.1 baseline, and `CompatibilitySuppressions.xml` has been deleted because there is nothing left
+to suppress. Existing compiled assemblies continue to load; existing source continues to compile,
+with deprecation warnings where an old style has a supported replacement.
 
 ### Added
 

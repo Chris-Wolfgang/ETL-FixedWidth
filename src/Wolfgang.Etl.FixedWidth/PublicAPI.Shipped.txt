@@ -180,6 +180,7 @@ Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FieldSeparator.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>!>! logger, System.Text.Encoding! encoding) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream! stream, System.Text.Encoding! encoding) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.Stream! stream, Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions? options = null, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.TextReader! reader) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.IO.TextReader! reader, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.HasHeader.get -> bool
 Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.HasHeader.set -> void
@@ -227,6 +228,7 @@ Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FieldSeparator.set -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream! stream, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>!>! logger, System.Text.Encoding! encoding) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream! stream, System.Text.Encoding! encoding) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.Stream! stream, Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions? options = null, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>!>? logger = null) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.TextWriter! writer) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.TextWriter! writer, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>!>? logger = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.HeaderConverter.get -> System.Func<string!, Wolfgang.Etl.FixedWidth.FieldContext!, string!>!
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.HeaderConverter.set -> void
@@ -306,6 +308,7 @@ Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.Field<TProperty>(System.Linq.
 Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.FixedWidthSchemaBuilder() -> void
 Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>.Skip(int index, int length, string? message = null) -> Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>!
 Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>
+Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination>! transform) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination>! transform, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>!>? logger = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthValueParser
 Wolfgang.Etl.FixedWidth.Generated.GeneratedAccessorRegistry
