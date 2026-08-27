@@ -13,6 +13,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
+- **The `Encoding` properties on `FixedWidthBinaryExtractor<T>`, `FixedWidthBinaryLoader<T>`,
+  `FixedWidthMultiRecordExtractor` and `FixedWidthDataReader<T>`** are `[Obsolete]` rather than
+  removed, so 0.10.x source keeps compiling.
+
+  Resolution rule: **options win when supplied; the property is the fallback when they are not.**
+  The two cannot conflict in existing code, because the options constructor did not exist before
+  0.11.0 — a caller was necessarily using the property.
+
+  ```csharp
+  new X(stream) { Encoding = latin1 }                 // property honoured
+  new X(stream, new XOptions { Encoding = latin1 })   // supported route
+  new X(stream, new XOptions { Encoding = latin1 }) { Encoding = Encoding.ASCII }   // options win
+  ```
+
+  The value is resolved at the point of use, not captured in the constructor. That is load-bearing:
+  an `init` property is assigned *after* the constructor body runs, so capturing it there would read
+  the default and silently ignore whatever the caller set — the exact inert-property failure this
+  release set out to remove. Two of these properties were already inert on part of their own
+  surface: `FixedWidthDataReader<T>` said so in its XML doc, and `FixedWidthMultiRecordExtractor`
+  had the same silent gap. They are now honoured only where they mean something.
+
+  Three tests pin the rule, including the case that fails if the value is captured early.
+
 - **The pre-0.11.0 `Stream` constructors are `[Obsolete]` rather than removed.** On
   `FixedWidthBinaryExtractor<T>`, `FixedWidthBinaryLoader<T>`, `FixedWidthMultiRecordExtractor` and
   `FixedWidthDataReader<T>`:
@@ -128,20 +151,6 @@ parameter. Six superseded constructors and four public `Encoding` properties are
   release. All six in-package call sites have moved to the new constructor.
 
 ### Removed
-
-- **Breaking.** The public `Encoding` properties on `FixedWidthBinaryExtractor<T>`,
-  `FixedWidthBinaryLoader<T>`, `FixedWidthMultiRecordExtractor` and `FixedWidthDataReader<T>` are
-  replaced by the `Encoding` property on their options records.
-
-  ```diff
-  - new FixedWidthBinaryExtractor<T>(stream) { Encoding = Encoding.Latin1 }
-  + new FixedWidthBinaryExtractor<T>(stream, new FixedWidthBinaryExtractorOptions { Encoding = Encoding.Latin1 })
-  ```
-
-  Two of these were inert on part of their own surface. `FixedWidthDataReader<T>` said so in its
-  XML doc — `Encoding` was *"ignored when constructed from a `TextReader`"* — and
-  `FixedWidthMultiRecordExtractor` had the same silent gap. Scoping the setting to the `Stream`
-  constructor removes it from the path where it did nothing. Defaults are unchanged.
 
 - **Breaking.** Six superseded constructors on `FixedWidthExtractor<T>` and `FixedWidthLoader<T>`
   (#332):
