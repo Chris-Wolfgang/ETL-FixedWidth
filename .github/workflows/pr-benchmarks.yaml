@@ -165,7 +165,7 @@ jobs:
           python3 benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/scripts/regression-gate.py \
             "${{ steps.locate.outputs.report }}" \
             "$RUNNER_TEMP/baseline-data.js" \
-            1.50 \
+            1.001 \
             1
 
       - name: Record gate result for the confirm job
