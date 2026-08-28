@@ -11,10 +11,17 @@ name: PR Benchmarks
 # candidates. Full mutation-style cost is avoided by BDN's --job short.
 #
 # The actual gate is a retry-confirmed absolute-floor comparison (see the
-# "regression gate" steps below), not the vanilla action's ratio-only alert.
+# "regression gate" job below), not the vanilla action's ratio-only alert.
 # ETL-Abstractions#427 showed a single noisy shared-runner sample can push
 # every file-I/O benchmark 2-4x with no code change involved; a regression
-# only fails this job if it reproduces on a second, independent run.
+# only fails this workflow if it reproduces on a second, independent sample.
+#
+# The confirmation MUST be a separate job, not a second step in the same job:
+# GitHub Actions only provisions a fresh runner VM per job, not per step. An
+# earlier version of this workflow re-ran the benchmarks as a later step in
+# the same job and both samples landed on the identical runner (confirmed via
+# the BDN host-environment line: same CPU model, same run) — that is not an
+# independent sample and does not actually rule out a bad-runner event.
 
 on:
   pull_request:
@@ -44,6 +51,9 @@ jobs:
     permissions:
       contents: read
       pull-requests: write   # post / update the delta comment
+
+    outputs:
+      gate_failed: ${{ steps.gate1_result.outputs.failed }}
 
     steps:
       - name: Checkout repository
@@ -141,14 +151,14 @@ jobs:
         # baseline scale, not copied verbatim. It still only rescues small,
         # low-absolute-magnitude noise; it does NOT by itself clear the
         # large-absolute-magnitude I/O noise seen at higher record counts —
-        # that's what the retry step below is for.
+        # that's what the confirm-on-independent-runner job is for.
         #
         # continue-on-error: a single alert here is not trusted on its own —
         # investigating ETL-Abstractions#427 showed one real GH-hosted-runner
         # noise event can push every file benchmark 2-4x, at every record
-        # count, and that a second run on fresh hardware clears completely.
-        # So a first-sample alert only triggers a confirmation re-run below;
-        # it does not fail the job by itself.
+        # count, and that a fresh runner clears completely. So a first-sample
+        # alert only triggers the confirm job below; it does not fail this
+        # job by itself.
         id: gate1
         continue-on-error: true
         run: |
@@ -158,40 +168,74 @@ jobs:
             1.50 \
             200000
 
-      - name: Re-run benchmarks to confirm a flagged regression
-        # Only runs when gate1 alerted. A single noisy sample isn't enough
-        # evidence (see ETL-Abstractions#427) — re-run once on a fresh runner
-        # and only fail if the regression reproduces.
-        if: steps.gate1.outcome == 'failure'
+      - name: Record gate result for the confirm job
+        id: gate1_result
+        if: always()
+        run: echo "failed=${{ steps.gate1.outcome == 'failure' }}" >> "$GITHUB_OUTPUT"
+
+  confirm-regression:
+    name: Confirm regression on an independent runner
+    needs: benchmark
+    if: needs.benchmark.outputs.gate_failed == 'true'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
+        with:
+          dotnet-version: |
+            10.0.x
+
+      - name: Restore
+        run: dotnet restore benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks.csproj
+
+      - name: Build (Release)
+        run: dotnet build -c Release --no-restore benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks.csproj
+
+      - name: Run benchmarks
         working-directory: benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks
         run: dotnet run -c Release --no-build -- --filter "*" --job short --memory --exporters json
 
-      - name: Merge per-class BDN reports (retry)
-        id: locate_retry
-        if: steps.gate1.outcome == 'failure'
+      - name: Merge per-class BDN reports
+        id: locate
         working-directory: benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks
         run: |
           shopt -s nullglob
           reports=(BenchmarkDotNet.Artifacts/results/*-report-full-compressed.json)
           if [ ${#reports[@]} -eq 0 ]; then
-            echo "::error::No BenchmarkDotNet JSON report found on retry"
+            echo "::error::No BenchmarkDotNet JSON report found"
             exit 1
           fi
           jq -s '{
-            Title: "BenchmarkDotNet combined report (retry)",
+            Title: "BenchmarkDotNet combined report (confirm)",
             HostEnvironmentInfo: .[0].HostEnvironmentInfo,
             Benchmarks: [.[].Benchmarks[]]
-          }' "${reports[@]}" > benchmarks-result-retry.json
-          echo "report=benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/benchmarks-result-retry.json" >> "$GITHUB_OUTPUT"
+          }' "${reports[@]}" > benchmarks-result.json
+          echo "report=benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/benchmarks-result.json" >> "$GITHUB_OUTPUT"
 
-      - name: Absolute-floor regression gate (#367) - confirm on retry
+      - name: Fetch the gh-pages benchmark baseline
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin gh-pages
+          git show FETCH_HEAD:dev/bench/data.js > "$RUNNER_TEMP/baseline-data.js"
+
+      - name: Absolute-floor regression gate (#367) - confirm
         # This one is NOT continue-on-error: if the regression reproduces on
-        # a second, independent sample, that's real signal and the job fails.
-        # If it clears here, treat the first alert as noise and pass.
-        if: steps.gate1.outcome == 'failure'
+        # this second, independent runner, that's real signal and the
+        # workflow fails. If it clears here, the first alert was noise and
+        # the workflow passes (the "benchmark" job above already succeeded
+        # for everything except this gate, per continue-on-error there).
         run: |
           python3 benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/scripts/regression-gate.py \
-            "${{ steps.locate_retry.outputs.report }}" \
+            "${{ steps.locate.outputs.report }}" \
             "$RUNNER_TEMP/baseline-data.js" \
             1.50 \
             200000
