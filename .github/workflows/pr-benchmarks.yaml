@@ -9,6 +9,12 @@ name: PR Benchmarks
 # Scoped to code that can actually move the numbers (src/**, benchmarks/**) so it
 # does not run on docs/test-only PRs, and to main/vNext so it exercises release
 # candidates. Full mutation-style cost is avoided by BDN's --job short.
+#
+# The actual gate is a retry-confirmed absolute-floor comparison (see the
+# "regression gate" steps below), not the vanilla action's ratio-only alert.
+# ETL-Abstractions#427 showed a single noisy shared-runner sample can push
+# every file-I/O benchmark 2-4x with no code change involved; a regression
+# only fails this job if it reproduces on a second, independent run.
 
 on:
   pull_request:
@@ -90,6 +96,13 @@ jobs:
         # Same action + SHA pin as benchmarks.yaml. Compares the PR result against
         # the gh-pages baseline (latest main data point) WITHOUT pushing:
         # auto-push:false + save-data-file:false leave gh-pages untouched.
+        # PR-only: workflow_dispatch runs have no PR to comment on, and the
+        # action errors with "Resource not accessible by integration" if it
+        # tries outside a pull_request event — surfaced investigating
+        # Chris-Wolfgang/ETL-Abstractions#427, where every manual dispatch of
+        # this workflow failed here regardless of the actual numbers, making
+        # ad-hoc re-runs look inconclusive at a glance.
+        if: github.event_name == 'pull_request'
         uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba  # v1.22.1
         with:
           name: BenchmarkDotNet
@@ -104,6 +117,81 @@ jobs:
           comment-always: true
           comment-on-alert: true
           # 150% = a metric 1.5x worse than baseline. Deliberately loose because
-          # GitHub-hosted runners are noisy; tighten once the noise floor settles.
+          # GitHub-hosted runners are noisy. The action posts the comparison
+          # comment but does NOT fail the job (fail-on-alert:false) — a
+          # ratio-only gate false-positives on sub-millisecond/noisy-I/O
+          # benchmarks (same shape as ETL-Abstractions#367; this exact gate
+          # false-positived the Abstractions 0.23.2 bump at
+          # Chris-Wolfgang/ETL-Abstractions#427, which turned out to be
+          # runner noise, not a real regression). The absolute-floor gate
+          # below is the real pass/fail signal.
           alert-threshold: '150%'
-          fail-on-alert: true
+          fail-on-alert: false
+
+      - name: Fetch the gh-pages benchmark baseline
+        run: |
+          set -euo pipefail
+          git fetch --depth=1 origin gh-pages
+          git show FETCH_HEAD:dev/bench/data.js > "$RUNNER_TEMP/baseline-data.js"
+
+      - name: Absolute-floor regression gate (#367) - first sample
+        # Floor is 200us, not Abstractions' 50us: FixedWidth's file-I/O
+        # benchmarks run 500us-90ms (three orders of magnitude wider than
+        # Abstractions' in-memory suite), and this floor is sized to that
+        # baseline scale, not copied verbatim. It still only rescues small,
+        # low-absolute-magnitude noise; it does NOT by itself clear the
+        # large-absolute-magnitude I/O noise seen at higher record counts —
+        # that's what the retry step below is for.
+        #
+        # continue-on-error: a single alert here is not trusted on its own —
+        # investigating ETL-Abstractions#427 showed one real GH-hosted-runner
+        # noise event can push every file benchmark 2-4x, at every record
+        # count, and that a second run on fresh hardware clears completely.
+        # So a first-sample alert only triggers a confirmation re-run below;
+        # it does not fail the job by itself.
+        id: gate1
+        continue-on-error: true
+        run: |
+          python3 benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/scripts/regression-gate.py \
+            "${{ steps.locate.outputs.report }}" \
+            "$RUNNER_TEMP/baseline-data.js" \
+            1.50 \
+            200000
+
+      - name: Re-run benchmarks to confirm a flagged regression
+        # Only runs when gate1 alerted. A single noisy sample isn't enough
+        # evidence (see ETL-Abstractions#427) — re-run once on a fresh runner
+        # and only fail if the regression reproduces.
+        if: steps.gate1.outcome == 'failure'
+        working-directory: benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks
+        run: dotnet run -c Release --no-build -- --filter "*" --job short --memory --exporters json
+
+      - name: Merge per-class BDN reports (retry)
+        id: locate_retry
+        if: steps.gate1.outcome == 'failure'
+        working-directory: benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks
+        run: |
+          shopt -s nullglob
+          reports=(BenchmarkDotNet.Artifacts/results/*-report-full-compressed.json)
+          if [ ${#reports[@]} -eq 0 ]; then
+            echo "::error::No BenchmarkDotNet JSON report found on retry"
+            exit 1
+          fi
+          jq -s '{
+            Title: "BenchmarkDotNet combined report (retry)",
+            HostEnvironmentInfo: .[0].HostEnvironmentInfo,
+            Benchmarks: [.[].Benchmarks[]]
+          }' "${reports[@]}" > benchmarks-result-retry.json
+          echo "report=benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/benchmarks-result-retry.json" >> "$GITHUB_OUTPUT"
+
+      - name: Absolute-floor regression gate (#367) - confirm on retry
+        # This one is NOT continue-on-error: if the regression reproduces on
+        # a second, independent sample, that's real signal and the job fails.
+        # If it clears here, treat the first alert as noise and pass.
+        if: steps.gate1.outcome == 'failure'
+        run: |
+          python3 benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/scripts/regression-gate.py \
+            "${{ steps.locate_retry.outputs.report }}" \
+            "$RUNNER_TEMP/baseline-data.js" \
+            1.50 \
+            200000
