@@ -166,7 +166,7 @@ jobs:
             "${{ steps.locate.outputs.report }}" \
             "$RUNNER_TEMP/baseline-data.js" \
             1.50 \
-            200000
+            1
 
       - name: Record gate result for the confirm job
         id: gate1_result
@@ -238,4 +238,4 @@ jobs:
             "${{ steps.locate.outputs.report }}" \
             "$RUNNER_TEMP/baseline-data.js" \
             1.50 \
-            200000
+            1
