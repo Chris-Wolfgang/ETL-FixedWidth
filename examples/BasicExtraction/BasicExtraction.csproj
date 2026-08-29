@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Wolfgang.Etl.TestKit" Version="0.23.1" />
+    <PackageReference Include="Wolfgang.Etl.TestKit" Version="0.23.3" />
   </ItemGroup>
 
   <!-- Analyzer PackageReferences are centralized in Directory.Build.props -->
