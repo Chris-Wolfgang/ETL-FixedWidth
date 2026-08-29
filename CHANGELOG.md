@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `Wolfgang.Etl.Abstractions` family bumped **0.23.1 → 0.23.3** (drop-in, no shipped-API change).
+  Lifts the pin added in 0.10.1 pending
+  [Chris-Wolfgang/ETL-Abstractions#427](https://github.com/Chris-Wolfgang/ETL-Abstractions/issues/427):
+  re-running the same benchmarks fresh confirmed the 2-4x file-write "regression" reported against
+  0.23.2 was GitHub-hosted-runner noise, not a real code/version regression — the compiled
+  Abstractions DLL is byte-identical between 0.23.1 and 0.23.2/0.23.3 at the IL level. Bumping
+  straight to 0.23.3 rather than back to 0.23.2, since 0.23.3 is now the latest published version
+  and is a purely internal/analyzer change with no behavior or public-API difference from 0.23.2.
+
 ### Deprecated
 
 - **Binary-compatibility overloads without deprecation.**
