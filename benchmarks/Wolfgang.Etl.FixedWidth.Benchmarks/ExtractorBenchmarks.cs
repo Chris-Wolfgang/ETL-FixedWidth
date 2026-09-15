@@ -36,7 +36,7 @@ public class ExtractorBenchmarks
 
         _data = Encoding.UTF8.GetBytes(sb.ToString());
 
-        _filePath = Path.Combine(Path.GetTempPath(), $"fw_bench_extract_{RecordCount}.txt");
+        _filePath = BenchmarkScratch.PathFor($"fw_bench_extract_{RecordCount}.txt");
         await File.WriteAllBytesAsync(_filePath, _data);
     }
 

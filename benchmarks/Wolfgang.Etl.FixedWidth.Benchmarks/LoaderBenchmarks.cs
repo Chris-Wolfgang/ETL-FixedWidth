@@ -35,7 +35,7 @@ public class LoaderBenchmarks
             };
         }
 
-        _filePath = Path.Combine(Path.GetTempPath(), $"fw_bench_load_{RecordCount}.txt");
+        _filePath = BenchmarkScratch.PathFor($"fw_bench_load_{RecordCount}.txt");
     }
 
 
