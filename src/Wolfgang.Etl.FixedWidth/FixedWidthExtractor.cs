@@ -107,7 +107,27 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         TextReader reader,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
-        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null, timer: null, logger: logger)
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null, encoding: null, timer: null, logger: logger)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance that reads from <paramref name="reader"/> with the given configuration.
+    /// </summary>
+    /// <param name="reader">The reader supplying the fixed-width lines. The caller owns it.</param>
+    /// <param name="options">The parsing configuration. The reader has already decoded its bytes, so this is the base record without an <c>Encoding</c>.</param>
+    /// <param name="logger">An optional logger.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="reader"/> or <paramref name="options"/> is <see langword="null"/>.</exception>
+    public FixedWidthExtractor
+    (
+        TextReader reader,
+        FixedWidthExtractorOptions<TRecord> options,
+        ILogger<FixedWidthExtractor<TRecord>>? logger = null
+    )
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null,
+               options: options ?? throw new ArgumentNullException(nameof(options)), encoding: null, timer: null, logger: logger)
     {
     }
 
@@ -137,7 +157,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         IProgressTimer timer,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
-        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null,
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null, encoding: null,
                timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
     }
@@ -151,7 +171,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// The encoding to decode with, or <see langword="null"/> for the documented default.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    [Obsolete("Use the constructor that takes FixedWidthExtractorOptions. This overload will be removed in a future release.")]
+    [Obsolete("Use the constructor that takes FixedWidthExtractorStreamOptions. This overload will be removed in a future release.")]
     public FixedWidthExtractor(Stream stream, Encoding encoding)
         : this(stream, options: ToOptions(encoding), logger: null)
     {
@@ -169,7 +189,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// The encoding to decode with, or <see langword="null"/> for the documented default.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    [Obsolete("Use the constructor that takes FixedWidthExtractorOptions. This overload will be removed in a future release.")]
+    [Obsolete("Use the constructor that takes FixedWidthExtractorStreamOptions. This overload will be removed in a future release.")]
     public FixedWidthExtractor(Stream stream, ILogger<FixedWidthExtractor<TRecord>> logger, Encoding encoding)
         : this(stream, options: ToOptions(encoding), logger: logger)
     {
@@ -187,7 +207,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// </summary>
     /// <param name="stream">The <see cref="Stream"/> to use.</param>
     /// <param name="options">
-    /// Options that control behaviour, including the <see cref="FixedWidthExtractorOptions.Encoding"/>
+    /// Options that control behaviour, including the <see cref="FixedWidthExtractorStreamOptions{TRecord}.Encoding"/>
     /// to use. When <c>null</c>, the documented defaults apply.
     /// </param>
     /// <param name="logger">
@@ -198,10 +218,10 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     public FixedWidthExtractor
     (
         Stream stream,
-        FixedWidthExtractorOptions? options = null,
+        FixedWidthExtractorStreamOptions<TRecord>? options = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
-        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, timer: null, logger: logger)
+        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, encoding: options?.Encoding, timer: null, logger: logger)
     {
     }
 
@@ -233,10 +253,10 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     (
         Stream stream,
         IProgressTimer timer,
-        FixedWidthExtractorOptions? options = null,
+        FixedWidthExtractorStreamOptions<TRecord>? options = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
-        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options,
+        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, encoding: options?.Encoding,
                timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
     }
@@ -252,7 +272,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     (
         TextReader? reader,
         Stream? stream,
-        FixedWidthExtractorOptions? options,
+        FixedWidthExtractorOptions<TRecord>? options,
+        Encoding? encoding,
         IProgressTimer? timer,
         ILogger<FixedWidthExtractor<TRecord>>? logger
     )
@@ -273,11 +294,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
         if (stream is not null)
         {
-            var resolved = options ?? new FixedWidthExtractorOptions();
-            _reader = CreateBufferedReader(stream, resolved.Encoding);
+            var resolvedEncoding = encoding ?? Encoding.UTF8;
+            _reader = CreateBufferedReader(stream, resolvedEncoding);
             _ownsReader = true;
             _offsetStream = stream;
-            _offsetEncoding = resolved.Encoding;
+            _offsetEncoding = resolvedEncoding;
         }
         else
         {
@@ -286,6 +307,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
         _progressTimer = timer;
         _logger = logger ?? (ILogger)NullLogger.Instance;
+
+        ApplyOptions(options);
     }
 
 
@@ -313,10 +336,37 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     // The removed constructors took a loose Encoding. Callers reaching them through the obsolete
     // overloads above could legitimately pass null, which meant "use the default" - so null must
     // map to no options rather than to an options record carrying a null Encoding.
-    private static FixedWidthExtractorOptions? ToOptions(Encoding? encoding)
-        => encoding is null ? null : new FixedWidthExtractorOptions { Encoding = encoding };
+    private static FixedWidthExtractorStreamOptions<TRecord>? ToOptions(Encoding? encoding)
+        => encoding is null ? null : new FixedWidthExtractorStreamOptions<TRecord> { Encoding = encoding };
 
 
+
+
+
+    /// <summary>
+    /// Copies every setting from <paramref name="options"/> onto the extractor. Called once, at the end of
+    /// construction; a <see langword="null"/> record keeps the documented defaults.
+    /// </summary>
+    private void ApplyOptions(FixedWidthExtractorOptions<TRecord>? options)
+    {
+        if (options is null)
+        {
+            return;
+        }
+
+        MalformedLineHandling = options.MalformedLineHandling;
+        BlankLineHandling = options.BlankLineHandling;
+        LineFilter = options.LineFilter;
+        RecordValidator = options.RecordValidator;
+        OnError = options.OnError;
+        ValueParser = options.ValueParser;
+        HeaderLineCount = options.HeaderLineCount;
+        FieldSeparator = options.FieldSeparator;
+        FieldDelimiter = options.FieldDelimiter;
+        Schema = options.Schema;
+        TrackByteOffset = options.TrackByteOffset;
+        StartByteOffset = options.StartByteOffset;
+    }
 
 
 

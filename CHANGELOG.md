@@ -8,8 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Options records for the extractor and loader** (ADR-0009, first half of #341; Chris-Wolfgang/ETL-Abstractions#455).
+  `FixedWidthExtractorOptions<TRecord>` carries the twelve parsing settings (`MalformedLineHandling`,
+  `BlankLineHandling`, `LineFilter`, `RecordValidator`, `OnError`, `ValueParser`, `HeaderLineCount`,
+  `FieldSeparator`, `FieldDelimiter`, `Schema`, `TrackByteOffset`, `StartByteOffset`);
+  `FixedWidthLoaderOptions` carries the seven formatting settings (`ValueConverter`, `HeaderConverter`,
+  `WriteHeader`, `IsDryRun`, `FieldSeparator`, `FieldDelimiter`, `Schema`). Both are `{ get; init; }`
+  records whose invalid values are rejected from the `init` accessor. New constructors
+  `FixedWidthExtractor<T>(TextReader, FixedWidthExtractorOptions<T>, ILogger?)` and
+  `FixedWidthLoader<T>(TextWriter, FixedWidthLoaderOptions, ILogger?)` accept them; the `Stream`
+  constructors accept the derived `FixedWidthExtractorStreamOptions<TRecord>` /
+  `FixedWidthLoaderStreamOptions`, which add `Encoding`. The existing setters are unchanged in this
+  release — their deprecation is the second half of #341.
 
 ### Changed
+- **`Encoding` moved from the base options records to the new `*StreamOptions` records.** The shipped
+  `FixedWidthExtractorOptions` (non-generic) and `FixedWidthLoaderOptions` carried only `Encoding` and were
+  accepted only by the `Stream` constructors. The loader record's name is now the shape-agnostic base, and
+  the extractor record became generic (its `RecordValidator` is typed over `TRecord`). Migration is a
+  one-word rename: `new FixedWidthLoaderOptions { Encoding = x }` → `new FixedWidthLoaderStreamOptions { Encoding = x }`,
+  `new FixedWidthExtractorOptions { Encoding = x }` → `new FixedWidthExtractorStreamOptions<T> { Encoding = x }`.
+  A `TextReader`/`TextWriter` caller can no longer set an `Encoding` at all — it was inert there.
 
 ### Deprecated
 
@@ -89,6 +108,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `options: null` explicitly to reach the new constructor. Both go away when these are removed.
 
 ### Removed
+- `FixedWidthLoader<TRecord>` no longer implements `ISupportDryRun`; ETL-Abstractions removes the interface in
+  its next release (Chris-Wolfgang/ETL-Abstractions#457). `IsDryRun` is configured through
+  `FixedWidthLoaderOptions`; the property's setter remains for now and is deprecated with the rest in #341's
+  second half.
 
 ### Fixed
 

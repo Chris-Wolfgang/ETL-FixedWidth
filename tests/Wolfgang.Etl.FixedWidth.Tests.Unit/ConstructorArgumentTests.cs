@@ -611,7 +611,7 @@ public class ConstructorArgumentTests
     [Fact]
     public void Extractor_private_core_when_both_sources_are_null_throws()
     {
-        AssertBothNullSourcesThrow(typeof(FixedWidthExtractor<PersonRecord>), 5);
+        AssertBothNullSourcesThrow(typeof(FixedWidthExtractor<PersonRecord>), 6);
     }
 
 
@@ -619,7 +619,7 @@ public class ConstructorArgumentTests
     [Fact]
     public void Loader_private_core_when_both_sources_are_null_throws()
     {
-        AssertBothNullSourcesThrow(typeof(FixedWidthLoader<PersonRecord>), 5);
+        AssertBothNullSourcesThrow(typeof(FixedWidthLoader<PersonRecord>), 6);
     }
 
 

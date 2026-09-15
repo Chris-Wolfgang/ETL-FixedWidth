@@ -82,7 +82,7 @@ public class FixedWidthExtractorStreamCtorTests
         var sut = new FixedWidthExtractor<PersonRecord>
         (
             stream,
-            new FixedWidthExtractorOptions { Encoding = Encoding.UTF8 },
+            new FixedWidthExtractorStreamOptions<PersonRecord> { Encoding = Encoding.UTF8 },
             logger: null
         );
 
@@ -191,7 +191,7 @@ public class FixedWidthLoaderStreamCtorTests
         var sut = new FixedWidthLoader<PersonRecord>
         (
             stream,
-            new FixedWidthLoaderOptions { Encoding = Encoding.UTF8 },
+            new FixedWidthLoaderStreamOptions { Encoding = Encoding.UTF8 },
             logger: null
         );
 
