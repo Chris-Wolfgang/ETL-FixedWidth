@@ -1,4 +1,5 @@
 using System;
+using Wolfgang.Etl.Abstractions;
 
 namespace Wolfgang.Etl.FixedWidth;
 
@@ -13,7 +14,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// mutating it during one (ADR-0009). The documented defaults live on the property initializers, so
 /// no constructor can diverge from them; a <see langword="null"/> options argument means "all defaults".
 /// </remarks>
-public record FixedWidthLoaderOptions
+public record FixedWidthLoaderOptions : LoaderOptions
 {
     /// <summary>
     /// Converts a field value to its written text. Defaults to <see cref="FixedWidthConverter.Strict"/>.

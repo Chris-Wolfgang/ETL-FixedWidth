@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **The options records inherit the Abstractions 0.24 base records** (ADR-0009):
+  `FixedWidthExtractorOptions<TRecord> : ExtractorOptions` and `FixedWidthLoaderOptions : LoaderOptions` (the
+  `*StreamOptions` records inherit through them). `ReportingInterval`, `MaximumItemCount`, `SkipItemCount` and
+  `ErrorPolicy` are configured through the same record as every fixed-width setting and applied by the base
+  constructor, so one object configures the whole stage.
 - **Options records for the extractor and loader** (ADR-0009, first half of #341; Chris-Wolfgang/ETL-Abstractions#455).
   `FixedWidthExtractorOptions<TRecord>` carries the twelve parsing settings (`MalformedLineHandling`,
   `BlankLineHandling`, `LineFilter`, `RecordValidator`, `OnError`, `ValueParser`, `HeaderLineCount`,
@@ -22,6 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   same release — see *Deprecated* below for the migration guidance.
 
 ### Changed
+- `Wolfgang.Etl.Abstractions` 0.23.4 → 0.24.0 (`Wolfgang.Etl.TestKit` / `.TestKit.Xunit` for the test project and
+  examples). The dry-run contract test returns to the TestKit base, now non-generic.
+- **Binary-only break on `net462`, `netstandard2.0` and `netstandard2.1`:** because the options records now have a base
+  record, the compiler-synthesized `<Clone>$` method (what a `with` expression calls) returns `ExtractorOptions` /
+  `LoaderOptions` on targets without covariant returns. Source compiles unchanged; an assembly compiled against an
+  earlier build of these records on one of those targets that uses `with` must be rebuilt
+  (`CompatibilitySuppressions.xml`).
 - **`Encoding` moved from the base options records to the new `*StreamOptions` records.** The shipped
   `FixedWidthExtractorOptions` (non-generic) and `FixedWidthLoaderOptions` carried only `Encoding` and were
   accepted only by the `Stream` constructors. The loader record's name is now the shape-agnostic base, and

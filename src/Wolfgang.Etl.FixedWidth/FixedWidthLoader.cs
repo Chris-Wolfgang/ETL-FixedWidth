@@ -289,6 +289,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
         IProgressTimer? timer,
         ILogger<FixedWidthLoader<TRecord>>? logger
     )
+        : base(options)
     {
         // Defensive invariant guard. Every caller-facing constructor null-checks its own source
         // before delegating here, so this cannot fire today — it exists so that a constructor added

@@ -1,4 +1,5 @@
 using System;
+using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Wolfgang.Etl.FixedWidth.Parsing;
 
@@ -19,7 +20,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// cannot be constructed.
 /// </remarks>
 /// <typeparam name="TRecord">The record type the extractor produces.</typeparam>
-public record FixedWidthExtractorOptions<TRecord>
+public record FixedWidthExtractorOptions<TRecord> : ExtractorOptions
     where TRecord : notnull
 {
     /// <summary>
