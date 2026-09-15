@@ -42,10 +42,12 @@ namespace Wolfgang.Etl.FixedWidth;
 /// var result = sw.ToString();
 ///
 /// // Write a formatted table to the console
-/// var loader = new FixedWidthLoader&lt;MyRecord&gt;(Console.Out);
-/// loader.WriteHeader    = true;
-/// loader.FieldSeparator = '-';
-/// loader.FieldDelimiter = " | ";
+/// var loader = new FixedWidthLoader&lt;MyRecord&gt;(Console.Out, new FixedWidthLoaderOptions
+/// {
+///     WriteHeader    = true,
+///     FieldSeparator = '-',
+///     FieldDelimiter = " | ",
+/// });
 /// </code>
 /// </remarks>
 public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
@@ -116,6 +118,28 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     )
         : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null,
                options: options, encoding: null, timer: null, logger: logger)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Test-only: injects the progress timer and a formatting configuration for a <see cref="TextWriter"/> sink.
+    /// </summary>
+    /// <param name="writer">The writer receiving the fixed-width lines.</param>
+    /// <param name="timer">The progress timer to use instead of the default.</param>
+    /// <param name="options">The formatting configuration.</param>
+    /// <param name="logger">An optional logger.</param>
+    internal FixedWidthLoader
+    (
+        TextWriter writer,
+        IProgressTimer timer,
+        FixedWidthLoaderOptions options,
+        ILogger<FixedWidthLoader<TRecord>>? logger = null
+    )
+        : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null,
+               options: options ?? throw new ArgumentNullException(nameof(options)), encoding: null,
+               timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
     }
 
@@ -339,6 +363,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
             return;
         }
 
+#pragma warning disable CS0618 // ApplyOptions is the supported replacement for these setters; it necessarily writes them.
         ValueConverter = options.ValueConverter;
         HeaderConverter = options.HeaderConverter;
         WriteHeader = options.WriteHeader;
@@ -346,6 +371,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
         FieldSeparator = options.FieldSeparator;
         FieldDelimiter = options.FieldDelimiter;
         Schema = options.Schema;
+#pragma warning restore CS0618
     }
 
 
@@ -383,16 +409,17 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// <example>
     /// <code>
     /// // Write booleans as "Y"/"N" instead of "True"/"False":
-    /// loader.ValueConverter = (value, ctx) =>
+    /// // Supplied through FixedWidthLoaderOptions, passed to the constructor:
+    /// ValueConverter = (value, ctx) =>
     ///     ctx.PropertyType == typeof(bool)
     ///         ? ((bool)value ? "Y" : "N")
-    ///         : FixedWidthConverter.Strict(value, ctx);
+    ///         : FixedWidthConverter.Strict(value, ctx),
     ///
     /// // Silently truncate all values instead of throwing on overflow:
-    /// loader.ValueConverter = FixedWidthConverter.Truncate;
+    /// ValueConverter = FixedWidthConverter.Truncate,
     /// </code>
     /// </example>
-    public Func<object, FieldContext, string> ValueConverter { get; set; } = FixedWidthConverter.Strict;
+    public Func<object, FieldContext, string> ValueConverter { get; [Obsolete("Configure ValueConverter through FixedWidthLoaderOptions passed to the constructor instead. This setter will be removed in a future release.")] set; } = FixedWidthConverter.Strict;
 
 
 
@@ -409,14 +436,15 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// <example>
     /// <code>
     /// // Render all headers in upper-case:
-    /// loader.HeaderConverter = (label, ctx) =>
-    ///     FixedWidthConverter.StrictHeader(label.ToUpperInvariant(), ctx);
+    /// // Supplied through FixedWidthLoaderOptions, passed to the constructor:
+    /// HeaderConverter = (label, ctx) =>
+    ///     FixedWidthConverter.StrictHeader(label.ToUpperInvariant(), ctx),
     ///
     /// // Silently truncate headers that are too long:
-    /// loader.HeaderConverter = FixedWidthConverter.TruncateHeader;
+    /// HeaderConverter = FixedWidthConverter.TruncateHeader,
     /// </code>
     /// </example>
-    public Func<string, FieldContext, string> HeaderConverter { get; set; } = FixedWidthConverter.StrictHeader;
+    public Func<string, FieldContext, string> HeaderConverter { get; [Obsolete("Configure HeaderConverter through FixedWidthLoaderOptions passed to the constructor instead. This setter will be removed in a future release.")] set; } = FixedWidthConverter.StrictHeader;
 
 
 
@@ -432,11 +460,12 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// </remarks>
     /// <example>
     /// <code>
-    /// loader.WriteHeader = true;
+    /// // Supplied through FixedWidthLoaderOptions, passed to the constructor:
+    /// WriteHeader = true,
     /// // Produces a header line like: "FirstName LastName  Age  "
     /// </code>
     /// </example>
-    public bool WriteHeader { get; set; }
+    public bool WriteHeader { get; [Obsolete("Configure WriteHeader through FixedWidthLoaderOptions passed to the constructor instead. This setter will be removed in a future release.")] set; }
 
 
 
@@ -451,7 +480,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// <see cref="Exceptions.FieldOverflowException"/> the same way a real run would.
     /// Defaults to <see langword="false"/>.
     /// </remarks>
-    public bool IsDryRun { get; set; }
+    public bool IsDryRun { get; [Obsolete("Configure IsDryRun through FixedWidthLoaderOptions passed to the constructor instead. This setter will be removed in a future release.")] set; }
 
 
 
@@ -464,12 +493,13 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// </summary>
     /// <example>
     /// <code>
-    /// loader.FieldSeparator = '-';  // writes "----------"
-    /// loader.FieldSeparator = '=';  // writes "=========="
-    /// loader.FieldSeparator = null; // no separator (default)
+    /// // Supplied through FixedWidthLoaderOptions, passed to the constructor:
+    /// FieldSeparator = '-',  // writes "----------"
+    /// FieldSeparator = '=',  // writes "=========="
+    /// FieldSeparator = null, // no separator (default)
     /// </code>
     /// </example>
-    public char? FieldSeparator { get; set; }
+    public char? FieldSeparator { get; [Obsolete("Configure FieldSeparator through FixedWidthLoaderOptions passed to the constructor instead. This setter will be removed in a future release.")] set; }
 
 
 
@@ -488,11 +518,12 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// </remarks>
     /// <example>
     /// <code>
-    /// loader.FieldDelimiter = " | ";   // human-readable table: "John       | Smith      |  42 "
-    /// loader.FieldDelimiter = null;    // pure fixed-width (default): "John      Smith        42 "
+    /// // Supplied through FixedWidthLoaderOptions, passed to the constructor:
+    /// FieldDelimiter = " | ",   // human-readable table: "John       | Smith      |  42 "
+    /// FieldDelimiter = null,    // pure fixed-width (default): "John      Smith        42 "
     /// </code>
     /// </example>
-    public string? FieldDelimiter { get; set; }
+    public string? FieldDelimiter { get; [Obsolete("Configure FieldDelimiter through FixedWidthLoaderOptions passed to the constructor instead. This setter will be removed in a future release.")] set; }
 
 
 
@@ -503,7 +534,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// default) the attribute-based layout is used. The schema's <see cref="FixedWidthSchema.RecordType"/>
     /// must be <typeparamref name="TRecord"/>.
     /// </summary>
-    public FixedWidthSchema? Schema { get; set; }
+    public FixedWidthSchema? Schema { get; [Obsolete("Configure Schema through FixedWidthLoaderOptions passed to the constructor instead. This setter will be removed in a future release.")] set; }
 
 
 

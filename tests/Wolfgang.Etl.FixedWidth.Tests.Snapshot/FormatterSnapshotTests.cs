@@ -69,12 +69,11 @@ public class FormatterSnapshotTests
 
 
 
-    private static async Task<string> Write<T>(IEnumerable<T> items, System.Action<FixedWidthLoader<T>>? configure = null)
+    private static async Task<string> Write<T>(IEnumerable<T> items, FixedWidthLoaderOptions? options = null)
         where T : notnull
     {
         var writer = new StringWriter();
-        using var loader = new FixedWidthLoader<T>(writer);
-        configure?.Invoke(loader);
+        using var loader = options is null ? new FixedWidthLoader<T>(writer) : new FixedWidthLoader<T>(writer, options);
         await loader.LoadAsync(ToAsync(items), CancellationToken.None);
         return writer.ToString();
     }
@@ -94,22 +93,22 @@ public class FormatterSnapshotTests
 
     [Fact]
     public Task With_header_row() =>
-        Snapshot(Write(People, l => l.WriteHeader = true).GetAwaiter().GetResult());
+        Snapshot(Write(People, new FixedWidthLoaderOptions { WriteHeader = true }).GetAwaiter().GetResult());
 
 
 
     [Fact]
     public Task With_field_delimiter() =>
-        Snapshot(Write(People, l => l.FieldDelimiter = " | ").GetAwaiter().GetResult());
+        Snapshot(Write(People, new FixedWidthLoaderOptions { FieldDelimiter = " | " }).GetAwaiter().GetResult());
 
 
 
     [Fact]
     public Task With_header_and_separator_line() =>
-        Snapshot(Write(People, l =>
+        Snapshot(Write(People, new FixedWidthLoaderOptions
         {
-            l.WriteHeader = true;
-            l.FieldSeparator = '-';   // draws a separator line beneath the header
+            WriteHeader = true,
+            FieldSeparator = '-',   // draws a separator line beneath the header
         }).GetAwaiter().GetResult());
 
 

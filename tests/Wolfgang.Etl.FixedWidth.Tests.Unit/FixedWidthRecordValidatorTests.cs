@@ -50,12 +50,12 @@ public class FixedWidthRecordValidatorTests
     [Fact]
     public async Task RecordValidator_Skip_drops_the_record_and_increments_skipped_count()
     {
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(await SerializeAsync(Source)))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(await SerializeAsync(Source)), new FixedWidthExtractorOptions<PersonRecord>
         {
             RecordValidator = record => string.Equals(record.FirstName, "Bob", StringComparison.Ordinal)
                 ? ValidationResult.Skip("no bobs")
                 : ValidationResult.Accept(),
-        };
+        });
 
         var results = await ExtractAsync(extractor);
 
@@ -70,12 +70,12 @@ public class FixedWidthRecordValidatorTests
     [Fact]
     public async Task RecordValidator_Stop_ends_extraction_before_the_matching_record()
     {
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(await SerializeAsync(Source)))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(await SerializeAsync(Source)), new FixedWidthExtractorOptions<PersonRecord>
         {
             RecordValidator = record => string.Equals(record.FirstName, "Carol", StringComparison.Ordinal)
                 ? ValidationResult.Stop("hit Carol")
                 : ValidationResult.Accept(),
-        };
+        });
 
         var results = await ExtractAsync(extractor);
 
@@ -103,12 +103,12 @@ public class FixedWidthRecordValidatorTests
     public async Task RecordValidator_Skip_logs_the_reason_at_Debug()
     {
         var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(await SerializeAsync(Source)), logger)
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(await SerializeAsync(Source)), new FixedWidthExtractorOptions<PersonRecord>
         {
             RecordValidator = record => string.Equals(record.FirstName, "Bob", StringComparison.Ordinal)
                 ? ValidationResult.Skip("no bobs")
                 : ValidationResult.Accept(),
-        };
+        }, logger);
 
         await ExtractAsync(extractor);
 
@@ -125,12 +125,12 @@ public class FixedWidthRecordValidatorTests
     public async Task RecordValidator_Stop_logs_the_reason_at_Debug()
     {
         var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(await SerializeAsync(Source)), logger)
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(await SerializeAsync(Source)), new FixedWidthExtractorOptions<PersonRecord>
         {
             RecordValidator = record => string.Equals(record.FirstName, "Carol", StringComparison.Ordinal)
                 ? ValidationResult.Stop("hit Carol")
                 : ValidationResult.Accept(),
-        };
+        }, logger);
 
         await ExtractAsync(extractor);
 

@@ -109,16 +109,20 @@ public static class Program
         Console.WriteLine();
 
         var writer1 = new StringWriter();
-        var loader1 = new FixedWidthLoader<ReportRecord>(writer1);
+        var loader1Options = new FixedWidthLoaderOptions
+        {
 
-        // WriteHeader: emit a header row. The header labels come from the
-        // Header property on [FixedWidthField] — "Region", "Sales ($)", "Units".
-        loader1.WriteHeader = true;
+            // WriteHeader: emit a header row. The header labels come from the
+            // Header property on [FixedWidthField] — "Region", "Sales ($)", "Units".
+            WriteHeader = true,
 
-        // FieldSeparator: after the header, write a separator line where each
-        // field width is filled with this character. The separator respects
-        // field widths: 10 dashes, 10 dashes, 8 dashes = 28 total characters.
-        loader1.FieldSeparator = '-';
+            // FieldSeparator: after the header, write a separator line where each
+            // field width is filled with this character. The separator respects
+            // field widths: 10 dashes, 10 dashes, 8 dashes = 28 total characters.
+            FieldSeparator = '-',
+        };
+
+        var loader1 = new FixedWidthLoader<ReportRecord>(writer1, loader1Options);
 
         await loader1.LoadAsync
         (
@@ -144,19 +148,23 @@ public static class Program
         Console.WriteLine();
 
         var reader2 = new StringReader(output1);
-        var extractor2 = new FixedWidthExtractor<ReportRecord>(reader2);
+        var extractor2Options = new FixedWidthExtractorOptions<ReportRecord>
+        {
 
-        // HasHeader: tells the extractor that line 1 is a header — skip it.
-        // This is a convenience for HeaderLineCount = 1. If your file has
-        // multiple header lines (e.g. a title row and a column names row),
-        // set HeaderLineCount = 2 instead.
-        extractor2.HasHeader = true;
+            // HasHeader: tells the extractor that line 1 is a header — skip it.
+            // This is a convenience for HeaderLineCount = 1. If your file has
+            // multiple header lines (e.g. a title row and a column names row),
+            // set HeaderLineCount = 2 instead.
+            HeaderLineCount = 1,
 
-        // FieldSeparator: tells the extractor that the line immediately after
-        // the header(s) is a separator — skip it too. The character value ('-')
-        // is not used for parsing; it only signals that the separator line exists.
-        // The actual content of the separator line is ignored.
-        extractor2.FieldSeparator = '-';
+            // FieldSeparator: tells the extractor that the line immediately after
+            // the header(s) is a separator — skip it too. The character value ('-')
+            // is not used for parsing; it only signals that the separator line exists.
+            // The actual content of the separator line is ignored.
+            FieldSeparator = '-',
+        };
+
+        var extractor2 = new FixedWidthExtractor<ReportRecord>(reader2, extractor2Options);
 
         await foreach (var record in extractor2.ExtractAsync(CancellationToken.None))
         {
@@ -172,19 +180,23 @@ public static class Program
         Console.WriteLine();
 
         var writer3 = new StringWriter();
-        var loader3 = new FixedWidthLoader<ReportRecord>(writer3);
-        loader3.WriteHeader = true;
-        loader3.FieldSeparator = '=';
+        var loader3Options = new FixedWidthLoaderOptions
+        {
+            WriteHeader = true,
+            FieldSeparator = '=',
 
-        // HeaderConverter: a delegate that transforms the header label string
-        // before it is written. The default (StrictHeader) just validates that
-        // the label fits within the field width. Here we wrap it to upper-case
-        // the label first, then pass it through StrictHeader for validation.
-        //
-        // The FieldContext parameter provides metadata about the field (width,
-        // alignment, etc.) so the converter can make informed decisions.
-        loader3.HeaderConverter = (label, ctx) =>
-            FixedWidthConverter.StrictHeader(label.ToUpperInvariant(), ctx);
+            // HeaderConverter: a delegate that transforms the header label string
+            // before it is written. The default (StrictHeader) just validates that
+            // the label fits within the field width. Here we wrap it to upper-case
+            // the label first, then pass it through StrictHeader for validation.
+            //
+            // The FieldContext parameter provides metadata about the field (width,
+            // alignment, etc.) so the converter can make informed decisions.
+            HeaderConverter = (label, ctx) =>
+                FixedWidthConverter.StrictHeader(label.ToUpperInvariant(), ctx),
+        };
+
+        var loader3 = new FixedWidthLoader<ReportRecord>(writer3, loader3Options);
 
         await loader3.LoadAsync
         (
@@ -209,9 +221,13 @@ public static class Program
         // Build a fixed-width string that has data rows followed by a footer.
         // The footer starts with "TOTAL" — a common pattern in report files.
         var writer4 = new StringWriter();
-        var loader4 = new FixedWidthLoader<ReportRecord>(writer4);
-        loader4.WriteHeader = true;
-        loader4.FieldSeparator = '-';
+        var loader4Options = new FixedWidthLoaderOptions
+        {
+            WriteHeader = true,
+            FieldSeparator = '-',
+        };
+
+        var loader4 = new FixedWidthLoader<ReportRecord>(writer4, loader4Options);
 
         await loader4.LoadAsync
         (
@@ -229,21 +245,25 @@ public static class Program
 
         // Extract with a LineFilter that stops when it sees "TOTAL".
         var reader4 = new StringReader(dataWithFooter);
-        var extractor4 = new FixedWidthExtractor<ReportRecord>(reader4);
-        extractor4.HasHeader = true;
-        extractor4.FieldSeparator = '-';
+        var extractor4Options = new FixedWidthExtractorOptions<ReportRecord>
+        {
+            HeaderLineCount = 1,
+            FieldSeparator = '-',
 
-        // LineFilter: invoked for every DATA line (after structural header/separator
-        // lines are skipped). The delegate receives the raw line string and returns
-        // a LineAction:
-        //   - Process: parse the line normally and yield the record
-        //   - Skip: ignore this line entirely (invisible to counting)
-        //   - Stop: end extraction immediately (the current line is NOT parsed)
-        //
-        // Here we stop when a line starts with "TOTAL" — the footer is never
-        // parsed, so we avoid a parse error on the non-standard footer format.
-        extractor4.LineFilter = (line) =>
-            line.StartsWith("TOTAL") ? LineAction.Stop : LineAction.Process;
+            // LineFilter: invoked for every DATA line (after structural header/separator
+            // lines are skipped). The delegate receives the raw line string and returns
+            // a LineAction:
+            //   - Process: parse the line normally and yield the record
+            //   - Skip: ignore this line entirely (invisible to counting)
+            //   - Stop: end extraction immediately (the current line is NOT parsed)
+            //
+            // Here we stop when a line starts with "TOTAL" — the footer is never
+            // parsed, so we avoid a parse error on the non-standard footer format.
+            LineFilter = (line) =>
+                line.StartsWith("TOTAL") ? LineAction.Stop : LineAction.Process,
+        };
+
+        var extractor4 = new FixedWidthExtractor<ReportRecord>(reader4, extractor4Options);
 
         Console.WriteLine("Extracted records (stopped before TOTAL footer):");
 

@@ -8,6 +8,8 @@ using Wolfgang.Etl.Abstractions;
 
 namespace Wolfgang.Etl.FixedWidth;
 
+#pragma warning disable CS0618 // The builder writes the deprecated setters on the stage it constructs or wraps; #342 rewrites it to accumulate into the options record.
+
 /// <summary>
 /// Default <see cref="IFixedWidthLoaderBuilder{T}"/> implementation. Records configuration up front,
 /// then materializes a <see cref="FixedWidthLoader{T}"/> and terminates the upstream pipeline when
@@ -150,3 +152,4 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
         return this;
     }
 }
+#pragma warning restore CS0618

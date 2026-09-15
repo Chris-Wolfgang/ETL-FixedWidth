@@ -39,10 +39,10 @@ public class FixedWidthItemErrorHandlingTests
     [Fact]
     public async Task Malformed_Skip_counts_as_a_base_error_item()
     {
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad), new FixedWidthExtractorOptions<PersonRecord>
         {
             MalformedLineHandling = MalformedLineHandling.Skip,
-        };
+        });
 
         var yielded = await Drain(extractor);
 
@@ -57,10 +57,10 @@ public class FixedWidthItemErrorHandlingTests
     {
         // The one line parses fine but the validator rejects it. That is a business decision,
         // not a parse error — CurrentRejectedItemCount counts it, CurrentErrorItemCount does not.
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(Line("Bob", "Brown", "30")))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(Line("Bob", "Brown", "30")), new FixedWidthExtractorOptions<PersonRecord>
         {
             RecordValidator = _ => ValidationResult.Skip("no bobs"),
-        };
+        });
 
         var yielded = await Drain(extractor);
 
@@ -73,10 +73,10 @@ public class FixedWidthItemErrorHandlingTests
     [Fact]
     public async Task Malformed_ReturnDefault_recovers_and_is_not_an_error()
     {
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(Line("Eve", "Evans", BadAge)))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(Line("Eve", "Evans", BadAge)), new FixedWidthExtractorOptions<PersonRecord>
         {
             MalformedLineHandling = MalformedLineHandling.ReturnDefault,
-        };
+        });
 
         var yielded = await Drain(extractor);
 
@@ -101,14 +101,14 @@ public class FixedWidthItemErrorHandlingTests
             Line("Bob", "Brown", "30")
         );
 
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(input))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(input), new FixedWidthExtractorOptions<PersonRecord>
         {
             MalformedLineHandling = MalformedLineHandling.ReturnDefault,
             RecordValidator = record =>
                 (record.FirstName ?? string.Empty).IndexOf("Bob", System.StringComparison.Ordinal) >= 0
                     ? ValidationResult.Skip("no bobs")
                     : ValidationResult.Accept(),
-        };
+        });
 
         var yielded = await Drain(extractor);
 
@@ -133,10 +133,10 @@ public class FixedWidthItemErrorHandlingTests
     {
         var reports = new List<EtlPipelineProgress>();
         var progress = new SyncProgress(reports.Add);
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad), new FixedWidthExtractorOptions<PersonRecord>
         {
             MalformedLineHandling = MalformedLineHandling.Skip,
-        };
+        });
         var loader = new CountingLoader();
 
         await EtlPipeline
@@ -157,11 +157,11 @@ public class FixedWidthItemErrorHandlingTests
     public async Task OnError_captures_the_failed_lines_as_dead_letters()
     {
         var captured = new List<FixedWidthError>();
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad), new FixedWidthExtractorOptions<PersonRecord>
         {
             MalformedLineHandling = MalformedLineHandling.Skip,
             OnError = captured.Add,
-        };
+        });
 
         var yielded = await Drain(extractor);
 
@@ -180,10 +180,10 @@ public class FixedWidthItemErrorHandlingTests
         // Decision: OnError fires on Abort too — the failing record is always observable, then the run
         // stops (default MalformedLineHandling == ThrowException).
         var captured = new List<FixedWidthError>();
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad), new FixedWidthExtractorOptions<PersonRecord>
         {
             OnError = captured.Add,
-        };
+        });
 
         await Assert.ThrowsAnyAsync<MalformedLineException>(() => Drain(extractor));
 

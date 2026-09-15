@@ -135,15 +135,19 @@ public static class Program
         Console.WriteLine("=== Scenario 1: MalformedLineHandling.ThrowException ===");
 
         var reader = new StringReader(BuildSampleData());
-        var extractor = new FixedWidthExtractor<ProductRecord>(reader);
+        var extractorOptions = new FixedWidthExtractorOptions<ProductRecord>
+        {
 
-        // ThrowException is the default, but we set it explicitly for clarity.
-        extractor.MalformedLineHandling = MalformedLineHandling.ThrowException;
+            // ThrowException is the default, but we set it explicitly for clarity.
+            MalformedLineHandling = MalformedLineHandling.ThrowException,
 
-        // BlankLineHandling defaults to ThrowException as well. We set Skip
-        // here so we can demonstrate the MalformedLineHandling path without
-        // the blank line stopping us first.
-        extractor.BlankLineHandling = BlankLineHandling.Skip;
+            // BlankLineHandling defaults to ThrowException as well. We set Skip
+            // here so we can demonstrate the MalformedLineHandling path without
+            // the blank line stopping us first.
+            BlankLineHandling = BlankLineHandling.Skip,
+        };
+
+        var extractor = new FixedWidthExtractor<ProductRecord>(reader, extractorOptions);
 
         try
         {
@@ -201,16 +205,20 @@ public static class Program
         Console.WriteLine("=== Scenario 2: MalformedLineHandling.Skip ===");
 
         var reader = new StringReader(BuildSampleData());
-        var extractor = new FixedWidthExtractor<ProductRecord>(reader);
+        var extractorOptions = new FixedWidthExtractorOptions<ProductRecord>
+        {
 
-        // Skip malformed lines — the extractor will continue past bad data.
-        extractor.MalformedLineHandling = MalformedLineHandling.Skip;
+            // Skip malformed lines — the extractor will continue past bad data.
+            MalformedLineHandling = MalformedLineHandling.Skip,
 
-        // Also skip blank lines so they do not cause errors.
-        // When BlankLineHandling is Skip, blank lines are invisible to all
-        // counting logic — they do not affect SkipItemCount, MaximumItemCount,
-        // or CurrentSkippedItemCount.
-        extractor.BlankLineHandling = BlankLineHandling.Skip;
+            // Also skip blank lines so they do not cause errors.
+            // When BlankLineHandling is Skip, blank lines are invisible to all
+            // counting logic — they do not affect SkipItemCount, MaximumItemCount,
+            // or CurrentSkippedItemCount.
+            BlankLineHandling = BlankLineHandling.Skip,
+        };
+
+        var extractor = new FixedWidthExtractor<ProductRecord>(reader, extractorOptions);
 
         var records = new List<ProductRecord>();
 
@@ -253,14 +261,18 @@ public static class Program
         Console.WriteLine("=== Scenario 3: MalformedLineHandling.ReturnDefault ===");
 
         var reader = new StringReader(BuildSampleData());
-        var extractor = new FixedWidthExtractor<ProductRecord>(reader);
+        var extractorOptions = new FixedWidthExtractorOptions<ProductRecord>
+        {
 
-        // Return a default record for malformed lines.
-        extractor.MalformedLineHandling = MalformedLineHandling.ReturnDefault;
+            // Return a default record for malformed lines.
+            MalformedLineHandling = MalformedLineHandling.ReturnDefault,
 
-        // Also return defaults for blank lines, so every source line
-        // maps to exactly one output record.
-        extractor.BlankLineHandling = BlankLineHandling.ReturnDefault;
+            // Also return defaults for blank lines, so every source line
+            // maps to exactly one output record.
+            BlankLineHandling = BlankLineHandling.ReturnDefault,
+        };
+
+        var extractor = new FixedWidthExtractor<ProductRecord>(reader, extractorOptions);
 
         var lineIndex = 0;
 

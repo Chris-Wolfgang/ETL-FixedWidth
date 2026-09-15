@@ -10,6 +10,8 @@ using Wolfgang.Etl.FixedWidth.Enums;
 
 namespace Wolfgang.Etl.FixedWidth;
 
+#pragma warning disable CS0618 // The builder writes the deprecated setters on the stage it constructs or wraps; #342 rewrites it to accumulate into the options record.
+
 /// <summary>
 /// Default <see cref="IFixedWidthExtractorBuilder{T}"/> implementation. Records configuration until the
 /// first pipeline operator, then materializes a <see cref="FixedWidthExtractor{T}"/> and delegates to a
@@ -244,3 +246,4 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
         }
     }
 }
+#pragma warning restore CS0618

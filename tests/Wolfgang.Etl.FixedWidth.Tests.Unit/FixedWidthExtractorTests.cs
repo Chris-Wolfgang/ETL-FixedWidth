@@ -96,8 +96,8 @@ public class FixedWidthExtractorTests
     // Helpers
     // ------------------------------------------------------------------
 
-    private static FixedWidthExtractor<PersonRecord> CreateExtractor(string content) =>
-        new(new StringReader(content));
+    private static FixedWidthExtractor<PersonRecord> CreateExtractor(string content, FixedWidthExtractorOptions<PersonRecord>? options = null) =>
+        options is null ? new(new StringReader(content)) : new(new StringReader(content), options);
 
 
 
@@ -108,8 +108,12 @@ public class FixedWidthExtractorTests
     [Fact]
     public async Task ExtractAsync_when_HeaderLineCount_is_set_skips_that_many_header_lines()
     {
-        var extractor = CreateExtractor( "FirstName LastName  Age\n" + "John      Smith     042\n" + "Jane      Doe       030");
-        extractor.HeaderLineCount = 1;
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            HeaderLineCount = 1,
+        };
+
+        var extractor = CreateExtractor( "FirstName LastName  Age\n" + "John      Smith     042\n" + "Jane      Doe       030", extractorOptions);
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -130,8 +134,12 @@ public class FixedWidthExtractorTests
     [Fact]
     public async Task ExtractAsync_when_HasHeader_is_true_skips_one_header_line()
     {
-        var extractor = CreateExtractor( "FirstName LastName  Age\n" + "John      Smith     042\n" + "Jane      Doe       030");
-        extractor.HasHeader = true;
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            HeaderLineCount = 1,
+        };
+
+        var extractor = CreateExtractor( "FirstName LastName  Age\n" + "John      Smith     042\n" + "Jane      Doe       030", extractorOptions);
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -152,44 +160,29 @@ public class FixedWidthExtractorTests
     [Fact]
     public void HasHeader_get_returns_true_when_HeaderLineCount_is_greater_than_zero()
     {
-        var extractor = CreateExtractor(string.Empty);
-        extractor.HeaderLineCount = 2;
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            HeaderLineCount = 2,
+        };
+
+        var extractor = CreateExtractor(string.Empty, extractorOptions);
 
         Assert.True(extractor.HasHeader);
     }
 
 
 
-    [Fact]
-    public void HasHeader_set_to_false_sets_HeaderLineCount_to_zero()
+    [Theory]
+    [InlineData(0, false)]
+    [InlineData(1, true)]
+    [InlineData(2, true)]
+    public void HasHeader_is_a_projection_of_HeaderLineCount(int headerLineCount, bool expected)
     {
-        var extractor = CreateExtractor(string.Empty);
-        extractor.HeaderLineCount = 2;
-        extractor.HasHeader = false;
+        // HasHeader has no state of its own: it reads as "HeaderLineCount > 0". Its deprecated setter
+        // (true -> 1, false -> 0) is exercised nowhere else; the projection is what survives #341.
+        var extractor = CreateExtractor(string.Empty, new FixedWidthExtractorOptions<PersonRecord> { HeaderLineCount = headerLineCount });
 
-        Assert.Equal
-        (
-            0,
-            extractor.HeaderLineCount
-        );
-    }
-
-
-
-    [Fact]
-    public void HasHeader_set_to_true_then_direct_HeaderLineCount_assignment_overrides_it()
-    {
-        // HasHeader = true sets HeaderLineCount to 1, but a subsequent direct
-        // assignment to HeaderLineCount takes full effect.
-        var extractor = CreateExtractor(string.Empty);
-        extractor.HasHeader = true;
-        extractor.HeaderLineCount = 2;
-
-        Assert.Equal
-        (
-            2,
-            extractor.HeaderLineCount
-        );
+        Assert.Equal(expected, extractor.HasHeader);
     }
 
 
@@ -197,9 +190,13 @@ public class FixedWidthExtractorTests
     [Fact]
     public async Task ExtractAsync_when_FieldSeparator_is_set_skips_the_separator_line()
     {
-        var extractor = CreateExtractor( "FirstName LastName  Age\n" + "-----------------------\n" + "John      Smith     042");
-        extractor.HeaderLineCount = 1;
-        extractor.FieldSeparator = '-';
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            HeaderLineCount = 1,
+            FieldSeparator = '-',
+        };
+
+        var extractor = CreateExtractor( "FirstName LastName  Age\n" + "-----------------------\n" + "John      Smith     042", extractorOptions);
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -217,8 +214,12 @@ public class FixedWidthExtractorTests
     public async Task ExtractAsync_when_FieldSeparator_is_set_but_HeaderLineCount_is_zero_does_not_skip_any_lines()
     {
         // FieldSeparator with HeaderLineCount = 0 should not skip any lines.
-        var extractor = CreateExtractor( "John      Smith     042\n" + "Jane      Doe       030");
-        extractor.FieldSeparator = '-';
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            FieldSeparator = '-',
+        };
+
+        var extractor = CreateExtractor( "John      Smith     042\n" + "Jane      Doe       030", extractorOptions);
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -248,8 +249,12 @@ public class FixedWidthExtractorTests
     [Fact]
     public async Task ExtractAsync_when_BlankLineHandling_is_Skip_skips_blank_lines()
     {
-        var extractor = CreateExtractor("John      Smith     042\n\nJane      Doe       030");
-        extractor.BlankLineHandling = BlankLineHandling.Skip;
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            BlankLineHandling = BlankLineHandling.Skip,
+        };
+
+        var extractor = CreateExtractor("John      Smith     042\n\nJane      Doe       030", extractorOptions);
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -265,8 +270,12 @@ public class FixedWidthExtractorTests
     [Fact]
     public async Task ExtractAsync_when_BlankLineHandling_is_ReturnDefault_yields_a_default_record_for_blank_lines()
     {
-        var extractor = CreateExtractor("John      Smith     042\n\nJane      Doe       030");
-        extractor.BlankLineHandling = BlankLineHandling.ReturnDefault;
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            BlankLineHandling = BlankLineHandling.ReturnDefault,
+        };
+
+        var extractor = CreateExtractor("John      Smith     042\n\nJane      Doe       030", extractorOptions);
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -298,9 +307,13 @@ public class FixedWidthExtractorTests
     [Fact]
     public async Task ExtractAsync_when_MalformedLineHandling_is_Skip_skips_short_lines()
     {
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            MalformedLineHandling = MalformedLineHandling.Skip,
+        };
+
         var extractor = CreateExtractor( "John      Smith \n" + // too short — 16 chars
-                                         "Jane      Doe       030");
-        extractor.MalformedLineHandling = MalformedLineHandling.Skip;
+                                         "Jane      Doe       030", extractorOptions);
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -317,9 +330,13 @@ public class FixedWidthExtractorTests
     [Fact]
     public async Task ExtractAsync_when_MalformedLineHandling_is_ReturnDefault_yields_a_default_record_for_short_lines()
     {
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            MalformedLineHandling = MalformedLineHandling.ReturnDefault,
+        };
+
         var extractor = CreateExtractor( "John      Smith \n" + // too short — 16 chars
-                                         "Jane      Doe       030");
-        extractor.MalformedLineHandling = MalformedLineHandling.ReturnDefault;
+                                         "Jane      Doe       030", extractorOptions);
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -345,8 +362,12 @@ public class FixedWidthExtractorTests
     [Fact]
     public async Task ExtractAsync_when_LineFilter_returns_Process_parses_the_line_normally()
     {
-        var extractor = CreateExtractor("John      Smith     042");
-        extractor.LineFilter = _ => LineAction.Process;
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            LineFilter = _ => LineAction.Process,
+        };
+
+        var extractor = CreateExtractor("John      Smith     042", extractorOptions);
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -363,10 +384,14 @@ public class FixedWidthExtractorTests
     [Fact]
     public async Task ExtractAsync_when_LineFilter_returns_Skip_skips_the_line()
     {
-        var extractor = CreateExtractor( "# comment  \n" + "John      Smith     042");
-        extractor.LineFilter = line => line.StartsWith("#")
-            ? LineAction.Skip
-            : LineAction.Process;
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            LineFilter = line => line.StartsWith("#")
+                ? LineAction.Skip
+                : LineAction.Process,
+        };
+
+        var extractor = CreateExtractor( "# comment  \n" + "John      Smith     042", extractorOptions);
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -383,10 +408,14 @@ public class FixedWidthExtractorTests
     [Fact]
     public async Task ExtractAsync_when_LineFilter_returns_Stop_ends_the_stream()
     {
-        var extractor = CreateExtractor( "John      Smith     042\n" + "END\n" + "Jane      Doe       030");
-        extractor.LineFilter = line => "END".Equals(line, StringComparison.InvariantCultureIgnoreCase)
-            ? LineAction.Stop
-            : LineAction.Process;
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            LineFilter = line => "END".Equals(line, StringComparison.InvariantCultureIgnoreCase)
+                ? LineAction.Stop
+                : LineAction.Process,
+        };
+
+        var extractor = CreateExtractor( "John      Smith     042\n" + "END\n" + "Jane      Doe       030", extractorOptions);
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -403,10 +432,14 @@ public class FixedWidthExtractorTests
     [Fact]
     public async Task ExtractAsync_when_LineFilter_returns_Stop_on_a_trailing_separator_line_ends_the_stream()
     {
-        var extractor = CreateExtractor( "John      Smith     042\n" + "Jane      Doe       030\n" + "-----------------------");
-        extractor.LineFilter = line => line.Length > 0 && line.Trim('-').Length == 0
-            ? LineAction.Stop
-            : LineAction.Process;
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            LineFilter = line => line.Length > 0 && line.Trim('-').Length == 0
+                ? LineAction.Stop
+                : LineAction.Process,
+        };
+
+        var extractor = CreateExtractor( "John      Smith     042\n" + "Jane      Doe       030\n" + "-----------------------", extractorOptions);
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -423,19 +456,22 @@ public class FixedWidthExtractorTests
     public async Task ExtractAsync_LineFilter_is_not_invoked_for_blank_lines()
     {
         // BlankLineHandling is evaluated before LineFilter — blank lines never reach it.
-        var extractor = CreateExtractor( "John      Smith     042\n" + "\n" + "Jane      Doe       030");
-
-        extractor.BlankLineHandling = BlankLineHandling.Skip;
         var filterInvokedForBlank = false;
-        extractor.LineFilter = line =>
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
         {
-            if (string.IsNullOrEmpty(line))
-            {
-                filterInvokedForBlank = true;
-            }
+            BlankLineHandling = BlankLineHandling.Skip,
+            LineFilter = line =>
+                {
+                if (string.IsNullOrEmpty(line))
+                {
+                    filterInvokedForBlank = true;
+                }
 
-            return LineAction.Process;
+                return LineAction.Process;
+            },
         };
+
+        var extractor = CreateExtractor( "John      Smith     042\n" + "\n" + "Jane      Doe       030", extractorOptions);
 
         await extractor.ExtractAsync().ToListAsync();
 
@@ -514,10 +550,14 @@ public class FixedWidthExtractorTests
     {
         // BlankLineHandling.Skip — blank line is invisible to counting logic.
         // With SkipItemCount = 1, the blank line should not consume the skip budget.
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            BlankLineHandling = BlankLineHandling.Skip,
+        };
+
         var extractor = CreateExtractor( "\n" + // blank — invisible
                                          "John      Smith     042\n" +  // should be skipped (skip budget = 1)
-                                         "Jane      Doe       030");
-        extractor.BlankLineHandling = BlankLineHandling.Skip;
+                                         "Jane      Doe       030", extractorOptions);
         extractor.SkipItemCount = 1;
 
         var results = await extractor.ExtractAsync().ToListAsync();
@@ -536,10 +576,14 @@ public class FixedWidthExtractorTests
     public async Task ExtractAsync_when_BlankLineHandling_is_ReturnDefault_and_blank_line_is_within_the_skip_budget_counts_toward_SkipItemCount()
     {
         // BlankLineHandling.ReturnDefault — blank line within skip budget counts as a skip.
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            BlankLineHandling = BlankLineHandling.ReturnDefault,
+        };
+
         var extractor = CreateExtractor( "\n" + // blank — counts as skip #1
                                          "John      Smith     042\n" + // counts as skip #2
-                                         "Jane      Doe       030");
-        extractor.BlankLineHandling = BlankLineHandling.ReturnDefault;
+                                         "Jane      Doe       030", extractorOptions);
         extractor.SkipItemCount = 2;
 
         var results = await extractor.ExtractAsync().ToListAsync();
@@ -564,8 +608,12 @@ public class FixedWidthExtractorTests
     {
         // BlankLineHandling.ReturnDefault — blank line past skip budget yields a default
         // record and counts toward MaximumItemCount.
-        var extractor = CreateExtractor( "John      Smith     042\n" + "\n" + "Jane      Doe       030");
-        extractor.BlankLineHandling = BlankLineHandling.ReturnDefault;
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            BlankLineHandling = BlankLineHandling.ReturnDefault,
+        };
+
+        var extractor = CreateExtractor( "John      Smith     042\n" + "\n" + "Jane      Doe       030", extractorOptions);
         extractor.MaximumItemCount = 2;
 
         var results = await extractor.ExtractAsync().ToListAsync();
@@ -589,10 +637,14 @@ public class FixedWidthExtractorTests
     public async Task ExtractAsync_when_LineFilter_returns_Skip_the_line_is_invisible_to_all_counting()
     {
         // LineAction.Skip lines are invisible — they do not affect any counter.
-        var extractor = CreateExtractor( "# comment  \n" + "John      Smith     042");
-        extractor.LineFilter = line => line.StartsWith("#")
-            ? LineAction.Skip
-            : LineAction.Process;
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            LineFilter = line => line.StartsWith("#")
+                ? LineAction.Skip
+                : LineAction.Process,
+        };
+
+        var extractor = CreateExtractor( "# comment  \n" + "John      Smith     042", extractorOptions);
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -619,10 +671,10 @@ public class FixedWidthExtractorTests
     public async Task ExtractAsync_when_FieldDelimiter_is_set_parses_fields_correctly()
     {
         const string content = "John       | Smith      | 042";
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content), new FixedWidthExtractorOptions<PersonRecord>
         {
             FieldDelimiter = " | ",
-        };
+        });
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -654,11 +706,11 @@ public class FixedWidthExtractorTests
             "John       | Smith      | 042\n" +
             "Jane       | Doe        | 030";
 
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content), new FixedWidthExtractorOptions<PersonRecord>
         {
             FieldDelimiter = " | ",
             HeaderLineCount = 1,
-        };
+        });
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -688,12 +740,12 @@ public class FixedWidthExtractorTests
                                "-----------| -----------| ---\n" +
                                "John       | Smith      | 042";
 
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content), new FixedWidthExtractorOptions<PersonRecord>
         {
             FieldDelimiter = " | ",
             HeaderLineCount = 1,
             FieldSeparator = '-',
-        };
+        });
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -712,10 +764,10 @@ public class FixedWidthExtractorTests
     {
         // With " | " delimiter PersonRecord expects 29 chars — line below is too short.
         const string content = "John       | Smith     ";
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content), new FixedWidthExtractorOptions<PersonRecord>
         {
             FieldDelimiter = " | ",
-        };
+        });
 
         await Assert.ThrowsAsync<LineTooShortException>( async () => await extractor.ExtractAsync().ToListAsync());
     }
@@ -729,11 +781,11 @@ public class FixedWidthExtractorTests
             "John       | Smith     \n" + // too short
             "Jane       | Doe        | 030";
 
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content), new FixedWidthExtractorOptions<PersonRecord>
         {
             FieldDelimiter = " | ",
-            MalformedLineHandling = MalformedLineHandling.Skip
-        };
+            MalformedLineHandling = MalformedLineHandling.Skip,
+        });
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -753,11 +805,11 @@ public class FixedWidthExtractorTests
         const string content = "John       | Smith     \n" + // too short
                                "Jane       | Doe        | 030";
 
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content), new FixedWidthExtractorOptions<PersonRecord>
         {
             FieldDelimiter = " | ",
-            MalformedLineHandling = MalformedLineHandling.ReturnDefault
-        };
+            MalformedLineHandling = MalformedLineHandling.ReturnDefault,
+        });
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -784,15 +836,18 @@ public class FixedWidthExtractorTests
     public async Task ExtractAsync_when_custom_ValueParser_is_set_uses_it_for_all_fields()
     {
         // Upper-case all string values to verify the parser is being called.
-        var extractor = CreateExtractor("john      smith     042");
-        extractor.ValueParser =
-            (
-                    text,
-                    ctx
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            ValueParser = (
+                text,
+                ctx
                 ) =>
                 ctx.PropertyType == typeof(string)
-                    ? text.ToString().Trim().ToUpperInvariant()
-                    : FixedWidthConverter.DefaultParser(text, ctx);
+                ? text.ToString().Trim().ToUpperInvariant()
+                : FixedWidthConverter.DefaultParser(text, ctx),
+        };
+
+        var extractor = CreateExtractor("john      smith     042", extractorOptions);
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -846,11 +901,11 @@ public class FixedWidthExtractorTests
                                "Jane      Doe       030\n" + // line 4
                                "Bob       Jones     055"; // line 5
 
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content), new FixedWidthExtractorOptions<PersonRecord>
         {
-            HasHeader = true,
+            HeaderLineCount = 1,
             FieldSeparator = '-',
-        };
+        });
 
         await foreach (var _ in extractor.ExtractAsync()) {}
 
@@ -899,10 +954,10 @@ public class FixedWidthExtractorTests
                                "Bad       Line     \n" + // too short — rejected
                                "Jane      Doe       030";
 
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content), new FixedWidthExtractorOptions<PersonRecord>
         {
             MalformedLineHandling = MalformedLineHandling.Skip,
-        };
+        });
 
         _ = await extractor.ExtractAsync().ToListAsync();
 
@@ -952,8 +1007,8 @@ public class FixedWidthExtractorTests
 
 
 
-    private static FixedWidthExtractor<EmployeeRecord> CreateEmployeeExtractor(string content) =>
-        new(new StringReader(content));
+    private static FixedWidthExtractor<EmployeeRecord> CreateEmployeeExtractor(string content, FixedWidthExtractorOptions<EmployeeRecord>? options = null) =>
+        options is null ? new(new StringReader(content)) : new(new StringReader(content), options);
 
 
 
@@ -1041,8 +1096,12 @@ public class FixedWidthExtractorTests
     {
         // MaximumItemCount = 1, first line is a normal record, second line is blank.
         // The blank line should NOT be yielded because the budget is already full.
-        var extractor = CreateExtractor("John      Smith     042\n\nJane      Doe       030");
-        extractor.BlankLineHandling = BlankLineHandling.ReturnDefault;
+        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
+        {
+            BlankLineHandling = BlankLineHandling.ReturnDefault,
+        };
+
+        var extractor = CreateExtractor("John      Smith     042\n\nJane      Doe       030", extractorOptions);
         extractor.MaximumItemCount = 1;
 
         var results = await extractor.ExtractAsync().ToListAsync();
