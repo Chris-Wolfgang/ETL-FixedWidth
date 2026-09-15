@@ -48,7 +48,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// loader.FieldDelimiter = " | ";
 /// </code>
 /// </remarks>
-public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, ISupportDryRun
+public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     where TRecord : notnull
 {
     // ------------------------------------------------------------------
@@ -95,7 +95,27 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         TextWriter writer,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
-        : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null, options: null, timer: null, logger: logger)
+        : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null, options: null, encoding: null, timer: null, logger: logger)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance that writes to <paramref name="writer"/> with the given configuration.
+    /// </summary>
+    /// <param name="writer">The writer receiving the fixed-width lines. The caller owns it.</param>
+    /// <param name="options">The formatting configuration. The writer already owns its encoding, so this is the base record without an <c>Encoding</c>.</param>
+    /// <param name="logger">An optional logger.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="writer"/> or <paramref name="options"/> is <see langword="null"/>.</exception>
+    public FixedWidthLoader
+    (
+        TextWriter writer,
+        FixedWidthLoaderOptions options,
+        ILogger<FixedWidthLoader<TRecord>>? logger = null
+    )
+        : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null,
+               options: options ?? throw new ArgumentNullException(nameof(options)), encoding: null, timer: null, logger: logger)
     {
     }
 
@@ -125,7 +145,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         IProgressTimer timer,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
-        : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null, options: null,
+        : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null, options: null, encoding: null,
                timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
     }
@@ -139,7 +159,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     /// The encoding to decode with, or <see langword="null"/> for the documented default.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    [Obsolete("Use the constructor that takes FixedWidthLoaderOptions. This overload will be removed in a future release.")]
+    [Obsolete("Use the constructor that takes FixedWidthLoaderStreamOptions. This overload will be removed in a future release.")]
     public FixedWidthLoader(Stream stream, Encoding encoding)
         : this(stream, options: ToOptions(encoding), logger: null)
     {
@@ -157,7 +177,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     /// The encoding to decode with, or <see langword="null"/> for the documented default.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    [Obsolete("Use the constructor that takes FixedWidthLoaderOptions. This overload will be removed in a future release.")]
+    [Obsolete("Use the constructor that takes FixedWidthLoaderStreamOptions. This overload will be removed in a future release.")]
     public FixedWidthLoader(Stream stream, ILogger<FixedWidthLoader<TRecord>> logger, Encoding encoding)
         : this(stream, options: ToOptions(encoding), logger: logger)
     {
@@ -175,7 +195,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     /// </summary>
     /// <param name="stream">The <see cref="Stream"/> to use.</param>
     /// <param name="options">
-    /// Options that control behaviour, including the <see cref="FixedWidthLoaderOptions.Encoding"/>
+    /// Options that control behaviour, including the <see cref="FixedWidthLoaderStreamOptions.Encoding"/>
     /// to use. When <c>null</c>, the documented defaults apply.
     /// </param>
     /// <param name="logger">
@@ -186,10 +206,10 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     public FixedWidthLoader
     (
         Stream stream,
-        FixedWidthLoaderOptions? options = null,
+        FixedWidthLoaderStreamOptions? options = null,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
-        : this(writer: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, timer: null, logger: logger)
+        : this(writer: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, encoding: options?.Encoding, timer: null, logger: logger)
     {
     }
 
@@ -221,10 +241,10 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     (
         Stream stream,
         IProgressTimer timer,
-        FixedWidthLoaderOptions? options = null,
+        FixedWidthLoaderStreamOptions? options = null,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
-        : this(writer: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options,
+        : this(writer: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, encoding: options?.Encoding,
                timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
     }
@@ -241,6 +261,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
         TextWriter? writer,
         Stream? stream,
         FixedWidthLoaderOptions? options,
+        Encoding? encoding,
         IProgressTimer? timer,
         ILogger<FixedWidthLoader<TRecord>>? logger
     )
@@ -261,8 +282,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
         if (stream is not null)
         {
-            var resolved = options ?? new FixedWidthLoaderOptions();
-            _writer = CreateBufferedWriter(stream, resolved.Encoding);
+            _writer = CreateBufferedWriter(stream, encoding ?? Encoding.UTF8);
             _ownsWriter = true;
         }
         else
@@ -272,6 +292,8 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
 
         _progressTimer = timer;
         _logger = logger ?? (ILogger)NullLogger.Instance;
+
+        ApplyOptions(options);
     }
 
 
@@ -299,10 +321,32 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>, 
     // The removed constructors took a loose Encoding. Callers reaching them through the obsolete
     // overloads above could legitimately pass null, which meant "use the default" - so null must
     // map to no options rather than to an options record carrying a null Encoding.
-    private static FixedWidthLoaderOptions? ToOptions(Encoding? encoding)
-        => encoding is null ? null : new FixedWidthLoaderOptions { Encoding = encoding };
+    private static FixedWidthLoaderStreamOptions? ToOptions(Encoding? encoding)
+        => encoding is null ? null : new FixedWidthLoaderStreamOptions { Encoding = encoding };
 
 
+
+
+
+    /// <summary>
+    /// Copies every setting from <paramref name="options"/> onto the loader. Called once, at the end of
+    /// construction; a <see langword="null"/> record keeps the documented defaults.
+    /// </summary>
+    private void ApplyOptions(FixedWidthLoaderOptions? options)
+    {
+        if (options is null)
+        {
+            return;
+        }
+
+        ValueConverter = options.ValueConverter;
+        HeaderConverter = options.HeaderConverter;
+        WriteHeader = options.WriteHeader;
+        IsDryRun = options.IsDryRun;
+        FieldSeparator = options.FieldSeparator;
+        FieldDelimiter = options.FieldDelimiter;
+        Schema = options.Schema;
+    }
 
 
 
