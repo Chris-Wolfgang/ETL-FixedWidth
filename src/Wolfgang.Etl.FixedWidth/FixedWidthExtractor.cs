@@ -528,11 +528,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <example>
     /// <code>
     /// var errors = new List&lt;FixedWidthError&gt;();
-    /// var extractor = new FixedWidthExtractor&lt;Record&gt;(reader)
+    /// var extractor = new FixedWidthExtractor&lt;Record&gt;(reader, new FixedWidthExtractorOptions&lt;Record&gt;
     /// {
     ///     MalformedLineHandling = MalformedLineHandling.Skip,
     ///     OnError = errors.Add,
-    /// };
+    /// });
     /// await foreach (var ok in extractor.ExtractAsync(token)) { /* only good records */ }
     /// // errors now holds the dead letters
     /// </code>
