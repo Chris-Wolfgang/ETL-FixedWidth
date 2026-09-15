@@ -16,12 +16,18 @@ name: PR Benchmarks
 # every file-I/O benchmark 2-4x with no code change involved; a regression
 # only fails this workflow if it reproduces on a second, independent sample.
 #
-# The confirmation MUST be a separate job, not a second step in the same job:
-# GitHub Actions only provisions a fresh runner VM per job, not per step. An
-# earlier version of this workflow re-ran the benchmarks as a later step in
-# the same job and both samples landed on the identical runner (confirmed via
-# the BDN host-environment line: same CPU model, same run) — that is not an
-# independent sample and does not actually rule out a bad-runner event.
+# The confirmation is a same-runner A/B against the merge-base (#355), not a
+# second sample against the stored chart baseline. Comparing against gh-pages
+# exposes every PR to runner-to-runner drift: on 2026-09-15 an unchanged main
+# read 2.55x against its own baseline on one runner and 0.45x on another an
+# hour later, so a "fresh, independent runner" only re-rolls that die. The
+# confirm job instead builds and runs the merge-base and the PR head back to
+# back on ONE runner, re-running only the methods the first sample flagged,
+# with ten measured iterations each, and gates on the median (a single
+# stalled disk flush moves the mean of three iterations by an order of
+# magnitude and the median not at all). The stored baseline is still what the
+# first sample and the delta comment compare against; it is cheap, and its
+# alert only decides whether the A/B runs.
 
 on:
   pull_request:
@@ -54,6 +60,7 @@ jobs:
 
     outputs:
       gate_failed: ${{ steps.gate1_result.outputs.failed }}
+      regressed: ${{ steps.gate1_result.outputs.regressed }}
 
     steps:
       - name: Checkout repository
@@ -166,76 +173,112 @@ jobs:
             "${{ steps.locate.outputs.report }}" \
             "$RUNNER_TEMP/baseline-data.js" \
             1.50 \
-            200000
+            200000 \
+            "$RUNNER_TEMP/regressed.txt"
 
       - name: Record gate result for the confirm job
         id: gate1_result
         if: always()
-        run: echo "failed=${{ steps.gate1.outcome == 'failure' }}" >> "$GITHUB_OUTPUT"
+        env:
+          GATE_FAILED: ${{ steps.gate1.outcome == 'failure' }}
+        run: |
+          echo "failed=$GATE_FAILED" >> "$GITHUB_OUTPUT"
+          # One --filter glob per regressed method, space-separated (globs contain no spaces).
+          regressed=""
+          if [ -s "$RUNNER_TEMP/regressed.txt" ]; then
+            regressed=$(tr '\n' ' ' < "$RUNNER_TEMP/regressed.txt" | sed 's/ *$//')
+          fi
+          echo "regressed=$regressed" >> "$GITHUB_OUTPUT"
 
   confirm-regression:
-    name: Confirm regression on an independent runner
+    name: Confirm regression (same-runner A/B against the merge-base)
     needs: benchmark
     if: needs.benchmark.outputs.gate_failed == 'true'
     runs-on: ubuntu-latest
-
+    timeout-minutes: 60
     permissions:
       contents: read
-
+    env:
+      BENCH_DIR: benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks
+      BENCH_PROJECT: benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks.csproj
+      # Space-separated --filter globs from the first sample; empty = whole suite.
+      REGRESSED_GLOBS: ${{ needs.benchmark.outputs.regressed }}
     steps:
-      - name: Checkout repository
+      - name: Checkout repository (full history, for the merge-base)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-
+          fetch-depth: 0
       - name: Setup .NET
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
         with:
           dotnet-version: |
             10.0.x
-
-      - name: Restore
-        run: dotnet restore benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks.csproj
-
-      - name: Build (Release)
-        run: dotnet build -c Release --no-restore benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks.csproj
-
-      - name: Run benchmarks
-        working-directory: benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks
-        run: dotnet run -c Release --no-build -- --filter "*" --job short --memory --exporters json
-
-      - name: Merge per-class BDN reports
-        id: locate
-        working-directory: benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks
-        run: |
-          shopt -s nullglob
-          reports=(BenchmarkDotNet.Artifacts/results/*-report-full-compressed.json)
-          if [ ${#reports[@]} -eq 0 ]; then
-            echo "::error::No BenchmarkDotNet JSON report found"
-            exit 1
-          fi
-          jq -s '{
-            Title: "BenchmarkDotNet combined report (confirm)",
-            HostEnvironmentInfo: .[0].HostEnvironmentInfo,
-            Benchmarks: [.[].Benchmarks[]]
-          }' "${reports[@]}" > benchmarks-result.json
-          echo "report=benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/benchmarks-result.json" >> "$GITHUB_OUTPUT"
-
-      - name: Fetch the gh-pages benchmark baseline
+      - name: Locate the merge-base
+        id: base
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
         run: |
           set -euo pipefail
-          git fetch --depth=1 origin gh-pages
-          git show FETCH_HEAD:dev/bench/data.js > "$RUNNER_TEMP/baseline-data.js"
-
-      - name: Absolute-floor regression gate (#367) - confirm
-        # This one is NOT continue-on-error: if the regression reproduces on
-        # this second, independent runner, that's real signal and the
-        # workflow fails. If it clears here, the first alert was noise and
-        # the workflow passes (the "benchmark" job above already succeeded
-        # for everything except this gate, per continue-on-error there).
+          git fetch --no-tags origin "$BASE_REF"
+          base=$(git merge-base "origin/$BASE_REF" HEAD)
+          echo "sha=$base" >> "$GITHUB_OUTPUT"
+          echo "Merge-base with $BASE_REF: $base"
+      - name: Benchmark the merge-base
+        # A detached worktree of the merge-base, built and run on THIS runner.
+        # `read -ra` splits the globs without letting the shell expand them.
+        env:
+          BASE_SHA: ${{ steps.base.outputs.sha }}
         run: |
-          python3 benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/scripts/regression-gate.py \
-            "${{ steps.locate.outputs.report }}" \
-            "$RUNNER_TEMP/baseline-data.js" \
+          set -euo pipefail
+          read -ra globs <<< "${REGRESSED_GLOBS:-*}"
+          git worktree add --detach "$RUNNER_TEMP/base" "$BASE_SHA"
+          dotnet restore "$RUNNER_TEMP/base/$BENCH_PROJECT"
+          dotnet build -c Release --no-restore "$RUNNER_TEMP/base/$BENCH_PROJECT"
+          (
+            cd "$RUNNER_TEMP/base/$BENCH_DIR"
+            dotnet run -c Release --no-build -- --filter "${globs[@]}" --job short --iterationCount 10 --memory --exporters json
+            shopt -s nullglob
+            reports=(BenchmarkDotNet.Artifacts/results/*-report-full-compressed.json)
+            if [ ${#reports[@]} -eq 0 ]; then
+              echo "::error::No BenchmarkDotNet JSON report found for the merge-base"
+              exit 1
+            fi
+            jq -s '{
+              Title: "BenchmarkDotNet combined report (merge-base)",
+              HostEnvironmentInfo: .[0].HostEnvironmentInfo,
+              Benchmarks: [.[].Benchmarks[]]
+            }' "${reports[@]}" > "$RUNNER_TEMP/base-result.json"
+          )
+      - name: Benchmark the PR head (same runner, immediately after)
+        run: |
+          set -euo pipefail
+          read -ra globs <<< "${REGRESSED_GLOBS:-*}"
+          dotnet restore "$BENCH_PROJECT"
+          dotnet build -c Release --no-restore "$BENCH_PROJECT"
+          (
+            cd "$BENCH_DIR"
+            dotnet run -c Release --no-build -- --filter "${globs[@]}" --job short --iterationCount 10 --memory --exporters json
+            shopt -s nullglob
+            reports=(BenchmarkDotNet.Artifacts/results/*-report-full-compressed.json)
+            if [ ${#reports[@]} -eq 0 ]; then
+              echo "::error::No BenchmarkDotNet JSON report found for the PR head"
+              exit 1
+            fi
+            jq -s '{
+              Title: "BenchmarkDotNet combined report (PR head)",
+              HostEnvironmentInfo: .[0].HostEnvironmentInfo,
+              Benchmarks: [.[].Benchmarks[]]
+            }' "${reports[@]}" > "$RUNNER_TEMP/head-result.json"
+          )
+      - name: Absolute-floor regression gate (#367) - same-runner A/B, median vs median (#355)
+        # NOT continue-on-error: the same code on the same runner minutes
+        # apart, ten iterations a side, compared by median, is the signal the
+        # first sample could not give. If a benchmark still clears both the
+        # ratio and the absolute floor here, the PR made it slower.
+        run: |
+          python3 "$BENCH_DIR/scripts/regression-gate.py" \
+            "$RUNNER_TEMP/head-result.json" \
+            "$RUNNER_TEMP/base-result.json" \
             1.50 \
             200000
