@@ -79,11 +79,16 @@ public class FixedWidthLoaderOptionsTests
 
 
     [Fact]
-    public void Writer_constructor_when_options_are_null_throws_ArgumentNullException()
+    public void Writer_constructor_when_options_are_null_keeps_the_defaults()
     {
-        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthLoader<PersonRecord>(new StringWriter(), (FixedWidthLoaderOptions)null!));
+        var defaults = new FixedWidthLoaderOptions();
 
-        Assert.Equal("options", ex.ParamName);
+        using var sut = new FixedWidthLoader<PersonRecord>(new StringWriter(), (FixedWidthLoaderOptions?)null);
+
+        Assert.Equal(defaults.WriteHeader, sut.WriteHeader);
+        Assert.Equal(defaults.IsDryRun, sut.IsDryRun);
+        Assert.Equal(defaults.FieldSeparator, sut.FieldSeparator);
+        Assert.Equal(defaults.FieldDelimiter, sut.FieldDelimiter);
     }
 
 

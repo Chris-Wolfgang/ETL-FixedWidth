@@ -105,17 +105,17 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// Initializes a new instance that writes to <paramref name="writer"/> with the given configuration.
     /// </summary>
     /// <param name="writer">The writer receiving the fixed-width lines. The caller owns it.</param>
-    /// <param name="options">The formatting configuration. The writer already owns its encoding, so this is the base record without an <c>Encoding</c>.</param>
+    /// <param name="options">The formatting configuration. <see langword="null"/> (the default) keeps every default. The writer already owns its encoding, so this is the base record without an <c>Encoding</c>.</param>
     /// <param name="logger">An optional logger.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="writer"/> or <paramref name="options"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="writer"/> is <see langword="null"/>.</exception>
     public FixedWidthLoader
     (
         TextWriter writer,
-        FixedWidthLoaderOptions options,
+        FixedWidthLoaderOptions? options = null,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
         : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null,
-               options: options ?? throw new ArgumentNullException(nameof(options)), encoding: null, timer: null, logger: logger)
+               options: options, encoding: null, timer: null, logger: logger)
     {
     }
 

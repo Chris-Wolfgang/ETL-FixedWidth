@@ -104,11 +104,16 @@ public class FixedWidthExtractorOptionsTests
 
 
     [Fact]
-    public void Reader_constructor_when_options_are_null_throws_ArgumentNullException()
+    public void Reader_constructor_when_options_are_null_keeps_the_defaults()
     {
-        var ex = Assert.Throws<ArgumentNullException>(() => new FixedWidthExtractor<PersonRecord>(new StringReader(string.Empty), (FixedWidthExtractorOptions<PersonRecord>)null!));
+        var defaults = new FixedWidthExtractorOptions<PersonRecord>();
 
-        Assert.Equal("options", ex.ParamName);
+        using var sut = new FixedWidthExtractor<PersonRecord>(new StringReader(string.Empty), (FixedWidthExtractorOptions<PersonRecord>?)null);
+
+        Assert.Equal(defaults.HeaderLineCount, sut.HeaderLineCount);
+        Assert.Equal(defaults.MalformedLineHandling, sut.MalformedLineHandling);
+        Assert.Equal(defaults.BlankLineHandling, sut.BlankLineHandling);
+        Assert.Equal(defaults.StartByteOffset, sut.StartByteOffset);
     }
 
 
