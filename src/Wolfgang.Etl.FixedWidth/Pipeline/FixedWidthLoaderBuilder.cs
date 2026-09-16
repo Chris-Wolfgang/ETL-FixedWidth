@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -8,7 +7,6 @@ using Wolfgang.Etl.Abstractions;
 
 namespace Wolfgang.Etl.FixedWidth;
 
-#pragma warning disable CS0618 // The builder writes the deprecated setters on the stage it constructs or wraps; #342 rewrites it to accumulate into the options record.
 
 /// <summary>
 /// Default <see cref="IFixedWidthLoaderBuilder{T}"/> implementation. Records configuration up front,
@@ -24,7 +22,7 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
     private readonly string? _path;
     private readonly Stream? _stream;
     private readonly TextWriter? _writer;
-    private readonly List<Action<FixedWidthLoader<T>>> _mutations = new();
+    private FixedWidthLoaderOptions _options = new();
 
     private Encoding _encoding = System.Text.Encoding.UTF8;
 
@@ -68,7 +66,7 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
     }
 
 
-    public IFixedWidthLoaderBuilder<T> WriteHeader(bool writeHeader) => Configure(l => l.WriteHeader = writeHeader);
+    public IFixedWidthLoaderBuilder<T> WriteHeader(bool writeHeader) => Set(o => o with { WriteHeader = writeHeader });
 
 
     public IFixedWidthLoaderBuilder<T> ValueConverter(Func<object, FieldContext, string> converter)
@@ -78,7 +76,7 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
             throw new ArgumentNullException(nameof(converter));
         }
 
-        return Configure(l => l.ValueConverter = converter);
+        return Set(o => o with { ValueConverter = converter });
     }
 
 
@@ -89,17 +87,17 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
             throw new ArgumentNullException(nameof(converter));
         }
 
-        return Configure(l => l.HeaderConverter = converter);
+        return Set(o => o with { HeaderConverter = converter });
     }
 
 
-    public IFixedWidthLoaderBuilder<T> FieldSeparator(char? separator) => Configure(l => l.FieldSeparator = separator);
+    public IFixedWidthLoaderBuilder<T> FieldSeparator(char? separator) => Set(o => o with { FieldSeparator = separator });
 
 
-    public IFixedWidthLoaderBuilder<T> FieldDelimiter(string? delimiter) => Configure(l => l.FieldDelimiter = delimiter);
+    public IFixedWidthLoaderBuilder<T> FieldDelimiter(string? delimiter) => Set(o => o with { FieldDelimiter = delimiter });
 
 
-    public IFixedWidthLoaderBuilder<T> IsDryRun(bool isDryRun) => Configure(l => l.IsDryRun = isDryRun);
+    public IFixedWidthLoaderBuilder<T> IsDryRun(bool isDryRun) => Set(o => o with { IsDryRun = isDryRun });
 
 
     public Task RunAsync(IProgress<EtlPipelineProgress>? progress = null, CancellationToken token = default)
@@ -110,14 +108,14 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
         if (_writer is not null)
         {
             // Caller owns the writer and flushes it; dispose nothing.
-            loader = new FixedWidthLoader<T>(_writer);
+            loader = new FixedWidthLoader<T>(_writer, _options);
         }
         else if (_stream is not null)
         {
             // The loader wraps the caller's stream with leaveOpen:true and flushes it during the run;
             // dispose the loader afterward to release its internal writer. The stream stays open.
 #pragma warning disable S125 // Sonar mis-detects this behaviour comment as commented-out code
-            loader = new FixedWidthLoader<T>(_stream, new FixedWidthLoaderStreamOptions { Encoding = _encoding });
+            loader = new FixedWidthLoader<T>(_stream, new FixedWidthLoaderStreamOptions(_options, _encoding));
 #pragma warning restore S125
             owned = loader;
         }
@@ -126,13 +124,8 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
             // Path sink: the builder owns the writer it opens. Disposing it after the run flushes the
             // file to disk and closes it.
             var writer = new StreamWriter(_path!, append: false, _encoding);
-            loader = new FixedWidthLoader<T>(writer);
+            loader = new FixedWidthLoader<T>(writer, _options);
             owned = writer;
-        }
-
-        foreach (var mutation in _mutations)
-        {
-            mutation(loader);
         }
 
         var sink = _pipeline.To(loader);
@@ -146,10 +139,9 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
     }
 
 
-    private IFixedWidthLoaderBuilder<T> Configure(Action<FixedWidthLoader<T>> mutation)
+    private IFixedWidthLoaderBuilder<T> Set(Func<FixedWidthLoaderOptions, FixedWidthLoaderOptions> update)
     {
-        _mutations.Add(mutation);
+        _options = update(_options);
         return this;
     }
 }
-#pragma warning restore CS0618

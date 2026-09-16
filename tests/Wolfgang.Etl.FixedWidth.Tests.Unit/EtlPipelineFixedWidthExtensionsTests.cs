@@ -137,6 +137,34 @@ public sealed class EtlPipelineFixedWidthExtensionsTests : IDisposable
     }
 
 
+
+
+    [Fact]
+    public async Task Extractor_from_existing_instance_configured_through_the_builder_keeps_the_callers_own_settings()
+    {
+        // A caller-supplied extractor is already configured (MalformedLineHandling); the builder must copy only the
+        // members configured through it (HeaderLineCount) rather than apply a whole record over the caller's settings.
+        using var reader = ReaderOver("HEADER LINE\n" + Content(("Alice", "Smith", 30)));
+        var extractor = new FixedWidthExtractor<PersonRecord>
+        (
+            reader,
+            new FixedWidthExtractorOptions<PersonRecord> { MalformedLineHandling = MalformedLineHandling.Skip }
+        );
+        using var targetWriter = new StringWriter();
+
+        await EtlPipeline
+            .Create()
+            .FixedWidthExtractor<PersonRecord>(extractor)
+            .HeaderLineCount(1)
+            .FixedWidthLoader<PersonRecord>(targetWriter)
+            .RunAsync();
+
+        Assert.Equal(1, extractor.HeaderLineCount);
+        Assert.Equal(MalformedLineHandling.Skip, extractor.MalformedLineHandling);
+        Assert.Equal("Alice     Smith     030", Normalize(targetWriter.ToString()).TrimEnd('\n'));
+    }
+
+
     [Fact]
     public async Task Header_separator_and_delimiter_setters_round_trip_through_a_file()
     {
