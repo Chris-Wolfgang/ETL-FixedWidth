@@ -8,6 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+
+## [0.12.0] - 2026-09-16
+
+### Added
 - **The options records inherit the Abstractions 0.24 base records** (ADR-0009):
   `FixedWidthExtractorOptions<TRecord> : ExtractorOptions` and `FixedWidthLoaderOptions : LoaderOptions` (the
   `*StreamOptions` records inherit through them). `ReportingInterval`, `MaximumItemCount`, `SkipItemCount` and
@@ -124,10 +139,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   its next release (Chris-Wolfgang/ETL-Abstractions#457). `IsDryRun` is configured through
   `FixedWidthLoaderOptions`; the property's setter remains for now and is deprecated with the rest in #341's
   second half.
-
-### Fixed
-
-### Security
 
 ## [0.11.0] - 2026-08-27
 
@@ -778,7 +789,8 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
 [#26]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/26
 [#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.10.1...HEAD
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.11.0...v0.12.0
 [0.10.1]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.8.0...v0.9.0
