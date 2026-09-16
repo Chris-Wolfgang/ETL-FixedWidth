@@ -63,19 +63,25 @@ Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.Encoding.get -> System.Tex
 Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.Encoding.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.Equals(Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions? other) -> bool
 Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.FixedWidthLoaderStreamOptions() -> void
+override Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>.EqualityContract.get -> System.Type!
 override Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>.Equals(object? obj) -> bool
 override Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>.GetHashCode() -> int
+override Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>.PrintMembers(System.Text.StringBuilder! builder) -> bool
 override Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>.ToString() -> string!
 override Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions<TRecord>.Equals(object? obj) -> bool
 override Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions<TRecord>.GetHashCode() -> int
 override Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions<TRecord>.ToString() -> string!
+override Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.EqualityContract.get -> System.Type!
 override Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.Equals(object? obj) -> bool
 override Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.GetHashCode() -> int
+override Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.PrintMembers(System.Text.StringBuilder! builder) -> bool
 override Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.ToString() -> string!
 override Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.Equals(object? obj) -> bool
 override Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.GetHashCode() -> int
 override Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.ToString() -> string!
+override sealed Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>.Equals(Wolfgang.Etl.Abstractions.ExtractorOptions? other) -> bool
 override sealed Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions<TRecord>.Equals(Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>? other) -> bool
+override sealed Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.Equals(Wolfgang.Etl.Abstractions.LoaderOptions? other) -> bool
 override sealed Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.Equals(Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions? other) -> bool
 static Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>.operator !=(Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>? left, Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>? right) -> bool
 static Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>.operator ==(Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>? left, Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>? right) -> bool
@@ -85,11 +91,5 @@ static Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.operator !=(Wolfgang.Etl.
 static Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.operator ==(Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions? right) -> bool
 static Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.operator !=(Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions? right) -> bool
 static Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.operator ==(Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions? right) -> bool
-virtual Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>.<Clone>$() -> Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>!
-virtual Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>.EqualityContract.get -> System.Type!
 virtual Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>.Equals(Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>? other) -> bool
-virtual Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>.PrintMembers(System.Text.StringBuilder! builder) -> bool
-virtual Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.<Clone>$() -> Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions!
-virtual Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.EqualityContract.get -> System.Type!
 virtual Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.Equals(Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions? other) -> bool
-virtual Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.PrintMembers(System.Text.StringBuilder! builder) -> bool

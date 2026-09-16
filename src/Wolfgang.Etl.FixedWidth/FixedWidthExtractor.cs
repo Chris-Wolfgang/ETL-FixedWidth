@@ -299,6 +299,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         IProgressTimer? timer,
         ILogger<FixedWidthExtractor<TRecord>>? logger
     )
+        : base(options)
     {
         // Defensive invariant guard. Every caller-facing constructor null-checks its own source
         // before delegating here, so this cannot fire today — it exists so that a constructor added
