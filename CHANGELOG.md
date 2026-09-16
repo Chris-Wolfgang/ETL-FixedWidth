@@ -29,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - `Wolfgang.Etl.Abstractions` 0.23.4 → 0.24.0 (`Wolfgang.Etl.TestKit` / `.TestKit.Xunit` for the test project and
   examples). The dry-run contract test returns to the TestKit base, now non-generic.
-- **Binary-only break on `net462`, `netstandard2.0` and `netstandard2.1`:** because the options records now have a base
+- **Binary-only break on `net462`, `net481` and `netstandard2.0`:** because the options records now have a base
   record, the compiler-synthesized `<Clone>$` method (what a `with` expression calls) returns `ExtractorOptions` /
   `LoaderOptions` on targets without covariant returns. Source compiles unchanged; an assembly compiled against an
   earlier build of these records on one of those targets that uses `with` must be rebuilt
