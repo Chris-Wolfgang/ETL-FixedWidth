@@ -117,17 +117,17 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// Initializes a new instance that reads from <paramref name="reader"/> with the given configuration.
     /// </summary>
     /// <param name="reader">The reader supplying the fixed-width lines. The caller owns it.</param>
-    /// <param name="options">The parsing configuration. The reader has already decoded its bytes, so this is the base record without an <c>Encoding</c>.</param>
+    /// <param name="options">The parsing configuration. <see langword="null"/> (the default) keeps every default. The reader has already decoded its bytes, so this is the base record without an <c>Encoding</c>.</param>
     /// <param name="logger">An optional logger.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="reader"/> or <paramref name="options"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <see langword="null"/>.</exception>
     public FixedWidthExtractor
     (
         TextReader reader,
-        FixedWidthExtractorOptions<TRecord> options,
+        FixedWidthExtractorOptions<TRecord>? options = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
         : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null,
-               options: options ?? throw new ArgumentNullException(nameof(options)), encoding: null, timer: null, logger: logger)
+               options: options, encoding: null, timer: null, logger: logger)
     {
     }
 
