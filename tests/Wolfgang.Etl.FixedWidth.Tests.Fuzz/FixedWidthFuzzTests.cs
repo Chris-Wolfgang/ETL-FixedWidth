@@ -111,11 +111,11 @@ public class FixedWidthFuzzTests
         Gen.String.Sample(
             line =>
             {
-                using var extractor = new FixedWidthExtractor<FuzzRecord>(new StringReader(line))
+                using var extractor = new FixedWidthExtractor<FuzzRecord>(new StringReader(line), new FixedWidthExtractorOptions<FuzzRecord>
                 {
                     MalformedLineHandling = MalformedLineHandling.Skip,
                     BlankLineHandling = BlankLineHandling.Skip,
-                };
+                });
 
                 // Draining must complete; a crash here (IndexOutOfRange, NullRef,
                 // ...) is a robustness bug for CsCheck to shrink and report.

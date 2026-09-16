@@ -116,12 +116,16 @@ public static class Program
         // -----------------------------------------------------------------
 
         var reader = new StringReader(data);
-        var extractor = new FixedWidthExtractor<EmployeeRecord>(reader);
+        var extractorOptions = new FixedWidthExtractorOptions<EmployeeRecord>
+        {
 
-        extractor.ValueParser = (text, ctx) =>
-            ctx.PropertyType == typeof(bool)
-                ? (object)(text.Span.SequenceEqual("Y".AsSpan()))
-                : FixedWidthConverter.DefaultParser(text, ctx);
+            ValueParser = (text, ctx) =>
+                ctx.PropertyType == typeof(bool)
+                    ? (object)(text.Span.SequenceEqual("Y".AsSpan()))
+                    : FixedWidthConverter.DefaultParser(text, ctx),
+        };
+
+        var extractor = new FixedWidthExtractor<EmployeeRecord>(reader, extractorOptions);
 
         Console.WriteLine("=== Extracted Records ===");
 
@@ -156,12 +160,16 @@ public static class Program
         // -----------------------------------------------------------------
 
         var output = new StringWriter();
-        var loader = new FixedWidthLoader<EmployeeRecord>(output);
+        var loaderOptions = new FixedWidthLoaderOptions
+        {
 
-        loader.ValueConverter = (value, ctx) =>
-            ctx.PropertyType == typeof(bool)
-                ? ((bool)value ? "Y" : "N")
-                : FixedWidthConverter.Strict(value, ctx);
+            ValueConverter = (value, ctx) =>
+                ctx.PropertyType == typeof(bool)
+                    ? ((bool)value ? "Y" : "N")
+                    : FixedWidthConverter.Strict(value, ctx),
+        };
+
+        var loader = new FixedWidthLoader<EmployeeRecord>(output, loaderOptions);
 
         // Feed the extracted records back into the loader.
         // ToAsyncEnumerable() converts the List<T> to IAsyncEnumerable<T>.

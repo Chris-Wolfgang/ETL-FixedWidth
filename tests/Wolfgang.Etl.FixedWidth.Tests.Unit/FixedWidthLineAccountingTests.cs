@@ -34,18 +34,24 @@ public class FixedWidthLineAccountingTests
 
 
 
+    private static readonly FixedWidthExtractorOptions<PersonRecord> Options = new()
+    {
+        BlankLineHandling = BlankLineHandling.Skip,
+        MalformedLineHandling = MalformedLineHandling.Skip,
+        LineFilter = line => line.StartsWith("#", StringComparison.Ordinal)
+            ? LineAction.Skip
+            : LineAction.Process,
+        RecordValidator = record => string.Equals(record.FirstName, "Bob", StringComparison.Ordinal)
+            ? ValidationResult.Skip("no bobs")
+            : ValidationResult.Accept(),
+    };
+
+
+
     private static FixedWidthExtractor<PersonRecord> CreateExtractor() =>
-        new(new StringReader(Input))
+        new(new StringReader(Input), Options)
         {
             SkipItemCount = 1,
-            BlankLineHandling = BlankLineHandling.Skip,
-            MalformedLineHandling = MalformedLineHandling.Skip,
-            LineFilter = line => line.StartsWith("#", StringComparison.Ordinal)
-                ? LineAction.Skip
-                : LineAction.Process,
-            RecordValidator = record => string.Equals(record.FirstName, "Bob", StringComparison.Ordinal)
-                ? ValidationResult.Skip("no bobs")
-                : ValidationResult.Accept(),
         };
 
 

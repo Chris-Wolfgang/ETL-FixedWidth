@@ -18,8 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `FixedWidthExtractor<T>(TextReader, FixedWidthExtractorOptions<T>, ILogger?)` and
   `FixedWidthLoader<T>(TextWriter, FixedWidthLoaderOptions, ILogger?)` accept them; the `Stream`
   constructors accept the derived `FixedWidthExtractorStreamOptions<TRecord>` /
-  `FixedWidthLoaderStreamOptions`, which add `Encoding`. The existing setters are unchanged in this
-  release — their deprecation is the second half of #341.
+  `FixedWidthLoaderStreamOptions`, which add `Encoding`. The existing setters are deprecated in this
+  same release — see *Deprecated* below for the migration guidance.
 
 ### Changed
 - **`Encoding` moved from the base options records to the new `*StreamOptions` records.** The shipped
