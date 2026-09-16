@@ -56,14 +56,16 @@ public static class FixedWidthConverter
     /// <example>
     /// <code>
     /// // Use Strict explicitly (it is also the default):
-    /// // Supplied through FixedWidthLoaderOptions, passed to the constructor:
-    /// ValueConverter = FixedWidthConverter.Strict,
+    /// new FixedWidthLoaderOptions { ValueConverter = FixedWidthConverter.Strict }
     ///
     /// // Fall back to Strict for all types except bool:
-    /// ValueConverter = (value, ctx) =>
-    ///     ctx.PropertyType == typeof(bool)
-    ///         ? ((bool)value ? "Y" : "N")
-    ///         : FixedWidthConverter.Strict(value, ctx),
+    /// new FixedWidthLoaderOptions
+    /// {
+    ///     ValueConverter = (value, ctx) =>
+    ///         ctx.PropertyType == typeof(bool)
+    ///             ? ((bool)value ? "Y" : "N")
+    ///             : FixedWidthConverter.Strict(value, ctx),
+    /// }
     /// </code>
     /// </example>
     public static readonly Func<object, FieldContext, string> Strict =
@@ -103,8 +105,7 @@ public static class FixedWidthConverter
     /// <example>
     /// <code>
     /// // Use Truncate when long values should be silently clipped:
-    /// // Supplied through FixedWidthLoaderOptions, passed to the constructor:
-    /// ValueConverter = FixedWidthConverter.Truncate,
+    /// new FixedWidthLoaderOptions { ValueConverter = FixedWidthConverter.Truncate }
     /// </code>
     /// </example>
     public static readonly Func<object, FieldContext, string> Truncate =
@@ -143,12 +144,14 @@ public static class FixedWidthConverter
     /// <example>
     /// <code>
     /// // Use StrictHeader explicitly (it is also the default):
-    /// // Supplied through FixedWidthLoaderOptions, passed to the constructor:
-    /// HeaderConverter = FixedWidthConverter.StrictHeader,
+    /// new FixedWidthLoaderOptions { HeaderConverter = FixedWidthConverter.StrictHeader }
     ///
     /// // Convert header labels to upper-case, still enforcing the field width:
-    /// HeaderConverter = (label, ctx) =>
-    ///     FixedWidthConverter.StrictHeader(label.ToUpperInvariant(), ctx),
+    /// new FixedWidthLoaderOptions
+    /// {
+    ///     HeaderConverter = (label, ctx) =>
+    ///         FixedWidthConverter.StrictHeader(label.ToUpperInvariant(), ctx),
+    /// }
     /// </code>
     /// </example>
     public static readonly Func<string, FieldContext, string> StrictHeader =
@@ -180,8 +183,7 @@ public static class FixedWidthConverter
     /// <example>
     /// <code>
     /// // Use TruncateHeader when header labels may exceed the field width:
-    /// // Supplied through FixedWidthLoaderOptions, passed to the constructor:
-    /// HeaderConverter = FixedWidthConverter.TruncateHeader,
+    /// new FixedWidthLoaderOptions { HeaderConverter = FixedWidthConverter.TruncateHeader }
     /// </code>
     /// </example>
     public static readonly Func<string, FieldContext, string> TruncateHeader =
@@ -227,14 +229,16 @@ public static class FixedWidthConverter
     /// <example>
     /// <code>
     /// // Use DefaultParser explicitly (it is also the default):
-    /// // Supplied through FixedWidthExtractorOptions&lt;TRecord&gt;, passed to the constructor:
-    /// ValueParser = FixedWidthConverter.DefaultParser,
+    /// new FixedWidthExtractorOptions&lt;TRecord&gt; { ValueParser = FixedWidthConverter.DefaultParser }
     ///
     /// // Handle "Y"/"N" booleans, fall back to DefaultParser for everything else:
-    /// ValueParser = (text, ctx) =>
-    ///     ctx.PropertyType == typeof(bool)
-    ///         ? (object)(text.Span.SequenceEqual("Y".AsSpan()))
-    ///         : FixedWidthConverter.DefaultParser(text, ctx),
+    /// new FixedWidthExtractorOptions&lt;TRecord&gt;
+    /// {
+    ///     ValueParser = (text, ctx) =>
+    ///         ctx.PropertyType == typeof(bool)
+    ///             ? (object)(text.Span.SequenceEqual("Y".AsSpan()))
+    ///             : FixedWidthConverter.DefaultParser(text, ctx),
+    /// }
     /// </code>
     /// </example>
     public static readonly FixedWidthValueParser DefaultParser =

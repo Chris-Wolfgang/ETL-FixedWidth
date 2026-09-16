@@ -475,20 +475,19 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <example>
     /// <code>
     /// // Footer string — stop when a known marker line is reached
-    /// // Supplied through FixedWidthExtractorOptions&lt;TRecord&gt;, passed to the constructor:
-    /// LineFilter = line => line == "END" ? LineAction.Stop : LineAction.Process,
+    /// new FixedWidthExtractorOptions&lt;TRecord&gt; { LineFilter = line => line == "END" ? LineAction.Stop : LineAction.Process }
     ///
     /// // Trailing separator — stop when a line consists entirely of dashes
-    /// LineFilter = line => line.All(c => c == '-') ? LineAction.Stop : LineAction.Process,
+    /// new FixedWidthExtractorOptions&lt;TRecord&gt; { LineFilter = line => line.All(c => c == '-') ? LineAction.Stop : LineAction.Process }
     ///
     /// // EOF marker — stop when a line starts with a sentinel prefix
-    /// LineFilter = line => line.StartsWith("$$") ? LineAction.Stop : LineAction.Process,
+    /// new FixedWidthExtractorOptions&lt;TRecord&gt; { LineFilter = line => line.StartsWith("$$") ? LineAction.Stop : LineAction.Process }
     ///
     /// // Comment lines — skip lines that begin with '#'
-    /// LineFilter = line => line.StartsWith("#") ? LineAction.Skip : LineAction.Process,
+    /// new FixedWidthExtractorOptions&lt;TRecord&gt; { LineFilter = line => line.StartsWith("#") ? LineAction.Skip : LineAction.Process }
     ///
     /// // Blank line as terminator — stop at the first empty line
-    /// LineFilter = line => string.IsNullOrWhiteSpace(line) ? LineAction.Stop : LineAction.Process,
+    /// new FixedWidthExtractorOptions&lt;TRecord&gt; { LineFilter = line => string.IsNullOrWhiteSpace(line) ? LineAction.Stop : LineAction.Process }
     /// </code>
     /// </example>
     public Func<string, LineAction> LineFilter { get; [Obsolete("Configure LineFilter through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; } = _ => LineAction.Process;
@@ -563,17 +562,22 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <example>
     /// <code>
     /// // Treat "Y"/"N" as bool, fall back to DefaultParser for everything else:
-    /// // Supplied through FixedWidthExtractorOptions&lt;TRecord&gt;, passed to the constructor:
-    /// ValueParser = (text, ctx) =>
-    ///     ctx.PropertyType == typeof(bool)
-    ///         ? (object)(text.Span.SequenceEqual("Y".AsSpan()))
-    ///         : FixedWidthConverter.DefaultParser(text, ctx),
+    /// new FixedWidthExtractorOptions&lt;TRecord&gt;
+    /// {
+    ///     ValueParser = (text, ctx) =>
+    ///         ctx.PropertyType == typeof(bool)
+    ///             ? (object)(text.Span.SequenceEqual("Y".AsSpan()))
+    ///             : FixedWidthConverter.DefaultParser(text, ctx),
+    /// }
     ///
     /// // Parse a custom date format for a specific field:
-    /// ValueParser = (text, ctx) =>
-    ///     ctx.PropertyName == "BirthDate"
-    ///         ? DateTime.ParseExact(text.ToString(), "dd/MM/yyyy", CultureInfo.InvariantCulture)
-    ///         : FixedWidthConverter.DefaultParser(text, ctx),
+    /// new FixedWidthExtractorOptions&lt;TRecord&gt;
+    /// {
+    ///     ValueParser = (text, ctx) =>
+    ///         ctx.PropertyName == "BirthDate"
+    ///             ? DateTime.ParseExact(text.ToString(), "dd/MM/yyyy", CultureInfo.InvariantCulture)
+    ///             : FixedWidthConverter.DefaultParser(text, ctx),
+    /// }
     /// </code>
     /// </example>
     public FixedWidthValueParser ValueParser { get; [Obsolete("Configure ValueParser through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; } = FixedWidthConverter.DefaultParser;

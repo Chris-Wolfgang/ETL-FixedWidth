@@ -59,6 +59,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
+- **The 20 configuration setters — 13 on `FixedWidthExtractor<T>`** (`MalformedLineHandling`, `BlankLineHandling`,
+  `LineFilter`, `RecordValidator`, `OnError`, `ValueParser`, `HeaderLineCount`, `FieldSeparator`, `FieldDelimiter`,
+  `Schema`, `TrackByteOffset` and two more) **and 7 on `FixedWidthLoader<T>`** (`ValueConverter`, `HeaderConverter`,
+  `WriteHeader`, `IsDryRun`, `FieldSeparator`, `FieldDelimiter`, `Schema`) — are `[Obsolete]` on the **setter
+  accessor**, so reads stay warning-free, pointing at the member of the same name on
+  `FixedWidthExtractorOptions<T>` / `FixedWidthLoaderOptions`, passed to the constructor (#354). The fluent builders
+  were rewritten onto the records, so `EtlPipeline` callers are unaffected. Nothing is removed in this release;
+  removal is tracked in #342.
+
 - **Binary-compatibility overloads without deprecation.**
   `FixedWidthExtractor<T>(TextReader)`, `FixedWidthLoader<T>(TextWriter)` and
   `FixedWidthTransformer<TSource, TDestination>(Func<TSource, TDestination>)` are restored, but

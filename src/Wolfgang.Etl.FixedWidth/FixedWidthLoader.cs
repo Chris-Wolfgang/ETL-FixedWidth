@@ -410,14 +410,16 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// <example>
     /// <code>
     /// // Write booleans as "Y"/"N" instead of "True"/"False":
-    /// // Supplied through FixedWidthLoaderOptions, passed to the constructor:
-    /// ValueConverter = (value, ctx) =>
-    ///     ctx.PropertyType == typeof(bool)
-    ///         ? ((bool)value ? "Y" : "N")
-    ///         : FixedWidthConverter.Strict(value, ctx),
+    /// new FixedWidthLoaderOptions
+    /// {
+    ///     ValueConverter = (value, ctx) =>
+    ///         ctx.PropertyType == typeof(bool)
+    ///             ? ((bool)value ? "Y" : "N")
+    ///             : FixedWidthConverter.Strict(value, ctx),
+    /// }
     ///
     /// // Silently truncate all values instead of throwing on overflow:
-    /// ValueConverter = FixedWidthConverter.Truncate,
+    /// new FixedWidthLoaderOptions { ValueConverter = FixedWidthConverter.Truncate }
     /// </code>
     /// </example>
     public Func<object, FieldContext, string> ValueConverter { get; [Obsolete("Configure ValueConverter through FixedWidthLoaderOptions passed to the constructor instead. This setter will be removed in a future release.")] set; } = FixedWidthConverter.Strict;
@@ -437,12 +439,14 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// <example>
     /// <code>
     /// // Render all headers in upper-case:
-    /// // Supplied through FixedWidthLoaderOptions, passed to the constructor:
-    /// HeaderConverter = (label, ctx) =>
-    ///     FixedWidthConverter.StrictHeader(label.ToUpperInvariant(), ctx),
+    /// new FixedWidthLoaderOptions
+    /// {
+    ///     HeaderConverter = (label, ctx) =>
+    ///         FixedWidthConverter.StrictHeader(label.ToUpperInvariant(), ctx),
+    /// }
     ///
     /// // Silently truncate headers that are too long:
-    /// HeaderConverter = FixedWidthConverter.TruncateHeader,
+    /// new FixedWidthLoaderOptions { HeaderConverter = FixedWidthConverter.TruncateHeader }
     /// </code>
     /// </example>
     public Func<string, FieldContext, string> HeaderConverter { get; [Obsolete("Configure HeaderConverter through FixedWidthLoaderOptions passed to the constructor instead. This setter will be removed in a future release.")] set; } = FixedWidthConverter.StrictHeader;
