@@ -21,4 +21,29 @@ public sealed record FixedWidthLoaderStreamOptions : FixedWidthLoaderOptions
         get;
         init => field = value ?? throw new ArgumentNullException(nameof(value));
     } = Encoding.UTF8;
+
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FixedWidthLoaderStreamOptions"/> class.
+    /// </summary>
+    public FixedWidthLoaderStreamOptions()
+    {
+    }
+
+
+
+    /// <summary>
+    /// Copies the formatting settings of <paramref name="formatting"/> and adds the <paramref name="encoding"/> the stream is
+    /// written with. Used by the pipeline builder, which accumulates the base record and only learns the output shape
+    /// when it materializes.
+    /// </summary>
+    /// <param name="formatting">The formatting settings to copy.</param>
+    /// <param name="encoding">The encoding to write the stream with.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="formatting"/> or <paramref name="encoding"/> is <see langword="null"/>.</exception>
+    internal FixedWidthLoaderStreamOptions(FixedWidthLoaderOptions formatting, Encoding encoding)
+        : base(formatting ?? throw new ArgumentNullException(nameof(formatting)))
+    {
+        Encoding = encoding;
+    }
 }
