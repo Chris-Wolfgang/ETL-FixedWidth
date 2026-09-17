@@ -425,7 +425,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 | **Multi-record-type files** | `FixedWidthMultiRecordExtractor` routes each line to a different POCO by a discriminator predicate (`.When(…)` / `.Otherwise(…)`), for header/detail/trailer batch files |
 | **Pipeline composition** | `EtlPipeline.Create().FixedWidthExtractor<T>(…).FixedWidthLoader<T>(…).RunAsync()` — fluent source factories and sink terminators over the generic `EtlPipeline` (requires `Wolfgang.Etl.Abstractions` 0.16.0) |
 | **Metrics** | Zero-config `System.Diagnostics.Metrics` instruments (throughput, skips, duration) from the `Wolfgang.Etl.FixedWidth` meter — OpenTelemetry / Prometheus / any `MeterListener` |
-| **Multi-TFM support** | net462, net481, netstandard2.0, net8.0, net10.0 |
+| **Multi-TFM support** | net462, net481, netstandard2.0, net5.0, net6.0, net7.0, net8.0, net10.0 |
 
 **Examples:**
 
@@ -470,9 +470,9 @@ This library targets:
 
 - **.NET Framework:** 4.6.2, 4.8.1
 - **.NET Standard:** 2.0
-- **.NET:** 8.0, 10.0
+- **.NET:** 5.0, 6.0, 7.0, 8.0, 10.0
 
-> The CI test matrix additionally exercises the library on .NET Framework 4.7.x/4.8 and .NET 5.0–9.0 via the `netstandard2.0` facade; those are tested-against runtimes, not package target frameworks.
+> The CI test matrix additionally exercises the library on .NET Framework 4.7.x/4.8, .NET Core 3.1 and .NET 9.0 via the nearest package asset; those are tested-against runtimes, not package target frameworks.
 
 See the [NuGet package page](https://www.nuget.org/packages/Wolfgang.Etl.FixedWidth/) for the authoritative per-TFM compatibility matrix.
 
