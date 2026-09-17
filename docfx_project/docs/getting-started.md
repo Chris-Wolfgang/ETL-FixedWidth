@@ -228,17 +228,6 @@ using var extractor = new FixedWidthMultiRecordExtractor(reader)
     .When(line => line[0] == 'D', typeof(DetailRecord))
     .When(line => line[0] == 'T', typeof(TrailerRecord));
 
-// From a stream, with the encoding on the options record (the TextReader form above
-// already knows its encoding, so it takes no record):
-using var fromFile = new FixedWidthMultiRecordExtractor
-(
-    File.OpenRead("batch.txt"),
-    new FixedWidthMultiRecordExtractorOptions { Encoding = Encoding.Latin1 }
-)
-    .When(line => line[0] == 'H', typeof(HeaderRecord))
-    .When(line => line[0] == 'D', typeof(DetailRecord))
-    .When(line => line[0] == 'T', typeof(TrailerRecord));
-
 await foreach (var record in extractor.ExtractAsync(token))
 {
     switch (record)
@@ -248,6 +237,19 @@ await foreach (var record in extractor.ExtractAsync(token))
         case TrailerRecord t: /* ... */ break;
     }
 }
+```
+
+From a file or other `Stream`, the encoding travels on the options record (the `TextReader` form above already knows its encoding, so it takes no record):
+
+```csharp
+using var extractor = new FixedWidthMultiRecordExtractor
+(
+    File.OpenRead("batch.txt"),
+    new FixedWidthMultiRecordExtractorOptions { Encoding = Encoding.Latin1 }
+)
+    .When(line => line[0] == 'H', typeof(HeaderRecord))
+    .When(line => line[0] == 'D', typeof(DetailRecord))
+    .When(line => line[0] == 'T', typeof(TrailerRecord));
 ```
 
 Each record type keeps its own independent `[FixedWidthField]` layout. A line matching no rule throws by default; set `UnmatchedLineHandling = UnmatchedLineHandling.Skip` to drop it or register a catch-all with `.Otherwise(typeof(UnknownRecord))`. The extractor shares the family's `HeaderLineCount`, `FieldDelimiter`, `ValueParser`, `SkipItemCount`/`MaximumItemCount`, dead-letter `OnError`, and progress reporting.
