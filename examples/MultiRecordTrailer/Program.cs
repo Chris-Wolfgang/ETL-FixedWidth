@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Threading;
 using Wolfgang.Etl.FixedWidth;
 using Wolfgang.Etl.FixedWidth.Attributes;
@@ -25,7 +26,12 @@ var file = string.Join
     Trailer(count: 3, total: 1115275) // sum of the three amounts
 );
 
-using var extractor = new FixedWidthMultiRecordExtractor(new StringReader(file))
+// The stream constructor takes the options record; Encoding is its own member.
+using var extractor = new FixedWidthMultiRecordExtractor
+(
+    new MemoryStream(Encoding.UTF8.GetBytes(file)),
+    new FixedWidthMultiRecordExtractorOptions { Encoding = Encoding.UTF8 }
+)
     .When(line => line[0] == 'H', typeof(HeaderRecord))
     .When(line => line[0] == 'D', typeof(DetailRecord))
     .When(line => line[0] == 'T', typeof(TrailerRecord));
