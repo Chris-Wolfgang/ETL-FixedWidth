@@ -107,7 +107,49 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         TextReader reader,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
-        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null, timer: null, logger: logger)
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null, encoding: null, timer: null, logger: logger)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new instance that reads from <paramref name="reader"/> with the given configuration.
+    /// </summary>
+    /// <param name="reader">The reader supplying the fixed-width lines. The caller owns it.</param>
+    /// <param name="options">The parsing configuration. <see langword="null"/> (the default) keeps every default. The reader has already decoded its bytes, so this is the base record without an <c>Encoding</c>.</param>
+    /// <param name="logger">An optional logger.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <see langword="null"/>.</exception>
+    public FixedWidthExtractor
+    (
+        TextReader reader,
+        FixedWidthExtractorOptions<TRecord>? options = null,
+        ILogger<FixedWidthExtractor<TRecord>>? logger = null
+    )
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null,
+               options: options, encoding: null, timer: null, logger: logger)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Test-only: injects the progress timer and a parsing configuration for a <see cref="TextReader"/> source.
+    /// </summary>
+    /// <param name="reader">The reader supplying the fixed-width lines.</param>
+    /// <param name="timer">The progress timer to use instead of the default.</param>
+    /// <param name="options">The parsing configuration.</param>
+    /// <param name="logger">An optional logger.</param>
+    internal FixedWidthExtractor
+    (
+        TextReader reader,
+        IProgressTimer timer,
+        FixedWidthExtractorOptions<TRecord> options,
+        ILogger<FixedWidthExtractor<TRecord>>? logger = null
+    )
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null,
+               options: options ?? throw new ArgumentNullException(nameof(options)), encoding: null,
+               timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
     }
 
@@ -137,7 +179,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         IProgressTimer timer,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
-        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null,
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null, encoding: null,
                timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
     }
@@ -151,7 +193,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// The encoding to decode with, or <see langword="null"/> for the documented default.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    [Obsolete("Use the constructor that takes FixedWidthExtractorOptions. This overload will be removed in a future release.")]
+    [Obsolete("Use the constructor that takes FixedWidthExtractorStreamOptions. This overload will be removed in a future release.")]
     public FixedWidthExtractor(Stream stream, Encoding encoding)
         : this(stream, options: ToOptions(encoding), logger: null)
     {
@@ -169,7 +211,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// The encoding to decode with, or <see langword="null"/> for the documented default.
     /// </param>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    [Obsolete("Use the constructor that takes FixedWidthExtractorOptions. This overload will be removed in a future release.")]
+    [Obsolete("Use the constructor that takes FixedWidthExtractorStreamOptions. This overload will be removed in a future release.")]
     public FixedWidthExtractor(Stream stream, ILogger<FixedWidthExtractor<TRecord>> logger, Encoding encoding)
         : this(stream, options: ToOptions(encoding), logger: logger)
     {
@@ -187,7 +229,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// </summary>
     /// <param name="stream">The <see cref="Stream"/> to use.</param>
     /// <param name="options">
-    /// Options that control behaviour, including the <see cref="FixedWidthExtractorOptions.Encoding"/>
+    /// Options that control behaviour, including the <see cref="FixedWidthExtractorStreamOptions{TRecord}.Encoding"/>
     /// to use. When <c>null</c>, the documented defaults apply.
     /// </param>
     /// <param name="logger">
@@ -198,10 +240,10 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     public FixedWidthExtractor
     (
         Stream stream,
-        FixedWidthExtractorOptions? options = null,
+        FixedWidthExtractorStreamOptions<TRecord>? options = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
-        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, timer: null, logger: logger)
+        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, encoding: options?.Encoding, timer: null, logger: logger)
     {
     }
 
@@ -233,10 +275,10 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     (
         Stream stream,
         IProgressTimer timer,
-        FixedWidthExtractorOptions? options = null,
+        FixedWidthExtractorStreamOptions<TRecord>? options = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
-        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options,
+        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, encoding: options?.Encoding,
                timer: timer ?? throw new ArgumentNullException(nameof(timer)), logger: logger)
     {
     }
@@ -252,10 +294,12 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     (
         TextReader? reader,
         Stream? stream,
-        FixedWidthExtractorOptions? options,
+        FixedWidthExtractorOptions<TRecord>? options,
+        Encoding? encoding,
         IProgressTimer? timer,
         ILogger<FixedWidthExtractor<TRecord>>? logger
     )
+        : base(options)
     {
         // Defensive invariant guard. Every caller-facing constructor null-checks its own source
         // before delegating here, so this cannot fire today — it exists so that a constructor added
@@ -273,11 +317,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
         if (stream is not null)
         {
-            var resolved = options ?? new FixedWidthExtractorOptions();
-            _reader = CreateBufferedReader(stream, resolved.Encoding);
+            var resolvedEncoding = encoding ?? Encoding.UTF8;
+            _reader = CreateBufferedReader(stream, resolvedEncoding);
             _ownsReader = true;
             _offsetStream = stream;
-            _offsetEncoding = resolved.Encoding;
+            _offsetEncoding = resolvedEncoding;
         }
         else
         {
@@ -286,6 +330,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
         _progressTimer = timer;
         _logger = logger ?? (ILogger)NullLogger.Instance;
+
+        ApplyOptions(options);
     }
 
 
@@ -313,10 +359,39 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     // The removed constructors took a loose Encoding. Callers reaching them through the obsolete
     // overloads above could legitimately pass null, which meant "use the default" - so null must
     // map to no options rather than to an options record carrying a null Encoding.
-    private static FixedWidthExtractorOptions? ToOptions(Encoding? encoding)
-        => encoding is null ? null : new FixedWidthExtractorOptions { Encoding = encoding };
+    private static FixedWidthExtractorStreamOptions<TRecord>? ToOptions(Encoding? encoding)
+        => encoding is null ? null : new FixedWidthExtractorStreamOptions<TRecord> { Encoding = encoding };
 
 
+
+
+
+    /// <summary>
+    /// Copies every setting from <paramref name="options"/> onto the extractor. Called once, at the end of
+    /// construction; a <see langword="null"/> record keeps the documented defaults.
+    /// </summary>
+    private void ApplyOptions(FixedWidthExtractorOptions<TRecord>? options)
+    {
+        if (options is null)
+        {
+            return;
+        }
+
+#pragma warning disable CS0618 // ApplyOptions is the supported replacement for these setters; it necessarily writes them.
+        MalformedLineHandling = options.MalformedLineHandling;
+        BlankLineHandling = options.BlankLineHandling;
+        LineFilter = options.LineFilter;
+        RecordValidator = options.RecordValidator;
+        OnError = options.OnError;
+        ValueParser = options.ValueParser;
+        HeaderLineCount = options.HeaderLineCount;
+        FieldSeparator = options.FieldSeparator;
+        FieldDelimiter = options.FieldDelimiter;
+        Schema = options.Schema;
+        TrackByteOffset = options.TrackByteOffset;
+        StartByteOffset = options.StartByteOffset;
+#pragma warning restore CS0618
+    }
 
 
 
@@ -350,7 +425,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// When set to <see cref="MalformedLineHandling.ReturnDefault"/>, a default instance
     /// of <typeparamref name="TRecord"/> is yielded for the offending line.
     /// </remarks>
-    public MalformedLineHandling MalformedLineHandling { get; set; } = MalformedLineHandling.ThrowException;
+    public MalformedLineHandling MalformedLineHandling { get; [Obsolete("Configure MalformedLineHandling through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; } = MalformedLineHandling.ThrowException;
 
 
 
@@ -378,7 +453,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <see cref="LineFilter"/> is not invoked for blank lines.
     /// </para>
     /// </remarks>
-    public BlankLineHandling BlankLineHandling { get; set; } = BlankLineHandling.ThrowException;
+    public BlankLineHandling BlankLineHandling { get; [Obsolete("Configure BlankLineHandling through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; } = BlankLineHandling.ThrowException;
 
 
 
@@ -400,22 +475,22 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <example>
     /// <code>
     /// // Footer string — stop when a known marker line is reached
-    /// extractor.LineFilter = line => line == "END" ? LineAction.Stop : LineAction.Process;
+    /// new FixedWidthExtractorOptions&lt;TRecord&gt; { LineFilter = line => line == "END" ? LineAction.Stop : LineAction.Process }
     ///
     /// // Trailing separator — stop when a line consists entirely of dashes
-    /// extractor.LineFilter = line => line.All(c => c == '-') ? LineAction.Stop : LineAction.Process;
+    /// new FixedWidthExtractorOptions&lt;TRecord&gt; { LineFilter = line => line.All(c => c == '-') ? LineAction.Stop : LineAction.Process }
     ///
     /// // EOF marker — stop when a line starts with a sentinel prefix
-    /// extractor.LineFilter = line => line.StartsWith("$$") ? LineAction.Stop : LineAction.Process;
+    /// new FixedWidthExtractorOptions&lt;TRecord&gt; { LineFilter = line => line.StartsWith("$$") ? LineAction.Stop : LineAction.Process }
     ///
     /// // Comment lines — skip lines that begin with '#'
-    /// extractor.LineFilter = line => line.StartsWith("#") ? LineAction.Skip : LineAction.Process;
+    /// new FixedWidthExtractorOptions&lt;TRecord&gt; { LineFilter = line => line.StartsWith("#") ? LineAction.Skip : LineAction.Process }
     ///
     /// // Blank line as terminator — stop at the first empty line
-    /// extractor.LineFilter = line => string.IsNullOrWhiteSpace(line) ? LineAction.Stop : LineAction.Process;
+    /// new FixedWidthExtractorOptions&lt;TRecord&gt; { LineFilter = line => string.IsNullOrWhiteSpace(line) ? LineAction.Stop : LineAction.Process }
     /// </code>
     /// </example>
-    public Func<string, LineAction> LineFilter { get; set; } = _ => LineAction.Process;
+    public Func<string, LineAction> LineFilter { get; [Obsolete("Configure LineFilter through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; } = _ => LineAction.Process;
 
 
 
@@ -429,13 +504,14 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// </summary>
     /// <example>
     /// <code>
-    /// extractor.RecordValidator = record =>
+    /// // Supplied through FixedWidthExtractorOptions&lt;TRecord&gt;, passed to the constructor:
+    /// RecordValidator = record =>
     ///     record.Balance &lt; 0
     ///         ? ValidationResult.Skip("Negative balance")
-    ///         : ValidationResult.Accept();
+    ///         : ValidationResult.Accept(),
     /// </code>
     /// </example>
-    public Func<TRecord, ValidationResult>? RecordValidator { get; set; }
+    public Func<TRecord, ValidationResult>? RecordValidator { get; [Obsolete("Configure RecordValidator through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; }
 
 
 
@@ -452,16 +528,16 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <example>
     /// <code>
     /// var errors = new List&lt;FixedWidthError&gt;();
-    /// var extractor = new FixedWidthExtractor&lt;Record&gt;(reader)
+    /// var extractor = new FixedWidthExtractor&lt;Record&gt;(reader, new FixedWidthExtractorOptions&lt;Record&gt;
     /// {
     ///     MalformedLineHandling = MalformedLineHandling.Skip,
     ///     OnError = errors.Add,
-    /// };
+    /// });
     /// await foreach (var ok in extractor.ExtractAsync(token)) { /* only good records */ }
     /// // errors now holds the dead letters
     /// </code>
     /// </example>
-    public Action<FixedWidthError>? OnError { get; set; }
+    public Action<FixedWidthError>? OnError { get; [Obsolete("Configure OnError through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; }
 
 
 
@@ -486,19 +562,25 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <example>
     /// <code>
     /// // Treat "Y"/"N" as bool, fall back to DefaultParser for everything else:
-    /// extractor.ValueParser = (text, ctx) =>
-    ///     ctx.PropertyType == typeof(bool)
-    ///         ? (object)(text.Span.SequenceEqual("Y".AsSpan()))
-    ///         : FixedWidthConverter.DefaultParser(text, ctx);
+    /// new FixedWidthExtractorOptions&lt;TRecord&gt;
+    /// {
+    ///     ValueParser = (text, ctx) =>
+    ///         ctx.PropertyType == typeof(bool)
+    ///             ? (object)(text.Span.SequenceEqual("Y".AsSpan()))
+    ///             : FixedWidthConverter.DefaultParser(text, ctx),
+    /// }
     ///
     /// // Parse a custom date format for a specific field:
-    /// extractor.ValueParser = (text, ctx) =>
-    ///     ctx.PropertyName == "BirthDate"
-    ///         ? DateTime.ParseExact(text.ToString(), "dd/MM/yyyy", CultureInfo.InvariantCulture)
-    ///         : FixedWidthConverter.DefaultParser(text, ctx);
+    /// new FixedWidthExtractorOptions&lt;TRecord&gt;
+    /// {
+    ///     ValueParser = (text, ctx) =>
+    ///         ctx.PropertyName == "BirthDate"
+    ///             ? DateTime.ParseExact(text.ToString(), "dd/MM/yyyy", CultureInfo.InvariantCulture)
+    ///             : FixedWidthConverter.DefaultParser(text, ctx),
+    /// }
     /// </code>
     /// </example>
-    public FixedWidthValueParser ValueParser { get; set; } = FixedWidthConverter.DefaultParser;
+    public FixedWidthValueParser ValueParser { get; [Obsolete("Configure ValueParser through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; } = FixedWidthConverter.DefaultParser;
 
 
 
@@ -515,13 +597,14 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <example>
     /// <code>
     /// // File has two header lines followed by data:
-    /// extractor.HeaderLineCount = 2;
+    /// // Supplied through FixedWidthExtractorOptions&lt;TRecord&gt;, passed to the constructor:
+    /// HeaderLineCount = 2,
     ///
     /// // Equivalent shorthand for the common single-header case:
-    /// extractor.HasHeader = true;
+    /// HeaderLineCount = 1,
     /// </code>
     /// </example>
-    public int HeaderLineCount { get; set; }
+    public int HeaderLineCount { get; [Obsolete("Configure HeaderLineCount through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; }
 
 
 
@@ -535,16 +618,18 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <example>
     /// <code>
     /// // Skip one header line before reading records:
-    /// extractor.HasHeader = true;
+    /// // Supplied through FixedWidthExtractorOptions&lt;TRecord&gt;, passed to the constructor:
+    /// HeaderLineCount = 1,
     ///
     /// // Skip one header line and one separator line:
-    /// extractor.HasHeader    = true;
-    /// extractor.FieldSeparator = '-';
+    /// HeaderLineCount    = 1,
+    /// FieldSeparator = '-',
     /// </code>
     /// </example>
     public bool HasHeader
     {
         get => HeaderLineCount > 0;
+        [Obsolete("Configure HeaderLineCount through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release. HasHeader is a projection of HeaderLineCount.")]
         set => HeaderLineCount = value
             ? 1
             : 0;
@@ -561,12 +646,13 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// </summary>
     /// <example>
     /// <code>
-    /// extractor.HasHeader      = true;
-    /// extractor.FieldSeparator = '-';  // skips a "----------" separator line after the header
-    /// extractor.FieldSeparator = null; // no separator line (default)
+    /// // Supplied through FixedWidthExtractorOptions&lt;TRecord&gt;, passed to the constructor:
+    /// HeaderLineCount      = 1,
+    /// FieldSeparator = '-',  // skips a "----------" separator line after the header
+    /// FieldSeparator = null, // no separator line (default)
     /// </code>
     /// </example>
-    public char? FieldSeparator { get; set; }
+    public char? FieldSeparator { get; [Obsolete("Configure FieldSeparator through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; }
 
 
 
@@ -583,13 +669,14 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <example>
     /// <code>
     /// // File was written with FieldDelimiter = " | " — set the same value on the extractor:
-    /// extractor.FieldDelimiter = " | ";
+    /// // Supplied through FixedWidthExtractorOptions&lt;TRecord&gt;, passed to the constructor:
+    /// FieldDelimiter = " | ",
     ///
     /// // Pure fixed-width file with no delimiter (default):
-    /// extractor.FieldDelimiter = null;
+    /// FieldDelimiter = null,
     /// </code>
     /// </example>
-    public string? FieldDelimiter { get; set; }
+    public string? FieldDelimiter { get; [Obsolete("Configure FieldDelimiter through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; }
 
 
 
@@ -600,7 +687,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// default) the attribute-based layout is used. The schema's <see cref="FixedWidthSchema.RecordType"/>
     /// must be <typeparamref name="TRecord"/>.
     /// </summary>
-    public FixedWidthSchema? Schema { get; set; }
+    public FixedWidthSchema? Schema { get; [Obsolete("Configure Schema through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; }
 
 
 
@@ -637,7 +724,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// the constructor when enabling tracking. A matching-encoding BOM (e.g. a UTF-8 BOM with the
     /// default encoding) is handled correctly.
     /// </remarks>
-    public bool TrackByteOffset { get; set; }
+    public bool TrackByteOffset { get; [Obsolete("Configure TrackByteOffset through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; }
 
 
 
@@ -653,6 +740,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     public long StartByteOffset
     {
         get => _startByteOffset;
+        [Obsolete("Configure StartByteOffset through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")]
         set
         {
             if (value < 0)

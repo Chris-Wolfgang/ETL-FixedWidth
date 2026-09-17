@@ -35,7 +35,10 @@ public sealed class FixedWidthExtractorCheckpointTests
     [Fact]
     public async Task CurrentByteOffset_advances_one_line_at_a_time()
     {
-        using var extractor = new FixedWidthExtractor<Rec>(new MemoryStream(Ascii(ThreeRecords))) { TrackByteOffset = true };
+        using var extractor = new FixedWidthExtractor<Rec>(new MemoryStream(Ascii(ThreeRecords)), new FixedWidthExtractorStreamOptions<Rec>
+        {
+            TrackByteOffset = true,
+        });
 
         var offsets = new List<long>();
         await foreach (var _ in extractor.ExtractAsync(CancellationToken.None))
@@ -54,7 +57,10 @@ public sealed class FixedWidthExtractorCheckpointTests
 
         // First run: process one record, then "crash" — capturing the checkpoint.
         long checkpoint;
-        using (var first = new FixedWidthExtractor<Rec>(new MemoryStream(bytes)) { TrackByteOffset = true })
+        using (var first = new FixedWidthExtractor<Rec>(new MemoryStream(bytes), new FixedWidthExtractorStreamOptions<Rec>
+        {
+            TrackByteOffset = true,
+        }))
         {
             checkpoint = 0;
             await foreach (var r in first.ExtractAsync(CancellationToken.None))
@@ -68,7 +74,10 @@ public sealed class FixedWidthExtractorCheckpointTests
         Assert.Equal(9, checkpoint);
 
         // Resume: seek to the checkpoint and read the rest.
-        using var resumed = new FixedWidthExtractor<Rec>(new MemoryStream(bytes)) { StartByteOffset = checkpoint };
+        using var resumed = new FixedWidthExtractor<Rec>(new MemoryStream(bytes), new FixedWidthExtractorStreamOptions<Rec>
+        {
+            StartByteOffset = checkpoint,
+        });
         var rest = await resumed.ExtractAsync(CancellationToken.None).ToListAsync();
 
         Assert.Equal(new[] { "DEF", "GHI" }, rest.Select(r => r.Code));
@@ -83,7 +92,10 @@ public sealed class FixedWidthExtractorCheckpointTests
         var bytes = Ascii("ABC00001\r\nDEF00002\r\nGHI00003\r\n");   // each line is 10 bytes
 
         long checkpoint;
-        using (var first = new FixedWidthExtractor<Rec>(new MemoryStream(bytes)) { TrackByteOffset = true })
+        using (var first = new FixedWidthExtractor<Rec>(new MemoryStream(bytes), new FixedWidthExtractorStreamOptions<Rec>
+        {
+            TrackByteOffset = true,
+        }))
         {
             checkpoint = 0;
             await foreach (var _ in first.ExtractAsync(CancellationToken.None))
@@ -95,7 +107,10 @@ public sealed class FixedWidthExtractorCheckpointTests
 
         Assert.Equal(10, checkpoint);
 
-        using var resumed = new FixedWidthExtractor<Rec>(new MemoryStream(bytes)) { StartByteOffset = checkpoint };
+        using var resumed = new FixedWidthExtractor<Rec>(new MemoryStream(bytes), new FixedWidthExtractorStreamOptions<Rec>
+        {
+            StartByteOffset = checkpoint,
+        });
         var rest = await resumed.ExtractAsync(CancellationToken.None).ToListAsync();
 
         Assert.Equal(new[] { "DEF", "GHI" }, rest.Select(r => r.Code));
@@ -107,11 +122,11 @@ public sealed class FixedWidthExtractorCheckpointTests
     {
         var bytes = Ascii("HDR\nABC00001\nDEF00002\n");   // "HDR\n" = 4 bytes, then two 9-byte records
 
-        using var resumed = new FixedWidthExtractor<Rec>(new MemoryStream(bytes))
+        using var resumed = new FixedWidthExtractor<Rec>(new MemoryStream(bytes), new FixedWidthExtractorStreamOptions<Rec>
         {
-            HasHeader = true,          // still set, but must be ignored on resume
-            StartByteOffset = 4 + 9,   // past the header and the first record
-        };
+            HeaderLineCount = 1,      // still set, but must be ignored on resume
+            StartByteOffset = 4 + 9,  // past the header and the first record
+        });
 
         var rest = await resumed.ExtractAsync(CancellationToken.None).ToListAsync();
 
@@ -126,7 +141,10 @@ public sealed class FixedWidthExtractorCheckpointTests
         var bytes = Encoding.UTF8.GetBytes("émA00001\némB00002\n");
 
         long checkpoint;
-        using (var first = new FixedWidthExtractor<Rec>(new MemoryStream(bytes)) { TrackByteOffset = true })
+        using (var first = new FixedWidthExtractor<Rec>(new MemoryStream(bytes), new FixedWidthExtractorStreamOptions<Rec>
+        {
+            TrackByteOffset = true,
+        }))
         {
             checkpoint = 0;
             await foreach (var _ in first.ExtractAsync(CancellationToken.None))
@@ -138,7 +156,10 @@ public sealed class FixedWidthExtractorCheckpointTests
 
         Assert.Equal(10, checkpoint);   // "émA00001\n" = 9 bytes content + 1 for the extra byte of 'é' ... = 10
 
-        using var resumed = new FixedWidthExtractor<Rec>(new MemoryStream(bytes)) { StartByteOffset = checkpoint };
+        using var resumed = new FixedWidthExtractor<Rec>(new MemoryStream(bytes), new FixedWidthExtractorStreamOptions<Rec>
+        {
+            StartByteOffset = checkpoint,
+        });
         var rest = await resumed.ExtractAsync(CancellationToken.None).ToListAsync();
 
         Assert.Single(rest);
@@ -156,7 +177,10 @@ public sealed class FixedWidthExtractorCheckpointTests
         content.CopyTo(bytes, bom.Length);
 
         long checkpoint;
-        using (var first = new FixedWidthExtractor<Rec>(new MemoryStream(bytes)) { TrackByteOffset = true })
+        using (var first = new FixedWidthExtractor<Rec>(new MemoryStream(bytes), new FixedWidthExtractorStreamOptions<Rec>
+        {
+            TrackByteOffset = true,
+        }))
         {
             checkpoint = 0;
             await foreach (var _ in first.ExtractAsync(CancellationToken.None))
@@ -168,7 +192,10 @@ public sealed class FixedWidthExtractorCheckpointTests
 
         Assert.Equal(bom.Length + 9, checkpoint);   // BOM is counted so the offset aligns with real bytes
 
-        using var resumed = new FixedWidthExtractor<Rec>(new MemoryStream(bytes)) { StartByteOffset = checkpoint };
+        using var resumed = new FixedWidthExtractor<Rec>(new MemoryStream(bytes), new FixedWidthExtractorStreamOptions<Rec>
+        {
+            StartByteOffset = checkpoint,
+        });
         var rest = await resumed.ExtractAsync(CancellationToken.None).ToListAsync();
 
         Assert.Equal(new[] { "DEF", "GHI" }, rest.Select(r => r.Code));
@@ -180,10 +207,14 @@ public sealed class FixedWidthExtractorCheckpointTests
     {
         var bytes = Ascii(ThreeRecords);
 
-        using var resumed = new FixedWidthExtractor<Rec>(new MemoryStream(bytes))
+        using var resumed = new FixedWidthExtractor<Rec>(new MemoryStream(bytes), new FixedWidthExtractorStreamOptions<Rec>
         {
-            StartByteOffset = 9,   // resume at DEF
-            SkipItemCount = 1,     // then skip DEF
+            StartByteOffset = 9,
+        })
+        {
+            // resume at DEF
+            SkipItemCount = 1,
+            // then skip DEF
         };
 
         var rest = await resumed.ExtractAsync(CancellationToken.None).ToListAsync();
@@ -201,6 +232,7 @@ public sealed class FixedWidthExtractorCheckpointTests
     }
 
 
+#pragma warning disable CS0618 // Exercises the deprecated setter's guard until the setter is removed; the record's guard is covered in FixedWidthExtractorOptionsTests.
     [Fact]
     public void StartByteOffset_rejects_a_negative_value()
     {
@@ -208,12 +240,16 @@ public sealed class FixedWidthExtractorCheckpointTests
 
         Assert.Throws<ArgumentOutOfRangeException>(() => extractor.StartByteOffset = -1);
     }
+#pragma warning restore CS0618
 
 
     [Fact]
     public async Task Tracking_without_a_stream_constructor_throws()
     {
-        using var extractor = new FixedWidthExtractor<Rec>(new StringReader(ThreeRecords)) { TrackByteOffset = true };
+        using var extractor = new FixedWidthExtractor<Rec>(new StringReader(ThreeRecords), new FixedWidthExtractorOptions<Rec>
+        {
+            TrackByteOffset = true,
+        });
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
@@ -234,7 +270,10 @@ public sealed class FixedWidthExtractorCheckpointTests
     [Fact]
     public async Task StartByteOffset_on_a_non_seekable_stream_throws()
     {
-        using var extractor = new FixedWidthExtractor<Rec>(new NonSeekableStream(Ascii(ThreeRecords))) { StartByteOffset = 9 };
+        using var extractor = new FixedWidthExtractor<Rec>(new NonSeekableStream(Ascii(ThreeRecords)), new FixedWidthExtractorStreamOptions<Rec>
+        {
+            StartByteOffset = 9,
+        });
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
@@ -245,7 +284,11 @@ public sealed class FixedWidthExtractorCheckpointTests
     public async Task Tracking_with_a_bomless_encoding_reports_offsets_from_zero()
     {
         // ASCII has no byte-order-mark preamble, exercising the preamble short-circuit.
-        using var extractor = new FixedWidthExtractor<Rec>(new MemoryStream(Ascii(ThreeRecords)), new FixedWidthExtractorOptions { Encoding = Encoding.ASCII }) { TrackByteOffset = true };
+        using var extractor = new FixedWidthExtractor<Rec>(new MemoryStream(Ascii(ThreeRecords)), new FixedWidthExtractorStreamOptions<Rec>
+        {
+            Encoding = Encoding.ASCII,
+            TrackByteOffset = true,
+        });
 
         var offsets = new List<long>();
         await foreach (var _ in extractor.ExtractAsync(CancellationToken.None))
@@ -262,7 +305,10 @@ public sealed class FixedWidthExtractorCheckpointTests
     {
         var timer = new ManualProgressTimer();
         var sink = new CollectingProgress();
-        using var extractor = new FixedWidthExtractor<Rec>(new MemoryStream(Ascii(ThreeRecords)), timer) { TrackByteOffset = true };
+        using var extractor = new FixedWidthExtractor<Rec>(new MemoryStream(Ascii(ThreeRecords)), timer, new FixedWidthExtractorStreamOptions<Rec>
+        {
+            TrackByteOffset = true,
+        });
 
         await foreach (var _ in extractor.ExtractAsync(sink, CancellationToken.None))
         {

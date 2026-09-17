@@ -10,6 +10,7 @@ using Wolfgang.Etl.FixedWidth.Enums;
 
 namespace Wolfgang.Etl.FixedWidth;
 
+
 /// <summary>
 /// Default <see cref="IFixedWidthExtractorBuilder{T}"/> implementation. Records configuration until the
 /// first pipeline operator, then materializes a <see cref="FixedWidthExtractor{T}"/> and delegates to a
@@ -25,7 +26,8 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
     private readonly Stream? _stream;
     private readonly TextReader? _reader;
     private readonly FixedWidthExtractor<T>? _existing;
-    private readonly List<Action<FixedWidthExtractor<T>>> _mutations = new();
+    private FixedWidthExtractorOptions<T> _options = new();
+    private Touched _touched;
 
     private Encoding _encoding = System.Text.Encoding.UTF8;
     private IEtlPipeline<T>? _pipeline;
@@ -75,16 +77,16 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
     }
 
 
-    public IFixedWidthExtractorBuilder<T> HeaderLineCount(int count) => Configure(e => e.HeaderLineCount = count);
+    public IFixedWidthExtractorBuilder<T> HeaderLineCount(int count) => Set(o => o with { HeaderLineCount = count }, Touched.HeaderLineCount);
 
 
-    public IFixedWidthExtractorBuilder<T> HasHeader(bool hasHeader) => Configure(e => e.HasHeader = hasHeader);
+    public IFixedWidthExtractorBuilder<T> HasHeader(bool hasHeader) => Set(o => o with { HeaderLineCount = hasHeader ? 1 : 0 }, Touched.HeaderLineCount);
 
 
-    public IFixedWidthExtractorBuilder<T> MalformedLineHandling(MalformedLineHandling handling) => Configure(e => e.MalformedLineHandling = handling);
+    public IFixedWidthExtractorBuilder<T> MalformedLineHandling(MalformedLineHandling handling) => Set(o => o with { MalformedLineHandling = handling }, Touched.MalformedLineHandling);
 
 
-    public IFixedWidthExtractorBuilder<T> BlankLineHandling(BlankLineHandling handling) => Configure(e => e.BlankLineHandling = handling);
+    public IFixedWidthExtractorBuilder<T> BlankLineHandling(BlankLineHandling handling) => Set(o => o with { BlankLineHandling = handling }, Touched.BlankLineHandling);
 
 
     public IFixedWidthExtractorBuilder<T> LineFilter(Func<string, LineAction> filter)
@@ -94,7 +96,7 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
             throw new ArgumentNullException(nameof(filter));
         }
 
-        return Configure(e => e.LineFilter = filter);
+        return Set(o => o with { LineFilter = filter }, Touched.LineFilter);
     }
 
 
@@ -105,7 +107,7 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
             throw new ArgumentNullException(nameof(validator));
         }
 
-        return Configure(e => e.RecordValidator = validator);
+        return Set(o => o with { RecordValidator = validator }, Touched.RecordValidator);
     }
 
 
@@ -116,14 +118,14 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
             throw new ArgumentNullException(nameof(parser));
         }
 
-        return Configure(e => e.ValueParser = parser);
+        return Set(o => o with { ValueParser = parser }, Touched.ValueParser);
     }
 
 
-    public IFixedWidthExtractorBuilder<T> FieldSeparator(char? separator) => Configure(e => e.FieldSeparator = separator);
+    public IFixedWidthExtractorBuilder<T> FieldSeparator(char? separator) => Set(o => o with { FieldSeparator = separator }, Touched.FieldSeparator);
 
 
-    public IFixedWidthExtractorBuilder<T> FieldDelimiter(string? delimiter) => Configure(e => e.FieldDelimiter = delimiter);
+    public IFixedWidthExtractorBuilder<T> FieldDelimiter(string? delimiter) => Set(o => o with { FieldDelimiter = delimiter }, Touched.FieldDelimiter);
 
 
     public IEtlPipeline<TOut> Through<TOut>(ITransformAsync<T, TOut> transformer) where TOut : notnull => Pipeline().Through(transformer);
@@ -144,11 +146,48 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
     public IAsyncEnumerable<T> AsAsyncEnumerable(CancellationToken token = default) => Pipeline().AsAsyncEnumerable(token);
 
 
-    private IFixedWidthExtractorBuilder<T> Configure(Action<FixedWidthExtractor<T>> mutation)
+    private IFixedWidthExtractorBuilder<T> Set
+    (
+        Func<FixedWidthExtractorOptions<T>, FixedWidthExtractorOptions<T>> update,
+        Touched member
+    )
     {
         ThrowIfMaterialized();
-        _mutations.Add(mutation);
+        _options = update(_options);
+        _touched |= member;
         return this;
+    }
+
+
+
+#pragma warning disable CS0618 // The only place the builder writes the deprecated setters: a caller-supplied instance (FromExtractor) is already configured, and a whole record cannot be applied to it without resetting what the caller set, so the members configured through the builder are copied one by one. Goes with the setters (#342). Constructed sources take the record.
+    private void ApplyTo(FixedWidthExtractor<T> existing)
+    {
+        if (_touched.HasFlag(Touched.HeaderLineCount)) { existing.HeaderLineCount = _options.HeaderLineCount; }
+        if (_touched.HasFlag(Touched.MalformedLineHandling)) { existing.MalformedLineHandling = _options.MalformedLineHandling; }
+        if (_touched.HasFlag(Touched.BlankLineHandling)) { existing.BlankLineHandling = _options.BlankLineHandling; }
+        if (_touched.HasFlag(Touched.LineFilter)) { existing.LineFilter = _options.LineFilter; }
+        if (_touched.HasFlag(Touched.RecordValidator)) { existing.RecordValidator = _options.RecordValidator; }
+        if (_touched.HasFlag(Touched.ValueParser)) { existing.ValueParser = _options.ValueParser; }
+        if (_touched.HasFlag(Touched.FieldSeparator)) { existing.FieldSeparator = _options.FieldSeparator; }
+        if (_touched.HasFlag(Touched.FieldDelimiter)) { existing.FieldDelimiter = _options.FieldDelimiter; }
+    }
+#pragma warning restore CS0618
+
+
+
+    [Flags]
+    private enum Touched
+    {
+        None = 0,
+        HeaderLineCount = 1 << 0,
+        MalformedLineHandling = 1 << 1,
+        BlankLineHandling = 1 << 2,
+        LineFilter = 1 << 3,
+        RecordValidator = 1 << 4,
+        ValueParser = 1 << 5,
+        FieldSeparator = 1 << 6,
+        FieldDelimiter = 1 << 7,
     }
 
 
@@ -185,31 +224,27 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
             // Caller-supplied instance — the caller owns its lifetime; dispose nothing.
             extractor = _existing;
             ownedResources = Array.Empty<object?>();
+            ApplyTo(extractor);
         }
         else if (_reader is not null)
         {
             // Caller owns the reader; the extractor's Dispose is a no-op. Dispose nothing.
-            extractor = new FixedWidthExtractor<T>(_reader);
+            extractor = new FixedWidthExtractor<T>(_reader, _options);
             ownedResources = Array.Empty<object?>();
         }
         else if (_stream is not null)
         {
             // The extractor wraps the caller's stream with leaveOpen:true, so dispose only the
             // extractor (to release its internal reader); the caller retains the stream.
-            extractor = new FixedWidthExtractor<T>(_stream, new FixedWidthExtractorOptions { Encoding = _encoding });
+            extractor = new FixedWidthExtractor<T>(_stream, new FixedWidthExtractorStreamOptions<T>(_options, _encoding));
             ownedResources = new object?[] { extractor };
         }
         else
         {
             // Path source: the builder owns the reader it opens, so dispose it once drained.
             var reader = new StreamReader(_path!, _encoding, detectEncodingFromByteOrderMarks: true);
-            extractor = new FixedWidthExtractor<T>(reader);
+            extractor = new FixedWidthExtractor<T>(reader, _options);
             ownedResources = new object?[] { reader };
-        }
-
-        foreach (var mutation in _mutations)
-        {
-            mutation(extractor);
         }
 
         return extractor;

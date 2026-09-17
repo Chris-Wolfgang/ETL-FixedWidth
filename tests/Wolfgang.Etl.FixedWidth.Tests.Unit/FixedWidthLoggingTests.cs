@@ -158,15 +158,10 @@ public class FixedWidthExtractorLoggingTests
     {
         var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = "FirstName LastName  Age\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord>
-        (
-            new StringReader(content),
-            new ManualProgressTimer(),
-            logger
-        )
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content), new ManualProgressTimer(), new FixedWidthExtractorOptions<PersonRecord>
         {
-            HasHeader = true,
-        };
+            HeaderLineCount = 1,
+        }, logger);
 
         await extractor.ExtractAsync().ToListAsync();
 
@@ -189,15 +184,10 @@ public class FixedWidthExtractorLoggingTests
     {
         var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = PersonLine + "\n\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord>
-        (
-            new StringReader(content),
-            new ManualProgressTimer(),
-            logger
-        )
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content), new ManualProgressTimer(), new FixedWidthExtractorOptions<PersonRecord>
         {
             BlankLineHandling = BlankLineHandling.Skip,
-        };
+        }, logger);
 
         await extractor.ExtractAsync().ToListAsync();
 
@@ -216,15 +206,10 @@ public class FixedWidthExtractorLoggingTests
     {
         var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = PersonLine + "\n\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord>
-        (
-            new StringReader(content),
-            new ManualProgressTimer(),
-            logger
-        )
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content), new ManualProgressTimer(), new FixedWidthExtractorOptions<PersonRecord>
         {
             BlankLineHandling = BlankLineHandling.ReturnDefault,
-        };
+        }, logger);
 
         await extractor.ExtractAsync().ToListAsync();
 
@@ -310,15 +295,10 @@ public class FixedWidthExtractorLoggingTests
     {
         var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = "Short\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord>
-        (
-            new StringReader(content),
-            new ManualProgressTimer(),
-            logger
-        )
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content), new ManualProgressTimer(), new FixedWidthExtractorOptions<PersonRecord>
         {
             MalformedLineHandling = MalformedLineHandling.Skip,
-        };
+        }, logger);
 
         await extractor.ExtractAsync().ToListAsync();
 
@@ -337,15 +317,10 @@ public class FixedWidthExtractorLoggingTests
     {
         var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = "Short\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord>
-        (
-            new StringReader(content),
-            new ManualProgressTimer(),
-            logger
-        )
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content), new ManualProgressTimer(), new FixedWidthExtractorOptions<PersonRecord>
         {
             MalformedLineHandling = MalformedLineHandling.ReturnDefault,
-        };
+        }, logger);
 
         await extractor.ExtractAsync().ToListAsync();
 
@@ -368,17 +343,12 @@ public class FixedWidthExtractorLoggingTests
     {
         var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = "# comment\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord>
-        (
-            new StringReader(content),
-            new ManualProgressTimer(),
-            logger
-        )
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content), new ManualProgressTimer(), new FixedWidthExtractorOptions<PersonRecord>
         {
             LineFilter = line => line.StartsWith("#")
                 ? LineAction.Skip
                 : LineAction.Process,
-        };
+        }, logger);
 
         await extractor.ExtractAsync().ToListAsync();
 
@@ -397,17 +367,12 @@ public class FixedWidthExtractorLoggingTests
     {
         var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = PersonLine + "\nEND\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord>
-        (
-            new StringReader(content),
-            new ManualProgressTimer(),
-            logger
-        )
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content), new ManualProgressTimer(), new FixedWidthExtractorOptions<PersonRecord>
         {
             LineFilter = line => string.Equals(line, "END", StringComparison.Ordinal)
                 ? LineAction.Stop
                 : LineAction.Process,
-        };
+        }, logger);
 
         await extractor.ExtractAsync().ToListAsync();
 
@@ -609,15 +574,10 @@ public class FixedWidthLoaderLoggingTests
     public async Task LoadAsync_when_WriteHeader_is_true_logs_Debug_header_written()
     {
         var logger = new SpyLogger<FixedWidthLoader<PersonRecord>>();
-        var loader = new FixedWidthLoader<PersonRecord>
-        (
-            new StringWriter(),
-            new ManualProgressTimer(),
-            logger
-        )
+        var loader = new FixedWidthLoader<PersonRecord>(new StringWriter(), new ManualProgressTimer(), new FixedWidthLoaderOptions
         {
             WriteHeader = true,
-        };
+        }, logger);
 
         await loader.LoadAsync(OneRecord.ToAsyncEnumerable());
 
@@ -635,16 +595,11 @@ public class FixedWidthLoaderLoggingTests
     public async Task LoadAsync_when_FieldSeparator_is_set_logs_Debug_separator_written()
     {
         var logger = new SpyLogger<FixedWidthLoader<PersonRecord>>();
-        var loader = new FixedWidthLoader<PersonRecord>
-        (
-            new StringWriter(),
-            new ManualProgressTimer(),
-            logger
-        )
+        var loader = new FixedWidthLoader<PersonRecord>(new StringWriter(), new ManualProgressTimer(), new FixedWidthLoaderOptions
         {
             WriteHeader = true,
             FieldSeparator = '-',
-        };
+        }, logger);
 
         await loader.LoadAsync(OneRecord.ToAsyncEnumerable());
 

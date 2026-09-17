@@ -50,17 +50,12 @@ public class FixedWidthLoggingCompletionTests
     {
         var logger = new SpyLogger<FixedWidthExtractor<PersonRecord>>();
         var content = PersonLine + "\nEND\n" + PersonLine;
-        var extractor = new FixedWidthExtractor<PersonRecord>
-        (
-            new StringReader(content),
-            new ManualProgressTimer(),
-            logger
-        )
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content), new ManualProgressTimer(), new FixedWidthExtractorOptions<PersonRecord>
         {
             LineFilter = line => string.Equals(line, "END", StringComparison.Ordinal)
                 ? LineAction.Stop
                 : LineAction.Process,
-        };
+        }, logger);
 
         await extractor.ExtractAsync().ToListAsync();
 

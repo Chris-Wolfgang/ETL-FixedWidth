@@ -13,6 +13,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
+### Removed
+
+### Fixed
+
+### Security
+
+
+## [0.12.0] - 2026-09-16
+
+### Added
+- **The options records inherit the Abstractions 0.24 base records** (ADR-0009):
+  `FixedWidthExtractorOptions<TRecord> : ExtractorOptions` and `FixedWidthLoaderOptions : LoaderOptions` (the
+  `*StreamOptions` records inherit through them). `ReportingInterval`, `MaximumItemCount`, `SkipItemCount` and
+  `ErrorPolicy` are configured through the same record as every fixed-width setting and applied by the base
+  constructor, so one object configures the whole stage.
+- **Options records for the extractor and loader** (ADR-0009, first half of #341; Chris-Wolfgang/ETL-Abstractions#455).
+  `FixedWidthExtractorOptions<TRecord>` carries the twelve parsing settings (`MalformedLineHandling`,
+  `BlankLineHandling`, `LineFilter`, `RecordValidator`, `OnError`, `ValueParser`, `HeaderLineCount`,
+  `FieldSeparator`, `FieldDelimiter`, `Schema`, `TrackByteOffset`, `StartByteOffset`);
+  `FixedWidthLoaderOptions` carries the seven formatting settings (`ValueConverter`, `HeaderConverter`,
+  `WriteHeader`, `IsDryRun`, `FieldSeparator`, `FieldDelimiter`, `Schema`). Both are `{ get; init; }`
+  records whose invalid values are rejected from the `init` accessor. New constructors
+  `FixedWidthExtractor<T>(TextReader, FixedWidthExtractorOptions<T>, ILogger?)` and
+  `FixedWidthLoader<T>(TextWriter, FixedWidthLoaderOptions, ILogger?)` accept them; the `Stream`
+  constructors accept the derived `FixedWidthExtractorStreamOptions<TRecord>` /
+  `FixedWidthLoaderStreamOptions`, which add `Encoding`. The existing setters are deprecated in this
+  same release — see *Deprecated* below for the migration guidance.
+
+### Changed
+- `Wolfgang.Etl.Abstractions` 0.23.4 → 0.24.0 (`Wolfgang.Etl.TestKit` / `.TestKit.Xunit` for the test project and
+  examples). The dry-run contract test returns to the TestKit base, now non-generic.
+- **Binary-only break on `net462`, `net481` and `netstandard2.0`:** because the options records now have a base
+  record, the compiler-synthesized `<Clone>$` method (what a `with` expression calls) returns `ExtractorOptions` /
+  `LoaderOptions` on targets without covariant returns. Source compiles unchanged; an assembly compiled against an
+  earlier build of these records on one of those targets that uses `with` must be rebuilt
+  (`CompatibilitySuppressions.xml`).
+- **`Encoding` moved from the base options records to the new `*StreamOptions` records.** The shipped
+  `FixedWidthExtractorOptions` (non-generic) and `FixedWidthLoaderOptions` carried only `Encoding` and were
+  accepted only by the `Stream` constructors. The loader record's name is now the shape-agnostic base, and
+  the extractor record became generic (its `RecordValidator` is typed over `TRecord`). Migration is a
+  one-word rename: `new FixedWidthLoaderOptions { Encoding = x }` → `new FixedWidthLoaderStreamOptions { Encoding = x }`,
+  `new FixedWidthExtractorOptions { Encoding = x }` → `new FixedWidthExtractorStreamOptions<T> { Encoding = x }`.
+  A `TextReader`/`TextWriter` caller can no longer set an `Encoding` at all — it was inert there.
+
+### Deprecated
+
+- **The 20 configuration setters — 13 on `FixedWidthExtractor<T>`** (`MalformedLineHandling`, `BlankLineHandling`,
+  `LineFilter`, `RecordValidator`, `OnError`, `ValueParser`, `HeaderLineCount`, `FieldSeparator`, `FieldDelimiter`,
+  `Schema`, `TrackByteOffset` and two more) **and 7 on `FixedWidthLoader<T>`** (`ValueConverter`, `HeaderConverter`,
+  `WriteHeader`, `IsDryRun`, `FieldSeparator`, `FieldDelimiter`, `Schema`) — are `[Obsolete]` on the **setter
+  accessor**, so reads stay warning-free, pointing at the member of the same name on
+  `FixedWidthExtractorOptions<T>` / `FixedWidthLoaderOptions`, passed to the constructor (#354). The fluent builders
+  were rewritten onto the records, so `EtlPipeline` callers are unaffected. Nothing is removed in this release;
+  removal is tracked in #342.
+
 - **Binary-compatibility overloads without deprecation.**
   `FixedWidthExtractor<T>(TextReader)`, `FixedWidthLoader<T>(TextWriter)` and
   `FixedWidthTransformer<TSource, TDestination>(Func<TSource, TDestination>)` are restored, but
@@ -89,10 +144,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `options: null` explicitly to reach the new constructor. Both go away when these are removed.
 
 ### Removed
-
-### Fixed
-
-### Security
+- `FixedWidthLoader<TRecord>` no longer implements `ISupportDryRun`; ETL-Abstractions removes the interface in
+  its next release (Chris-Wolfgang/ETL-Abstractions#457). `IsDryRun` is configured through
+  `FixedWidthLoaderOptions`; the property's setter remains for now and is deprecated with the rest in #341's
+  second half.
 
 ## [0.11.0] - 2026-08-27
 
@@ -743,7 +798,8 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
 [#26]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/26
 [#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.10.1...HEAD
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.11.0...v0.12.0
 [0.10.1]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.8.0...v0.9.0

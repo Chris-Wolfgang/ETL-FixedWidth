@@ -88,13 +88,10 @@ public sealed class FixedWidthSchemaBuilderTests
     {
         var schema = PlainPersonBuilder().Build();
 
-        var extractor = new FixedWidthExtractor<PlainPerson>
-        (
-            new StringReader(Content(("Alice", "Smith", 30), ("Bob", "Jones", 25)))
-        )
+        var extractor = new FixedWidthExtractor<PlainPerson>(new StringReader(Content(("Alice", "Smith", 30), ("Bob", "Jones", 25))), new FixedWidthExtractorOptions<PlainPerson>
         {
             Schema = schema,
-        };
+        });
 
         var people = await DrainAsync(extractor);
 
@@ -112,7 +109,10 @@ public sealed class FixedWidthSchemaBuilderTests
     {
         var schema = PlainPersonBuilder().Build();
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<PlainPerson>(writer) { Schema = schema };
+        var loader = new FixedWidthLoader<PlainPerson>(writer, new FixedWidthLoaderOptions
+        {
+            Schema = schema,
+        });
 
         await loader.LoadAsync(ToAsync(new PlainPerson { FirstName = "Alice", LastName = "Smith", Age = 30 }), CancellationToken.None);
 
@@ -126,11 +126,17 @@ public sealed class FixedWidthSchemaBuilderTests
         var schema = PlainPersonBuilder().Build();
         var source = Content(("Alice", "Smith", 30), ("Bob", "Jones", 25));
 
-        var extractor = new FixedWidthExtractor<PlainPerson>(new StringReader(source)) { Schema = schema };
+        var extractor = new FixedWidthExtractor<PlainPerson>(new StringReader(source), new FixedWidthExtractorOptions<PlainPerson>
+        {
+            Schema = schema,
+        });
         var people = await DrainAsync(extractor);
 
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<PlainPerson>(writer) { Schema = schema };
+        var loader = new FixedWidthLoader<PlainPerson>(writer, new FixedWidthLoaderOptions
+        {
+            Schema = schema,
+        });
         await loader.LoadAsync(ToAsync(people.ToArray()), CancellationToken.None);
 
         Assert.Equal(source.TrimEnd('\n'), Normalize(writer.ToString()).TrimEnd('\n'));
@@ -150,13 +156,10 @@ public sealed class FixedWidthSchemaBuilderTests
         Assert.Equal(24, schema.ExpectedLineWidth);
         Assert.Equal(1, schema.SkipCount);
 
-        var extractor = new FixedWidthExtractor<PlainRecordWithSkip>
-        (
-            new StringReader("Alice     19900101E12345\n")
-        )
+        var extractor = new FixedWidthExtractor<PlainRecordWithSkip>(new StringReader("Alice     19900101E12345\n"), new FixedWidthExtractorOptions<PlainRecordWithSkip>
         {
             Schema = schema,
-        };
+        });
 
         var records = await DrainAsync(extractor);
 
@@ -175,13 +178,10 @@ public sealed class FixedWidthSchemaBuilderTests
             .Skip(1, 13)
             .Build();
 
-        var extractor = new FixedWidthExtractor<PersonRecord>
-        (
-            new StringReader("Alice     Smith     030\n")
-        )
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader("Alice     Smith     030\n"), new FixedWidthExtractorOptions<PersonRecord>
         {
             Schema = schema,
-        };
+        });
 
         var people = await DrainAsync(extractor);
 
@@ -269,10 +269,10 @@ public sealed class FixedWidthSchemaBuilderTests
     public async Task Extractor_with_a_mismatched_schema_record_type_throws()
     {
         var plainSchema = PlainPersonBuilder().Build();
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader("Alice     Smith     030\n"))
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader("Alice     Smith     030\n"), new FixedWidthExtractorOptions<PersonRecord>
         {
             Schema = plainSchema,   // schema is for PlainPerson, not PersonRecord
-        };
+        });
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
@@ -287,7 +287,10 @@ public sealed class FixedWidthSchemaBuilderTests
     public async Task Loader_with_a_mismatched_schema_record_type_throws()
     {
         var plainSchema = PlainPersonBuilder().Build();
-        var loader = new FixedWidthLoader<PersonRecord>(new StringWriter()) { Schema = plainSchema };
+        var loader = new FixedWidthLoader<PersonRecord>(new StringWriter(), new FixedWidthLoaderOptions
+        {
+            Schema = plainSchema,
+        });
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             loader.LoadAsync(ToAsync(new PersonRecord { FirstName = "Alice", LastName = "Smith", Age = 30 }), CancellationToken.None));

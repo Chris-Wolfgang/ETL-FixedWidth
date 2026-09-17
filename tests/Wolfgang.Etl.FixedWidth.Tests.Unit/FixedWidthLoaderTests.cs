@@ -68,10 +68,10 @@ public class FixedWidthLoaderTests
     // Helpers
     // ------------------------------------------------------------------
 
-    private static FixedWidthLoader<PersonRecord> CreateLoader(out StringWriter writer)
+    private static FixedWidthLoader<PersonRecord> CreateLoader(out StringWriter writer, FixedWidthLoaderOptions? options = null)
     {
         writer = new StringWriter();
-        return new FixedWidthLoader<PersonRecord>(writer);
+        return options is null ? new FixedWidthLoader<PersonRecord>(writer) : new FixedWidthLoader<PersonRecord>(writer, options);
     }
 
 
@@ -171,8 +171,12 @@ public class FixedWidthLoaderTests
     [Fact]
     public async Task LoadAsync_when_WriteHeader_is_true_writes_the_header_as_the_first_line()
     {
-        var loader = CreateLoader(out var writer);
-        loader.WriteHeader = true;
+        var loaderOptions = new FixedWidthLoaderOptions
+        {
+            WriteHeader = true,
+        };
+
+        var loader = CreateLoader(out var writer, loaderOptions);
 
         await loader.LoadAsync(new[]
         {
@@ -199,7 +203,10 @@ public class FixedWidthLoaderTests
     public async Task LoadAsync_when_WriteHeader_is_true_and_Header_attribute_is_set_uses_the_attribute_value()
     {
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<HeaderRecord>(writer) { WriteHeader = true };
+        var loader = new FixedWidthLoader<HeaderRecord>(writer, new FixedWidthLoaderOptions
+        {
+            WriteHeader = true,
+        });
 
         await loader.LoadAsync(new[]
         {
@@ -319,8 +326,12 @@ public class FixedWidthLoaderTests
     [Fact]
     public async Task LoadAsync_when_FieldDelimiter_is_set_inserts_delimiter_between_fields()
     {
-        var loader = CreateLoader(out var writer);
-        loader.FieldDelimiter = " | ";
+        var loaderOptions = new FixedWidthLoaderOptions
+        {
+            FieldDelimiter = " | ",
+        };
+
+        var loader = CreateLoader(out var writer, loaderOptions);
 
         await loader.LoadAsync(new[]
         {
@@ -341,9 +352,13 @@ public class FixedWidthLoaderTests
     [Fact]
     public async Task LoadAsync_when_WriteHeader_and_FieldDelimiter_are_set_header_line_is_also_delimited_zero_padded()
     {
-        var loader = CreateLoader(out var writer);
-        loader.WriteHeader = true;
-        loader.FieldDelimiter = " | ";
+        var loaderOptions = new FixedWidthLoaderOptions
+        {
+            WriteHeader = true,
+            FieldDelimiter = " | ",
+        };
+
+        var loader = CreateLoader(out var writer, loaderOptions);
 
         await loader.LoadAsync(new[]
         {
@@ -389,11 +404,11 @@ public class FixedWidthLoaderTests
     public async Task LoadAsync_when_WriteHeader_and_FieldDelimiter_are_set_header_line_is_also_delimited_space_padded()
     {
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<SpacePaddedRecord>(writer)
+        var loader = new FixedWidthLoader<SpacePaddedRecord>(writer, new FixedWidthLoaderOptions
         {
             WriteHeader = true,
             FieldDelimiter = " | ",
-        };
+        });
 
         await loader.LoadAsync
         (
@@ -426,9 +441,13 @@ public class FixedWidthLoaderTests
     [Fact]
     public async Task LoadAsync_when_FieldSeparator_is_set_writes_separator_line_after_the_header()
     {
-        var loader = CreateLoader(out var writer);
-        loader.WriteHeader = true;
-        loader.FieldSeparator = '-';
+        var loaderOptions = new FixedWidthLoaderOptions
+        {
+            WriteHeader = true,
+            FieldSeparator = '-',
+        };
+
+        var loader = CreateLoader(out var writer, loaderOptions);
 
         await loader.LoadAsync(new[]
         {
@@ -459,10 +478,14 @@ public class FixedWidthLoaderTests
     [Fact]
     public async Task LoadAsync_when_FieldSeparator_and_FieldDelimiter_are_set_separator_line_is_also_delimited()
     {
-        var loader = CreateLoader(out var writer);
-        loader.WriteHeader = true;
-        loader.FieldSeparator = '-';
-        loader.FieldDelimiter = "-|-";
+        var loaderOptions = new FixedWidthLoaderOptions
+        {
+            WriteHeader = true,
+            FieldSeparator = '-',
+            FieldDelimiter = "-|-",
+        };
+
+        var loader = CreateLoader(out var writer, loaderOptions);
 
         await loader.LoadAsync(new[]
         {
@@ -484,9 +507,13 @@ public class FixedWidthLoaderTests
     [Fact]
     public async Task LoadAsync_when_FieldSeparator_is_set_but_WriteHeader_is_false_does_not_write_a_separator_line()
     {
-        var loader = CreateLoader(out var writer);
-        loader.WriteHeader = false;
-        loader.FieldSeparator = '-';
+        var loaderOptions = new FixedWidthLoaderOptions
+        {
+            WriteHeader = false,
+            FieldSeparator = '-',
+        };
+
+        var loader = CreateLoader(out var writer, loaderOptions);
 
         await loader.LoadAsync(new[]
         {
@@ -507,11 +534,11 @@ public class FixedWidthLoaderTests
     {
         // 1 header + 1 separator + 2 data rows = 4 physical lines written.
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<PersonRecord>(writer)
+        var loader = new FixedWidthLoader<PersonRecord>(writer, new FixedWidthLoaderOptions
         {
             WriteHeader = true,
             FieldSeparator = '-',
-        };
+        });
 
         await loader.LoadAsync(new[]
         {
@@ -563,15 +590,18 @@ public class FixedWidthLoaderTests
     [Fact]
     public async Task LoadAsync_when_ValueConverter_is_set_uses_custom_converter()
     {
-        var loader = CreateLoader(out var writer);
-        loader.ValueConverter =
-            (
-                    value,
-                    ctx
+        var loaderOptions = new FixedWidthLoaderOptions
+        {
+            ValueConverter = (
+                value,
+                ctx
                 ) =>
                 string.Equals(ctx.PropertyName, nameof(PersonRecord.FirstName), StringComparison.Ordinal)
-                    ? ((string)value).ToUpperInvariant()
-                    : FixedWidthConverter.Strict(value, ctx);
+                ? ((string)value).ToUpperInvariant()
+                : FixedWidthConverter.Strict(value, ctx),
+        };
+
+        var loader = CreateLoader(out var writer, loaderOptions);
 
         await loader.LoadAsync(new[]
         {
@@ -592,13 +622,16 @@ public class FixedWidthLoaderTests
     [Fact]
     public async Task LoadAsync_when_HeaderConverter_is_set_uses_custom_converter()
     {
-        var loader = CreateLoader(out var writer);
-        loader.WriteHeader = true;
-        loader.HeaderConverter =
-        (
-            label,
-            _
-        ) => label.ToUpperInvariant();
+        var loaderOptions = new FixedWidthLoaderOptions
+        {
+            WriteHeader = true,
+            HeaderConverter = (
+                label,
+                _
+                ) => label.ToUpperInvariant(),
+        };
+
+        var loader = CreateLoader(out var writer, loaderOptions);
 
         await loader.LoadAsync(new[]
         {
@@ -670,10 +703,10 @@ public class FixedWidthLoaderTests
     public async Task LoadAsync_when_WriteHeader_is_true_and_header_exceeds_field_width_throws_FieldOverflowException()
     {
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<OverflowHeaderRecord>(writer)
+        var loader = new FixedWidthLoader<OverflowHeaderRecord>(writer, new FixedWidthLoaderOptions
         {
             WriteHeader = true,
-        };
+        });
 
         await Assert.ThrowsAsync<FieldOverflowException>
         (
@@ -694,11 +727,11 @@ public class FixedWidthLoaderTests
     public async Task LoadAsync_when_HeaderConverter_is_TruncateHeader_truncates_long_headers()
     {
         var writer = new StringWriter();
-        var loader = new FixedWidthLoader<OverflowHeaderRecord>(writer)
+        var loader = new FixedWidthLoader<OverflowHeaderRecord>(writer, new FixedWidthLoaderOptions
         {
             WriteHeader = true,
             HeaderConverter = FixedWidthConverter.TruncateHeader,
-        };
+        });
 
         await loader.LoadAsync
         (

@@ -69,10 +69,10 @@ public class FixedWidthNumberStylesTests
     private static async Task<T[]> ExtractAsync<T>(string line, MalformedLineHandling malformed = MalformedLineHandling.ThrowException)
         where T : notnull, new()
     {
-        var extractor = new FixedWidthExtractor<T>(new StringReader(line))
+        var extractor = new FixedWidthExtractor<T>(new StringReader(line), new FixedWidthExtractorOptions<T>
         {
             MalformedLineHandling = malformed,
-        };
+        });
 
         var results = new System.Collections.Generic.List<T>();
         await foreach (var record in extractor.ExtractAsync(CancellationToken.None))
@@ -99,10 +99,10 @@ public class FixedWidthNumberStylesTests
     public async Task Default_for_decimal_rejects_a_parenthesized_negative()
     {
         // Parentheses are not part of the natural (Number) style — rejected.
-        var extractor = new FixedWidthExtractor<MoneyRecord>(new StringReader("(500)       "))
+        var extractor = new FixedWidthExtractor<MoneyRecord>(new StringReader("(500)       "), new FixedWidthExtractorOptions<MoneyRecord>
         {
             MalformedLineHandling = MalformedLineHandling.Skip,
-        };
+        });
 
         var results = await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
 
@@ -126,10 +126,10 @@ public class FixedWidthNumberStylesTests
     public async Task Default_for_int_rejects_a_decimal_point()
     {
         // Integer (the natural style for int) disallows the decimal point.
-        var extractor = new FixedWidthExtractor<PlainIntRecord>(new StringReader("12.5        "))
+        var extractor = new FixedWidthExtractor<PlainIntRecord>(new StringReader("12.5        "), new FixedWidthExtractorOptions<PlainIntRecord>
         {
             MalformedLineHandling = MalformedLineHandling.Skip,
-        };
+        });
 
         var results = await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
 

@@ -63,7 +63,10 @@ var customers = new[]
 };
 
 var writer = new StringWriter();
-var loader = new FixedWidthLoader<Customer>(writer) { Schema = schema };
+var loader = new FixedWidthLoader<Customer>(writer, new FixedWidthLoaderOptions
+{
+    Schema = schema,
+});
 await loader.LoadAsync(ToAsyncEnumerable(customers), CancellationToken.None);
 
 var text = writer.ToString();
@@ -76,7 +79,10 @@ Console.WriteLine();
 // Step 4: Extract the same text back through the same schema.
 // ---------------------------------------------------------------------------
 
-var extractor = new FixedWidthExtractor<Customer>(new StringReader(text)) { Schema = schema };
+var extractor = new FixedWidthExtractor<Customer>(new StringReader(text), new FixedWidthExtractorOptions<Customer>
+{
+    Schema = schema,
+});
 
 Console.WriteLine("Extracted back into records:");
 await foreach (var customer in extractor.ExtractAsync(CancellationToken.None))

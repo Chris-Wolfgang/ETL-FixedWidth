@@ -77,21 +77,25 @@ public static class Program
         Console.WriteLine();
 
         var withDelimiter = new StringWriter();
-        var loaderWithDelim = new FixedWidthLoader<ContactRecord>(withDelimiter);
+        var loaderWithDelimOptions = new FixedWidthLoaderOptions
+        {
 
-        // FieldDelimiter: the string placed between every pair of adjacent fields.
-        // " | " adds 3 characters of visual separation between each column.
-        loaderWithDelim.FieldDelimiter = " | ";
+            // FieldDelimiter: the string placed between every pair of adjacent fields.
+            // " | " adds 3 characters of visual separation between each column.
+            FieldDelimiter = " | ",
 
-        // WriteHeader: emit a header row using property names (or the Header
-        // attribute if set) before the data rows.
-        loaderWithDelim.WriteHeader = true;
+            // WriteHeader: emit a header row using property names (or the Header
+            // attribute if set) before the data rows.
+            WriteHeader = true,
 
-        // FieldSeparator: when WriteHeader is true, a separator line of this
-        // character is written after the header. The separator respects the
-        // delimiter — it fills field widths with the separator char and places
-        // the delimiter string between them.
-        loaderWithDelim.FieldSeparator = '-';
+            // FieldSeparator: when WriteHeader is true, a separator line of this
+            // character is written after the header. The separator respects the
+            // delimiter — it fills field widths with the separator char and places
+            // the delimiter string between them.
+            FieldSeparator = '-',
+        };
+
+        var loaderWithDelim = new FixedWidthLoader<ContactRecord>(withDelimiter, loaderWithDelimOptions);
 
         // Load the records into the StringWriter.
         await loaderWithDelim.LoadAsync
@@ -121,10 +125,14 @@ public static class Program
         // extractor will calculate incorrect field start positions and produce
         // garbled data.
         var readerWithDelim = new StringReader(outputWithDelimiter);
-        var extractorWithDelim = new FixedWidthExtractor<ContactRecord>(readerWithDelim);
-        extractorWithDelim.FieldDelimiter = " | ";
-        extractorWithDelim.HasHeader = true;
-        extractorWithDelim.FieldSeparator = '-';
+        var extractorWithDelimOptions = new FixedWidthExtractorOptions<ContactRecord>
+        {
+            FieldDelimiter = " | ",
+            HeaderLineCount = 1,
+            FieldSeparator = '-',
+        };
+
+        var extractorWithDelim = new FixedWidthExtractor<ContactRecord>(readerWithDelim, extractorWithDelimOptions);
 
         await foreach (var contact in extractorWithDelim.ExtractAsync(CancellationToken.None))
         {
@@ -140,12 +148,16 @@ public static class Program
         Console.WriteLine();
 
         var withoutDelimiter = new StringWriter();
-        var loaderNoDelim = new FixedWidthLoader<ContactRecord>(withoutDelimiter);
+        var loaderNoDelimOptions = new FixedWidthLoaderOptions
+        {
 
-        // No delimiter — fields are concatenated directly with no visual separator.
-        // Each field occupies exactly its declared width (15 + 25 + 12 = 52 chars).
-        loaderNoDelim.WriteHeader = true;
-        loaderNoDelim.FieldSeparator = '-';
+            // No delimiter — fields are concatenated directly with no visual separator.
+            // Each field occupies exactly its declared width (15 + 25 + 12 = 52 chars).
+            WriteHeader = true,
+            FieldSeparator = '-',
+        };
+
+        var loaderNoDelim = new FixedWidthLoader<ContactRecord>(withoutDelimiter, loaderNoDelimOptions);
 
         await loaderNoDelim.LoadAsync
         (
