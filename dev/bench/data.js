@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1789672944054,
+  "lastUpdate": 1789688138847,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-FixedWidth",
   "entries": {
     "BenchmarkDotNet": [
@@ -7968,6 +7968,222 @@ window.BENCHMARK_DATA = {
             "value": 280380699,
             "unit": "ns",
             "range": "± 2526723.536419794"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "167e6368a707797f30aaa4ff30160c90e0119971",
+          "message": "fix(tfm): ship net5.0/net6.0/net7.0 assemblies (inherited init-setter modreq hazard) (#374)\n\n* fix(tfm): ship net5.0/net6.0/net7.0 assemblies — inherited init setters would fail on .NET 5-7\n\nWolfgang.Etl.Abstractions ships per-runtime assemblies, and an init-only setter's IsExternalInit modreq has a different identity in its netstandard2.0 build (internal polyfill) and its net5.0+ builds (System.Runtime). This package's netstandard2.0 assembly is compiled against the former but, on .NET 5/6/7, runs beside the latter, so any write to an inherited options-record property (SkipItemCount / MaximumItemCount / ReportingInterval) from this assembly throws MissingMethodException — the defect Etl-Csv 0.9.0 hit in its release gate (Chris-Wolfgang/Etl-Csv#287). Nothing in this repo writes one today; the extra targets make it impossible to reintroduce. Same remedy as Abstractions, Etl-DbClient and Etl-Csv: each runtime gets an assembly compiled against its matching Abstractions asset.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n\n* docs: changelog fragment instead of a CHANGELOG.md edit; framework lists brought in line\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Opus 5 <noreply@anthropic.com>",
+          "timestamp": "2026-09-17T19:30:07-04:00",
+          "tree_id": "593709d6ef78143b5b38ce869916e982173831dd",
+          "url": "https://github.com/Chris-Wolfgang/ETL-FixedWidth/commit/167e6368a707797f30aaa4ff30160c90e0119971"
+        },
+        "date": 1789688135324,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.DateTimeBenchmarks.Extract_Memory(RecordCount: 10000)",
+            "value": 4213973.059895833,
+            "unit": "ns",
+            "range": "± 161558.9449833903"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.DateTimeBenchmarks.Load_Memory(RecordCount: 10000)",
+            "value": 2950899.3294270835,
+            "unit": "ns",
+            "range": "± 69536.06886448726"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_TextReader(RecordCount: 1000)",
+            "value": 364389.3603515625,
+            "unit": "ns",
+            "range": "± 1803.6020984207594"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_Stream(RecordCount: 1000)",
+            "value": 457447.0657552083,
+            "unit": "ns",
+            "range": "± 4897.404061326913"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_TextReader_1KB(RecordCount: 1000)",
+            "value": 379453.9052734375,
+            "unit": "ns",
+            "range": "± 355.07175725214773"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_Stream_64KB(RecordCount: 1000)",
+            "value": 476561.39274088544,
+            "unit": "ns",
+            "range": "± 4609.377638837527"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_TextReader(RecordCount: 10000)",
+            "value": 3478300.7213541665,
+            "unit": "ns",
+            "range": "± 24198.57253182463"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_Stream(RecordCount: 10000)",
+            "value": 3709230.9557291665,
+            "unit": "ns",
+            "range": "± 12328.577922549777"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_TextReader_1KB(RecordCount: 10000)",
+            "value": 3777734.9869791665,
+            "unit": "ns",
+            "range": "± 14049.16303240869"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_Stream_64KB(RecordCount: 10000)",
+            "value": 3796441.7122395835,
+            "unit": "ns",
+            "range": "± 29693.302351181002"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_TextReader(RecordCount: 100000)",
+            "value": 35806719.46666667,
+            "unit": "ns",
+            "range": "± 91483.9967134748"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_Stream(RecordCount: 100000)",
+            "value": 36313163.71428571,
+            "unit": "ns",
+            "range": "± 307225.21754370525"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_TextReader_1KB(RecordCount: 100000)",
+            "value": 40594405.92307692,
+            "unit": "ns",
+            "range": "± 392521.0253025746"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_Stream_64KB(RecordCount: 100000)",
+            "value": 37752866.97619048,
+            "unit": "ns",
+            "range": "± 204874.67561980034"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_TextWriter(RecordCount: 1000)",
+            "value": 231549.35310872397,
+            "unit": "ns",
+            "range": "± 1675.8176293784077"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_Stream(RecordCount: 1000)",
+            "value": 342727.978515625,
+            "unit": "ns",
+            "range": "± 951.0779034960983"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_TextWriter_1KB(RecordCount: 1000)",
+            "value": 350548.6236979167,
+            "unit": "ns",
+            "range": "± 10332.224800009184"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_Stream_64KB(RecordCount: 1000)",
+            "value": 493054.7073567708,
+            "unit": "ns",
+            "range": "± 6612.273400715274"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_TextWriter(RecordCount: 10000)",
+            "value": 3288136.5052083335,
+            "unit": "ns",
+            "range": "± 42259.767043318665"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_Stream(RecordCount: 10000)",
+            "value": 2768815.01171875,
+            "unit": "ns",
+            "range": "± 34235.55608404052"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_TextWriter_1KB(RecordCount: 10000)",
+            "value": 2868831.5390625,
+            "unit": "ns",
+            "range": "± 41387.687433887484"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_Stream_64KB(RecordCount: 10000)",
+            "value": 2829842.5052083335,
+            "unit": "ns",
+            "range": "± 12953.270938714248"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_TextWriter(RecordCount: 100000)",
+            "value": 25825180.083333332,
+            "unit": "ns",
+            "range": "± 74872.08553260873"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_Stream(RecordCount: 100000)",
+            "value": 26058242.916666668,
+            "unit": "ns",
+            "range": "± 193431.6996498127"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_TextWriter_1KB(RecordCount: 100000)",
+            "value": 27150339.166666668,
+            "unit": "ns",
+            "range": "± 298799.7657114528"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_Stream_64KB(RecordCount: 100000)",
+            "value": 25733987.9375,
+            "unit": "ns",
+            "range": "± 514546.87605018733"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 0)",
+            "value": 458916.97705078125,
+            "unit": "ns",
+            "range": "± 25380.70047193685"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 1)",
+            "value": 477123.21370442706,
+            "unit": "ns",
+            "range": "± 2559.719379169311"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 1000)",
+            "value": 910942.0302734375,
+            "unit": "ns",
+            "range": "± 40649.42814744164"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 10000)",
+            "value": 4081798.5885416665,
+            "unit": "ns",
+            "range": "± 14637.604085158238"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 100000)",
+            "value": 41317372.102564104,
+            "unit": "ns",
+            "range": "± 59270.95112834486"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 1000000)",
+            "value": 359232245,
+            "unit": "ns",
+            "range": "± 3718377.2874009167"
           }
         ]
       }
