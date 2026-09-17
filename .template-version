@@ -1,0 +1,15 @@
+{
+  "template": "Chris-Wolfgang/repo-template",
+  "commit": "2bc270f6ea53e8ad12d4e6a9267a7ab64c19c4e5",
+  "updated": "2026-09-16",
+  "placeholders": {
+    "GITHUB_OWNER": "Chris-Wolfgang",
+    "REPO_NAME": "ETL-FixedWidth",
+    "GITHUB_REPO_URL": "https://github.com/Chris-Wolfgang/ETL-FixedWidth",
+    "DOCS_URL": "https://chris-wolfgang.github.io/ETL-FixedWidth/",
+    "PROJECT_NAME": "Wolfgang.Etl.FixedWidth",
+    "PACKAGE_NAME": "Wolfgang.Etl.FixedWidth",
+    "LICENSE_TYPE": "MIT"
+  },
+  "note": "Written by scripts/setup.ps1 and scripts/upgrade.ps1; the template commit this repository last took template-managed files from, and the placeholder values setup used."
+}
