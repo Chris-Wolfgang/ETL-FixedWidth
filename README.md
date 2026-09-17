@@ -304,6 +304,17 @@ using var extractor = new FixedWidthMultiRecordExtractor(reader)
     .When(line => line[0] == 'D', typeof(DetailRecord))
     .When(line => line[0] == 'T', typeof(TrailerRecord));
 
+// From a stream, with the encoding on the options record (the TextReader form above
+// already knows its encoding, so it takes no record):
+using var fromFile = new FixedWidthMultiRecordExtractor
+(
+    File.OpenRead("batch.txt"),
+    new FixedWidthMultiRecordExtractorOptions { Encoding = Encoding.Latin1 }
+)
+    .When(line => line[0] == 'H', typeof(HeaderRecord))
+    .When(line => line[0] == 'D', typeof(DetailRecord))
+    .When(line => line[0] == 'T', typeof(TrailerRecord));
+
 await foreach (var record in extractor.ExtractAsync(token))
 {
     switch (record)
