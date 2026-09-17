@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Class FixedWidthExtractorOptions&lt;TRecord&gt; | Wolfgang.Etl.FixedWidth Documentation </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Class FixedWidthExtractorOptions&lt;TRecord&gt; | Wolfgang.Etl.FixedWidth Documentation ">
+      
+      <meta name="description" content="Configuration for a , supplied to its constructor. Carries every parsing setting that is independent of the input shape; the  constructors take the derived , which adds the byte-decoding Encoding a  caller has already decided.">
+      <link rel="icon" href="../favicon.svg">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.12.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="ManagedReference">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="Wolfgang.Etl.FixedWidth">
+            Wolfgang.Etl.FixedWidth
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+
+      <div class="content">
+        <div class="actionbar">
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1">
+
+
+
+  <h1 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1" class="text-break">
+Class FixedWidthExtractorOptions&lt;TRecord&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractorOptions{TRecord}.cs/#L23"><i class="bi bi-code-slash"></i></a>
+  </h1>
+
+  <div class="facts text-secondary">
+    <dl><dt>Namespace</dt><dd><a class="xref" href="Wolfgang.html">Wolfgang</a>.<a class="xref" href="Wolfgang.Etl.html">Etl</a>.<a class="xref" href="Wolfgang.Etl.FixedWidth.html">FixedWidth</a></dd></dl>
+  <dl><dt>Assembly</dt><dd>Wolfgang.Etl.FixedWidth.dll</dd></dl>
+  </div>
+
+  <div class="markdown summary"><p>Configuration for a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a>, supplied to its constructor.
+Carries every parsing setting that is independent of the input shape; the
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> constructors take the derived <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions-1.html">FixedWidthExtractorStreamOptions&lt;TRecord&gt;</a>,
+which adds the byte-decoding <code>Encoding</code> a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textreader">TextReader</a> caller has
+already decided.</p>
+</div>
+  <div class="markdown conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public record FixedWidthExtractorOptions&lt;TRecord&gt; : ExtractorOptions, IEquatable&lt;ExtractorOptions&gt;, IEquatable&lt;FixedWidthExtractorOptions&lt;TRecord&gt;&gt; where TRecord : notnull</code></pre>
+  </div>
+
+
+
+  <h4 class="section">Type Parameters</h4>
+  <dl class="parameters">
+    <dt><code>TRecord</code></dt>
+    <dd><p>The record type the extractor produces.</p>
+</dd>
+  </dl>
+
+  <dl class="typelist inheritance">
+    <dt>Inheritance</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+      <div><span class="xref">ExtractorOptions</span></div>
+      <div><span class="xref">FixedWidthExtractorOptions&lt;TRecord&gt;</span></div>
+    </dd>
+  </dl>
+
+  <dl class="typelist implements">
+    <dt>Implements</dt>
+    <dd>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<span class="xref">ExtractorOptions</span>&gt;</div>
+      <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions-1.html">FixedWidthExtractorOptions</a>&lt;TRecord&gt;&gt;</div>
+    </dd>
+  </dl>
+
+  <dl class="typelist derived">
+    <dt>Derived</dt>
+    <dd>
+      <div><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions-1.html">FixedWidthExtractorStreamOptions</a>&lt;TRecord&gt;</div>
+    </dd>
+  </dl>
+
+  <dl class="typelist inheritedMembers">
+    <dt>Inherited Members</dt>
+    <dd>
+    <div>
+      <span class="xref">ExtractorOptions.ToString()</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.stringbuilder">ExtractorOptions.PrintMembers(StringBuilder)</a>
+    </div>
+    <div>
+      <span class="xref">ExtractorOptions.GetHashCode()</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">ExtractorOptions.Equals(object)</a>
+    </div>
+    <div>
+      <span class="xref">ExtractorOptions.Equals(ExtractorOptions)</span>
+    </div>
+    <div>
+      <span class="xref">ExtractorOptions.&lt;Clone&gt;$()</span>
+    </div>
+    <div>
+      <span class="xref">ExtractorOptions.EqualityContract</span>
+    </div>
+    <div>
+      <span class="xref">ExtractorOptions.ReportingInterval</span>
+    </div>
+    <div>
+      <span class="xref">ExtractorOptions.MaximumItemCount</span>
+    </div>
+    <div>
+      <span class="xref">ExtractorOptions.SkipItemCount</span>
+    </div>
+    <div>
+      <span class="xref">ExtractorOptions.ErrorPolicy</span>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+  </dd></dl>
+
+
+
+
+  <h2 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>Every property is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/init">init</a>-only: settle the configuration before a run rather than
+mutating it during one (ADR-0009). The documented defaults live on the property initializers, so
+no constructor can diverge from them; a <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> options argument means &quot;all defaults&quot;.
+Members that reject a value do so from the <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/init">init</a> accessor, so an invalid record
+cannot be constructed.</p>
+</div>
+
+
+  <h2 class="section" id="properties">Properties
+</h2>
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_BlankLineHandling_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.BlankLineHandling*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_BlankLineHandling" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.BlankLineHandling">
+  BlankLineHandling
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractorOptions{TRecord}.cs/#L37"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>How a blank line is handled. Defaults to <a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling.html#Wolfgang_Etl_FixedWidth_Enums_BlankLineHandling_ThrowException">ThrowException</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BlankLineHandling BlankLineHandling { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.BlankLineHandling.html">BlankLineHandling</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_FieldDelimiter_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.FieldDelimiter*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_FieldDelimiter" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.FieldDelimiter">
+  FieldDelimiter
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractorOptions{TRecord}.cs/#L114"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The delimiter present between fields in the source, accounted for when computing field
+positions. Defaults to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> (no delimiter).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public string? FieldDelimiter { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_FieldSeparator_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.FieldSeparator*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_FieldSeparator" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.FieldSeparator">
+  FieldSeparator
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractorOptions{TRecord}.cs/#L106"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>When non-null, the line after the last header line is treated as a separator and skipped.
+Only its presence matters, not its value. Defaults to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public char? FieldSeparator { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_HeaderLineCount_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.HeaderLineCount*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_HeaderLineCount" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.HeaderLineCount">
+  HeaderLineCount
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractorOptions{TRecord}.cs/#L86"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The number of header lines skipped before the first record. Defaults to <code>0</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int HeaderLineCount { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception">ArgumentOutOfRangeException</a></dt>
+    <dd><p>The value is negative.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_LineFilter_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.LineFilter*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_LineFilter" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.LineFilter">
+  LineFilter
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractorOptions{TRecord}.cs/#L46"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Decides, per line, whether it is processed, skipped, or ends extraction. Defaults to a
+filter that processes every line.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;string, LineAction&gt; LineFilter { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.LineAction.html">LineAction</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
+    <dd><p>The value is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_MalformedLineHandling_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.MalformedLineHandling*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_MalformedLineHandling" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.MalformedLineHandling">
+  MalformedLineHandling
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractorOptions{TRecord}.cs/#L30"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>How a line whose length does not match the schema is handled. Defaults to
+<a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling.html#Wolfgang_Etl_FixedWidth_Enums_MalformedLineHandling_ThrowException">ThrowException</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public MalformedLineHandling MalformedLineHandling { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.Enums.MalformedLineHandling.html">MalformedLineHandling</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_OnError_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.OnError*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_OnError" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.OnError">
+  OnError
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractorOptions{TRecord}.cs/#L65"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Optional callback invoked for each recoverable error. Defaults to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Action&lt;FixedWidthError&gt;? OnError { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.action-1">Action</a>&lt;<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthError.html">FixedWidthError</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_RecordValidator_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.RecordValidator*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_RecordValidator" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.RecordValidator">
+  RecordValidator
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractorOptions{TRecord}.cs/#L58"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Optional validation applied to each parsed record before it is yielded. Defaults to
+<a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> (no validation).</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;TRecord, ValidationResult&gt;? RecordValidator { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TRecord, <a class="xref" href="Wolfgang.Etl.FixedWidth.ValidationResult.html">ValidationResult</a>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_Schema_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.Schema*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_Schema" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.Schema">
+  Schema
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractorOptions{TRecord}.cs/#L122"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>An explicit schema overriding the attribute-derived layout of <code class="typeparamref">TRecord</code>.
+Defaults to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FixedWidthSchema? Schema { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchema.html">FixedWidthSchema</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_StartByteOffset_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.StartByteOffset*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_StartByteOffset" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.StartByteOffset">
+  StartByteOffset
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractorOptions{TRecord}.cs/#L139"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The byte offset to seek to before extraction begins — a checkpoint from a prior run.
+Defaults to <code>0</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long StartByteOffset { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception">ArgumentOutOfRangeException</a></dt>
+    <dd><p>The value is negative.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_TrackByteOffset_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.TrackByteOffset*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_TrackByteOffset" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.TrackByteOffset">
+  TrackByteOffset
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractorOptions{TRecord}.cs/#L130"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Whether byte offsets are tracked so a run can be checkpointed and resumed. Requires a
+seekable <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> source. Defaults to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool TrackByteOffset { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_ValueParser_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.ValueParser*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_ValueParser" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions`1.ValueParser">
+  ValueParser
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractorOptions{TRecord}.cs/#L74"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Converts a field's text to the property's CLR type. Defaults to
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthConverter.html#Wolfgang_Etl_FixedWidth_FixedWidthConverter_DefaultParser">DefaultParser</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FixedWidthValueParser ValueParser { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthValueParser.html">FixedWidthValueParser</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
+    <dd><p>The value is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>.</p>
+</dd>
+  </dl>
+
+
+
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthExtractorOptions{TRecord}.cs/#L23" class="edit-link">Edit this page</a>
+        </div>
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          Made with DocFX <script>(function(){var r='/';if(window.location.hostname.endsWith('.github.io')){var s=window.location.pathname.split('/').filter(Boolean);if(s.length)r='/'+s[0]+'/';}var t=document.createElement('script');t.src=r+'public/version-picker.js';t.async=true;document.head.appendChild(t);})();</script>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

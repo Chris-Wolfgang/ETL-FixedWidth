@@ -414,17 +414,31 @@
     },
     {
       "type": "ManagedReference",
-      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.yml",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions-1.yml",
       "output": {
         ".html": {
-          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.html"
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions-1.html"
         }
       },
       "version": "",
       "Uid": null,
       "IsMRef": true,
-      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions",
-      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.yml\" sourcestartlinenumber=\"1\">Options for the <xref href=\"System.IO.Stream\" data-throw-if-not-resolved=\"false\"></xref>-based <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601\" data-throw-if-not-resolved=\"false\"></xref>\nconstructors.</p>\n"
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions-1.yml\" sourcestartlinenumber=\"1\">Configuration for a <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601\" data-throw-if-not-resolved=\"false\"></xref>, supplied to its constructor.\nCarries every parsing setting that is independent of the input shape; the\n<xref href=\"System.IO.Stream\" data-throw-if-not-resolved=\"false\"></xref> constructors take the derived <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions%601\" data-throw-if-not-resolved=\"false\"></xref>,\nwhich adds the byte-decoding <code>Encoding</code> a <xref href=\"System.IO.TextReader\" data-throw-if-not-resolved=\"false\"></xref> caller has\nalready decided.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions<TRecord>",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions-1.yml\" sourcestartlinenumber=\"1\">Configuration for a <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601\" data-throw-if-not-resolved=\"false\"></xref> constructed over a\n<xref href=\"System.IO.Stream\" data-throw-if-not-resolved=\"false\"></xref>: everything in <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions%601\" data-throw-if-not-resolved=\"false\"></xref> plus\nthe <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions%601.Encoding\" data-throw-if-not-resolved=\"false\"></xref> used to decode the bytes. The <xref href=\"System.IO.TextReader\" data-throw-if-not-resolved=\"false\"></xref>\nconstructors take the base record instead, because a reader has already decoded its bytes and an\n<code>Encoding</code> there would be settable but inert.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -466,7 +480,21 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions",
-      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.yml\" sourcestartlinenumber=\"1\">Options for the <xref href=\"System.IO.Stream\" data-throw-if-not-resolved=\"false\"></xref>-based <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthLoader%601\" data-throw-if-not-resolved=\"false\"></xref>\nconstructors.</p>\n"
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.yml\" sourcestartlinenumber=\"1\">Configuration for a <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthLoader%601\" data-throw-if-not-resolved=\"false\"></xref>, supplied to its constructor. Carries\nevery formatting setting that is independent of the output shape; the <xref href=\"System.IO.Stream\" data-throw-if-not-resolved=\"false\"></xref>\nconstructors take the derived <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions\" data-throw-if-not-resolved=\"false\"></xref>, which adds the\nbyte-encoding <code>Encoding</code> a <xref href=\"System.IO.TextWriter\" data-throw-if-not-resolved=\"false\"></xref> caller has already decided.</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.yml\" sourcestartlinenumber=\"1\">Configuration for a <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthLoader%601\" data-throw-if-not-resolved=\"false\"></xref> constructed over a\n<xref href=\"System.IO.Stream\" data-throw-if-not-resolved=\"false\"></xref>: everything in <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions\" data-throw-if-not-resolved=\"false\"></xref> plus the\n<xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.Encoding\" data-throw-if-not-resolved=\"false\"></xref> used to encode the bytes. The <xref href=\"System.IO.TextWriter\" data-throw-if-not-resolved=\"false\"></xref> constructors\ntake the base record instead, because a writer already owns its encoding and an <code>Encoding</code>\nthere would be settable but inert.</p>\n"
     },
     {
       "type": "ManagedReference",

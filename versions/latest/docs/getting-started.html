@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/docfx_project/docs/getting-started.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/docfx_project/docs/getting-started.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -254,6 +254,16 @@ await foreach (var record in extractor.ExtractAsync(token))
     }
 }
 </code></pre>
+<p>From a file or other <code>Stream</code>, the encoding travels on the options record (the <code>TextReader</code> form above already knows its encoding, so it takes no record):</p>
+<pre><code class="lang-csharp">using var extractor = new FixedWidthMultiRecordExtractor
+(
+    File.OpenRead(&quot;batch.txt&quot;),
+    new FixedWidthMultiRecordExtractorOptions { Encoding = Encoding.Latin1 }
+)
+    .When(line =&gt; line[0] == 'H', typeof(HeaderRecord))
+    .When(line =&gt; line[0] == 'D', typeof(DetailRecord))
+    .When(line =&gt; line[0] == 'T', typeof(TrailerRecord));
+</code></pre>
 <p>Each record type keeps its own independent <code>[FixedWidthField]</code> layout. A line matching no rule throws by default; set <code>UnmatchedLineHandling = UnmatchedLineHandling.Skip</code> to drop it or register a catch-all with <code>.Otherwise(typeof(UnknownRecord))</code>. The extractor shares the family's <code>HeaderLineCount</code>, <code>FieldDelimiter</code>, <code>ValueParser</code>, <code>SkipItemCount</code>/<code>MaximumItemCount</code>, dead-letter <code>OnError</code>, and progress reporting.</p>
 <h3 id="composing-an-etl-pipeline">Composing an ETL pipeline</h3>
 <p>The whole extract → transform → load flow can be written as one fluent chain on the generic <code>EtlPipeline</code> (from <code>Wolfgang.Etl.Abstractions</code> 0.16.0). <code>FixedWidthExtractor&lt;T&gt;</code> source factories hang off <code>EtlPipeline.Create()</code> and <code>FixedWidthLoader&lt;T&gt;</code> sink terminators hang off the pipeline, with the extractor/loader configuration exposed as inline setters:</p>
@@ -297,7 +307,7 @@ await EtlPipeline
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.11.0/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>

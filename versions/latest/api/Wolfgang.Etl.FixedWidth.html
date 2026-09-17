@@ -157,9 +157,21 @@ them for logging, a dead-letter queue, or post-run inspection (#29).</p>
 </dd>
     </dl>
     <dl class="jumplist">
-      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions.html">FixedWidthExtractorOptions</a></dt>
-      <dd><p>Options for the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a>-based <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a>
-constructors.</p>
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions-1.html">FixedWidthExtractorOptions&lt;TRecord&gt;</a></dt>
+      <dd><p>Configuration for a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a>, supplied to its constructor.
+Carries every parsing setting that is independent of the input shape; the
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a> constructors take the derived <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions-1.html">FixedWidthExtractorStreamOptions&lt;TRecord&gt;</a>,
+which adds the byte-decoding <code>Encoding</code> a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textreader">TextReader</a> caller has
+already decided.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions-1.html">FixedWidthExtractorStreamOptions&lt;TRecord&gt;</a></dt>
+      <dd><p>Configuration for a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a> constructed over a
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a>: everything in <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions-1.html">FixedWidthExtractorOptions&lt;TRecord&gt;</a> plus
+the <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractorStreamOptions_1_Encoding">Encoding</a> used to decode the bytes. The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textreader">TextReader</a>
+constructors take the base record instead, because a reader has already decoded its bytes and an
+<code>Encoding</code> there would be settable but inert.</p>
 </dd>
     </dl>
     <dl class="jumplist">
@@ -177,8 +189,19 @@ either a mapped field or a skipped column — exposed by
     </dl>
     <dl class="jumplist">
       <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.html">FixedWidthLoaderOptions</a></dt>
-      <dd><p>Options for the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a>-based <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a>
-constructors.</p>
+      <dd><p>Configuration for a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a>, supplied to its constructor. Carries
+every formatting setting that is independent of the output shape; the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a>
+constructors take the derived <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.html">FixedWidthLoaderStreamOptions</a>, which adds the
+byte-encoding <code>Encoding</code> a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textwriter">TextWriter</a> caller has already decided.</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.html">FixedWidthLoaderStreamOptions</a></dt>
+      <dd><p>Configuration for a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html">FixedWidthLoader&lt;TRecord&gt;</a> constructed over a
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a>: everything in <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.html">FixedWidthLoaderOptions</a> plus the
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthLoaderStreamOptions_Encoding">Encoding</a> used to encode the bytes. The <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.textwriter">TextWriter</a> constructors
+take the base record instead, because a writer already owns its encoding and an <code>Encoding</code>
+there would be settable but inert.</p>
 </dd>
     </dl>
     <dl class="jumplist">
