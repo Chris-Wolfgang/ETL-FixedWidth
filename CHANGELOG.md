@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Ship `net5.0`, `net6.0` and `net7.0` assemblies. `Wolfgang.Etl.Abstractions` ships per-runtime assets and an `init` accessor's `IsExternalInit` modreq differs between its `netstandard2.0` build (internal polyfill) and its `net5.0`+ builds (`System.Runtime`), so this package's `netstandard2.0` assembly, compiled against the former but loaded beside the latter on .NET 5–7, would throw `MissingMethodException` on any write to an inherited options-record property (`SkipItemCount` / `MaximumItemCount` / `ReportingInterval`). Same remedy as Abstractions, Etl-DbClient and Etl-Csv 0.9.0: each runtime now gets an assembly compiled against its matching Abstractions asset.
+
 ### Security
 
 

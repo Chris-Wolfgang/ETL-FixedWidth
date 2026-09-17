@@ -425,7 +425,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 | **Multi-record-type files** | `FixedWidthMultiRecordExtractor` routes each line to a different POCO by a discriminator predicate (`.When(…)` / `.Otherwise(…)`), for header/detail/trailer batch files |
 | **Pipeline composition** | `EtlPipeline.Create().FixedWidthExtractor<T>(…).FixedWidthLoader<T>(…).RunAsync()` — fluent source factories and sink terminators over the generic `EtlPipeline` (requires `Wolfgang.Etl.Abstractions` 0.16.0) |
 | **Metrics** | Zero-config `System.Diagnostics.Metrics` instruments (throughput, skips, duration) from the `Wolfgang.Etl.FixedWidth` meter — OpenTelemetry / Prometheus / any `MeterListener` |
-| **Multi-TFM support** | net462, net481, netstandard2.0, net8.0, net10.0 |
+| **Multi-TFM support** | net462, net481, netstandard2.0, net5.0, net6.0, net7.0, net8.0, net10.0 |
 
 **Examples:**
 
