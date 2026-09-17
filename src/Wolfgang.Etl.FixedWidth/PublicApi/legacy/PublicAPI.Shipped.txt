@@ -1,0 +1,6 @@
+#nullable enable
+override Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>.<Clone>$() -> Wolfgang.Etl.Abstractions.ExtractorOptions!
+override Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions<TRecord>.<Clone>$() -> Wolfgang.Etl.Abstractions.ExtractorOptions!
+override Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.<Clone>$() -> Wolfgang.Etl.Abstractions.LoaderOptions!
+override Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.<Clone>$() -> Wolfgang.Etl.Abstractions.LoaderOptions!
+override Wolfgang.Etl.FixedWidth.FixedWidthReport.<Clone>$() -> Wolfgang.Etl.Abstractions.Report!

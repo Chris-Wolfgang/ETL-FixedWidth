@@ -442,3 +442,51 @@ static readonly Wolfgang.Etl.FixedWidth.FixedWidthConverter.Truncate -> System.F
 static readonly Wolfgang.Etl.FixedWidth.FixedWidthConverter.TruncateHeader -> System.Func<string!, Wolfgang.Etl.FixedWidth.FieldContext!, string!>!
 virtual Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>.Equals(Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<TRecord>? other) -> bool
 virtual Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.Equals(Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions? other) -> bool
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.<Clone>$() -> Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions!
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.Equals(Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions? other) -> bool
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.<Clone>$() -> Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions!
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.Equals(Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions? other) -> bool
+Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.<Clone>$() -> Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions!
+Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.Equals(Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions? other) -> bool
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.<Clone>$() -> Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions!
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.Equals(Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions? other) -> bool
+Wolfgang.Etl.FixedWidth.FixedWidthReport.FixedWidthReport(Wolfgang.Etl.FixedWidth.FixedWidthReport! original) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.<Clone>$() -> Wolfgang.Etl.FixedWidth.FixedWidthReportOptions!
+Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.Equals(Wolfgang.Etl.FixedWidth.FixedWidthReportOptions? other) -> bool
+override Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.Equals(object? obj) -> bool
+override Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.GetHashCode() -> int
+override Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ToString() -> string!
+override Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.Equals(object? obj) -> bool
+override Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.GetHashCode() -> int
+override Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ToString() -> string!
+override Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.Equals(object? obj) -> bool
+override Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.GetHashCode() -> int
+override Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.ToString() -> string!
+override Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.Dispose(bool disposing) -> void
+override Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.Dispose(bool disposing) -> void
+override Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.Equals(object? obj) -> bool
+override Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.GetHashCode() -> int
+override Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ToString() -> string!
+override Wolfgang.Etl.FixedWidth.FixedWidthReport.EqualityContract.get -> System.Type!
+override Wolfgang.Etl.FixedWidth.FixedWidthReport.Equals(object? obj) -> bool
+override Wolfgang.Etl.FixedWidth.FixedWidthReport.GetHashCode() -> int
+override Wolfgang.Etl.FixedWidth.FixedWidthReport.PrintMembers(System.Text.StringBuilder! builder) -> bool
+override Wolfgang.Etl.FixedWidth.FixedWidthReport.ToString() -> string!
+override Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.Equals(object? obj) -> bool
+override Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.GetHashCode() -> int
+override Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.ToString() -> string!
+override sealed Wolfgang.Etl.FixedWidth.FixedWidthReport.Equals(Wolfgang.Etl.Abstractions.Report? other) -> bool
+static Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.operator !=(Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions? right) -> bool
+static Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.operator ==(Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions? right) -> bool
+static Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.operator !=(Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions? right) -> bool
+static Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.operator ==(Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions? right) -> bool
+static Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.operator !=(Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions? right) -> bool
+static Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions.operator ==(Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions? right) -> bool
+static Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.operator !=(Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions? right) -> bool
+static Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.operator ==(Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions? right) -> bool
+static Wolfgang.Etl.FixedWidth.FixedWidthReport.operator !=(Wolfgang.Etl.FixedWidth.FixedWidthReport? left, Wolfgang.Etl.FixedWidth.FixedWidthReport? right) -> bool
+static Wolfgang.Etl.FixedWidth.FixedWidthReport.operator ==(Wolfgang.Etl.FixedWidth.FixedWidthReport? left, Wolfgang.Etl.FixedWidth.FixedWidthReport? right) -> bool
+static Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.operator !=(Wolfgang.Etl.FixedWidth.FixedWidthReportOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthReportOptions? right) -> bool
+static Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.operator ==(Wolfgang.Etl.FixedWidth.FixedWidthReportOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthReportOptions? right) -> bool
+virtual Wolfgang.Etl.FixedWidth.FixedWidthReport.Equals(Wolfgang.Etl.FixedWidth.FixedWidthReport? other) -> bool
+virtual Wolfgang.Etl.FixedWidth.FixedWidthValueParser.Invoke(System.ReadOnlyMemory<char> text, Wolfgang.Etl.FixedWidth.FieldContext! context) -> object!
