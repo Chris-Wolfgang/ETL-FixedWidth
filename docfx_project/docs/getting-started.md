@@ -4,7 +4,7 @@ This guide will help you quickly get up and running with Wolfgang.Etl.FixedWidth
 
 ## Prerequisites
 
-- .NET 8.0 SDK or later to follow this guide (the package also targets net462, net481, and netstandard2.0 for older runtimes)
+- .NET 8.0 SDK or later to follow this guide (the package also targets net462, net481, netstandard2.0, net5.0, net6.0, and net7.0 for older runtimes)
 
 ## Installation
 

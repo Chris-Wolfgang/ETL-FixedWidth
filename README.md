@@ -470,9 +470,9 @@ This library targets:
 
 - **.NET Framework:** 4.6.2, 4.8.1
 - **.NET Standard:** 2.0
-- **.NET:** 8.0, 10.0
+- **.NET:** 5.0, 6.0, 7.0, 8.0, 10.0
 
-> The CI test matrix additionally exercises the library on .NET Framework 4.7.x/4.8 and .NET 5.0–9.0 via the `netstandard2.0` facade; those are tested-against runtimes, not package target frameworks.
+> The CI test matrix additionally exercises the library on .NET Framework 4.7.x/4.8, .NET Core 3.1 and .NET 9.0 via the nearest package asset; those are tested-against runtimes, not package target frameworks.
 
 See the [NuGet package page](https://www.nuget.org/packages/Wolfgang.Etl.FixedWidth/) for the authoritative per-TFM compatibility matrix.
 
