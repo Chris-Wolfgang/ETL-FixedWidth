@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1789515190766,
+  "lastUpdate": 1789603958832,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-FixedWidth",
   "entries": {
     "BenchmarkDotNet": [
@@ -7320,6 +7320,222 @@ window.BENCHMARK_DATA = {
             "value": 365695325.6666667,
             "unit": "ns",
             "range": "± 1624635.7907569108"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "bfeeb65e1c1ddac3ca86c07a576783851dde7575",
+          "message": "Release v0.12.0 — options records inherit the Abstractions 0.24 base records; 20 setters deprecated; builders rewritten onto the records (#365)\n\n* feat(options): extractor/loader options records with constructors; Encoding moves to *StreamOptions (#341, part 1)\n\nADR-0009 adoption for the two stages that still configure through live\nsetters. This is the additive half of #341: records, constructors, tests. The\n19 setters are untouched here; their [Obsolete] markers and the ~175 call-site\nmigration are the stacked second half, so this diff stays reviewable.\n\nRecords (all { get; init; }, invalid values rejected from the init accessor):\n  FixedWidthExtractorOptions<TRecord>   12 parsing settings; generic because\n                                        RecordValidator is Func<TRecord, …>\n  FixedWidthExtractorStreamOptions<TRecord> : adds Encoding (sealed)\n  FixedWidthLoaderOptions               7 formatting settings incl. IsDryRun\n  FixedWidthLoaderStreamOptions         : adds Encoding (sealed)\nSplit by input shape, as #341 specifies: TextReader/TextWriter constructors\ntake the base record (a reader/writer has already decided its encoding, so an\nEncoding there would be settable-but-inert — the footgun 0.11.0 removed from\nfour other types); Stream constructors take the derived record.\n\nThe one non-additive change: the shipped Encoding-only records\nFixedWidthExtractorOptions (non-generic) and FixedWidthLoaderOptions are the\nnames #341 needs for the base records, so Encoding moves to the new Stream\nrecords. Migration is a one-word type rename. Pre-1.0, recorded under Changed,\nand it is what keeps the loader record non-generic (a generic loader record\nwith an unused type parameter was the only additive alternative).\n\nConstructors: new (TextReader, FixedWidthExtractorOptions<T>, ILogger?) and\n(TextWriter, FixedWidthLoaderOptions, ILogger?) — options required, not\noptional, so `new X(reader)` still binds the existing (reader, logger)\noverload unambiguously. Stream overloads now type their parameter as the\nStream record. The private core constructors take the base record plus an\nexplicit Encoding? and end with ApplyOptions(options), the single place the\nrecord is copied onto the stage.\n\nFixedWidthLoader no longer implements ISupportDryRun (removed upstream in\nETL-Abstractions#457). IsDryRun lives on the loader record; its setter stays\nfor now. The TestKit contract test is replaced by FixedWidthLoaderDryRunTests\nbecause the 0.23.x contract base constrains TSut to the retired interface.\n\nTests: FixedWidthExtractorOptionsTests / FixedWidthLoaderOptionsTests —\ndefaults agree with the stage defaults, every member applied through the\nreader/writer ctor, Stream ctor applies Encoding + base members, null options\non the Stream path keeps defaults, null on the reader/writer path throws\nnaming `options`, every guard, `with` preserves unset members.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* feat(options): the record is optional on the TextReader/TextWriter constructors (review on #353)\n\nChris asked why options was required here when the Stream constructors take\nit optionally. The stated reason - keeping new X(reader) bound to the\nexisting (reader, logger = null) overload - was wrong: the shipped\nsingle-argument (TextReader) / (TextWriter) constructors still exist and win\nthat call by exact match, so an optional record introduces no ambiguity.\noptions is now FixedWidthExtractorOptions<TRecord>? options = null and\nFixedWidthLoaderOptions? options = null, mirroring the Stream constructors;\nnull keeps every default. The two null-throws facts become null-keeps-\ndefaults facts; PublicAPI entries updated.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* feat(options): deprecate the 20 configuration setters; migrate every write site to the records (#341, part 2)\n\nSecond half of #341, stacked on part 1. The setters on FixedWidthExtractor\nand FixedWidthLoader are marked [Obsolete] on the accessor only, so reads stay\nwarning-free and existing initializers compile with a warning that names the\nrecord to use. Nothing is removed; removal is #342.\n\nBecause this repo builds Release with TreatWarningsAsErrors, deprecating the\nsetters made every internal write a build error, so the migration lands here\nrather than in #342 (as #341 specifies):\n\n  src      ApplyOptions writes them by design (CS0618 pragma, same as Csv);\n           the two builders write them for a caller-supplied instance (file\n           pragma until #342 rewrites them); 39 XML-doc example statements\n           rewritten to the record-initializer form.\n  tests    63 object-initializer sites folded into an options argument;\n           13 contiguous post-construction blocks folded into an options\n           block above the construction; 24 helper-constructed sites routed\n           through CreateExtractor/CreateEmployeeExtractor/CreateLoader,\n           which gained an optional options parameter; the snapshot Write\n           helper takes FixedWidthLoaderOptions instead of a configuring\n           lambda; the two HasHeader setter-interaction tests replaced by a\n           HasHeader-is-a-projection theory (per #341); one setter-guard\n           test kept under a CS0618 pragma.\n  examples all 28 post-construction assignments folded, comments preserved\n           inside the initializers.\n\nHasHeader = true/false folded to HeaderLineCount = 1/0 everywhere.\n\nThe folding was scripted with brace/string-aware parsing and then reviewed\nby hand. Two defects it produced were caught before commit: a comma inside a\ntrailing // comment split an initializer entry (two sites, reconstructed),\nand a trailing comment swallowed the entry's comma (regex-fixed across the\ntree). Cross-object mis-attribution is impossible by construction — each fold\noperates on one construction's own initializer or one variable's own\nassignments — and the compiler independently rejects a base record passed to\na Stream constructor.\n\nNo public API text changes (accessor-level [Obsolete]); CHANGELOG Deprecated.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* docs: OnError example uses the options record; CHANGELOG first-half wording points at Deprecated (#354 review)\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* feat(options): inherit the Abstractions 0.24 base records; dry-run contract test back on the TestKit base\n\nFixedWidthExtractorOptions<TRecord> : ExtractorOptions and\nFixedWidthLoaderOptions : LoaderOptions (ADR-0009); the *StreamOptions\nrecords inherit through them. The private core constructors chain\nbase(options), so ReportingInterval, MaximumItemCount, SkipItemCount and\nErrorPolicy are applied by the base constructor and ApplyOptions applies\nonly the fixed-width settings. No member overlap, so nothing is renamed.\n\nWolfgang.Etl.Abstractions 0.23.4 -> 0.24.0 (TestKit / TestKit.Xunit for the\ntest project and examples). 0.24.0 is not published: this builds only\nagainst the local feed and the PR stays draft until it is.\n\nFixedWidthLoaderDryRunTests derives from the now non-generic\nSupportsDryRunContractTests again (RunAndReportSideEffectAsync over a\nMemoryStream); the two behavioural facts it duplicated are gone, the\noption-default/applied/still-counts facts stay. New\nFixedWidthOptionsBaseRecordTests (6 facts).\n\nPublicAPI: the two synthesized Equals(base?) overrides recorded; four\nentries flip virtual -> override (PrintMembers, EqualityContract on both\nroot records) and the root records' <Clone>$ lines are dropped as\nunmatchable. The capture also re-surfaced the 49 unrecorded members #352\ntracks; left out. ApiCompat: CP0002 x3 for FixedWidthLoaderOptions.<Clone>$\nreturning LoaderOptions on net462/netstandard2.x (binary-only break for\n`with` callers compiled against 0.11.0). CHANGELOG Added / Changed.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* feat(options): the pipeline builders accumulate an options record and pass it to the constructor (review on #354)\n\nChris asked why #354 left the builders on the deprecated setters under a\nfile-level pragma. There was no reason: both builders construct the stage\nthemselves, so they can accumulate the record and pass it to the options\nconstructor. Constructed sources (path, stream, reader/writer) now do\nexactly that; the stream shapes get an internal copy constructor on the\n*StreamOptions records that takes the accumulated base record plus the\nbuilder's encoding.\n\nThe one path that still writes a setter is a caller-supplied extractor\n(FromExtractor): it is already configured, and a whole record cannot be\napplied to it without resetting what the caller set, so the members\nconfigured through the builder are flagged and copied one by one in a\nsingle ApplyTo method, the only place under a CS0618 pragma. It goes with\nthe setters (#342). The loader builder has no wrap path and no pragma.\n\nNew test: a wrapped, pre-configured extractor keeps the caller's own\nsettings when one member is configured through the builder.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* feat(options): deprecate the 20 configuration setters; migrate every write site to the records (#341 part 2) (#354)\n\n* feat(options): deprecate the 20 configuration setters; migrate every write site to the records (#341, part 2)\n\nSecond half of #341, stacked on part 1. The setters on FixedWidthExtractor\nand FixedWidthLoader are marked [Obsolete] on the accessor only, so reads stay\nwarning-free and existing initializers compile with a warning that names the\nrecord to use. Nothing is removed; removal is #342.\n\nBecause this repo builds Release with TreatWarningsAsErrors, deprecating the\nsetters made every internal write a build error, so the migration lands here\nrather than in #342 (as #341 specifies):\n\n  src      ApplyOptions writes them by design (CS0618 pragma, same as Csv);\n           the two builders write them for a caller-supplied instance (file\n           pragma until #342 rewrites them); 39 XML-doc example statements\n           rewritten to the record-initializer form.\n  tests    63 object-initializer sites folded into an options argument;\n           13 contiguous post-construction blocks folded into an options\n           block above the construction; 24 helper-constructed sites routed\n           through CreateExtractor/CreateEmployeeExtractor/CreateLoader,\n           which gained an optional options parameter; the snapshot Write\n           helper takes FixedWidthLoaderOptions instead of a configuring\n           lambda; the two HasHeader setter-interaction tests replaced by a\n           HasHeader-is-a-projection theory (per #341); one setter-guard\n           test kept under a CS0618 pragma.\n  examples all 28 post-construction assignments folded, comments preserved\n           inside the initializers.\n\nHasHeader = true/false folded to HeaderLineCount = 1/0 everywhere.\n\nThe folding was scripted with brace/string-aware parsing and then reviewed\nby hand. Two defects it produced were caught before commit: a comma inside a\ntrailing // comment split an initializer entry (two sites, reconstructed),\nand a trailing comment swallowed the entry's comma (regex-fixed across the\ntree). Cross-object mis-attribution is impossible by construction — each fold\noperates on one construction's own initializer or one variable's own\nassignments — and the compiler independently rejects a base record passed to\na Stream constructor.\n\nNo public API text changes (accessor-level [Obsolete]); CHANGELOG Deprecated.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* docs: OnError example uses the options record; CHANGELOG first-half wording points at Deprecated (#354 review)\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* feat(options): the pipeline builders accumulate an options record and pass it to the constructor (review on #354)\n\nChris asked why #354 left the builders on the deprecated setters under a\nfile-level pragma. There was no reason: both builders construct the stage\nthemselves, so they can accumulate the record and pass it to the options\nconstructor. Constructed sources (path, stream, reader/writer) now do\nexactly that; the stream shapes get an internal copy constructor on the\n*StreamOptions records that takes the accumulated base record plus the\nbuilder's encoding.\n\nThe one path that still writes a setter is a caller-supplied extractor\n(FromExtractor): it is already configured, and a whole record cannot be\napplied to it without resetting what the caller set, so the members\nconfigured through the builder are flagged and copied one by one in a\nsingle ApplyTo method, the only place under a CS0618 pragma. It goes with\nthe setters (#342). The loader builder has no wrap path and no pragma.\n\nNew test: a wrapped, pre-configured extractor keeps the caller's own\nsettings when one member is configured through the builder.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Fable 5.1 <noreply@anthropic.com>\n\n* docs(changelog): the binary-only <Clone>$ note lists the TFMs this project ships (net462, net481, netstandard2.0) (Copilot review on #363)\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* release: v0.12.0\n\noptions records inherit the Abstractions 0.24 base records; 20 setters deprecated; builders rewritten onto the records MINOR bump from v0.11.0: new public surface (options records inheriting the Abstractions 0.24.0 base records, new constructors) and new [Obsolete] markers; no removals.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n\n* docs: complete options-initializer examples, CHANGELOG Deprecated entry for the 20 setters; overload guard test (review on #365)\n\nNine XML-doc <example> blocks on FixedWidthConverter, FixedWidthExtractor\nand FixedWidthLoader showed bare `Member = ...` fragments after #354; each\nalternative is now a complete `new FixedWidthLoaderOptions { ... }` /\n`new FixedWidthExtractorOptions<TRecord> { ... }` initializer.\n\nThe 0.12.0 CHANGELOG's Added section pointed at a Deprecated entry for\nthe 20 setters that was never written; added (13 on the extractor, 7 on\nthe loader, [Obsolete] on the accessor, removal in #342).\n\nConstructorOverloadResolutionTests pins that (reader, null) and\n(writer, null) still bind the shipped (source, ILogger?) overloads and\n(reader) the single-argument ones: an all-arguments-supplied candidate\nbeats one needing default substitution, so the optional record introduced\nno ambiguity. The file fails to compile if that ever changes.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Fable 5.1 <noreply@anthropic.com>",
+          "timestamp": "2026-09-16T20:07:21-04:00",
+          "tree_id": "e984b3e019c68a849661b0358697fd3d14de6169",
+          "url": "https://github.com/Chris-Wolfgang/ETL-FixedWidth/commit/bfeeb65e1c1ddac3ca86c07a576783851dde7575"
+        },
+        "date": 1789603954770,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.DateTimeBenchmarks.Extract_Memory(RecordCount: 10000)",
+            "value": 3046496.703125,
+            "unit": "ns",
+            "range": "± 7421.589781805802"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.DateTimeBenchmarks.Load_Memory(RecordCount: 10000)",
+            "value": 2504835.3619791665,
+            "unit": "ns",
+            "range": "± 140609.13143876585"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_TextReader(RecordCount: 1000)",
+            "value": 265627.51643880206,
+            "unit": "ns",
+            "range": "± 203.1413940611914"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_Stream(RecordCount: 1000)",
+            "value": 336102.2408854167,
+            "unit": "ns",
+            "range": "± 4607.502216536876"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_TextReader_1KB(RecordCount: 1000)",
+            "value": 278603.7604166667,
+            "unit": "ns",
+            "range": "± 287.3495974985827"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_Stream_64KB(RecordCount: 1000)",
+            "value": 322224.4231770833,
+            "unit": "ns",
+            "range": "± 8009.106230171797"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_TextReader(RecordCount: 10000)",
+            "value": 2607987.2942708335,
+            "unit": "ns",
+            "range": "± 3945.9281376151675"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_Stream(RecordCount: 10000)",
+            "value": 2675977.9583333335,
+            "unit": "ns",
+            "range": "± 16484.6922427751"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_TextReader_1KB(RecordCount: 10000)",
+            "value": 2813910.74609375,
+            "unit": "ns",
+            "range": "± 3214.325827976468"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_Stream_64KB(RecordCount: 10000)",
+            "value": 2758124.4036458335,
+            "unit": "ns",
+            "range": "± 13890.849865970655"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_TextReader(RecordCount: 100000)",
+            "value": 26147932.760416668,
+            "unit": "ns",
+            "range": "± 94065.02211061372"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_Stream(RecordCount: 100000)",
+            "value": 25545354.208333332,
+            "unit": "ns",
+            "range": "± 99874.76372225618"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_TextReader_1KB(RecordCount: 100000)",
+            "value": 27448954.291666668,
+            "unit": "ns",
+            "range": "± 131930.3863567915"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_Stream_64KB(RecordCount: 100000)",
+            "value": 26299684.90625,
+            "unit": "ns",
+            "range": "± 29936.577428194054"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_TextWriter(RecordCount: 1000)",
+            "value": 195481.29931640625,
+            "unit": "ns",
+            "range": "± 326.61463031072964"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_Stream(RecordCount: 1000)",
+            "value": 270856.6282552083,
+            "unit": "ns",
+            "range": "± 461.7755971621392"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_TextWriter_1KB(RecordCount: 1000)",
+            "value": 254350.3605143229,
+            "unit": "ns",
+            "range": "± 968.6447490080302"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_Stream_64KB(RecordCount: 1000)",
+            "value": 366219.91324869794,
+            "unit": "ns",
+            "range": "± 5766.47973170205"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_TextWriter(RecordCount: 10000)",
+            "value": 2671963.95703125,
+            "unit": "ns",
+            "range": "± 8793.943213964214"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_Stream(RecordCount: 10000)",
+            "value": 2221598.21484375,
+            "unit": "ns",
+            "range": "± 87188.74074457884"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_TextWriter_1KB(RecordCount: 10000)",
+            "value": 2181182.3489583335,
+            "unit": "ns",
+            "range": "± 30510.541379534432"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_Stream_64KB(RecordCount: 10000)",
+            "value": 2405485.3723958335,
+            "unit": "ns",
+            "range": "± 22658.905758817797"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_TextWriter(RecordCount: 100000)",
+            "value": 21948314.947916668,
+            "unit": "ns",
+            "range": "± 201415.72636040702"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_Stream(RecordCount: 100000)",
+            "value": 22279589.333333332,
+            "unit": "ns",
+            "range": "± 28888.317378387183"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_TextWriter_1KB(RecordCount: 100000)",
+            "value": 20609797.895833332,
+            "unit": "ns",
+            "range": "± 102711.34337702348"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_Stream_64KB(RecordCount: 100000)",
+            "value": 19722965.333333332,
+            "unit": "ns",
+            "range": "± 54552.65122123718"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 0)",
+            "value": 393690.05094401044,
+            "unit": "ns",
+            "range": "± 16348.940223494053"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 1)",
+            "value": 390722.4365234375,
+            "unit": "ns",
+            "range": "± 5244.047258328011"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 1000)",
+            "value": 810545.4541015625,
+            "unit": "ns",
+            "range": "± 17796.082353447535"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 10000)",
+            "value": 2909003.5807291665,
+            "unit": "ns",
+            "range": "± 3288.0634528771925"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 100000)",
+            "value": 26698466.885416668,
+            "unit": "ns",
+            "range": "± 101775.25173468514"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 1000000)",
+            "value": 275282419.6666667,
+            "unit": "ns",
+            "range": "± 2387964.5500855604"
           }
         ]
       }
