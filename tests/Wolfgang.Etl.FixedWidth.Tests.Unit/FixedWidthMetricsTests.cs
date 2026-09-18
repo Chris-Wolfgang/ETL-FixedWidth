@@ -72,11 +72,9 @@ public sealed class FixedWidthMetricsTests
 
         var extractor = new FixedWidthExtractor<MetricsSample>
         (
-            new StringReader(Content(("Alice", "Smith", 30), ("Bob", "Jones", 25), ("Carol", "White", 35)))
-        )
-        {
-            SkipItemCount = 2,
-        };
+            new StringReader(Content(("Alice", "Smith", 30), ("Bob", "Jones", 25), ("Carol", "White", 35))),
+            new FixedWidthExtractorOptions<MetricsSample> { SkipItemCount = 2 }
+        );
 
         await DrainAsync(extractor);
 

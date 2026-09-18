@@ -4,3 +4,6 @@ override Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions<TRecord>.<Clon
 override Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.<Clone>$() -> Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions!
 override Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions.<Clone>$() -> Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions!
 override Wolfgang.Etl.FixedWidth.FixedWidthReport.<Clone>$() -> Wolfgang.Etl.FixedWidth.FixedWidthReport!
+override Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.<Clone>$() -> Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions!
+override Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.<Clone>$() -> Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions!
+override Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.<Clone>$() -> Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions!

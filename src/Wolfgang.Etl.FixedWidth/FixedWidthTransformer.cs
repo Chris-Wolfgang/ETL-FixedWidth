@@ -66,6 +66,30 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
         Func<TSource, TDestination> transform,
         ILogger<FixedWidthTransformer<TSource, TDestination>>? logger = null
     )
+        : this(transform, options: null, logger)
+    {
+    }
+
+
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthTransformer{TSource, TDestination}"/> with the base-stage
+    /// configuration taken from <paramref name="options"/> (ADR-0009).
+    /// </summary>
+    /// <param name="transform">The per-record transformation.</param>
+    /// <param name="options">
+    /// The stage configuration (<c>ReportingInterval</c>, <c>MaximumItemCount</c>, <c>SkipItemCount</c>,
+    /// <c>ErrorPolicy</c>); <see langword="null"/> keeps the defaults.
+    /// </param>
+    /// <param name="logger">The logger; <see langword="null"/> logs nothing.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="transform"/> is <see langword="null"/>.</exception>
+    public FixedWidthTransformer
+    (
+        Func<TSource, TDestination> transform,
+        FixedWidthTransformerOptions? options,
+        ILogger<FixedWidthTransformer<TSource, TDestination>>? logger = null
+    )
+        : base(options)
     {
         _transform = transform ?? throw new ArgumentNullException(nameof(transform));
         _logger = logger ?? (ILogger)NullLogger.Instance;

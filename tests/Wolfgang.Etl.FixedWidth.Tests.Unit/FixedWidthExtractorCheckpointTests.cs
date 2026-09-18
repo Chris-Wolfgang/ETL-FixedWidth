@@ -209,13 +209,9 @@ public sealed class FixedWidthExtractorCheckpointTests
 
         using var resumed = new FixedWidthExtractor<Rec>(new MemoryStream(bytes), new FixedWidthExtractorStreamOptions<Rec>
         {
-            StartByteOffset = 9,
-        })
-        {
-            // resume at DEF
-            SkipItemCount = 1,
-            // then skip DEF
-        };
+            StartByteOffset = 9,  // resume at DEF
+            SkipItemCount = 1,    // then skip DEF
+        });
 
         var rest = await resumed.ExtractAsync(CancellationToken.None).ToListAsync();
 

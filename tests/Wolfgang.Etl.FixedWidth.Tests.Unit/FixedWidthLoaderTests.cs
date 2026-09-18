@@ -40,8 +40,17 @@ public class FixedWidthLoaderTests
     // ------------------------------------------------------------------
 
     /// <inheritdoc/>
-    protected override FixedWidthLoader<PersonRecord> CreateSut(int itemCount) =>
-        new(new StringWriter());
+    protected override FixedWidthLoader<PersonRecord> CreateSut(int itemCount, int maximumItemCount, int skipItemCount, int reportingInterval) =>
+        new
+        (
+            new StringWriter(),
+            new FixedWidthLoaderOptions
+            {
+                MaximumItemCount = maximumItemCount,
+                SkipItemCount = skipItemCount,
+                ReportingInterval = reportingInterval,
+            }
+        );
 
 
 
@@ -54,13 +63,6 @@ public class FixedWidthLoaderTests
         new PersonRecord { FirstName = "Dan", LastName = "Davis", Age = 40 },
         new PersonRecord { FirstName = "Eve", LastName = "Evans", Age = 45 },
     };
-
-
-
-    /// <inheritdoc/>
-    protected override FixedWidthLoader<PersonRecord> CreateSutWithTimer(
-        IProgressTimer timer) =>
-        new(new StringWriter(), timer);
 
 
 
@@ -97,7 +99,6 @@ public class FixedWidthLoaderTests
         );
         return trimmed;
     }
-
 
 
 
@@ -236,8 +237,7 @@ public class FixedWidthLoaderTests
     [Fact]
     public async Task LoadAsync_when_SkipItemCount_is_set_skips_the_first_N_records()
     {
-        var loader = CreateLoader(out var writer);
-        loader.SkipItemCount = 1;
+        var loader = CreateLoader(out var writer, new FixedWidthLoaderOptions { SkipItemCount = 1 });
 
         await loader.LoadAsync(new[]
         {
@@ -266,9 +266,7 @@ public class FixedWidthLoaderTests
     [Fact]
     public async Task LoadAsync_when_SkipItemCount_and_MaximumItemCount_are_both_set_skips_then_loads()
     {
-        var loader = CreateLoader(out var writer);
-        loader.SkipItemCount = 2;
-        loader.MaximumItemCount = 2;
+        var loader = CreateLoader(out var writer, new FixedWidthLoaderOptions { SkipItemCount = 2, MaximumItemCount = 2 });
 
         await loader.LoadAsync(new[]
         {

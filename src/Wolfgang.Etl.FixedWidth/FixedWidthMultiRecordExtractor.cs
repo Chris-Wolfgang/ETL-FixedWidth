@@ -109,6 +109,23 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     }
 
 
+
+    /// <summary>
+    /// Initializes a new <see cref="FixedWidthMultiRecordExtractor"/> that reads lines from
+    /// <paramref name="reader"/>, with the base-stage configuration taken from <paramref name="options"/>
+    /// (ADR-0009). <c>Encoding</c> on the record is not used for a <see cref="TextReader"/> source.
+    /// </summary>
+    /// <param name="reader">The text source to read lines from.</param>
+    /// <param name="options">The stage configuration; <see langword="null"/> keeps the defaults.</param>
+    /// <param name="logger">The logger; <see langword="null"/> logs nothing.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <see langword="null"/>.</exception>
+    public FixedWidthMultiRecordExtractor(TextReader reader, FixedWidthMultiRecordExtractorOptions? options, ILogger<FixedWidthMultiRecordExtractor>? logger = null)
+        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null,
+               options: options, timer: null, logger: logger)
+    {
+    }
+
+
     /// <summary>
     /// Initializes a new <see cref="FixedWidthMultiRecordExtractor"/> from a <see cref="Stream"/> using the
     /// default options, with diagnostic logging.
@@ -198,6 +215,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
         IProgressTimer? timer,
         ILogger<FixedWidthMultiRecordExtractor>? logger
     )
+        : base(options)
     {
         // Defensive invariant guard. Every caller-facing constructor null-checks its own source
         // before delegating here, so this cannot fire today — it exists so that a constructor added

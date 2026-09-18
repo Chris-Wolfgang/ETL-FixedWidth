@@ -24,11 +24,9 @@ public class FixedWidthLoggingCompletionTests
         (
             new StringReader(content),
             new ManualProgressTimer(),
+            new FixedWidthExtractorOptions<PersonRecord> { MaximumItemCount = 1 },
             logger
-        )
-        {
-            MaximumItemCount = 1,
-        };
+        );
 
         await extractor.ExtractAsync().ToListAsync();
 
@@ -85,11 +83,9 @@ public class FixedWidthLoggingCompletionTests
         (
             new StringWriter(),
             new ManualProgressTimer(),
+            new FixedWidthLoaderOptions { MaximumItemCount = 1 },
             logger
-        )
-        {
-            MaximumItemCount = 1,
-        };
+        );
 
         await loader.LoadAsync(records.ToAsyncEnumerable());
 

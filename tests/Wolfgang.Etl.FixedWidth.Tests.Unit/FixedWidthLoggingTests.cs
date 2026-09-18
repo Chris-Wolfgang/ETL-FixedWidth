@@ -399,11 +399,9 @@ public class FixedWidthExtractorLoggingTests
         (
             new StringReader(content),
             new ManualProgressTimer(),
+            new FixedWidthExtractorOptions<PersonRecord> { SkipItemCount = 1 },
             logger
-        )
-        {
-            SkipItemCount = 1,
-        };
+        );
 
         await extractor.ExtractAsync().ToListAsync();
 
@@ -426,11 +424,9 @@ public class FixedWidthExtractorLoggingTests
         (
             new StringReader(content),
             new ManualProgressTimer(),
+            new FixedWidthExtractorOptions<PersonRecord> { MaximumItemCount = 1 },
             logger
-        )
-        {
-            MaximumItemCount = 1,
-        };
+        );
 
         await extractor.ExtractAsync().ToListAsync();
 
@@ -630,11 +626,9 @@ public class FixedWidthLoaderLoggingTests
         (
             new StringWriter(),
             new ManualProgressTimer(),
+            new FixedWidthLoaderOptions { SkipItemCount = 1 },
             logger
-        )
-        {
-            SkipItemCount = 1,
-        };
+        );
 
         await loader.LoadAsync(records.ToAsyncEnumerable());
 
@@ -661,11 +655,9 @@ public class FixedWidthLoaderLoggingTests
         (
             new StringWriter(),
             new ManualProgressTimer(),
+            new FixedWidthLoaderOptions { MaximumItemCount = 1 },
             logger
-        )
-        {
-            MaximumItemCount = 1,
-        };
+        );
 
         await loader.LoadAsync(records.ToAsyncEnumerable());
 
@@ -794,10 +786,7 @@ public class FixedWidthLoaderLoggingTests
     public async Task TransformAsync_completion_log_reports_the_skipped_count()
     {
         var logger = new SpyLogger<FixedWidthTransformer<PersonRecord, PersonRecord>>();
-        var transformer = new FixedWidthTransformer<PersonRecord, PersonRecord>(r => r, logger)
-        {
-            SkipItemCount = 1,
-        };
+        var transformer = new FixedWidthTransformer<PersonRecord, PersonRecord>(r => r, new FixedWidthTransformerOptions { SkipItemCount = 1 }, logger);
 
         await transformer.TransformAsync(Source(3), CancellationToken.None).ToListAsync();
 

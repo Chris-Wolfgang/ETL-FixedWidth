@@ -1,4 +1,5 @@
 using System.Text;
+using Wolfgang.Etl.Abstractions;
 
 namespace Wolfgang.Etl.FixedWidth;
 
@@ -12,10 +13,12 @@ namespace Wolfgang.Etl.FixedWidth;
 /// in constructor bodies, so no constructor can accidentally diverge from them.
 /// <para>
 /// Options are scoped to the <em>input shape</em> they configure, not to the type as a whole, so
-/// every property here is meaningful for the constructor it is passed to.
+/// every property here is meaningful for the constructor it is passed to. The base-stage
+/// configuration (<c>ReportingInterval</c>, <c>MaximumItemCount</c>, <c>SkipItemCount</c>, <c>ErrorPolicy</c>)
+/// is inherited from the Abstractions record (ADR-0009).
 /// </para>
 /// </remarks>
-public sealed record FixedWidthBinaryExtractorOptions
+public sealed record FixedWidthBinaryExtractorOptions : ExtractorOptions
 {
     /// <summary>
     /// Gets the <see cref="System.Text.Encoding"/> used to decode text fields out of each binary record.
