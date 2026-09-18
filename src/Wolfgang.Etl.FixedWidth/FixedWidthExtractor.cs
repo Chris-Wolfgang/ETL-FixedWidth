@@ -377,20 +377,18 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
             return;
         }
 
-#pragma warning disable CS0618 // ApplyOptions is the supported replacement for these setters; it necessarily writes them.
-        MalformedLineHandling = options.MalformedLineHandling;
-        BlankLineHandling = options.BlankLineHandling;
-        LineFilter = options.LineFilter;
-        RecordValidator = options.RecordValidator;
-        OnError = options.OnError;
-        ValueParser = options.ValueParser;
-        HeaderLineCount = options.HeaderLineCount;
-        FieldSeparator = options.FieldSeparator;
-        FieldDelimiter = options.FieldDelimiter;
-        Schema = options.Schema;
-        TrackByteOffset = options.TrackByteOffset;
-        StartByteOffset = options.StartByteOffset;
-#pragma warning restore CS0618
+        _malformedLineHandling = options.MalformedLineHandling;
+        _blankLineHandling = options.BlankLineHandling;
+        _lineFilter = options.LineFilter;
+        _recordValidator = options.RecordValidator;
+        _onError = options.OnError;
+        _valueParser = options.ValueParser;
+        _headerLineCount = options.HeaderLineCount;
+        _fieldSeparator = options.FieldSeparator;
+        _fieldDelimiter = options.FieldDelimiter;
+        _schema = options.Schema;
+        _trackByteOffset = options.TrackByteOffset;
+        _startByteOffset = options.StartByteOffset;
     }
 
 
@@ -414,6 +412,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     // Properties
     // ------------------------------------------------------------------
 
+    private MalformedLineHandling _malformedLineHandling = MalformedLineHandling.ThrowException;
+
     /// <summary>
     /// Specifies what happens when a line is encountered that is too short or whose
     /// field values cannot be converted to the target property type.
@@ -425,9 +425,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// When set to <see cref="MalformedLineHandling.ReturnDefault"/>, a default instance
     /// of <typeparamref name="TRecord"/> is yielded for the offending line.
     /// </remarks>
-    public MalformedLineHandling MalformedLineHandling { get; [Obsolete("Configure MalformedLineHandling through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; } = MalformedLineHandling.ThrowException;
+    public MalformedLineHandling MalformedLineHandling { get => _malformedLineHandling; [Obsolete("Configure MalformedLineHandling through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set => _malformedLineHandling = value; }
 
 
+
+    private BlankLineHandling _blankLineHandling = BlankLineHandling.ThrowException;
 
     /// <summary>
     /// Specifies what happens when a truly blank line (zero length) is encountered
@@ -453,9 +455,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <see cref="LineFilter"/> is not invoked for blank lines.
     /// </para>
     /// </remarks>
-    public BlankLineHandling BlankLineHandling { get; [Obsolete("Configure BlankLineHandling through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; } = BlankLineHandling.ThrowException;
+    public BlankLineHandling BlankLineHandling { get => _blankLineHandling; [Obsolete("Configure BlankLineHandling through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set => _blankLineHandling = value; }
 
 
+
+    private Func<string, LineAction> _lineFilter = _ => LineAction.Process;
 
     /// <summary>
     /// A delegate invoked for every data line (after header and separator lines have been
@@ -490,9 +494,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// new FixedWidthExtractorOptions&lt;TRecord&gt; { LineFilter = line => string.IsNullOrWhiteSpace(line) ? LineAction.Stop : LineAction.Process }
     /// </code>
     /// </example>
-    public Func<string, LineAction> LineFilter { get; [Obsolete("Configure LineFilter through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; } = _ => LineAction.Process;
+    public Func<string, LineAction> LineFilter { get => _lineFilter; [Obsolete("Configure LineFilter through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set => _lineFilter = value; }
 
 
+
+    private Func<TRecord, ValidationResult>? _recordValidator;
 
     /// <summary>
     /// An optional callback invoked for each fully parsed record, after
@@ -511,9 +517,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     ///         : ValidationResult.Accept(),
     /// </code>
     /// </example>
-    public Func<TRecord, ValidationResult>? RecordValidator { get; [Obsolete("Configure RecordValidator through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; }
+    public Func<TRecord, ValidationResult>? RecordValidator { get => _recordValidator; [Obsolete("Configure RecordValidator through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set => _recordValidator = value; }
 
 
+
+    private Action<FixedWidthError>? _onError;
 
     /// <summary>
     /// An optional dead-letter sink invoked once for each record that fails to parse (#29). The
@@ -537,9 +545,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// // errors now holds the dead letters
     /// </code>
     /// </example>
-    public Action<FixedWidthError>? OnError { get; [Obsolete("Configure OnError through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; }
+    public Action<FixedWidthError>? OnError { get => _onError; [Obsolete("Configure OnError through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set => _onError = value; }
 
 
+
+    private FixedWidthValueParser _valueParser = FixedWidthConverter.DefaultParser;
 
     /// <summary>
     /// A delegate that converts a raw string read from the file into the target property
@@ -580,9 +590,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// }
     /// </code>
     /// </example>
-    public FixedWidthValueParser ValueParser { get; [Obsolete("Configure ValueParser through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; } = FixedWidthConverter.DefaultParser;
+    public FixedWidthValueParser ValueParser { get => _valueParser; [Obsolete("Configure ValueParser through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set => _valueParser = value; }
 
 
+
+    private int _headerLineCount;
 
     /// <summary>
     /// The number of header lines to skip at the beginning of the file before
@@ -604,7 +616,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// HeaderLineCount = 1,
     /// </code>
     /// </example>
-    public int HeaderLineCount { get; [Obsolete("Configure HeaderLineCount through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; }
+    public int HeaderLineCount { get => _headerLineCount; [Obsolete("Configure HeaderLineCount through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set => _headerLineCount = value; }
 
 
 
@@ -637,6 +649,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
 
 
+    private char? _fieldSeparator;
+
     /// <summary>
     /// When non-null, the line immediately following the last header line is treated
     /// as a separator and skipped. Has no effect if <see cref="HeaderLineCount"/> is 0.
@@ -652,9 +666,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// FieldSeparator = null, // no separator line (default)
     /// </code>
     /// </example>
-    public char? FieldSeparator { get; [Obsolete("Configure FieldSeparator through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; }
+    public char? FieldSeparator { get => _fieldSeparator; [Obsolete("Configure FieldSeparator through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set => _fieldSeparator = value; }
 
 
+
+    private string? _fieldDelimiter;
 
     /// <summary>
     /// The delimiter string present between fields in the source file, or
@@ -676,9 +692,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// FieldDelimiter = null,
     /// </code>
     /// </example>
-    public string? FieldDelimiter { get; [Obsolete("Configure FieldDelimiter through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; }
+    public string? FieldDelimiter { get => _fieldDelimiter; [Obsolete("Configure FieldDelimiter through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set => _fieldDelimiter = value; }
 
 
+
+    private FixedWidthSchema? _schema;
 
     /// <summary>
     /// An optional layout that overrides the <c>[FixedWidthField]</c> / <c>[FixedWidthSkip]</c> attributes
@@ -687,7 +705,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// default) the attribute-based layout is used. The schema's <see cref="FixedWidthSchema.RecordType"/>
     /// must be <typeparamref name="TRecord"/>.
     /// </summary>
-    public FixedWidthSchema? Schema { get; [Obsolete("Configure Schema through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; }
+    public FixedWidthSchema? Schema { get => _schema; [Obsolete("Configure Schema through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set => _schema = value; }
 
 
 
@@ -705,6 +723,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     public long CurrentLineNumber => Interlocked.Read(ref _currentLineNumber);
 
 
+
+    private bool _trackByteOffset;
 
     /// <summary>
     /// Enables byte-offset tracking for checkpoint/resume (#31). When <see langword="true"/>,
@@ -724,7 +744,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// the constructor when enabling tracking. A matching-encoding BOM (e.g. a UTF-8 BOM with the
     /// default encoding) is handled correctly.
     /// </remarks>
-    public bool TrackByteOffset { get; [Obsolete("Configure TrackByteOffset through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set; }
+    public bool TrackByteOffset { get => _trackByteOffset; [Obsolete("Configure TrackByteOffset through FixedWidthExtractorOptions<TRecord> passed to the constructor instead. This setter will be removed in a future release.")] set => _trackByteOffset = value; }
 
 
 
