@@ -175,6 +175,12 @@ public sealed class BinaryCodecTests
     [InlineData(256L, true, 4)]
     [InlineData(65413L, false, 4)]
     [InlineData(-1L, true, 8)]
+    [InlineData(127L, true, 1)]      // max signed, 1 byte
+    [InlineData(-128L, true, 1)]     // min signed, 1 byte
+    [InlineData(255L, false, 1)]     // max unsigned, 1 byte
+    [InlineData(0L, false, 1)]       // min unsigned
+    [InlineData(32767L, true, 2)]
+    [InlineData(-32768L, true, 2)]
     public void BinaryInteger_encode_round_trips(long value, bool signed, int byteLength)
     {
         var buffer = new byte[byteLength];
@@ -202,22 +208,6 @@ public sealed class BinaryCodecTests
     }
 
     // -------------------- range boundaries (mutation-hardening) --------------------
-
-    [Theory]
-    [InlineData(127L, true, 1)]      // max signed, 1 byte
-    [InlineData(-128L, true, 1)]     // min signed, 1 byte
-    [InlineData(255L, false, 1)]     // max unsigned, 1 byte
-    [InlineData(0L, false, 1)]       // min unsigned
-    [InlineData(32767L, true, 2)]
-    [InlineData(-32768L, true, 2)]
-    public void BinaryInteger_encode_exact_boundaries_round_trip(long value, bool signed, int byteLength)
-    {
-        var buffer = new byte[byteLength];
-        BinaryInteger.Encode(value, signed, buffer);
-
-        Assert.Equal(value, BinaryInteger.Decode(buffer, signed));
-    }
-
 
     [Fact]
     public void BinaryInteger_encode_8_byte_extremes_round_trip()
