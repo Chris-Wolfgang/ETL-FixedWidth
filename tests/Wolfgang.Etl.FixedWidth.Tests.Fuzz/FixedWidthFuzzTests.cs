@@ -66,20 +66,17 @@ public class FixedWidthFuzzTests
 
 
 
-    private static List<T> Drain<T>(IAsyncEnumerable<T> source)
+    private static List<T> Drain<T>(IAsyncEnumerable<T> source) =>
+        DrainAsync(source).GetAwaiter().GetResult();
+
+
+
+    private static async Task<List<T>> DrainAsync<T>(IAsyncEnumerable<T> source)
     {
         var results = new List<T>();
-        var enumerator = source.GetAsyncEnumerator(CancellationToken.None);
-        try
+        await foreach (var item in source.ConfigureAwait(false))
         {
-            while (enumerator.MoveNextAsync().AsTask().GetAwaiter().GetResult())
-            {
-                results.Add(enumerator.Current);
-            }
-        }
-        finally
-        {
-            enumerator.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            results.Add(item);
         }
 
         return results;

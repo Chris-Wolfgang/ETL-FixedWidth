@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -95,7 +96,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     public FixedWidthLoader
     (
         TextWriter writer,
-        ILogger<FixedWidthLoader<TRecord>>? logger = null
+        ILogger<FixedWidthLoader<TRecord>>? logger
     )
         : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null, options: null, encoding: null, timer: null, logger: logger)
     {
@@ -110,10 +111,11 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// <param name="options">The formatting configuration. <see langword="null"/> (the default) keeps every default. The writer already owns its encoding, so this is the base record without an <c>Encoding</c>.</param>
     /// <param name="logger">An optional logger.</param>
     /// <exception cref="ArgumentNullException"><paramref name="writer"/> is <see langword="null"/>.</exception>
+    [SuppressMessage("ApiDesign", "RS0026:Do not add multiple public overloads with optional parameters", Justification = "Shipped shape: the Stream overload keeps its optional options/logger for source compatibility until the constructor set is settled in the 2026-12-15 removal wave (#373 / #343).")]
     public FixedWidthLoader
     (
         TextWriter writer,
-        FixedWidthLoaderOptions? options = null,
+        FixedWidthLoaderOptions? options,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
         : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null,
@@ -480,7 +482,10 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
 
     private bool _isDryRun;
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets or sets a value indicating whether the run is a dry run that exercises the pipeline without
+    /// writing any output.
+    /// </summary>
     /// <remarks>
     /// When <see langword="true"/>, the loader enumerates the source and evaluates
     /// <see cref="Abstractions.LoaderBase{TDestination,TProgress}.SkipItemCount"/> /

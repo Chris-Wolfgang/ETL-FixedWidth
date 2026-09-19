@@ -64,7 +64,7 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
     public FixedWidthTransformer
     (
         Func<TSource, TDestination> transform,
-        ILogger<FixedWidthTransformer<TSource, TDestination>>? logger = null
+        ILogger<FixedWidthTransformer<TSource, TDestination>>? logger
     )
         : this(transform, options: null, logger)
     {
@@ -148,13 +148,10 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
 
 
     /// <inheritdoc/>
-    // Keep the descriptive `source` / `cancellationToken` names at the override site;
-    // the base class shortens them to `items` / `token` but the longer forms are the
-    // fleet-wide convention in this repo. S4456 also fires on the async-iterator
-    // pattern of "check args, then yield" — splitting the ArgumentNullException check
-    // into a separate non-iterator method would move the throw off the enumerator's
-    // MoveNextAsync path, breaking the "pre-yield throws surface at the call site"
-    // contract this override deliberately preserves.
+    // S927: the override keeps the descriptive parameter names (source, cancellationToken) that are the
+    // convention in this repo although the base class uses shorter ones. S4456: the argument check sits
+    // inside the async iterator on purpose, so the pre-yield throw surfaces at the call site rather than
+    // on first enumeration; hoisting it into a separate non-iterator method would break that contract.
 #pragma warning disable S927, S4456
     protected override async IAsyncEnumerable<TDestination> TransformWorkerAsync
     (

@@ -303,7 +303,7 @@ public static class FixedWidthConverter
         // non-null but real-world overrides return null; guard stays regardless of
         // what ReSharper's NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
         // infers.
-        // ReSharper disable once ConstantNullCoalescingCondition
+        // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
         return value.ToString() ?? string.Empty;
     }
 
