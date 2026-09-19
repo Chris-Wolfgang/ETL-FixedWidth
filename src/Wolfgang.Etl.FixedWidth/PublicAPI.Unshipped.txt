@@ -1,1 +1,12 @@
 #nullable enable
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(System.IO.TextReader! reader, Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions? options, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor!>? logger = null) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination>! transform, Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions? options, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>!>? logger = null) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions
+Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions.Equals(Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions? other) -> bool
+Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions.FixedWidthTransformerOptions() -> void
+override Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions.Equals(object? obj) -> bool
+override Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions.GetHashCode() -> int
+override Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions.ToString() -> string!
+override sealed Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions.Equals(Wolfgang.Etl.Abstractions.TransformerOptions? other) -> bool
+static Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions.operator !=(Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions? right) -> bool
+static Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions.operator ==(Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions? right) -> bool

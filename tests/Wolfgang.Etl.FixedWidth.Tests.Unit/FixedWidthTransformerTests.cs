@@ -102,11 +102,15 @@ public class FixedWidthTransformerTests
     [Fact]
     public async Task SkipItemCount_and_MaximumItemCount_are_honored()
     {
-        using var transformer = new FixedWidthTransformer<Src, Dst>(s => new Dst { Name = s.Name })
-        {
-            SkipItemCount = 1,
-            MaximumItemCount = 1,
-        };
+        using var transformer = new FixedWidthTransformer<Src, Dst>
+        (
+            s => new Dst { Name = s.Name },
+            new FixedWidthTransformerOptions
+            {
+                SkipItemCount = 1,
+                MaximumItemCount = 1,
+            }
+        );
 
         var results = await transformer.TransformAsync(ToAsync(Sources), CancellationToken.None).ToListAsync();
 

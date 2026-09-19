@@ -118,11 +118,15 @@ public sealed class FixedWidthBinaryExtractorTests
             Record("B", 2, Balance1234_56),
             Record("C", 3, Balance1234_56),
             Record("D", 4, Balance1234_56));
-        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data), options: null)
-        {
-            SkipItemCount = 1,
-            MaximumItemCount = 2,
-        };
+        using var extractor = new FixedWidthBinaryExtractor<Account>
+        (
+            new MemoryStream(data),
+            new FixedWidthBinaryExtractorOptions
+            {
+                SkipItemCount = 1,
+                MaximumItemCount = 2,
+            }
+        );
 
         var accounts = await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
 

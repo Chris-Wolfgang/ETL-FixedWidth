@@ -75,20 +75,22 @@ public class FixedWidthExtractorTests
 
 
     /// <inheritdoc/>
-    protected override FixedWidthExtractor<PersonRecord> CreateSut(int itemCount) =>
-        new(new StringReader(BuildPersonContent(itemCount)));
+    protected override FixedWidthExtractor<PersonRecord> CreateSut(int itemCount, int maximumItemCount, int skipItemCount, int reportingInterval) =>
+        new
+        (
+            new StringReader(BuildPersonContent(itemCount)),
+            new FixedWidthExtractorOptions<PersonRecord>
+            {
+                MaximumItemCount = maximumItemCount,
+                SkipItemCount = skipItemCount,
+                ReportingInterval = reportingInterval,
+            }
+        );
 
 
 
     /// <inheritdoc/>
     protected override IReadOnlyList<PersonRecord> CreateExpectedItems() => ExpectedItems;
-
-
-
-    /// <inheritdoc/>
-    protected override FixedWidthExtractor<PersonRecord> CreateSutWithTimer(
-        IProgressTimer timer) =>
-        new(new StringReader(BuildPersonContent(5)), timer);
 
 
 
@@ -525,8 +527,7 @@ public class FixedWidthExtractorTests
             ' ',
             23
         );
-        var extractor = CreateExtractor( allSpaces + "\n" + "John      Smith     042");
-        extractor.SkipItemCount = 1;
+        var extractor = CreateExtractor( allSpaces + "\n" + "John      Smith     042", new FixedWidthExtractorOptions<PersonRecord> { SkipItemCount = 1 });
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -557,8 +558,7 @@ public class FixedWidthExtractorTests
 
         var extractor = CreateExtractor( "\n" + // blank — invisible
                                          "John      Smith     042\n" +  // should be skipped (skip budget = 1)
-                                         "Jane      Doe       030", extractorOptions);
-        extractor.SkipItemCount = 1;
+                                         "Jane      Doe       030", extractorOptions with { SkipItemCount = 1 });
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -583,8 +583,7 @@ public class FixedWidthExtractorTests
 
         var extractor = CreateExtractor( "\n" + // blank — counts as skip #1
                                          "John      Smith     042\n" + // counts as skip #2
-                                         "Jane      Doe       030", extractorOptions);
-        extractor.SkipItemCount = 2;
+                                         "Jane      Doe       030", extractorOptions with { SkipItemCount = 2 });
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -613,8 +612,7 @@ public class FixedWidthExtractorTests
             BlankLineHandling = BlankLineHandling.ReturnDefault,
         };
 
-        var extractor = CreateExtractor( "John      Smith     042\n" + "\n" + "Jane      Doe       030", extractorOptions);
-        extractor.MaximumItemCount = 2;
+        var extractor = CreateExtractor( "John      Smith     042\n" + "\n" + "Jane      Doe       030", extractorOptions with { MaximumItemCount = 2 });
 
         var results = await extractor.ExtractAsync().ToListAsync();
 
@@ -1012,7 +1010,6 @@ public class FixedWidthExtractorTests
 
 
 
-
     [Fact]
     public async Task ExtractAsync_when_FixedWidthSkip_attributes_are_present_parses_the_correct_fields()
     {
@@ -1101,8 +1098,7 @@ public class FixedWidthExtractorTests
             BlankLineHandling = BlankLineHandling.ReturnDefault,
         };
 
-        var extractor = CreateExtractor("John      Smith     042\n\nJane      Doe       030", extractorOptions);
-        extractor.MaximumItemCount = 1;
+        var extractor = CreateExtractor("John      Smith     042\n\nJane      Doe       030", extractorOptions with { MaximumItemCount = 1 });
 
         var results = await extractor.ExtractAsync().ToListAsync();
 

@@ -19,8 +19,17 @@ public class FixedWidthTransformerContractTests
     >
 {
     /// <inheritdoc/>
-    protected override FixedWidthTransformer<PersonRecord, PersonRecord> CreateSut(int itemCount)
-        => new(record => record);
+    protected override FixedWidthTransformer<PersonRecord, PersonRecord> CreateSut(int itemCount, int maximumItemCount, int skipItemCount, int reportingInterval) =>
+        new
+        (
+            record => record,
+            new FixedWidthTransformerOptions
+            {
+                MaximumItemCount = maximumItemCount,
+                SkipItemCount = skipItemCount,
+                ReportingInterval = reportingInterval,
+            }
+        );
 
 
 
@@ -36,7 +45,4 @@ public class FixedWidthTransformerContractTests
 
 
 
-    /// <inheritdoc/>
-    protected override FixedWidthTransformer<PersonRecord, PersonRecord> CreateSutWithTimer(IProgressTimer timer)
-        => new(record => record, timer);
 }

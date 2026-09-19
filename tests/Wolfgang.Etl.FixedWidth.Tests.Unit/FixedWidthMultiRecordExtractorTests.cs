@@ -52,8 +52,8 @@ public sealed class FixedWidthMultiRecordExtractorTests
         "T00000002\n";
 
 
-    private static FixedWidthMultiRecordExtractor NewExtractor(string content)
-        => new FixedWidthMultiRecordExtractor(new StringReader(content))
+    private static FixedWidthMultiRecordExtractor NewExtractor(string content, FixedWidthMultiRecordExtractorOptions? options = null)
+        => new FixedWidthMultiRecordExtractor(new StringReader(content), options)
             .When(l => l[0] == 'H', typeof(HeaderRecord))
             .When(l => l[0] == 'D', typeof(DetailRecord))
             .When(l => l[0] == 'T', typeof(TrailerRecord));
@@ -264,9 +264,11 @@ public sealed class FixedWidthMultiRecordExtractorTests
     [Fact]
     public async Task Skip_and_Maximum_item_counts_apply_across_record_types()
     {
-        using var extractor = NewExtractor(SampleFile);
-        extractor.SkipItemCount = 1;      // skip the header
-        extractor.MaximumItemCount = 2;   // then take two
+        using var extractor = NewExtractor(SampleFile, new FixedWidthMultiRecordExtractorOptions
+        {
+            SkipItemCount = 1,      // skip the header
+            MaximumItemCount = 2,   // then take two
+        });
 
         var records = await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
 

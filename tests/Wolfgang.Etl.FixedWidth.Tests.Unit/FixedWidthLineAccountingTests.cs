@@ -49,10 +49,7 @@ public class FixedWidthLineAccountingTests
 
 
     private static FixedWidthExtractor<PersonRecord> CreateExtractor() =>
-        new(new StringReader(Input), Options)
-        {
-            SkipItemCount = 1,
-        };
+        new(new StringReader(Input), Options with { SkipItemCount = 1 });
 
 
 
