@@ -112,11 +112,9 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
         }
         else if (_stream is not null)
         {
-            // The loader wraps the caller's stream with leaveOpen:true and flushes it during the run;
-            // dispose the loader afterward to release its internal writer. The stream stays open.
-#pragma warning disable S125 // Sonar mis-detects this behaviour comment as commented-out code
+            // The loader wraps the caller's stream without taking ownership and flushes it during the run.
+            // Disposing the loader afterwards releases its internal writer; the caller's stream itself is left open.
             loader = new FixedWidthLoader<T>(_stream, new FixedWidthLoaderStreamOptions(_options, _encoding));
-#pragma warning restore S125
             owned = loader;
         }
         else
