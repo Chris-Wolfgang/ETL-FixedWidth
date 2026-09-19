@@ -12,6 +12,7 @@ namespace Wolfgang.Etl.FixedWidth.Benchmarks;
 /// (<c>/dev/shm</c> on the Linux runners) the scratch files go there: same stream code path, no disk
 /// latency. Anywhere else, the system temp directory is used as before.
 /// </remarks>
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S5443:Operating systems should not be used as trusted temp locations", Justification = "Benchmark scratch data only: generated, non-sensitive, deleted per run; the tmpfs/temp choice is the point of this helper.")]
 internal static class BenchmarkScratch
 {
     private const string LinuxTmpfs = "/dev/shm";

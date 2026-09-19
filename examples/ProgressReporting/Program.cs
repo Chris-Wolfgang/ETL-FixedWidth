@@ -105,11 +105,9 @@ public static class Program
         // -----------------------------------------------------------------
 
         var reader = new StringReader(data);
-        var extractor = new FixedWidthExtractor<DataRecord>(reader);
-
-        // Set the reporting interval BEFORE calling ExtractAsync.
-        // The timer is created internally when ExtractAsync starts.
-        extractor.ReportingInterval = 50;
+        // The reporting interval is part of the options record: the timer is created from it when
+        // ExtractAsync starts.
+        var extractor = new FixedWidthExtractor<DataRecord>(reader, new FixedWidthExtractorOptions<DataRecord> { ReportingInterval = 50 });
 
         // The Progress<T> callback fires each time the timer elapses.
         // In a real application, you might update a progress bar or log
