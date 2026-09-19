@@ -119,18 +119,22 @@ public static class Program
             // the reader's position is past line 5. We cannot rewind a StringReader,
             // so we must create a new one from the original string each time.
             var pageReader = new StringReader(allData);
-            var extractor = new FixedWidthExtractor<ItemRecord>(pageReader);
-
             // SkipItemCount: skip the first N data items. For page 1, skip 0.
             // For page 2, skip 5 (the first page's worth). For page 3, skip 10.
             // Skipped items are not yielded but ARE counted in the report's
             // CurrentSkippedItemCount.
-            extractor.SkipItemCount = skip;
-
             // MaximumItemCount: stop after yielding this many items. Once 5
             // records have been yielded, the extractor stops reading even if
             // more data remains in the reader.
-            extractor.MaximumItemCount = pageSize;
+            var extractor = new FixedWidthExtractor<ItemRecord>
+            (
+                pageReader,
+                new FixedWidthExtractorOptions<ItemRecord>
+                {
+                    SkipItemCount = skip,
+                    MaximumItemCount = pageSize,
+                }
+            );
 
             // Extract and print the page's records.
             await foreach (var item in extractor.ExtractAsync(CancellationToken.None))

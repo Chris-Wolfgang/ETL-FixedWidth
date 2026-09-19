@@ -28,3 +28,8 @@
 # active; per-call-site false positives get an inline `#pragma` or
 # [SuppressMessage] with the reason.
 resharper_check_namespace_highlighting = none
+
+# S1133 ("remove this deprecated code someday") — every [Obsolete] member in this
+# project is a deliberate deprecation marker for the dated removal wave (#373,
+# not before 2026-12-15). The rule is wrong for the whole project until then.
+dotnet_diagnostic.S1133.severity = none
