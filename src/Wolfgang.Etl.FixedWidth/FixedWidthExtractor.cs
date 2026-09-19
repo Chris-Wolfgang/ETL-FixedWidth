@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -105,7 +106,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     public FixedWidthExtractor
     (
         TextReader reader,
-        ILogger<FixedWidthExtractor<TRecord>>? logger = null
+        ILogger<FixedWidthExtractor<TRecord>>? logger
     )
         : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null, encoding: null, timer: null, logger: logger)
     {
@@ -120,10 +121,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <param name="options">The parsing configuration. <see langword="null"/> (the default) keeps every default. The reader has already decoded its bytes, so this is the base record without an <c>Encoding</c>.</param>
     /// <param name="logger">An optional logger.</param>
     /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <see langword="null"/>.</exception>
+    [SuppressMessage("ApiDesign", "RS0026:Do not add multiple public overloads with optional parameters", Justification = "Shipped shape: the Stream overload keeps its optional options/logger for source compatibility until the constructor set is settled in the 2026-12-15 removal wave (#373 / #343).")]
     public FixedWidthExtractor
     (
         TextReader reader,
-        FixedWidthExtractorOptions<TRecord>? options = null,
+        FixedWidthExtractorOptions<TRecord>? options,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
         : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null,
