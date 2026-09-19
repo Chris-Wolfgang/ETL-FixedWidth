@@ -482,7 +482,10 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
 
     private bool _isDryRun;
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets or sets a value indicating whether the run is a dry run that exercises the pipeline without
+    /// writing any output.
+    /// </summary>
     /// <remarks>
     /// When <see langword="true"/>, the loader enumerates the source and evaluates
     /// <see cref="Abstractions.LoaderBase{TDestination,TProgress}.SkipItemCount"/> /
