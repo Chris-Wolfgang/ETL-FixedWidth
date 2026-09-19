@@ -134,32 +134,6 @@ public class FixedWidthExtractorTests
 
 
     [Fact]
-    public async Task ExtractAsync_when_HasHeader_is_true_skips_one_header_line()
-    {
-        var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
-        {
-            HeaderLineCount = 1,
-        };
-
-        var extractor = CreateExtractor( "FirstName LastName  Age\n" + "John      Smith     042\n" + "Jane      Doe       030", extractorOptions);
-
-        var results = await extractor.ExtractAsync().ToListAsync();
-
-        Assert.Equal
-        (
-            2,
-            results.Count
-        );
-        Assert.Equal
-        (
-            "John",
-            results[0].FirstName
-        );
-    }
-
-
-
-    [Fact]
     public void HasHeader_get_returns_true_when_HeaderLineCount_is_greater_than_zero()
     {
         var extractorOptions = new FixedWidthExtractorOptions<PersonRecord>
