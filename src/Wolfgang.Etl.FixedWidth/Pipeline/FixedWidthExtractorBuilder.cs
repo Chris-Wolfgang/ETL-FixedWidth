@@ -179,6 +179,7 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
     [Flags]
     private enum Touched
     {
+        // ReSharper disable once UnusedMember.Local -- a [Flags] enum declares its zero value (CA1008); it is the default, never named
         None = 0,
         HeaderLineCount = 1 << 0,
         MalformedLineHandling = 1 << 1,
