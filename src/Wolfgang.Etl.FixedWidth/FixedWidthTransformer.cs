@@ -64,7 +64,7 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
     public FixedWidthTransformer
     (
         Func<TSource, TDestination> transform,
-        ILogger<FixedWidthTransformer<TSource, TDestination>>? logger = null
+        ILogger<FixedWidthTransformer<TSource, TDestination>>? logger
     )
         : this(transform, options: null, logger)
     {

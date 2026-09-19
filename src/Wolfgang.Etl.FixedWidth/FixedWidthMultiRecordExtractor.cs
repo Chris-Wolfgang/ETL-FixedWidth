@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -119,6 +120,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// <param name="options">The stage configuration; <see langword="null"/> keeps the defaults.</param>
     /// <param name="logger">The logger; <see langword="null"/> logs nothing.</param>
     /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <see langword="null"/>.</exception>
+    [SuppressMessage("ApiDesign", "RS0026:Do not add multiple public overloads with optional parameters", Justification = "Shipped shape; unlike the single-record stages there is no hidden (TextReader) overload to fall back on, so dropping either default is a source break. The constructor set is settled in the 2026-12-15 removal wave (#373 / #343).")]
     public FixedWidthMultiRecordExtractor(TextReader reader, FixedWidthMultiRecordExtractorOptions? options, ILogger<FixedWidthMultiRecordExtractor>? logger = null)
         : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null,
                options: options, timer: null, logger: logger)
