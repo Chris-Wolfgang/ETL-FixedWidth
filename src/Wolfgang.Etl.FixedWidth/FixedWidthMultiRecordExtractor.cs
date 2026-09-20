@@ -217,7 +217,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
         IProgressTimer? timer,
         ILogger<FixedWidthMultiRecordExtractor>? logger
     )
-        : base(options)
+        : base(options?.ToExtractorOptions())
     {
         // Defensive invariant guard. Every caller-facing constructor null-checks its own source
         // before delegating here, so this cannot fire today — it exists so that a constructor added

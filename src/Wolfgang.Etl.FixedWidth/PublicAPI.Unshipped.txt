@@ -20,3 +20,27 @@ Wolfgang.Etl.FixedWidth.FixedWidthExtractor<TRecord>.FixedWidthExtractor(System.
 Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>.FixedWidthLoader(System.IO.TextWriter! writer, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthLoader<TRecord>!>? logger) -> void
 *REMOVED*Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination>! transform, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>!>? logger = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination>! transform, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>!>? logger) -> void
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ErrorPolicy.get -> System.Func<Wolfgang.Etl.Abstractions.ItemErrorContext!, Wolfgang.Etl.Abstractions.ItemErrorAction>!
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ErrorPolicy.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.MaximumItemCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.MaximumItemCount.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ReportingInterval.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ReportingInterval.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.SkipItemCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.SkipItemCount.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ErrorPolicy.get -> System.Func<Wolfgang.Etl.Abstractions.ItemErrorContext!, Wolfgang.Etl.Abstractions.ItemErrorAction>!
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ErrorPolicy.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.MaximumItemCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.MaximumItemCount.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ReportingInterval.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ReportingInterval.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.SkipItemCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.SkipItemCount.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ErrorPolicy.get -> System.Func<Wolfgang.Etl.Abstractions.ItemErrorContext!, Wolfgang.Etl.Abstractions.ItemErrorAction>!
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ErrorPolicy.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.MaximumItemCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.MaximumItemCount.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ReportingInterval.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ReportingInterval.init -> void
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.SkipItemCount.get -> int
+Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.SkipItemCount.init -> void
