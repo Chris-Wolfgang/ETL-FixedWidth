@@ -89,7 +89,7 @@ public sealed class FixedWidthBinaryExtractor<TRecord> : ExtractorBase<TRecord, 
         FixedWidthBinaryExtractorOptions? options = null,
         ILogger<FixedWidthBinaryExtractor<TRecord>>? logger = null
     )
-        : base(options)
+        : base(options?.ToExtractorOptions())
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         if (!stream.CanRead)

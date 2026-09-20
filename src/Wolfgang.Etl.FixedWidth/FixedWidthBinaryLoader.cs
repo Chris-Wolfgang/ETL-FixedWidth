@@ -77,7 +77,7 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
         FixedWidthBinaryLoaderOptions? options = null,
         ILogger<FixedWidthBinaryLoader<TRecord>>? logger = null
     )
-        : base(options)
+        : base(options?.ToLoaderOptions())
     {
         _stream = stream ?? throw new ArgumentNullException(nameof(stream));
         if (!stream.CanWrite)
