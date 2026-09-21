@@ -91,14 +91,79 @@ function Test-Ancestor
 
 
 
+function Invoke-GhJson
+{
+    # Runs a gh command that prints JSON and parses it. stdout (JSON) and stderr (gh
+    # diagnostics) are kept apart: a warning on stderr would otherwise corrupt the JSON even
+    # when the command succeeded. Returns @{ Ok; Data; Error }.
+    param([string[]]$Arguments)
+
+    $errFile = [System.IO.Path]::GetTempFileName()
+    try
+    {
+        $raw = & gh @Arguments 2> $errFile
+        $exit = $LASTEXITCODE
+        $err = Get-Content $errFile -Raw -ErrorAction SilentlyContinue
+    }
+    finally { Remove-Item $errFile -Force -ErrorAction SilentlyContinue }
+    if ($exit -ne 0) { return @{ Ok = $false; Data = $null; Error = $err } }
+    return @{ Ok = $true; Data = @(($raw | Out-String) | ConvertFrom-Json); Error = $null }
+}
+
+
+
+function Show-NextPrs
+{
+    # The next few PRs to merge, in merge order, so the hand-off after a restack is a list of
+    # links rather than a branch name. Order: PRs whose base is $Base, lowest number first; each
+    # one is followed by whatever is stacked on it (depth-first), so a chain reads bottom to top.
+    param([string]$Base, [int]$Count = 5)
+
+    $res = Invoke-GhJson @('pr', 'list', '--state', 'open', '--limit', '500', '--json', 'number,title,url,headRefName,baseRefName,isDraft,isCrossRepository')
+    if (-not $res.Ok)
+    {
+        Write-Warning "Show-NextPrs: gh pr list failed, skipping the hand-off: $($res.Error)"
+        return
+    }
+    if (-not $res.Data) { return }
+    $prs = @($res.Data | Sort-Object number)
+    $ordered = New-Object System.Collections.Generic.List[object]
+    $visit = $null
+    $visit = {
+        param($pr)
+        if ($ordered.Contains($pr)) { return }
+        $ordered.Add($pr)
+        # A fork PR's headRefName is not unique in this repo, so only a
+        # same-repository head can be a parent branch another PR stacks on.
+        foreach ($child in ($prs | Where-Object { -not $_.isCrossRepository -and $_.baseRefName -eq $pr.headRefName })) { & $visit $child }
+    }
+    foreach ($root in ($prs | Where-Object { $_.baseRefName -eq $Base })) { & $visit $root }
+    # anything whose base is neither $Base nor another open PR's head (e.g. targets main) goes last
+    foreach ($pr in $prs) { & $visit $pr }
+    if ($ordered.Count -eq 0) { return }
+
+    Write-Host ''
+    Write-Host "Next $([Math]::Min($Count, $ordered.Count)) PR(s) in merge order:"
+    $i = 0
+    foreach ($pr in $ordered)
+    {
+        if ($i -ge $Count) { break }
+        $i++
+        $draft = if ($pr.isDraft) { ' (draft)' } else { '' }
+        Write-Host ("  {0}. [#{1} - {2}]({3}) -> {4}{5}" -f $i, $pr.number, $pr.title, $pr.url, $pr.baseRefName, $draft)
+    }
+}
+
+
+
 function Find-MergedTip
 {
     # The most recently merged PR whose head commit is an ancestor of the bottom branch.
     param([string]$Bottom)
 
-    $raw = & gh pr list --state merged --base $Base --limit 30 --json number,headRefOid,headRefName,mergedAt 2>&1
-    if ($LASTEXITCODE -ne 0) { throw "gh pr list failed (pass -MergedTip instead): $raw" }
-    $prs = @(($raw | Out-String) | ConvertFrom-Json) | Sort-Object mergedAt -Descending
+    $res = Invoke-GhJson @('pr', 'list', '--state', 'merged', '--base', $Base, '--limit', '30', '--json', 'number,headRefOid,headRefName,mergedAt')
+    if (-not $res.Ok) { throw "gh pr list failed (pass -MergedTip instead): $($res.Error)" }
+    $prs = $res.Data | Sort-Object mergedAt -Descending
     foreach ($pr in $prs)
     {
         if (Test-Ancestor $pr.headRefOid $Bottom)
@@ -116,9 +181,9 @@ function Set-PrBase
 {
     param([string]$Branch, [string]$ExpectedBase)
 
-    $raw = & gh pr list --head $Branch --state open --json number,baseRefName 2>&1
-    if ($LASTEXITCODE -ne 0) { Write-Warning "could not read PR for ${Branch}: $raw"; return }
-    $pr = @(($raw | Out-String) | ConvertFrom-Json) | Select-Object -First 1
+    $res = Invoke-GhJson @('pr', 'list', '--head', $Branch, '--state', 'open', '--json', 'number,baseRefName')
+    if (-not $res.Ok) { Write-Warning "could not read PR for ${Branch}: $($res.Error)"; return }
+    $pr = $res.Data | Select-Object -First 1
     if (-not $pr) { Write-Host "  no open PR for $Branch"; return }
     if ($pr.baseRefName -eq $ExpectedBase) { Write-Host "  PR #$($pr.number) base is $ExpectedBase"; return }
     if ($DryRun) { Write-Host "  DRY-RUN would retarget PR #$($pr.number) from $($pr.baseRefName) to $ExpectedBase"; return }
@@ -160,6 +225,13 @@ try
     {
         Write-Host ''
         Write-Host "== $b"
+        # The rebase works from the remote tip. Refuse if the local branch has commits the
+        # remote does not: `checkout -B` would silently throw them away.
+        $localTip = & git rev-parse --verify --quiet "refs/heads/$b" 2>$null
+        if ($localTip -and -not (Test-Ancestor $localTip $oldTip[$b]))
+        {
+            throw "local branch $b has commits that are not on $Remote/$b; push or drop them first"
+        }
         Invoke-Git @('checkout', '--quiet', '-B', $b, $oldTip[$b]) | Out-Null
         $out = & git rebase --onto $onto $cut $b 2>&1
         if ($LASTEXITCODE -ne 0)
@@ -188,3 +260,4 @@ finally
 }
 Write-Host ''
 Write-Host "restacked $($Stack.Count) branch(es); merge $($Stack[0]) next, then run again with -Stack $((@($Stack) | Select-Object -Skip 1) -join ',')"
+Show-NextPrs -Base $Base
