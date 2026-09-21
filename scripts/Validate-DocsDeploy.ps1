@@ -29,6 +29,29 @@ $script:Fail = 0
 
 function Write-Pass { param([string]$Message) Write-Host "  ✅ $Message"; $script:Pass++ }
 function Write-Fail { param([string]$Message) Write-Host "  ❌ $Message"; $script:Fail++ }
+
+# realpath equivalent: walk the path from the root and, whenever a segment is a
+# symlink/junction, continue from its resolved target - so a link anywhere in
+# the chain cannot smuggle a path outside the tree past a textual prefix check.
+# Segments that do not exist yet are appended textually (the caller checks
+# existence separately).
+function Resolve-RealPath {
+    param([string]$Path)
+    $full = [System.IO.Path]::GetFullPath($Path)
+    $root = [System.IO.Path]::GetPathRoot($full)
+    $current = $root
+    foreach ($segment in $full.Substring($root.Length) -split '[\\/]' | Where-Object { $_ }) {
+        $current = Join-Path $current $segment
+        if (-not (Test-Path -LiteralPath $current)) { continue }
+        $item = Get-Item -LiteralPath $current -Force
+        if ($item.LinkType) {
+            $target = $item.ResolveLinkTarget($true)
+            if (-not $target) { return '<unresolvable link>' }
+            $current = $target.FullName
+        }
+    }
+    return $current
+}
 function Write-Warn { param([string]$Message) Write-Host "  ⚠️  $Message" }
 function Write-Skip { param([string]$Message) Write-Host "  ⏭️  $Message" }
 
@@ -224,15 +247,23 @@ try {
             }
             $folder = Join-Path $workDir $folderName
             # Belt-and-braces: the resolved full path must still be under the root.
-            $realFolder = [System.IO.Path]::GetFullPath($folder)
-            if (-not $realFolder.StartsWith($realRoot + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
+            # GetFullPath only normalises text; a symlink/junction committed to
+            # gh-pages - as the final segment OR anywhere above it - could still
+            # point outside the worktree, so canonicalise segment by segment
+            # before comparing (the .sh used realpath for this).
+            $realFolder = Resolve-RealPath $folder
+            # Match the comparison to the filesystem, not the OS: Windows is case-insensitive,
+            # Linux is not, macOS is either (APFS/HFS+ default insensitive). Probe the worktree
+            # root itself - if its upper-cased path resolves, the volume ignores case.
+            $cmp = if (Test-Path -LiteralPath $realRoot.ToUpperInvariant()) { [System.StringComparison]::OrdinalIgnoreCase } else { [System.StringComparison]::Ordinal }
+            if (-not $realFolder.StartsWith($realRoot + [System.IO.Path]::DirectorySeparatorChar, $cmp)) {
                 $missing += "$ver  (resolved path '$realFolder' is outside gh-pages root - rejected)"
                 continue
             }
-            if (-not (Test-Path $folder -PathType Container)) {
+            if (-not (Test-Path -LiteralPath $folder -PathType Container)) {
                 $missing += "$ver  (folder '$folderName/' not found)"
             }
-            elseif (-not (Test-Path (Join-Path $folder 'index.html') -PathType Leaf)) {
+            elseif (-not (Test-Path -LiteralPath (Join-Path $folder 'index.html') -PathType Leaf)) {
                 $missing += "$ver  (index.html missing in '$folderName/')"
             }
         }
@@ -254,11 +285,13 @@ try {
 
     # 'public/' is a DocFX build artifact that should never appear at the
     # gh-pages root; its presence means a previous deploy did not clean up.
+    # A hard failure (the .sh this replaced only warned): a botched deploy
+    # must not validate as good.
     $stalePatterns = @('public')
     $foundStale = $false
     foreach ($p in $stalePatterns) {
         if (Test-Path (Join-Path $workDir $p)) {
-            Write-Warn "Potentially stale artifact found at root: '$p'"
+            Write-Fail "Stale DocFX artifact at the gh-pages root: '$p' - a previous deploy did not clean up"
             $foundStale = $true
         }
     }
