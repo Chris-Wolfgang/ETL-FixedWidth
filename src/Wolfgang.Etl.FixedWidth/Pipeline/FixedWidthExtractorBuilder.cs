@@ -48,6 +48,7 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
     }
 
 
+
     internal static IFixedWidthExtractorBuilder<T> FromPath(string path)
         => new FixedWidthExtractorBuilder<T>(path, stream: null, reader: null, existing: null);
 
@@ -77,6 +78,7 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
     }
 
 
+
     public IFixedWidthExtractorBuilder<T> HeaderLineCount(int count) => Set(o => o with { HeaderLineCount = count }, Touched.HeaderLineCount);
 
 
@@ -100,6 +102,7 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
     }
 
 
+
     public IFixedWidthExtractorBuilder<T> RecordValidator(Func<T, ValidationResult> validator)
     {
         if (validator is null)
@@ -111,6 +114,7 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
     }
 
 
+
     public IFixedWidthExtractorBuilder<T> ValueParser(FixedWidthValueParser parser)
     {
         if (parser is null)
@@ -120,6 +124,7 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
 
         return Set(o => o with { ValueParser = parser }, Touched.ValueParser);
     }
+
 
 
     public IFixedWidthExtractorBuilder<T> FieldSeparator(char? separator) => Set(o => o with { FieldSeparator = separator }, Touched.FieldSeparator);
@@ -192,6 +197,7 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
     }
 
 
+
     private void ThrowIfMaterialized()
     {
         if (_pipeline is not null)
@@ -204,6 +210,7 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
     }
 
 
+
     private IEtlPipeline<T> Pipeline()
     {
         if (_pipeline is null)
@@ -214,6 +221,7 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
 
         return _pipeline;
     }
+
 
 
     private FixedWidthExtractor<T> BuildExtractor(out object?[] ownedResources)

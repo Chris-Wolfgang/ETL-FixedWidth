@@ -688,9 +688,9 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// base per-item error policy (<see cref="OnItemError"/>), then either skips (returns
     /// <see langword="false"/>) or re-throws, per <see cref="MalformedLineHandling"/>.
     /// </summary>
-    private bool TryParseLine(string line, Rule rule, out object record)
+    private bool TryParseLine(string line, Rule rule, [MaybeNullWhen(false)] out object record)
     {
-        record = null!;
+        record = null;
         try
         {
             record = FixedWidthLineParser.ParseLine<object>

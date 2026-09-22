@@ -173,6 +173,7 @@ public sealed class FixedWidthSchemaBuilder<T>
     }
 
 
+
     private static PropertyInfo ResolveProperty<TProperty>(Expression<Func<T, TProperty>> selector)
     {
         var body = selector.Body;
@@ -200,6 +201,7 @@ public sealed class FixedWidthSchemaBuilder<T>
             nameof(selector)
         );
     }
+
 
 
     private sealed class Entry

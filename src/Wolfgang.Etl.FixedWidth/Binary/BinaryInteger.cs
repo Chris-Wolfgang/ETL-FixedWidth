@@ -127,6 +127,7 @@ internal static class BinaryInteger
     }
 
 
+
     private static bool FitsInField(long value, int byteLength, bool signed)
     {
         if (byteLength >= 8)
