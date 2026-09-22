@@ -242,13 +242,19 @@ public static class FixedWidthConverter
     /// </code>
     /// </example>
     public static readonly FixedWidthValueParser DefaultParser =
-        (text, context) => ParseValue
-        (
-            text,
-            context.PropertyType,
-            context.Format,
-            numberStyles: context.NumberStyles
-        );
+        (text, context) =>
+        {
+            // An empty nullable field legitimately parses to null. The delegate is still
+            // declared as returning non-null `object` for source compatibility; #508
+            // re-annotates it as `object?` in 0.14.0 and drops this forgiveness.
+            return ParseValue
+            (
+                text,
+                context.PropertyType,
+                context.Format,
+                numberStyles: context.NumberStyles
+            )!;
+        };
 
 
 
@@ -309,7 +315,7 @@ public static class FixedWidthConverter
 
 
 
-    internal static object ParseValue
+    internal static object? ParseValue
     (
         ReadOnlyMemory<char> text,
         Type targetType,
@@ -324,7 +330,7 @@ public static class FixedWidthConverter
         {
             if (span.IsEmpty)
             {
-                return null!;
+                return null;
             }
             return ParseValue
             (
@@ -345,7 +351,7 @@ public static class FixedWidthConverter
         {
             return targetType.IsValueType
                 ? Activator.CreateInstance(targetType)!
-                : null!;
+                : null;
         }
 
         if (targetType == typeof(DateTime) || targetType == typeof(DateTimeOffset) || targetType == typeof(TimeSpan))

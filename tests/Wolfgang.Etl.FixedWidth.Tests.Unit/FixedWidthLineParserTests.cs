@@ -700,7 +700,7 @@ public class FixedWidthLineParserTests
                 context.PropertyType,
                 context.Format,
                 null
-            )
+            )!
         );
 
         Assert.Equal("John", record.FirstName);
@@ -985,7 +985,7 @@ public class FixedWidthConverterTests
             "20260101T1200".AsMemory(),
             typeof(DateTimeOffset),
             "yyyyMMddTHHmm"
-        );
+        )!;
 
         Assert.Equal
         (
@@ -1173,7 +1173,7 @@ public class FixedWidthConverterTests
         var result = FixedWidthConverter.ParseValue(text.AsMemory(), targetType, format: null);
 
         Assert.Equal(expected, result);
-        Assert.Equal(targetType, result.GetType());
+        Assert.Equal(targetType, result!.GetType());
     }
 
 
@@ -1194,7 +1194,7 @@ public class FixedWidthConverterTests
     {
         var result = FixedWidthConverter.ParseValue("3.14159".AsMemory(), typeof(double), format: null);
 
-        Assert.Equal(3.14159, (double)result, precision: 5);
+        Assert.Equal(3.14159, (double)result!, precision: 5);
     }
 
 
@@ -1204,7 +1204,7 @@ public class FixedWidthConverterTests
     {
         var result = FixedWidthConverter.ParseValue("2.5".AsMemory(), typeof(float), format: null);
 
-        Assert.Equal(2.5f, (float)result);
+        Assert.Equal(2.5f, (float)result!);
     }
 
 
