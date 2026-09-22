@@ -106,7 +106,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     public FixedWidthExtractor
     (
         TextReader reader,
-        ILogger<FixedWidthExtractor<TRecord>>? logger
+        ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
         : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null, encoding: null, timer: null, logger: logger)
     {
@@ -125,7 +125,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     public FixedWidthExtractor
     (
         TextReader reader,
-        FixedWidthExtractorOptions<TRecord>? options,
+        FixedWidthExtractorOptions<TRecord>? options = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
         : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null,

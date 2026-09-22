@@ -96,7 +96,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     public FixedWidthLoader
     (
         TextWriter writer,
-        ILogger<FixedWidthLoader<TRecord>>? logger
+        ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
         : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null, options: null, encoding: null, timer: null, logger: logger)
     {
@@ -115,7 +115,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     public FixedWidthLoader
     (
         TextWriter writer,
-        FixedWidthLoaderOptions? options,
+        FixedWidthLoaderOptions? options = null,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
         : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null,
