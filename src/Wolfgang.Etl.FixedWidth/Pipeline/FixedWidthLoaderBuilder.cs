@@ -42,6 +42,7 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
     }
 
 
+
     internal static IFixedWidthLoaderBuilder<T> FromPath(IEtlPipeline<T> pipeline, string path)
         => new FixedWidthLoaderBuilder<T>(pipeline, path, stream: null, writer: null);
 
@@ -66,6 +67,7 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
     }
 
 
+
     public IFixedWidthLoaderBuilder<T> WriteHeader(bool writeHeader) => Set(o => o with { WriteHeader = writeHeader });
 
 
@@ -80,6 +82,7 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
     }
 
 
+
     public IFixedWidthLoaderBuilder<T> HeaderConverter(Func<string, FieldContext, string> converter)
     {
         if (converter is null)
@@ -89,6 +92,7 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
 
         return Set(o => o with { HeaderConverter = converter });
     }
+
 
 
     public IFixedWidthLoaderBuilder<T> FieldSeparator(char? separator) => Set(o => o with { FieldSeparator = separator });
@@ -135,6 +139,7 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
 
         return sink.RunAsync(progress, token);
     }
+
 
 
     private IFixedWidthLoaderBuilder<T> Set(Func<FixedWidthLoaderOptions, FixedWidthLoaderOptions> update)

@@ -27,6 +27,8 @@ internal sealed class BinaryFieldDescriptor
         TypeConverter = TypeDescriptor.GetConverter(PropertyType);
     }
 
+
+
     internal PropertyInfo Property { get; }
 
     internal FixedWidthBinaryFieldAttribute Attribute { get; }
@@ -86,7 +88,7 @@ internal sealed class BinaryFieldDescriptor
         switch (Attribute.Type)
         {
             case BinaryFieldType.Text:
-                var text = value?.ToString() ?? string.Empty;
+                var text = Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
                 if (text.Length > length)
                 {
                     throw new FieldOverflowException($"Value '{text}' is {text.Length} characters, longer than the {length}-byte field '{Property.Name}'.", Property.Name, length, text.Length);
@@ -146,6 +148,7 @@ internal sealed class BinaryFieldDescriptor
 
         return Convert.ChangeType(value, UnderlyingType, CultureInfo.InvariantCulture);
     }
+
 
 
     private static bool IsIntegralType(Type type)

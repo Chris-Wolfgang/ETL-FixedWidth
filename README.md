@@ -341,7 +341,7 @@ See the [MultiRecordTrailer](examples/MultiRecordTrailer) example for a runnable
 
 ### Composing an ETL pipeline
 
-Rather than wiring an extractor, transformer, and loader together by hand, the whole extract → transform → load flow can be expressed as one fluent chain on the generic `EtlPipeline` (from `Wolfgang.Etl.Abstractions` 0.16.0). `FixedWidthExtractor<T>` source factories hang off `EtlPipeline.Create()` and `FixedWidthLoader<T>` sink terminators hang off the pipeline, with the extractor/loader configuration exposed as inline setters:
+Rather than wiring an extractor, transformer, and loader together by hand, the whole extract → transform → load flow can be expressed as one fluent chain on the generic `EtlPipeline` (from `Wolfgang.Etl.Abstractions` 0.16.0 and later). `FixedWidthExtractor<T>` source factories hang off `EtlPipeline.Create()` and `FixedWidthLoader<T>` sink terminators hang off the pipeline, with the extractor/loader configuration exposed as inline setters:
 
 ```csharp
 using Wolfgang.Etl.Abstractions;
@@ -423,7 +423,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 | **Binary / mainframe** | `FixedWidthBinaryExtractor<T>` / `FixedWidthBinaryLoader<T>` read/write fixed-length binary records with COBOL `COMP` / `COMP-3` fields via `[FixedWidthBinaryField]` |
 | **Format transformation** | `FixedWidthTransformer<TSource, TDestination>` projects one layout to another in a single streaming pass, with optional `ByMatchingProperties()` auto-mapping |
 | **Multi-record-type files** | `FixedWidthMultiRecordExtractor` routes each line to a different POCO by a discriminator predicate (`.When(…)` / `.Otherwise(…)`), for header/detail/trailer batch files |
-| **Pipeline composition** | `EtlPipeline.Create().FixedWidthExtractor<T>(…).FixedWidthLoader<T>(…).RunAsync()` — fluent source factories and sink terminators over the generic `EtlPipeline` (requires `Wolfgang.Etl.Abstractions` 0.16.0) |
+| **Pipeline composition** | `EtlPipeline.Create().FixedWidthExtractor<T>(…).FixedWidthLoader<T>(…).RunAsync()` — fluent source factories and sink terminators over the generic `EtlPipeline` (requires `Wolfgang.Etl.Abstractions` 0.16.0 and later) |
 | **Metrics** | Zero-config `System.Diagnostics.Metrics` instruments (throughput, skips, duration) from the `Wolfgang.Etl.FixedWidth` meter — OpenTelemetry / Prometheus / any `MeterListener` |
 | **Multi-TFM support** | net462, net481, netstandard2.0, net5.0, net6.0, net7.0, net8.0, net10.0 |
 

@@ -142,7 +142,9 @@ public class FixedWidthExtractorStreamCtorTests
         var extractor = new FixedWidthExtractor<PersonRecord>(stream);
 
         extractor.Dispose();
-        extractor.Dispose();
+        var second = Record.Exception(() => extractor.Dispose());
+
+        Assert.Null(second);
     }
 }
 
