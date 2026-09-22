@@ -170,9 +170,14 @@ jobs:
         # job by itself.
         id: gate1
         continue-on-error: true
+        env:
+          # Through env, not template expansion: a ${{ }} inside a run: script is
+          # substituted before the shell sees it, so anything quote-like in the value
+          # would become part of the command (zizmor template-injection).
+          REPORT: ${{ steps.locate.outputs.report }}
         run: |
           python3 benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/scripts/regression-gate.py \
-            "${{ steps.locate.outputs.report }}" \
+            "$REPORT" \
             "$RUNNER_TEMP/baseline-data.js" \
             1.50 \
             200000 \
