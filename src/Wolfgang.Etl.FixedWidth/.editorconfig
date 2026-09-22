@@ -33,3 +33,18 @@ resharper_check_namespace_highlighting = none
 # project is a deliberate deprecation marker for the dated removal wave (#373,
 # not before 2026-12-15). The rule is wrong for the whole project until then.
 dotnet_diagnostic.S1133.severity = none
+
+# S3427 ("signature overlaps … default parameter value can't be used") — the
+# `= null` defaults on the (source, logger) / (source, options, logger)
+# constructors of these three files are redundant next to their sibling
+# overloads, but removing them rewrites recorded public signatures. The next
+# release ships with none, so they stay until the 2026-12-15 removal wave
+# (#495); delete these entries with them.
+[FixedWidthExtractor.cs]
+dotnet_diagnostic.S3427.severity = none
+
+[FixedWidthLoader.cs]
+dotnet_diagnostic.S3427.severity = none
+
+[FixedWidthTransformer.cs]
+dotnet_diagnostic.S3427.severity = none
