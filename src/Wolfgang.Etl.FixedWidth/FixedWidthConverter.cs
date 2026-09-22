@@ -246,7 +246,7 @@ public static class FixedWidthConverter
         {
             // An empty nullable field legitimately parses to null. The delegate is still
             // declared as returning non-null `object` for source compatibility; #508
-            // re-annotates it as `object?` in 0.14.0 and drops this forgiveness.
+            // re-annotates it as `object?` and drops this forgiveness.
             return ParseValue
             (
                 text,
