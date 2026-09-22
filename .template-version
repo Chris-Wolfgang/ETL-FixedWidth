@@ -1,15 +1,15 @@
 {
   "template": "Chris-Wolfgang/repo-template",
-  "commit": "d16994ec7f57e52dcbe8dd7dc700dc54649e9bcf",
-  "updated": "2026-09-20",
+  "commit": "74080b0f14fd9f3bca1b12f101852a9ffde2531d",
+  "updated": "2026-09-22",
   "placeholders": {
-    "GITHUB_OWNER": "Chris-Wolfgang",
-    "REPO_NAME": "ETL-FixedWidth",
-    "GITHUB_REPO_URL": "https://github.com/Chris-Wolfgang/ETL-FixedWidth",
-    "DOCS_URL": "https://chris-wolfgang.github.io/ETL-FixedWidth/",
     "PROJECT_NAME": "Wolfgang.Etl.FixedWidth",
-    "PACKAGE_NAME": "Wolfgang.Etl.FixedWidth",
-    "LICENSE_TYPE": "MIT"
+    "DOCS_URL": "https://chris-wolfgang.github.io/ETL-FixedWidth/",
+    "LICENSE_TYPE": "MIT",
+    "REPO_NAME": "ETL-FixedWidth",
+    "GITHUB_OWNER": "Chris-Wolfgang",
+    "GITHUB_REPO_URL": "https://github.com/Chris-Wolfgang/ETL-FixedWidth",
+    "PACKAGE_NAME": "Wolfgang.Etl.FixedWidth"
   },
   "note": "Written by scripts/setup.ps1 and scripts/upgrade.ps1; the template commit this repository last took template-managed files from, and the placeholder values setup used."
 }
