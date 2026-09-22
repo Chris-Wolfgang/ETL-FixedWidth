@@ -44,6 +44,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The options constructor assigns the stage's backing fields directly instead of going through the deprecated setters, so the `CS0618` suppressions that covered those writes are gone. The only validating setter (`StartByteOffset`) was already guarded on the record's init accessor, so no record change was needed; the four `ResolvedEncoding` observation reads stay as the issue scopes. (#441) (#441)
 - Internal field-parsing helper is now annotated as returning a nullable `object?` instead of null-forgiving `null!`; no behaviour change.
 - Record the compiler-synthesized members of the shipped records in `PublicAPI.Shipped.txt` (per-TFM files for the covariant `<Clone>$` lines); they were public all along, no surface change. (#375)
+- Review polish: `TryParseLine` declares its nullable out-parameter with `[MaybeNullWhen(false)]`, binary text fields encode with the invariant culture, and member spacing is normalised; no behaviour change.
+
 
 ## [0.12.0] - 2026-09-16
 
