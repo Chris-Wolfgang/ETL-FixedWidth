@@ -16,6 +16,8 @@ internal sealed class BinaryRecordMap
         Factory = factory;
     }
 
+
+
     internal IReadOnlyList<BinaryFieldDescriptor> Descriptors { get; }
 
     internal int RecordByteLength { get; }

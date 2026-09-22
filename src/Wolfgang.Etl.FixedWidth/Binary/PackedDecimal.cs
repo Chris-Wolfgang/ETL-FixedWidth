@@ -123,6 +123,8 @@ internal static class PackedDecimal
         destination[destination.Length - 1] |= (byte)(negative ? 0x0D : 0x0C);
     }
 
+
+
     private static decimal Pow10(int scale)
     {
         decimal result = 1m;

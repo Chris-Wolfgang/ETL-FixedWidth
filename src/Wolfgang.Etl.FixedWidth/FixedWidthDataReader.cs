@@ -608,6 +608,8 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
         }
     }
 
+
+
     private static string[] BuildNames(FieldMapResult fieldMap)
     {
         var names = new string[fieldMap.Descriptors.Count];
@@ -618,6 +620,8 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
 
         return names;
     }
+
+
 
     private void FillRow(string line)
     {
@@ -676,6 +680,8 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
             }
         }
     }
+
+
 
     private void FillDefaultRow()
     {
