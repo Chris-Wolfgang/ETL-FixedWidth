@@ -1,2 +1,1 @@
 #nullable enable
-override Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions.<Clone>$() -> Wolfgang.Etl.Abstractions.TransformerOptions!
