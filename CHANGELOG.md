@@ -824,7 +824,8 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
 [#26]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/26
 [#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.11.0...v0.12.0
 [0.10.1]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.9.0...v0.10.0
