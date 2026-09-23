@@ -915,6 +915,58 @@ references:
   isSpec: "True"
   fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.Encoding
   nameWithType: FixedWidthBinaryExtractorOptions.Encoding
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ErrorPolicy
+  name: ErrorPolicy
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_ErrorPolicy
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ErrorPolicy
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ErrorPolicy
+  nameWithType: FixedWidthBinaryExtractorOptions.ErrorPolicy
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ErrorPolicy*
+  name: ErrorPolicy
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_ErrorPolicy_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ErrorPolicy
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ErrorPolicy
+  nameWithType: FixedWidthBinaryExtractorOptions.ErrorPolicy
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.MaximumItemCount
+  name: MaximumItemCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_MaximumItemCount
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.MaximumItemCount
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.MaximumItemCount
+  nameWithType: FixedWidthBinaryExtractorOptions.MaximumItemCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.MaximumItemCount*
+  name: MaximumItemCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_MaximumItemCount_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.MaximumItemCount
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.MaximumItemCount
+  nameWithType: FixedWidthBinaryExtractorOptions.MaximumItemCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ReportingInterval
+  name: ReportingInterval
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_ReportingInterval
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ReportingInterval
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ReportingInterval
+  nameWithType: FixedWidthBinaryExtractorOptions.ReportingInterval
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ReportingInterval*
+  name: ReportingInterval
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_ReportingInterval_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ReportingInterval
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ReportingInterval
+  nameWithType: FixedWidthBinaryExtractorOptions.ReportingInterval
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.SkipItemCount
+  name: SkipItemCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_SkipItemCount
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.SkipItemCount
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.SkipItemCount
+  nameWithType: FixedWidthBinaryExtractorOptions.SkipItemCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.SkipItemCount*
+  name: SkipItemCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_SkipItemCount_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.SkipItemCount
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.SkipItemCount
+  nameWithType: FixedWidthBinaryExtractorOptions.SkipItemCount
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor`1
   name: FixedWidthBinaryExtractor<TRecord>
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor-1.html
@@ -1057,6 +1109,58 @@ references:
   isSpec: "True"
   fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.Encoding
   nameWithType: FixedWidthBinaryLoaderOptions.Encoding
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ErrorPolicy
+  name: ErrorPolicy
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryLoaderOptions_ErrorPolicy
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ErrorPolicy
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ErrorPolicy
+  nameWithType: FixedWidthBinaryLoaderOptions.ErrorPolicy
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ErrorPolicy*
+  name: ErrorPolicy
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryLoaderOptions_ErrorPolicy_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ErrorPolicy
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ErrorPolicy
+  nameWithType: FixedWidthBinaryLoaderOptions.ErrorPolicy
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.MaximumItemCount
+  name: MaximumItemCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryLoaderOptions_MaximumItemCount
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.MaximumItemCount
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.MaximumItemCount
+  nameWithType: FixedWidthBinaryLoaderOptions.MaximumItemCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.MaximumItemCount*
+  name: MaximumItemCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryLoaderOptions_MaximumItemCount_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.MaximumItemCount
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.MaximumItemCount
+  nameWithType: FixedWidthBinaryLoaderOptions.MaximumItemCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ReportingInterval
+  name: ReportingInterval
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryLoaderOptions_ReportingInterval
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ReportingInterval
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ReportingInterval
+  nameWithType: FixedWidthBinaryLoaderOptions.ReportingInterval
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ReportingInterval*
+  name: ReportingInterval
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryLoaderOptions_ReportingInterval_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ReportingInterval
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.ReportingInterval
+  nameWithType: FixedWidthBinaryLoaderOptions.ReportingInterval
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.SkipItemCount
+  name: SkipItemCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryLoaderOptions_SkipItemCount
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.SkipItemCount
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.SkipItemCount
+  nameWithType: FixedWidthBinaryLoaderOptions.SkipItemCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.SkipItemCount*
+  name: SkipItemCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthBinaryLoaderOptions_SkipItemCount_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.SkipItemCount
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions.SkipItemCount
+  nameWithType: FixedWidthBinaryLoaderOptions.SkipItemCount
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader`1
   name: FixedWidthBinaryLoader<TRecord>
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader-1.html
@@ -3354,6 +3458,15 @@ references:
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.New(System.IO.TextReader, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor))
   nameWithType: FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(TextReader, ILogger<FixedWidthMultiRecordExtractor>?)
   nameWithType.vb: FixedWidthMultiRecordExtractor.New(TextReader, ILogger(Of FixedWidthMultiRecordExtractor))
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.#ctor(System.IO.TextReader,Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor})
+  name: FixedWidthMultiRecordExtractor(TextReader, FixedWidthMultiRecordExtractorOptions?, ILogger<FixedWidthMultiRecordExtractor>?)
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.html#Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractor__ctor_System_IO_TextReader_Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractor__
+  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.#ctor(System.IO.TextReader,Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor})
+  name.vb: New(TextReader, FixedWidthMultiRecordExtractorOptions, ILogger(Of FixedWidthMultiRecordExtractor))
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(System.IO.TextReader, Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions?, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor>?)
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.New(System.IO.TextReader, Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor))
+  nameWithType: FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(TextReader, FixedWidthMultiRecordExtractorOptions?, ILogger<FixedWidthMultiRecordExtractor>?)
+  nameWithType.vb: FixedWidthMultiRecordExtractor.New(TextReader, FixedWidthMultiRecordExtractorOptions, ILogger(Of FixedWidthMultiRecordExtractor))
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.#ctor*
   name: FixedWidthMultiRecordExtractor
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.html#Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractor__ctor_
@@ -3639,6 +3752,58 @@ references:
   isSpec: "True"
   fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.Encoding
   nameWithType: FixedWidthMultiRecordExtractorOptions.Encoding
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ErrorPolicy
+  name: ErrorPolicy
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_ErrorPolicy
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ErrorPolicy
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ErrorPolicy
+  nameWithType: FixedWidthMultiRecordExtractorOptions.ErrorPolicy
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ErrorPolicy*
+  name: ErrorPolicy
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_ErrorPolicy_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ErrorPolicy
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ErrorPolicy
+  nameWithType: FixedWidthMultiRecordExtractorOptions.ErrorPolicy
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.MaximumItemCount
+  name: MaximumItemCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_MaximumItemCount
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.MaximumItemCount
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.MaximumItemCount
+  nameWithType: FixedWidthMultiRecordExtractorOptions.MaximumItemCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.MaximumItemCount*
+  name: MaximumItemCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_MaximumItemCount_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.MaximumItemCount
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.MaximumItemCount
+  nameWithType: FixedWidthMultiRecordExtractorOptions.MaximumItemCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ReportingInterval
+  name: ReportingInterval
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_ReportingInterval
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ReportingInterval
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ReportingInterval
+  nameWithType: FixedWidthMultiRecordExtractorOptions.ReportingInterval
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ReportingInterval*
+  name: ReportingInterval
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_ReportingInterval_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ReportingInterval
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ReportingInterval
+  nameWithType: FixedWidthMultiRecordExtractorOptions.ReportingInterval
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.SkipItemCount
+  name: SkipItemCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_SkipItemCount
+  commentId: P:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.SkipItemCount
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.SkipItemCount
+  nameWithType: FixedWidthMultiRecordExtractorOptions.SkipItemCount
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.SkipItemCount*
+  name: SkipItemCount
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_SkipItemCount_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.SkipItemCount
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.SkipItemCount
+  nameWithType: FixedWidthMultiRecordExtractorOptions.SkipItemCount
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthReport
   name: FixedWidthReport
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthReport.html
@@ -3986,6 +4151,12 @@ references:
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder(Of T).Skip
   nameWithType: FixedWidthSchemaBuilder<T>.Skip
   nameWithType.vb: FixedWidthSchemaBuilder(Of T).Skip
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions
+  name: FixedWidthTransformerOptions
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions.html
+  commentId: T:Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions
+  nameWithType: FixedWidthTransformerOptions
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthTransformer`2
   name: FixedWidthTransformer<TSource, TDestination>
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthTransformer-2.html
@@ -4004,6 +4175,15 @@ references:
   fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthTransformer(Of TSource, TDestination).New(System.Func(Of TSource, TDestination), Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthTransformer(Of TSource, TDestination)))
   nameWithType: FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(Func<TSource, TDestination>, ILogger<FixedWidthTransformer<TSource, TDestination>>?)
   nameWithType.vb: FixedWidthTransformer(Of TSource, TDestination).New(Func(Of TSource, TDestination), ILogger(Of FixedWidthTransformer(Of TSource, TDestination)))
+- uid: Wolfgang.Etl.FixedWidth.FixedWidthTransformer`2.#ctor(System.Func{`0,`1},Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthTransformer{`0,`1}})
+  name: FixedWidthTransformer(Func<TSource, TDestination>, FixedWidthTransformerOptions?, ILogger<FixedWidthTransformer<TSource, TDestination>>?)
+  href: api/Wolfgang.Etl.FixedWidth.FixedWidthTransformer-2.html#Wolfgang_Etl_FixedWidth_FixedWidthTransformer_2__ctor_System_Func__0__1__Wolfgang_Etl_FixedWidth_FixedWidthTransformerOptions_Microsoft_Extensions_Logging_ILogger_Wolfgang_Etl_FixedWidth_FixedWidthTransformer__0__1___
+  commentId: M:Wolfgang.Etl.FixedWidth.FixedWidthTransformer`2.#ctor(System.Func{`0,`1},Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions,Microsoft.Extensions.Logging.ILogger{Wolfgang.Etl.FixedWidth.FixedWidthTransformer{`0,`1}})
+  name.vb: New(Func(Of TSource, TDestination), FixedWidthTransformerOptions, ILogger(Of FixedWidthTransformer(Of TSource, TDestination)))
+  fullName: Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination>, Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions?, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>>?)
+  fullName.vb: Wolfgang.Etl.FixedWidth.FixedWidthTransformer(Of TSource, TDestination).New(System.Func(Of TSource, TDestination), Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions, Microsoft.Extensions.Logging.ILogger(Of Wolfgang.Etl.FixedWidth.FixedWidthTransformer(Of TSource, TDestination)))
+  nameWithType: FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(Func<TSource, TDestination>, FixedWidthTransformerOptions?, ILogger<FixedWidthTransformer<TSource, TDestination>>?)
+  nameWithType.vb: FixedWidthTransformer(Of TSource, TDestination).New(Func(Of TSource, TDestination), FixedWidthTransformerOptions, ILogger(Of FixedWidthTransformer(Of TSource, TDestination)))
 - uid: Wolfgang.Etl.FixedWidth.FixedWidthTransformer`2.#ctor*
   name: FixedWidthTransformer
   href: api/Wolfgang.Etl.FixedWidth.FixedWidthTransformer-2.html#Wolfgang_Etl_FixedWidth_FixedWidthTransformer_2__ctor_

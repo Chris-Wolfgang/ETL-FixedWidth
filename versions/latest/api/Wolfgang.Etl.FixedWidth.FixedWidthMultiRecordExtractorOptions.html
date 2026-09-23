@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.12.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.13.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,7 +75,7 @@
 
 
   <h1 id="Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions" class="text-break">
-Class FixedWidthMultiRecordExtractorOptions  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthMultiRecordExtractorOptions.cs/#L18"><i class="bi bi-code-slash"></i></a>
+Class FixedWidthMultiRecordExtractorOptions  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthMultiRecordExtractorOptions.cs/#L22"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
@@ -143,7 +143,9 @@ documented defaults below apply — defaults live on the property initializers h
 in constructor bodies, so no constructor can accidentally diverge from them.</p>
 <p>
 Options are scoped to the <em>input shape</em> they configure, not to the type as a whole, so
-every property here is meaningful for the constructor it is passed to.
+every property here is meaningful for the constructor it is passed to. The base-stage
+configuration (<code>ReportingInterval</code>, <code>MaximumItemCount</code>, <code>SkipItemCount</code>, <code>ErrorPolicy</code>)
+is inherited from the Abstractions record (ADR-0009).
 </p>
 </div>
 
@@ -156,7 +158,7 @@ every property here is meaningful for the constructor it is passed to.
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_Encoding" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.Encoding">
   Encoding
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthMultiRecordExtractorOptions.cs/#L24"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthMultiRecordExtractorOptions.cs/#L28"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.encoding">Encoding</a> used to decode the input stream.
@@ -185,11 +187,163 @@ Defaults to <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.
 
 
 
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_ErrorPolicy_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ErrorPolicy*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_ErrorPolicy" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ErrorPolicy">
+  ErrorPolicy
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthMultiRecordExtractorOptions.cs/#L101"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the per-item error policy. Defaults to the abort policy the base stages use.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Func&lt;ItemErrorContext, ItemErrorAction&gt; ErrorPolicy { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;<span class="xref">ItemErrorContext</span>, <span class="xref">ItemErrorAction</span>&gt;</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></dt>
+    <dd><p>The value is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_MaximumItemCount_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.MaximumItemCount*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_MaximumItemCount" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.MaximumItemCount">
+  MaximumItemCount
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthMultiRecordExtractorOptions.cs/#L56"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the maximum number of items the stage extracts. Defaults to <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32.maxvalue">MaxValue</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int MaximumItemCount { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception">ArgumentOutOfRangeException</a></dt>
+    <dd><p>The value is less than <code>1</code>.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_ReportingInterval_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ReportingInterval*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_ReportingInterval" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ReportingInterval">
+  ReportingInterval
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthMultiRecordExtractorOptions.cs/#L36"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the number of items between progress reports. Defaults to <code>1000</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int ReportingInterval { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception">ArgumentOutOfRangeException</a></dt>
+    <dd><p>The value is less than <code>1</code>.</p>
+</dd>
+  </dl>
+
+
+
+  <a id="Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_SkipItemCount_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.SkipItemCount*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthMultiRecordExtractorOptions_SkipItemCount" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.SkipItemCount">
+  SkipItemCount
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthMultiRecordExtractorOptions.cs/#L76"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Gets the number of items the stage skips before the first is yielded. Defaults to <code>0</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int SkipItemCount { get; init; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+  <h4 class="section">Exceptions</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception">ArgumentOutOfRangeException</a></dt>
+    <dd><p>The value is negative.</p>
+</dd>
+  </dl>
+
+
+
 
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.12.0/src/Wolfgang.Etl.FixedWidth/FixedWidthMultiRecordExtractorOptions.cs/#L18" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthMultiRecordExtractorOptions.cs/#L22" class="edit-link">Edit this page</a>
         </div>
 
 

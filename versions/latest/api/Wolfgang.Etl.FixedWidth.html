@@ -254,6 +254,14 @@ use it, or inspect it with <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWi
 </dd>
     </dl>
     <dl class="jumplist">
+      <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions.html">FixedWidthTransformerOptions</a></dt>
+      <dd><p>Configuration for a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthTransformer-2.html">FixedWidthTransformer&lt;TSource, TDestination&gt;</a>, supplied to its constructor.
+The transformer has no settings of its own beyond the base-stage ones it inherits
+(<code>ReportingInterval</code>, <code>MaximumItemCount</code>, <code>SkipItemCount</code>, <code>ErrorPolicy</code>); the record
+exists so the transformer is configured the same way as every other stage (ADR-0009).</p>
+</dd>
+    </dl>
+    <dl class="jumplist">
       <dt><a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthTransformer-2.html">FixedWidthTransformer&lt;TSource, TDestination&gt;</a></dt>
       <dd><p>Transforms a stream of <code class="typeparamref">TSource</code> records into
 <code class="typeparamref">TDestination</code> records in a single streaming pass (#14) —

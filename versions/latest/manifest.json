@@ -596,6 +596,20 @@
     },
     {
       "type": "ManagedReference",
+      "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions",
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions.yml\" sourcestartlinenumber=\"1\">Configuration for a <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthTransformer%602\" data-throw-if-not-resolved=\"false\"></xref>, supplied to its constructor.\nThe transformer has no settings of its own beyond the base-stage ones it inherits\n(<code>ReportingInterval</code>, <code>MaximumItemCount</code>, <code>SkipItemCount</code>, <code>ErrorPolicy</code>); the record\nexists so the transformer is configured the same way as every other stage (ADR-0009).</p>\n"
+    },
+    {
+      "type": "ManagedReference",
       "source_relative_path": "api/Wolfgang.Etl.FixedWidth.FixedWidthValueParser.yml",
       "output": {
         ".html": {
