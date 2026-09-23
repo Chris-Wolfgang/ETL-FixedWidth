@@ -712,12 +712,12 @@ jobs:
 
       - name: Build DocFX metadata
         if: steps.check.outputs.found == 'true'
-        run: docfx metadata
+        run: dotnet docfx metadata
         working-directory: docfx_project
 
       - name: Build documentation (no deploy)
         if: steps.check.outputs.found == 'true'
-        run: docfx build
+        run: dotnet docfx build
         working-directory: docfx_project
 
       - name: Verify documentation output
