@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1790118620979,
+  "lastUpdate": 1790129517312,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-FixedWidth",
   "entries": {
     "BenchmarkDotNet": [
@@ -10776,6 +10776,222 @@ window.BENCHMARK_DATA = {
             "value": 211909880.55555555,
             "unit": "ns",
             "range": "± 12301913.395376652"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0d79c08690648aed90b76e1f8dfcf03043bba04a",
+          "message": "Release v0.13.0 — options records on the Abstractions base, net5–7 assets, Abstractions 0.26.0 (#516)\n\n* ci: review round 2 — workflow concurrency groups and analyzer-config coverage\n\n- concurrency: cancel superseded runs on stryker.yaml workflow-security.yaml\n- .editorconfig: analyzer sections / files for project categories that were running at default severity\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* chore: review polish — MaybeNullWhen out-param, invariant text encoding, spacing, docs\n\n- FixedWidthMultiRecordExtractor.TryParseLine declares its out-parameter with\n  [MaybeNullWhen(false)] instead of assigning `null!`; a small internal\n  polyfill of the attribute covers net462 / net481 / netstandard2.0\n- BinaryFieldDescriptor encodes Text fields via\n  Convert.ToString(value, InvariantCulture) so a non-string property declared\n  as Text never formats with the current culture\n- three blank lines between members (house convention) in DataReader,\n  SchemaBuilder, Binary/* and the pipeline builders — 23 boundaries\n- FixedWidthStreamCtorTests: the double-Dispose test asserts explicitly via\n  Record.Exception + Assert.Null\n- README: \"Abstractions 0.16.0\" reads as the minimum (\"0.16.0 and later\"),\n  not a requirement of that exact version\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* docs: say what the Text-field culture change means; README distinguishes API introduction from requirement\n\nCopilot review on #511: the fragment claimed 'no behaviour change' although non-string Text values now format with the invariant culture instead of the current one; and the README's 'Abstractions 0.16.0' now reads as the version that introduced pipeline composition, not the version this package requires.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* docs(changelog): take the template's fragment README (repo-template#630)\n\nTwo additions: a label added after the fragment check ran does not reach a re-run (the re-run replays the original payload - push a commit instead), and the list of src/ files that never need a fragment (nested .editorconfig, globalconfig/ruleset/DotSettings, PublicAPI baselines) - the rule this repository's changelog.ps1 already implements.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* Release v0.13.0 — options records on the Abstractions base, FixedWidthTransformerOptions, net5–7 assets, Abstractions 0.26.0 (#514)\n\n* chore: apply the pre-release review fixes\n\n- FixedWidthConverter.ParseValue is annotated as returning `object?` instead of\n  handing back `null!` for empty nullable fields. The public\n  FixedWidthValueParser delegate keeps its non-null `object` return for 0.13.0;\n  DefaultParser carries the one remaining forgiveness with a note pointing at\n  #508, which re-annotates the delegate in 0.14.0.\n- Five FixedWidthLineParserTests sites that consume ParseValue directly now\n  acknowledge the nullable return (`result!`), no assertion changes.\n- README: the analyzer list omitted Microsoft.CodeAnalysis.PublicApiAnalyzers\n  (8 analyzers, not 7).\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* release: v0.13.0\n\nMINOR release built against Wolfgang.Etl.Abstractions 0.26.0. CHANGELOG\nassembled from the changelog/unreleased fragments (now removed); <Version>\n0.12.0 -> 0.13.0. AssemblyVersion stays pinned at 1.0.0.0 (never retrofit a pin). `PublicAPI.Unshipped.txt` (35 + 1 + 1 per-TFM entries) folded into `Shipped.txt`.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* release: fold the review-nits fragment into v0.13.0\n\nThe review-polish PR is stacked under this release, so its change ships in v0.13.0; the fragment now lives in this release's notes instead of the next one's.\n\nCo-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>\n\n* docs(changelog): reconcile the 0.13.0 notes (Copilot review on #514)\n\nThe notes are assembled from fragments written at different points in the cycle, and two of\nthem described decisions that were later reversed, so the section contradicted itself:\n\n- Abstractions was listed as 0.25.0 under Added and 0.26.0 under Internal, while also stating\n  the package requires 0.26.0+. The Internal bullet is the authoritative one; the Added bullet\n  now states the capability change without pinning a version.\n- The options records were described as deriving from the Abstractions base records (#443) and,\n  under Fixed, as explicitly NOT deriving (#485, which reverted #443 for the net462 / net481 /\n  netstandard2.0 `with`-expression break). The shipped behaviour is the Fixed bullet; the Added\n  bullet now keeps only what #443 actually left in place and points at it.\n- The constructor-defaults bullet was assembled twice, from #479 and #497.\n- \"(#441) (#441)\".\n\nAlso drops \"in 0.14.0\" from the FixedWidthConverter forgiveness comment: the re-annotation is\ntied to #508 and the dated removal wave, not to a particular version number.\n\nNo behaviour change; documentation and one comment.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Fable 5.1 <noreply@anthropic.com>\n\n* docs(changelog): 0.13.0 compare links, and drop the consumed review-nits fragment\n\nTwo Copilot findings on #516, both real:\n\n- `[Unreleased]` still compared v0.12.0...HEAD and there was no `[0.13.0]` definition, so the new\n  heading was unlinked and the Unreleased range included everything the release already shipped.\n- `changelog/unreleased/review-nits.md` survived the assemble even though its text is already the\n  last Internal bullet of 0.13.0. Left in place, the next `assemble` would emit it a second time.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n\n* docs(changelog): add the 0.13.0 compare link and move Unreleased to v0.13.0\n\n`[Unreleased]` still compared v0.12.0...HEAD and there was no `[0.13.0]` reference definition,\nso the new heading was unlinked and the Unreleased range covered everything the release shipped.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Fable 5.1 <noreply@anthropic.com>",
+          "timestamp": "2026-09-22T22:06:30-04:00",
+          "tree_id": "8e2c48fb26b7fb27568ce1569fdba2fa7ad6d7b4",
+          "url": "https://github.com/Chris-Wolfgang/ETL-FixedWidth/commit/0d79c08690648aed90b76e1f8dfcf03043bba04a"
+        },
+        "date": 1790129512996,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.DateTimeBenchmarks.Extract_Memory(RecordCount: 10000)",
+            "value": 3205626.6940104165,
+            "unit": "ns",
+            "range": "± 102916.04155119382"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.DateTimeBenchmarks.Load_Memory(RecordCount: 10000)",
+            "value": 2615925.00390625,
+            "unit": "ns",
+            "range": "± 15527.306927851878"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_TextReader(RecordCount: 1000)",
+            "value": 273534.96370442706,
+            "unit": "ns",
+            "range": "± 1678.9138693710784"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_Stream(RecordCount: 1000)",
+            "value": 316367.544921875,
+            "unit": "ns",
+            "range": "± 12993.614651391299"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_TextReader_1KB(RecordCount: 1000)",
+            "value": 291900.28889973956,
+            "unit": "ns",
+            "range": "± 6322.494529530233"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_Stream_64KB(RecordCount: 1000)",
+            "value": 325975.322265625,
+            "unit": "ns",
+            "range": "± 11776.724560525561"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_TextReader(RecordCount: 10000)",
+            "value": 2643601.6822916665,
+            "unit": "ns",
+            "range": "± 5688.465719782227"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_Stream(RecordCount: 10000)",
+            "value": 2679688.6002604165,
+            "unit": "ns",
+            "range": "± 28943.186709360263"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_TextReader_1KB(RecordCount: 10000)",
+            "value": 2763575.6796875,
+            "unit": "ns",
+            "range": "± 10756.92161854707"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_Stream_64KB(RecordCount: 10000)",
+            "value": 2762996.4830729165,
+            "unit": "ns",
+            "range": "± 13982.957089484853"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_TextReader(RecordCount: 100000)",
+            "value": 26314658.083333332,
+            "unit": "ns",
+            "range": "± 22058.35558949999"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_Stream(RecordCount: 100000)",
+            "value": 26832153.020833332,
+            "unit": "ns",
+            "range": "± 321399.19614198356"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_TextReader_1KB(RecordCount: 100000)",
+            "value": 27938198.21875,
+            "unit": "ns",
+            "range": "± 80816.20012978814"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_Stream_64KB(RecordCount: 100000)",
+            "value": 26975015.041666668,
+            "unit": "ns",
+            "range": "± 30895.87925283871"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_TextWriter(RecordCount: 1000)",
+            "value": 190795.39135742188,
+            "unit": "ns",
+            "range": "± 188.4873948372748"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_Stream(RecordCount: 1000)",
+            "value": 277727.37516276044,
+            "unit": "ns",
+            "range": "± 1203.4647607740778"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_TextWriter_1KB(RecordCount: 1000)",
+            "value": 295953.37711588544,
+            "unit": "ns",
+            "range": "± 3532.6182931013623"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_Stream_64KB(RecordCount: 1000)",
+            "value": 372946.94091796875,
+            "unit": "ns",
+            "range": "± 4046.7365156589053"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_TextWriter(RecordCount: 10000)",
+            "value": 2736137.49609375,
+            "unit": "ns",
+            "range": "± 10389.81841834835"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_Stream(RecordCount: 10000)",
+            "value": 2550009.6549479165,
+            "unit": "ns",
+            "range": "± 108045.61413741844"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_TextWriter_1KB(RecordCount: 10000)",
+            "value": 2226265.0546875,
+            "unit": "ns",
+            "range": "± 1918.5737326110795"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_Stream_64KB(RecordCount: 10000)",
+            "value": 2275983.97265625,
+            "unit": "ns",
+            "range": "± 6923.7700107277715"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_TextWriter(RecordCount: 100000)",
+            "value": 22602243.114583332,
+            "unit": "ns",
+            "range": "± 32985.022800133476"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_Stream(RecordCount: 100000)",
+            "value": 23662179.96875,
+            "unit": "ns",
+            "range": "± 491877.73423039983"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_TextWriter_1KB(RecordCount: 100000)",
+            "value": 24698522.520833332,
+            "unit": "ns",
+            "range": "± 94605.51047136314"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_Stream_64KB(RecordCount: 100000)",
+            "value": 20390791.947916668,
+            "unit": "ns",
+            "range": "± 29675.772214546036"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 0)",
+            "value": 395986.62418619794,
+            "unit": "ns",
+            "range": "± 4866.237976026644"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 1)",
+            "value": 396154.89794921875,
+            "unit": "ns",
+            "range": "± 7029.271569385747"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 1000)",
+            "value": 812219.1529947916,
+            "unit": "ns",
+            "range": "± 10156.700619310717"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 10000)",
+            "value": 3042098.1536458335,
+            "unit": "ns",
+            "range": "± 3681.6583275982166"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 100000)",
+            "value": 28731776.645833332,
+            "unit": "ns",
+            "range": "± 211829.1979113732"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 1000000)",
+            "value": 289315822.1666667,
+            "unit": "ns",
+            "range": "± 352997.4231536023"
           }
         ]
       }
