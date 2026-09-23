@@ -20,6 +20,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 
+## [0.13.0] - 2026-09-22
+
+### Added
+
+- The base-stage `ReportingInterval` / `MaximumItemCount` / `SkipItemCount` setters are deprecated fleet-wide in favour of the options record, and `IncrementCurrentItemCount(int)` / `IncrementCurrentSkippedItemCount(int)` are available to derived stages. (#443)
+- `FixedWidthMultiRecordExtractor` gains a `(TextReader, options, logger)` constructor (ADR-0009); see **Fixed** below for how the three binary / multi-record options records carry their base configuration in this release. New `FixedWidthTransformerOptions` record and `FixedWidthTransformer(transform, options, logger)` constructor for the same reason. (#443)
+
+### Fixed
+
+- `FixedWidthBinaryExtractorOptions`, `FixedWidthBinaryLoaderOptions` and `FixedWidthMultiRecordExtractorOptions` carry `ReportingInterval` / `MaximumItemCount` / `SkipItemCount` / `ErrorPolicy` themselves instead of deriving from the Abstractions base records, so a caller compiled against 0.12.0 that uses a `with` expression on them keeps working on net462 / net481 / netstandard2.0 (deriving is scheduled for the 2026-12-15 wave, #373). (#485)
+- Ship `net5.0`, `net6.0` and `net7.0` assemblies: the `netstandard2.0` build, loaded beside the `net5.0`+ `Wolfgang.Etl.Abstractions` asset, would throw `MissingMethodException` on any write to an inherited options-record property (`IsExternalInit` modreq mismatch). Each runtime now gets an assembly compiled against its matching Abstractions asset. (#374)
+
+### Internal
+
+- Built against Wolfgang.Etl.Abstractions / ErrorPolicies / TestKit / TestKit.Xunit 0.26.0 (trim- and native-AOT-compatible on net8.0+; no API change from 0.25.0), so the package now requires Abstractions 0.26.0 or later. (#500)
+- The `(reader|writer, logger = null)` and `(…, options = null, …)` constructor defaults on `FixedWidthExtractor`, `FixedWidthLoader` and `FixedWidthTransformer` stay as shipped in 0.12; dropping them (S3427) rewrites recorded public signatures and is scheduled for the 2026-12-15 wave (#495), with the rule silenced for those three files until then. The RS0026 justifications from the overload review remain. (#479)
+- The `ProgressReporting` and `SkipAndMax` examples pass `FixedWidthExtractorOptions<T>` instead of setting the deprecated base setters (CS0618). (#480)
+- S1133 ("remove this deprecated code someday") is off for the src project in its own `.editorconfig`: every `[Obsolete]` member is a deliberate marker for the 2026-12-15 removal wave (#373). (#478)
+- Src doc/comment clean-up: `FixedWidthLoader.IsDryRun` gets a real summary (it is not inherited), two rationale comments are reworded so Sonar stops reading them as code, the `NullCoalescing…` guard names the right inspection id, and the empty `FixedWidthTransformerOptions` record and the `[Flags]` zero member carry justified suppressions. (#481)
+- Tests/benchmarks: two duplicate tests merged into their twins (S4144), the fuzz `Drain` helper awaits the enumeration once (S5034), and `BenchmarkScratch` carries a justified S5443 suppression. (#482)
+- The options constructor assigns the stage's backing fields directly instead of going through the deprecated setters, so the `CS0618` suppressions that covered those writes are gone. The only validating setter (`StartByteOffset`) was already guarded on the record's init accessor, so no record change was needed; the four `ResolvedEncoding` observation reads stay as the issue scopes. (#441)
+- Internal field-parsing helper is now annotated as returning a nullable `object?` instead of null-forgiving `null!`; no behaviour change.
+- Record the compiler-synthesized members of the shipped records in `PublicAPI.Shipped.txt` (per-TFM files for the covariant `<Clone>$` lines); they were public all along, no surface change. (#375)
+- Review polish: `TryParseLine` declares its nullable out-parameter with `[MaybeNullWhen(false)]`, member spacing is normalised, and binary Text fields now encode non-string property values with the invariant culture (they previously used the current culture, so a `decimal` in a Text field could carry a locale-specific separator into the record).
+
+
 ## [0.12.0] - 2026-09-16
 
 ### Added
@@ -798,7 +824,8 @@ changes** — the shipped library is unchanged from 0.5.0.
 [#253]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/253
 [#26]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/26
 [#275]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/275
-[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.11.0...v0.12.0
 [0.10.1]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/Chris-Wolfgang/ETL-FixedWidth/compare/v0.9.0...v0.10.0
