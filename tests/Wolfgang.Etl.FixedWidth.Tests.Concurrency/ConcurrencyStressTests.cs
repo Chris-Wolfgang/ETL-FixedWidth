@@ -213,11 +213,21 @@ public sealed class ConcurrencyStressTests
         // Wait for every iteration without throwing on the first failure, then check
         // each one. Assert.All reports how many of the iterations failed and each one's
         // exception, and there is no failure-only branch that a passing run never executes.
+        // SuppressThrowing also swallows cancellation, and a canceled task has a null
+        // Exception, so each iteration must additionally have run to completion.
         await Task
             .WhenAll(tasks)
             .ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
 
-        Assert.All(tasks, task => Assert.Null(task.Exception));
+        Assert.All
+        (
+            tasks,
+            task =>
+            {
+                Assert.Null(task.Exception);
+                Assert.Equal(TaskStatus.RanToCompletion, task.Status);
+            }
+        );
     }
 
 
