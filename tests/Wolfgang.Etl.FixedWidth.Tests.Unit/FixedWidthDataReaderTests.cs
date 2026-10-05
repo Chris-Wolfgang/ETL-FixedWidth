@@ -1,6 +1,5 @@
 using System;
 using System.Data;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -18,7 +17,6 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 /// </summary>
 public sealed class FixedWidthDataReaderTests
 {
-    [ExcludeFromCodeCoverage]
     private sealed record Person
     {
         [FixedWidthField(0, 10)]
@@ -267,7 +265,6 @@ public sealed class FixedWidthDataReaderTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed record Wide
     {
         [FixedWidthField(0, 5)]
@@ -441,7 +438,6 @@ public sealed class FixedWidthDataReaderTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class CapturingLogger<T> : Microsoft.Extensions.Logging.ILogger<T>
     {
         public System.Collections.Generic.List<string> Messages { get; } = new();
@@ -468,5 +464,41 @@ public sealed class FixedWidthDataReaderTests
             {
             }
         }
+    }
+
+
+
+    [Fact]
+    public void Test_record_members_round_trip()
+    {
+        // The reader tests read these records' columns through the field map; this
+        // pins each member's own accessor pair as well.
+        var when = new DateTime(2026, 10, 4, 0, 0, 0, DateTimeKind.Utc);
+        var id = Guid.NewGuid();
+        var person = new Person { FirstName = "a", LastName = "b", Age = 1, Score = 2 };
+        var wide = new Wide { Flag = true, B = 3, C = 'c', S = 4, L = 5, D = 6m, Db = 7d, F = 8f, Dt = when, G = id };
+
+        Assert.Equal(("a", "b", 1, (int?)2), (person.FirstName, person.LastName, person.Age, person.Score));
+        Assert.Equal
+        (
+            (true, (byte)3, 'c', (short)4, 5L, 6m, 7d, 8f, when, id),
+            (wide.Flag, wide.B, wide.C, wide.S, wide.L, wide.D, wide.Db, wide.F, wide.Dt, wide.G)
+        );
+    }
+
+
+
+    [Fact]
+    public void CapturingLogger_is_always_enabled_and_hands_out_a_disposable_scope()
+    {
+        // Pins the parts of the logger double the logging test above never calls.
+        var logger = new CapturingLogger<FixedWidthDataReader<Person>>();
+
+        using (logger.BeginScope("scope"))
+        {
+            Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Trace));
+        }
+
+        Assert.Empty(logger.Messages);
     }
 }

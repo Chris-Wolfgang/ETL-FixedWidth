@@ -501,15 +501,14 @@ public sealed class EtlPipelineFixedWidthExtensionsTests : IDisposable
     }
 
 
-    private static async IAsyncEnumerable<PersonRecord> ThrowOnFirst(IAsyncEnumerable<PersonRecord> source)
-    {
-        await foreach (var _ in source.ConfigureAwait(false))
-        {
-            throw new InvalidOperationException("boom");
-        }
+    // Faults on the first record the stage pulls. Built from a projection rather than an
+    // async iterator: an iterator whose loop always throws never reaches its end.
+    private static IAsyncEnumerable<PersonRecord> ThrowOnFirst(IAsyncEnumerable<PersonRecord> source) =>
+        source.Select(ThrowBoom);
 
-        yield break;
-    }
+
+
+    private static PersonRecord ThrowBoom(PersonRecord _) => throw new InvalidOperationException("boom");
 
 
     private string WriteTempFile(string name, string content)

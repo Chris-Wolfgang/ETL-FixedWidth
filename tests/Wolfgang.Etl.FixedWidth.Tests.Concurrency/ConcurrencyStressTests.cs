@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -136,7 +135,11 @@ public sealed class ConcurrencyStressTests
         {
             var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content));
             var seen = 0;
-            try
+
+            // Record the outcome instead of catching each acceptable exception type in
+            // its own catch block: which outcome occurs depends on who wins the race,
+            // so per-outcome catch blocks would leave lines unexecuted on most runs.
+            var exception = await Record.ExceptionAsync(async () =>
             {
                 await foreach (var r in extractor.ExtractAsync(CancellationToken.None).ConfigureAwait(false))
                 {
@@ -148,19 +151,17 @@ public sealed class ConcurrencyStressTests
 #pragma warning restore CS4014
                     }
                 }
-            }
-            catch (ObjectDisposedException)
-            {
-                // Acceptable: disposal won the race.
-            }
-            catch (InvalidOperationException)
-            {
-                // Acceptable: reader closed underneath the enumerator.
-            }
-            finally
-            {
-                extractor.Dispose();
-            }
+            }).ConfigureAwait(false);
+
+            extractor.Dispose();
+
+            // Acceptable: completion, disposal winning the race (ObjectDisposedException),
+            // or the reader closing underneath the enumerator (InvalidOperationException).
+            Assert.True
+            (
+                exception is null or ObjectDisposedException or InvalidOperationException,
+                $"Unexpected outcome when disposing during enumeration: {exception}"
+            );
         });
     }
 
@@ -175,7 +176,10 @@ public sealed class ConcurrencyStressTests
             using var cts = new CancellationTokenSource();
             using var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(content));
             var seen = 0;
-            try
+
+            // The extractor checks the token before every record, so cancelling after
+            // the fifth record always ends the enumeration with OperationCanceledException.
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
             {
                 await foreach (var r in extractor.ExtractAsync(cts.Token).ConfigureAwait(false))
                 {
@@ -185,11 +189,7 @@ public sealed class ConcurrencyStressTests
                         cts.Cancel();
                     }
                 }
-            }
-            catch (OperationCanceledException)
-            {
-                // Expected when cancellation wins the race.
-            }
+            }).ConfigureAwait(false);
         });
     }
 
@@ -203,27 +203,31 @@ public sealed class ConcurrencyStressTests
 
     private static async Task RunFanoutAsync(Func<int, Task> body)
     {
-        var failures = new ConcurrentQueue<Exception>();
         var total = Iterations * Fanout;
 
-        var tasks = Enumerable.Range(0, total).Select(i => Task.Run(async () =>
-        {
-            try
-            {
-                await body(i).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                failures.Enqueue(ex);
-            }
-        }));
+        var tasks = Enumerable
+            .Range(0, total)
+            .Select(i => Task.Run(() => body(i)))
+            .ToArray();
 
-        await Task.WhenAll(tasks).ConfigureAwait(false);
+        // Wait for every iteration without throwing on the first failure, then check
+        // each one. Assert.All reports how many of the iterations failed and each one's
+        // exception, and there is no failure-only branch that a passing run never executes.
+        // SuppressThrowing also swallows cancellation, and a canceled task has a null
+        // Exception, so each iteration must additionally have run to completion.
+        await Task
+            .WhenAll(tasks)
+            .ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
 
-        if (!failures.IsEmpty)
-        {
-            throw new AggregateException($"{failures.Count}/{total} concurrent iterations failed.", failures);
-        }
+        Assert.All
+        (
+            tasks,
+            task =>
+            {
+                Assert.Null(task.Exception);
+                Assert.Equal(TaskStatus.RanToCompletion, task.Status);
+            }
+        );
     }
 
 

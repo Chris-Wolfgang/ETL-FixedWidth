@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Enums;
@@ -23,7 +22,6 @@ public class DirectWriteTests
     // Test POCOs
     // ------------------------------------------------------------------
 
-    [ExcludeFromCodeCoverage]
     private class SimpleRecord
     {
         [FixedWidthField(0, 10)]
@@ -42,7 +40,6 @@ public class DirectWriteTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class SkipMiddleRecord
     {
         [FixedWidthField(0, 10)]
@@ -57,7 +54,6 @@ public class DirectWriteTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class SkipTrailingRecord
     {
         [FixedWidthField(0, 10)]
@@ -71,7 +67,6 @@ public class DirectWriteTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class SkipLeadingRecord
     {
         [FixedWidthSkip(0, 5, Message = "RecordType")]

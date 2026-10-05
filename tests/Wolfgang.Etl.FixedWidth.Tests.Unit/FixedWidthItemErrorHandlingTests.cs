@@ -6,6 +6,8 @@ using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Wolfgang.Etl.FixedWidth.Exceptions;
 using Xunit;
+using System.Linq;
+using Wolfgang.Etl.TestKit.Xunit;
 
 namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 
@@ -240,5 +242,26 @@ public class FixedWidthItemErrorHandlingTests
 
             public int Count { get; }
         }
+    }
+
+
+
+    [Fact]
+    public async Task CountingLoader_final_progress_report_carries_the_loaded_count()
+    {
+        // The pipeline tests above read the loader's Loaded list, never its progress
+        // report; this pins the report the CountingLoader double produces.
+        var loader = new CountingLoader();
+        var reports = new List<CountingLoader.Report>();
+
+        await loader.LoadAsync
+        (
+            new[] { new PersonRecord(), new PersonRecord() }.ToAsyncEnumerable(),
+            new SynchronousProgress<CountingLoader.Report>(reports.Add),
+            CancellationToken.None
+        );
+
+        Assert.Equal(new CountingLoader.Report(2), reports.Last());
+        Assert.Equal(2, reports.Last().Count);
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -32,7 +31,6 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit.Globalization;
 /// drops a <c>culture</c> argument, the non-<c>en-US</c> rows fail.
 /// </para>
 /// </remarks>
-[ExcludeFromCodeCoverage]
 public class CultureInvarianceTests
 {
     /// <summary>
@@ -60,7 +58,6 @@ public class CultureInvarianceTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private record SampleRecord
     {
         // decimal + double exercise the separator classes (de-DE comma vs dot).
