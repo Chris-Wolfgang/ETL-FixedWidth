@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Wolfgang.Etl.Abstractions;
 using Xunit;
+using Wolfgang.Etl.TestKit.Xunit;
 
 namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 
@@ -14,7 +14,6 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 /// </summary>
 public class FixedWidthTransformerTests
 {
-    [ExcludeFromCodeCoverage]
     private sealed record Src
     {
         public string Name { get; set; } = string.Empty;
@@ -24,7 +23,6 @@ public class FixedWidthTransformerTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private sealed record Dst
     {
         public string Name { get; set; } = string.Empty;
@@ -36,7 +34,6 @@ public class FixedWidthTransformerTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class NoParameterlessCtor
     {
         public NoParameterlessCtor(string name) => Name = name;
@@ -137,9 +134,9 @@ public class FixedWidthTransformerTests
 
         async IAsyncEnumerable<Src> WithNull()
         {
+            await Task.CompletedTask;
             yield return new Src { Name = "alice" };
             yield return null!;
-            await Task.CompletedTask;
         }
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
@@ -187,54 +184,63 @@ public class FixedWidthTransformerTests
         using var cts = new CancellationTokenSource();
         cts.Cancel();
 
-        var enumerated = false;
-        async IAsyncEnumerable<Src> Poisoned()
-        {
-            enumerated = true;
-            yield return new Src { Name = "never" };
-            await Task.CompletedTask;
-        }
+        var source = new TrackedSource();
 
         // The pre-cancellation guard throws before the source is touched.
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            await transformer.TransformAsync(Poisoned(), cts.Token).ToListAsync());
+            await transformer.TransformAsync(source.ReadAsync(), cts.Token).ToListAsync());
 
-        Assert.False(enumerated);
+        Assert.False(source.Enumerated);
     }
 
 
-    [ExcludeFromCodeCoverage]
-    private sealed class ManualProgressTimer : IProgressTimer
-    {
-        private Action? _elapsed;
 
-        public bool WasStarted { get; private set; }
-
-        public event Action? Elapsed
-        {
-            add => _elapsed += value;
-            remove => _elapsed -= value;
-        }
-
-        public void Start(int intervalMilliseconds) => WasStarted = true;
-
-        public void StopTimer()
-        {
-        }
-
-        public void Fire() => _elapsed?.Invoke();
-
-        public void Dispose()
-        {
-        }
-    }
-
-
-    [ExcludeFromCodeCoverage]
     private sealed class CollectingProgress : IProgress<FixedWidthReport>
     {
         public List<FixedWidthReport> Reports { get; } = new();
 
         public void Report(FixedWidthReport value) => Reports.Add(value);
+    }
+
+
+
+    [Fact]
+    public void NoParameterlessCtor_keeps_the_name_it_was_built_with()
+    {
+        // ByMatchingProperties rejects this type by reflection; this pins its shape.
+        Assert.Equal("a", new NoParameterlessCtor("a").Name);
+    }
+
+
+
+    [Fact]
+    public async Task TransformAsync_when_token_not_cancelled_reads_the_tracked_source()
+    {
+        // Counterpart to the pre-cancelled test: the same tracked source IS read when
+        // nothing is cancelled, so that test's "never enumerated" is down to the guard.
+        using var transformer = new FixedWidthTransformer<Src, Dst>(s => new Dst { Name = s.Name });
+        var source = new TrackedSource();
+
+        var results = await transformer.TransformAsync(source.ReadAsync(), CancellationToken.None).ToListAsync();
+
+        Assert.True(source.Enumerated);
+        Assert.Equal("never", Assert.Single(results).Name);
+    }
+
+
+
+    // A one-record source that records whether anything pulled from it.
+    private sealed class TrackedSource
+    {
+        public bool Enumerated { get; private set; }
+
+
+
+        public async IAsyncEnumerable<Src> ReadAsync()
+        {
+            await Task.CompletedTask;
+            Enumerated = true;
+            yield return new Src { Name = "never" };
+        }
     }
 }

@@ -10,6 +10,7 @@ using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Xunit;
+using Wolfgang.Etl.TestKit.Xunit;
 
 namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 
@@ -19,7 +20,6 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 /// </summary>
 public sealed class FixedWidthBinaryLoaderTests
 {
-    [ExcludeFromCodeCoverage]
     public sealed class Account
     {
         [FixedWidthBinaryField(0, 8, BinaryFieldType.Text)]
@@ -109,7 +109,6 @@ public sealed class FixedWidthBinaryLoaderTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class ReadOnlyStream : MemoryStream
     {
         public override bool CanWrite => false;
@@ -235,34 +234,7 @@ public sealed class FixedWidthBinaryLoaderTests
 #pragma warning restore CS1998
 
 
-    [ExcludeFromCodeCoverage]
-    private sealed class ManualProgressTimer : IProgressTimer
-    {
-        private Action? _elapsed;
 
-        public event Action? Elapsed
-        {
-            add => _elapsed += value;
-            remove => _elapsed -= value;
-        }
-
-        public void Start(int intervalMilliseconds)
-        {
-        }
-
-        public void StopTimer()
-        {
-        }
-
-        public void Fire() => _elapsed?.Invoke();
-
-        public void Dispose()
-        {
-        }
-    }
-
-
-    [ExcludeFromCodeCoverage]
     [Fact]
     public void Internal_timer_ctor_accepts_a_logger_as_its_trailing_parameter()
     {

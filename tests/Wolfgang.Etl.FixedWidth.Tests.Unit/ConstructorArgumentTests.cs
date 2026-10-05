@@ -758,4 +758,16 @@ public class ConstructorArgumentTests
     }
 
 #pragma warning restore CS0618
+
+
+
+    [Fact]
+    public void BinaryAccount_members_round_trip()
+    {
+        // The constructor tests above only hand BinaryAccount to the extractor's
+        // argument checks; this pins the record shape they rely on.
+        var account = new BinaryAccount { AccountId = "ACC00001", TransactionCount = 3 };
+
+        Assert.Equal(("ACC00001", 3), (account.AccountId, account.TransactionCount));
+    }
 }

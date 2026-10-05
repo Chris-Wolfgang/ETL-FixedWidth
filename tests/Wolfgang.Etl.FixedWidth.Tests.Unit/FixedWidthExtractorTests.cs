@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,7 +15,6 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 // Shared test POCOs
 // ------------------------------------------------------------------
 
-[ExcludeFromCodeCoverage]
 public record PersonRecord
 {
 #pragma warning disable CS8618 // null by design — tests verify default(PersonRecord) has null strings
@@ -438,10 +436,7 @@ public class FixedWidthExtractorTests
             BlankLineHandling = BlankLineHandling.Skip,
             LineFilter = line =>
                 {
-                if (string.IsNullOrEmpty(line))
-                {
-                    filterInvokedForBlank = true;
-                }
+                filterInvokedForBlank |= string.IsNullOrEmpty(line);
 
                 return LineAction.Process;
             },
@@ -958,7 +953,6 @@ public class FixedWidthExtractorTests
     // FixedWidthSkipAttribute — integration
     // ------------------------------------------------------------------
 
-    [ExcludeFromCodeCoverage]
     private class EmployeeRecord
     {
         [FixedWidthField(0, 10)]

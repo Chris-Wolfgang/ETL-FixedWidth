@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Enums;
 
@@ -14,7 +13,6 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit.TestModels;
 /// <c>Wolfgang.Etl.FixedWidth.Analyzers</c> generator, referenced by this test project,
 /// emits accessors for this type and registers them from a module initializer.
 /// </summary>
-[ExcludeFromCodeCoverage]
 public sealed class GeneratedAccessorFixture
 {
     [FixedWidthField(0, 10)]
@@ -39,7 +37,6 @@ public sealed class GeneratedAccessorFixture
 /// through the reflection/Expression setter fallback. The fact that this file compiles is
 /// itself the regression guard.
 /// </summary>
-[ExcludeFromCodeCoverage]
 public sealed class GeneratedAccessorInitOnlyFixture
 {
     [FixedWidthField(0, 5)]

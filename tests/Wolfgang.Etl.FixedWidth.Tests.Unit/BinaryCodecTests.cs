@@ -38,10 +38,7 @@ public sealed class BinaryCodecTests
     [InlineData("9999999C", 0, "9999999")]   // 4 bytes -> 7 digits
     public void PackedDecimal_decodes_value_sign_and_scale(string hex, int scale, string expected)
     {
-        if (hex is null)
-        {
-            throw new ArgumentNullException(nameof(hex));
-        }
+        _ = hex ?? throw new ArgumentNullException(nameof(hex));
 
         var actual = PackedDecimal.Decode(Hex(hex), scale);
 
@@ -84,10 +81,7 @@ public sealed class BinaryCodecTests
     [InlineData("0000000000000100", true, 256L)]
     public void BinaryInteger_decodes_big_endian_two_complement(string hex, bool signed, long expected)
     {
-        if (hex is null)
-        {
-            throw new ArgumentNullException(nameof(hex));
-        }
+        _ = hex ?? throw new ArgumentNullException(nameof(hex));
 
         Assert.Equal(expected, BinaryInteger.Decode(Hex(hex), signed));
     }
@@ -110,10 +104,7 @@ public sealed class BinaryCodecTests
     [InlineData("0100", 256UL)]                                  // big-endian
     public void BinaryInteger_DecodeUnsigned_reads_the_full_ulong_range(string hex, ulong expected)
     {
-        if (hex is null)
-        {
-            throw new ArgumentNullException(nameof(hex));
-        }
+        _ = hex ?? throw new ArgumentNullException(nameof(hex));
 
         Assert.Equal(expected, BinaryInteger.DecodeUnsigned(Hex(hex)));
     }

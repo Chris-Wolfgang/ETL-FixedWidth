@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using Wolfgang.Etl.FixedWidth.Attributes;
@@ -13,7 +12,6 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 /// </summary>
 public class FixedWidthSchemaTests
 {
-    [ExcludeFromCodeCoverage]
     private record SkipLayoutRecord
     {
         [FixedWidthField(0, 10)]
@@ -26,7 +24,6 @@ public class FixedWidthSchemaTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private record TypedRecord
     {
         [FixedWidthField(0, 8, Alignment = FieldAlignment.Right, Pad = '0')]
@@ -161,5 +158,19 @@ public class FixedWidthSchemaTests
         Assert.Contains("'0'", diagram, StringComparison.Ordinal);
         Assert.Contains("yyyyMMdd", diagram, StringComparison.Ordinal);   // Date format
         Assert.Contains("3 fields + 0 skips", diagram, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public void Test_record_members_round_trip()
+    {
+        // The schema tests only reflect over these records; this pins their shape.
+        var date = new DateTime(2026, 10, 4, 0, 0, 0, DateTimeKind.Unspecified);
+        var skip = new SkipLayoutRecord { FirstName = "a", EmployeeNumber = "b" };
+        var typed = new TypedRecord { Id = 1, Amount = 2.5m, Date = date };
+
+        Assert.Equal(("a", "b"), (skip.FirstName, skip.EmployeeNumber));
+        Assert.Equal((1, 2.5m, date), (typed.Id, typed.Amount, typed.Date));
     }
 }
