@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,7 +12,6 @@ using Xunit;
 
 namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 
-[ExcludeFromCodeCoverage]
 public class HeaderRecord
 {
     [FixedWidthField(0, 10, Header = "FIRST_NM")]
@@ -85,19 +83,10 @@ public class FixedWidthLoaderTests
             ["\r\n", "\n"],
             StringSplitOptions.None
         );
-        if (parts.Length == 0 || parts[^1] != "")
-        {
-            return parts;
-        }
 
-        var trimmed = new string[parts.Length - 1];
-        Array.Copy
-        (
-            parts,
-            trimmed,
-            trimmed.Length
-        );
-        return trimmed;
+        // Drop the empty element after a trailing newline, keeping every other part.
+        var keep = parts.Length > 0 && parts[^1] == "" ? parts.Length - 1 : parts.Length;
+        return parts.Take(keep).ToArray();
     }
 
 
@@ -379,7 +368,6 @@ public class FixedWidthLoaderTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class SpacePaddedRecord
     {
         [FixedWidthField(0, 10)]
@@ -688,7 +676,6 @@ public class FixedWidthLoaderTests
     // StrictHeader overflow
     // ------------------------------------------------------------------
 
-    [ExcludeFromCodeCoverage]
     private class OverflowHeaderRecord
     {
         [FixedWidthField(0, 3, Header = "VERY_LONG_HEADER")]

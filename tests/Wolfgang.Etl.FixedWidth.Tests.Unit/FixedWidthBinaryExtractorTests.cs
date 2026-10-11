@@ -11,6 +11,7 @@ using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Binary;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Xunit;
+using Wolfgang.Etl.TestKit.Xunit;
 
 namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 
@@ -20,7 +21,6 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 /// </summary>
 public sealed class FixedWidthBinaryExtractorTests
 {
-    [ExcludeFromCodeCoverage]
     private sealed class Account
     {
         [FixedWidthBinaryField(0, 8, BinaryFieldType.Text)]
@@ -270,7 +270,6 @@ public sealed class FixedWidthBinaryExtractorTests
 #pragma warning restore CS0618
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class WriteOnlyStream : MemoryStream
     {
         public override bool CanRead => false;
@@ -285,7 +284,6 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class NoBinaryFields
     {
         public string Name { get; set; } = string.Empty;
@@ -299,7 +297,6 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class NullableAccount
     {
         [FixedWidthBinaryField(0, 5, BinaryFieldType.PackedDecimal, Scale = 2)]
@@ -323,7 +320,6 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class DuplicateIndex
     {
         [FixedWidthBinaryField(0, 4, BinaryFieldType.Binary)]
@@ -396,7 +392,6 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class UnsignedBig
     {
         [FixedWidthBinaryField(0, 8, BinaryFieldType.Binary, Signed = false)]
@@ -404,7 +399,6 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class SignedBig
     {
         [FixedWidthBinaryField(0, 8, BinaryFieldType.Binary, Signed = false)]
@@ -464,7 +458,6 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class FractionalToInt
     {
         [FixedWidthBinaryField(0, 4, BinaryFieldType.PackedDecimal, Scale = 2)]
@@ -472,7 +465,6 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class WholeToInt
     {
         [FixedWidthBinaryField(0, 4, BinaryFieldType.PackedDecimal, Scale = 0)]
@@ -480,7 +472,6 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class FractionalToDouble
     {
         [FixedWidthBinaryField(0, 4, BinaryFieldType.PackedDecimal, Scale = 2)]
@@ -523,34 +514,7 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
-    [ExcludeFromCodeCoverage]
-    private sealed class ManualProgressTimer : IProgressTimer
-    {
-        private Action? _elapsed;
 
-        public event Action? Elapsed
-        {
-            add => _elapsed += value;
-            remove => _elapsed -= value;
-        }
-
-        public void Start(int intervalMilliseconds)
-        {
-        }
-
-        public void StopTimer()
-        {
-        }
-
-        public void Fire() => _elapsed?.Invoke();
-
-        public void Dispose()
-        {
-        }
-    }
-
-
-    [ExcludeFromCodeCoverage]
     [Fact]
     public void Internal_timer_ctor_accepts_a_logger_as_its_trailing_parameter()
     {
@@ -572,5 +536,23 @@ public sealed class FixedWidthBinaryExtractorTests
         public System.Collections.Generic.List<FixedWidthReport> Reports { get; } = new();
 
         public void Report(FixedWidthReport value) => Reports.Add(value);
+    }
+
+
+
+    [Fact]
+    public void Test_record_members_round_trip()
+    {
+        // These records are only handed to the extractor's validation (which rejects
+        // them before reading a value); this pins the shape those tests rely on.
+        var noBinaryFields = new NoBinaryFields { Name = "a" };
+        var duplicate = new DuplicateIndex { A = 1, B = 2 };
+        var signedBig = new SignedBig { Value = 3 };
+        var fractionalToInt = new FractionalToInt { Amount = 4 };
+
+        Assert.Equal("a", noBinaryFields.Name);
+        Assert.Equal((1, 2), (duplicate.A, duplicate.B));
+        Assert.Equal(3L, signedBig.Value);
+        Assert.Equal(4, fractionalToInt.Amount);
     }
 }

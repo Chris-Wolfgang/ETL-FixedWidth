@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,7 +17,6 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 // Spy logger
 // ------------------------------------------------------------------
 
-[ExcludeFromCodeCoverage]
 internal sealed class SpyLogger<T> : ILogger<T>
 {
     private readonly List<LogEntry> _entries = new();
@@ -60,7 +58,6 @@ internal sealed class SpyLogger<T> : ILogger<T>
 
 
 
-[ExcludeFromCodeCoverage]
 internal sealed class LogEntry
 {
     public LogEntry(LogLevel level, string message, Exception? exception)
@@ -85,6 +82,19 @@ internal sealed class LogEntry
 
 public class FixedWidthExtractorLoggingTests
 {
+    [Fact]
+    public void SpyLogger_is_always_enabled_and_has_no_scope()
+    {
+        // Pins the parts of the shared logger double no logging test calls.
+        var logger = new SpyLogger<FixedWidthExtractorLoggingTests>();
+
+        Assert.Null(logger.BeginScope("scope"));
+        Assert.True(logger.IsEnabled(LogLevel.Trace));
+        Assert.Empty(logger.Entries);
+    }
+
+
+
     private static readonly string PersonLine = "John      Smith     042";
 
 

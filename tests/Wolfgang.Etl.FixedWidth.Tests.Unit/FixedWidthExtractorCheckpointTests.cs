@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Xunit;
+using Wolfgang.Etl.TestKit.Xunit;
 
 namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 
@@ -17,7 +17,6 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 /// </summary>
 public sealed class FixedWidthExtractorCheckpointTests
 {
-    [ExcludeFromCodeCoverage]
     private sealed class Rec
     {
         [FixedWidthField(0, 3)] public string Code { get; set; } = string.Empty;
@@ -252,7 +251,6 @@ public sealed class FixedWidthExtractorCheckpointTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class NonSeekableStream : MemoryStream
     {
         public NonSeekableStream(byte[] buffer) : base(buffer)
@@ -316,34 +314,7 @@ public sealed class FixedWidthExtractorCheckpointTests
     }
 
 
-    [ExcludeFromCodeCoverage]
-    private sealed class ManualProgressTimer : Abstractions.IProgressTimer
-    {
-        private Action? _elapsed;
 
-        public event Action? Elapsed
-        {
-            add => _elapsed += value;
-            remove => _elapsed -= value;
-        }
-
-        public void Start(int intervalMilliseconds)
-        {
-        }
-
-        public void StopTimer()
-        {
-        }
-
-        public void Fire() => _elapsed?.Invoke();
-
-        public void Dispose()
-        {
-        }
-    }
-
-
-    [ExcludeFromCodeCoverage]
     private sealed class CollectingProgress : IProgress<FixedWidthReport>
     {
         public List<FixedWidthReport> Reports { get; } = new();

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -20,7 +19,6 @@ public sealed class FixedWidthSchemaBuilderTests
 {
     // An undecorated record — no [FixedWidthField] attributes — to prove the builder maps a type the
     // caller does not own / cannot decorate.
-    [ExcludeFromCodeCoverage]
     public sealed class PlainPerson
     {
         public string FirstName { get; set; } = string.Empty;
@@ -31,14 +29,12 @@ public sealed class FixedWidthSchemaBuilderTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class ReadOnlyProperty
     {
         public string Name => "fixed";
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class NestedHolder
     {
         public PlainPerson Inner { get; set; } = new();
@@ -301,7 +297,6 @@ public sealed class FixedWidthSchemaBuilderTests
     // Helpers
     // ------------------------------------------------------------------
 
-    [ExcludeFromCodeCoverage]
     public sealed class PlainRecordWithSkip
     {
         public string FirstName { get; set; } = string.Empty;
@@ -339,4 +334,18 @@ public sealed class FixedWidthSchemaBuilderTests
         }
     }
 #pragma warning restore CS1998
+
+
+
+    [Fact]
+    public void Test_type_members_round_trip()
+    {
+        // ReadOnlyProperty and NestedHolder are only reflected over by the builder
+        // tests above (which reject them); this pins their shape.
+        var inner = new PlainPerson { FirstName = "a" };
+        var holder = new NestedHolder { Inner = inner };
+
+        Assert.Equal("fixed", new ReadOnlyProperty().Name);
+        Assert.Same(inner, holder.Inner);
+    }
 }
