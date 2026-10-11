@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.IO;
@@ -26,7 +25,6 @@ public sealed class FixedWidthMetricsTests
     private const string RecordTypeName = nameof(MetricsSample);
 
 
-    [ExcludeFromCodeCoverage]
     private sealed record MetricsSample
     {
         [FixedWidthField(0, 10)]

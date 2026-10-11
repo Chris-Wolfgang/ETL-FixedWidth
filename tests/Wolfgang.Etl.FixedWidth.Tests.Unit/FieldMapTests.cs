@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Parsing;
 using Xunit;
@@ -12,7 +11,6 @@ public class FieldMapTests
     // Test POCOs
     // ------------------------------------------------------------------
 
-    [ExcludeFromCodeCoverage]
     private class IndexedRecord
     {
         // Declared last in source, but Index = 0 means it's the first column.
@@ -32,7 +30,6 @@ public class FieldMapTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class DuplicateIndexRecord
     {
         [FixedWidthField(0, 10)]
@@ -46,7 +43,6 @@ public class FieldMapTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class NoSetterRecord
     {
         [FixedWidthField(0, 10)]
@@ -57,7 +53,6 @@ public class FieldMapTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class UnannotatedRecord
     {
         public string Name { get; set; } = string.Empty;
@@ -65,7 +60,6 @@ public class FieldMapTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class SkipMiddleRecord
     {
         [FixedWidthField(0, 10)]
@@ -86,7 +80,6 @@ public class FieldMapTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class SkipLeadingRecord
     {
         [FixedWidthSkip(0, 5, Message = "RecordType")]
@@ -101,7 +94,6 @@ public class FieldMapTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class SkipTrailingRecord
     {
         [FixedWidthField(0, 10)]
@@ -115,7 +107,6 @@ public class FieldMapTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class SkipDuplicateIndexRecord
     {
         [FixedWidthField(0, 10)]
@@ -442,10 +433,36 @@ public class FieldMapTests
     // Test POCOs — CompileFactory
     // ------------------------------------------------------------------
 
-    [ExcludeFromCodeCoverage]
     private class NoDefaultCtorRecord
     {
         public NoDefaultCtorRecord(string required) { Name = required; }
         public string Name { get; }
+    }
+
+
+
+    [Fact]
+    public void Test_record_members_round_trip()
+    {
+        // These records are only reflected over by the FieldMap tests above. Building
+        // each one pins the shape (settable, readable members) those tests rely on.
+        var indexed = new IndexedRecord { First = "a", Last = "b", Age = 1 };
+        var duplicate = new DuplicateIndexRecord { First = "c", Last = "d" };
+        var unannotated = new UnannotatedRecord { Name = "e" };
+        var skipMiddle = new SkipMiddleRecord { FirstName = "f", EmployeeNumber = "g", LastName = "h" };
+        var skipLeading = new SkipLeadingRecord { FirstName = "i", LastName = "j" };
+        var skipTrailing = new SkipTrailingRecord { FirstName = "k", Unused = "l" };
+        var skipDuplicate = new SkipDuplicateIndexRecord { FirstName = "m", LastName = "n" };
+        var noDefaultCtor = new NoDefaultCtorRecord("o");
+
+        Assert.Equal(("a", "b", 1), (indexed.First, indexed.Last, indexed.Age));
+        Assert.Equal(("c", "d"), (duplicate.First, duplicate.Last));
+        Assert.Equal("e", unannotated.Name);
+        Assert.Equal(("f", "g", "h"), (skipMiddle.FirstName, skipMiddle.EmployeeNumber, skipMiddle.LastName));
+        Assert.Equal(("i", "j"), (skipLeading.FirstName, skipLeading.LastName));
+        Assert.Equal(("k", "l"), (skipTrailing.FirstName, skipTrailing.Unused));
+        Assert.Equal(("m", "n"), (skipDuplicate.FirstName, skipDuplicate.LastName));
+        Assert.Equal("o", noDefaultCtor.Name);
+        Assert.Null(new NoSetterRecord().ReadOnly);
     }
 }

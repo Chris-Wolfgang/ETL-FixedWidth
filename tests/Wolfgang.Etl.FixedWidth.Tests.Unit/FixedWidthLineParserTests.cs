@@ -14,7 +14,6 @@ public class FixedWidthLineParserTests
     // Test POCOs
     // ------------------------------------------------------------------
 
-    [ExcludeFromCodeCoverage]
     private class SimpleRecord
     {
         [FixedWidthField(0, 10)]
@@ -33,7 +32,6 @@ public class FixedWidthLineParserTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class DateRecord
     {
         [FixedWidthField(0, 8, Format = "yyyyMMdd")]
@@ -42,7 +40,6 @@ public class FixedWidthLineParserTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class NullableRecord
     {
         [FixedWidthField(0, 10)]
@@ -56,7 +53,6 @@ public class FixedWidthLineParserTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class TrimRecord
     {
         [FixedWidthField(0, 10, TrimValue = false)]
@@ -440,7 +436,6 @@ public class FixedWidthLineParserTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class WideFieldRecord
     {
         // Exceeds the (currently 256-char) stackalloc threshold in
@@ -459,7 +454,6 @@ public class FixedWidthLineParserTests
     /// single-call stackalloc path of <c>WriteFieldSegment</c> from its
     /// multi-call fallback (one Write for the value + one or more for padding).
     /// </summary>
-    [ExcludeFromCodeCoverage]
     private sealed class CountingTextWriter : System.IO.TextWriter
     {
         private readonly System.IO.TextWriter _inner = new System.IO.StringWriter();
@@ -500,6 +494,24 @@ public class FixedWidthLineParserTests
 
 
     [Fact]
+    public void CountingTextWriter_counts_every_write_overload_and_keeps_the_text()
+    {
+        // The WriteFieldSegment tests above only reach the overloads their code path
+        // calls; this pins the remaining ones of the counting double.
+        var writer = new CountingTextWriter();
+
+        writer.Write('a');
+        writer.Write("bc");
+        writer.Write(new[] { 'd', 'e' }, 0, 2);
+
+        Assert.Equal(3, writer.WriteCallCount);
+        Assert.Equal("abcde", writer.ToString());
+        Assert.NotNull(writer.Encoding);
+    }
+
+
+
+    [Fact]
     public void WriteRecord_when_field_width_exceeds_stackalloc_threshold_uses_writepadding_fallback_left_aligned()
     {
         // Covers the non-stackalloc branch of WriteFieldSegment: when attr.Length
@@ -529,7 +541,6 @@ public class FixedWidthLineParserTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class WideRightAlignedRecord
     {
         // See WideFieldRecord for the rationale on the 1024 width.
@@ -713,7 +724,6 @@ public class FixedWidthLineParserTests
     // Test POCOs
     // ------------------------------------------------------------------
 
-    [ExcludeFromCodeCoverage]
     private class WriteSkipRecord
     {
         [FixedWidthField(0, 10)]
@@ -728,7 +738,6 @@ public class FixedWidthLineParserTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class TrailingSkipRecord
     {
         [FixedWidthField(0, 10)]
@@ -1242,7 +1251,6 @@ public class NullableParsingTests
     // Test POCO
     // ------------------------------------------------------------------
 
-    [ExcludeFromCodeCoverage]
     private class NullableRecord
     {
         [FixedWidthField(0, 5)]

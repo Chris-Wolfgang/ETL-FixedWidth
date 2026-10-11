@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,7 +20,6 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Snapshot;
 /// </summary>
 public class FormatterSnapshotTests
 {
-    [ExcludeFromCodeCoverage]
     private record PersonRecord
     {
         [FixedWidthField(0, 10)]
@@ -36,7 +34,6 @@ public class FormatterSnapshotTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private record SkipLayoutRecord
     {
         [FixedWidthField(0, 10)]

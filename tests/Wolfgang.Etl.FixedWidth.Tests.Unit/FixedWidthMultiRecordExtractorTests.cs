@@ -10,6 +10,7 @@ using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Xunit;
+using Wolfgang.Etl.TestKit.Xunit;
 
 namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 
@@ -19,7 +20,6 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 /// </summary>
 public sealed class FixedWidthMultiRecordExtractorTests
 {
-    [ExcludeFromCodeCoverage]
     private sealed class HeaderRecord
     {
         [FixedWidthField(0, 1)] public string Type { get; set; } = string.Empty;
@@ -27,7 +27,6 @@ public sealed class FixedWidthMultiRecordExtractorTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class DetailRecord
     {
         [FixedWidthField(0, 1)] public string Type { get; set; } = string.Empty;
@@ -36,7 +35,6 @@ public sealed class FixedWidthMultiRecordExtractorTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class TrailerRecord
     {
         [FixedWidthField(0, 1)] public string Type { get; set; } = string.Empty;
@@ -311,7 +309,6 @@ public sealed class FixedWidthMultiRecordExtractorTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class DuplicateIndex
     {
         [FixedWidthField(0, 4)] public string A { get; set; } = string.Empty;
@@ -491,7 +488,6 @@ public sealed class FixedWidthMultiRecordExtractorTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class EncodedRecord
     {
         [FixedWidthField(0, 3)] public string Value { get; set; } = string.Empty;
@@ -513,7 +509,6 @@ public sealed class FixedWidthMultiRecordExtractorTests
     }
 
 
-    [ExcludeFromCodeCoverage]
     private sealed class CapturingLogger<T> : Microsoft.Extensions.Logging.ILogger<T>
     {
         public List<string> Messages { get; } = new();
@@ -543,38 +538,37 @@ public sealed class FixedWidthMultiRecordExtractorTests
     }
 
 
-    [ExcludeFromCodeCoverage]
-    private sealed class ManualProgressTimer : IProgressTimer
-    {
-        private Action? _elapsed;
 
-        public event Action? Elapsed
-        {
-            add => _elapsed += value;
-            remove => _elapsed -= value;
-        }
-
-        public void Start(int intervalMilliseconds)
-        {
-        }
-
-        public void StopTimer()
-        {
-        }
-
-        public void Fire() => _elapsed?.Invoke();
-
-        public void Dispose()
-        {
-        }
-    }
-
-
-    [ExcludeFromCodeCoverage]
     private sealed class CollectingProgress : IProgress<FixedWidthReport>
     {
         public List<FixedWidthReport> Reports { get; } = new();
 
         public void Report(FixedWidthReport value) => Reports.Add(value);
+    }
+
+
+
+    [Fact]
+    public void DuplicateIndex_members_round_trip()
+    {
+        var record = new DuplicateIndex { A = "a", B = "b" };
+
+        Assert.Equal(("a", "b"), (record.A, record.B));
+    }
+
+
+
+    [Fact]
+    public void CapturingLogger_is_always_enabled_and_hands_out_a_disposable_scope()
+    {
+        // Pins the parts of the logger double the logging tests above never call.
+        var logger = new CapturingLogger<FixedWidthMultiRecordExtractor>();
+
+        using (logger.BeginScope("scope"))
+        {
+            Assert.True(logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Trace));
+        }
+
+        Assert.Empty(logger.Messages);
     }
 }
