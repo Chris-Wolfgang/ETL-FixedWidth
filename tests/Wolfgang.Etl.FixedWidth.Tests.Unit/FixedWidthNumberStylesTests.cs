@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -18,7 +17,6 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 /// </summary>
 public class FixedWidthNumberStylesTests
 {
-    [ExcludeFromCodeCoverage]
     private class MoneyRecord
     {
         // Default (null) -> Number for decimal: allows sign, decimal, thousands.
@@ -28,7 +26,6 @@ public class FixedWidthNumberStylesTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class PlainIntRecord
     {
         // Default (null) -> Integer for int: no decimals, no thousands.
@@ -38,7 +35,6 @@ public class FixedWidthNumberStylesTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class AnyMoneyRecord
     {
         // Explicit opt-in to the permissive forms (currency, parentheses, ...).
@@ -57,7 +53,6 @@ public class FixedWidthNumberStylesTests
 
 
 
-    [ExcludeFromCodeCoverage]
     private class TicketRecord
     {
         [FixedWidthField(0, 8)]
