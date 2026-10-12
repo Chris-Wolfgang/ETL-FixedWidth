@@ -64,7 +64,7 @@ public class DocExampleApiReferenceTests
             .GroupBy(t => StripArity(t.Name), StringComparer.Ordinal)
             .ToDictionary(g => g.Key, g => g.First(), StringComparer.Ordinal);
 
-        foreach (var file in EnumerateSourceFiles())
+        foreach (var file in EnumerateSourceFiles(AppContext.BaseDirectory))
         {
             var source = File.ReadAllText(file);
             foreach (var code in ExtractExampleCode(source))
@@ -104,9 +104,11 @@ public class DocExampleApiReferenceTests
         // assertion vacuously pass and hide real rot).
         Assert.NotEmpty(references);
 
+        // Format inside the one projection that runs for every reference: a separate
+        // Select after the Where would only execute when something had rotted.
         var rotted = references
-            .Where(r => r.Owner.GetMember(r.Member, flags).Length == 0)
-            .Select(r => $"{r.File}: '{r.Owner.Name}.{r.Member}'")
+            .Select(r => r.Owner.GetMember(r.Member, flags).Length == 0 ? $"{r.File}: '{r.Owner.Name}.{r.Member}'" : null)
+            .OfType<string>()
             .Distinct()
             .ToList();
 
@@ -154,11 +156,11 @@ public class DocExampleApiReferenceTests
 
 
 
-    private static IEnumerable<string> EnumerateSourceFiles()
+    private static IEnumerable<string> EnumerateSourceFiles(string startDirectory)
     {
         // [CallerFilePath] is unreliable in CI (deterministic /_/ paths), so walk up
         // from the test's base directory to the repo root and read the source tree.
-        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        var dir = new DirectoryInfo(startDirectory);
         while (dir != null)
         {
             var srcDir = Path.Combine(dir.FullName, "src", "Wolfgang.Etl.FixedWidth");
@@ -174,5 +176,17 @@ public class DocExampleApiReferenceTests
         }
 
         throw new DirectoryNotFoundException("Could not locate src/Wolfgang.Etl.FixedWidth from the test base directory.");
+    }
+
+
+
+    [Fact]
+    public void EnumerateSourceFiles_when_no_ancestor_holds_the_src_project_throws_DirectoryNotFoundException()
+    {
+        // A directory at the file-system root has no ancestor containing
+        // src/Wolfgang.Etl.FixedWidth, so the walk runs off the top.
+        var root = Path.GetPathRoot(Path.GetTempPath())!;
+
+        Assert.Throws<DirectoryNotFoundException>(() => EnumerateSourceFiles(root).ToList());
     }
 }

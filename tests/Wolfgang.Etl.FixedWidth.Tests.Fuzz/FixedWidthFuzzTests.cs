@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,7 +25,6 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Fuzz;
 /// </summary>
 public class FixedWidthFuzzTests
 {
-    [ExcludeFromCodeCoverage]
     public record FuzzRecord
     {
         [FixedWidthField(0, 10)]

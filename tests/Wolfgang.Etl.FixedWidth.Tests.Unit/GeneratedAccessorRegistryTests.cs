@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using Wolfgang.Etl.FixedWidth.Generated;
 using Xunit;
 
@@ -13,7 +12,6 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 /// </summary>
 public sealed class GeneratedAccessorRegistryTests
 {
-    [ExcludeFromCodeCoverage]
     private sealed class RegistryProbe
     {
         public string Value { get; set; } = string.Empty;
