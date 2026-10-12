@@ -29,6 +29,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <!-- pr.yaml and coverage-report.yaml run every discovered test project with the
+         XPlat Code Coverage collector, and Stage 1 fails a test assembly that ran
+         but recorded no coverage. Every other test project in the repo carries it. -->
+    <PackageReference Include="coverlet.collector" Version="10.1.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <!-- System.Reflection.Metadata is BCL for net10.0 — no PackageReference. -->
   </ItemGroup>
 
