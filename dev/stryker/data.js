@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791701854619,
+  "lastUpdate": 1792306884737,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-FixedWidth",
   "entries": {
     "Mutation score": [
@@ -75,6 +75,33 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/Chris-Wolfgang/ETL-FixedWidth/commit/358c1a3a581a6ddb02df98f43f1dea2f7b41ae51"
         },
         "date": 1791701848069,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "Mutation score",
+            "value": 74.74,
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]",
+            "email": "49699333+dependabot[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "aa72843d5a6a4fabe638f78c47686cc9632a294e",
+          "message": "build(deps): bump ossf/scorecard-action (#579)\n\nBumps the github-actions group with 1 update: [ossf/scorecard-action](https://github.com/ossf/scorecard-action).\n\n\nUpdates `ossf/scorecard-action` from 2.4.4 to 2.5.0\n- [Release notes](https://github.com/ossf/scorecard-action/releases)\n- [Changelog](https://github.com/ossf/scorecard-action/blob/main/RELEASE.md)\n- [Commits](https://github.com/ossf/scorecard-action/compare/2d1146689b8cda280b9bc96326124645441f03bc...fa7117db83c52d787ae5a89f350999701505d78e)\n\n---\nupdated-dependencies:\n- dependency-name: ossf/scorecard-action\n  dependency-version: 2.5.0\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: github-actions\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-10-17T02:38:04Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-FixedWidth/commit/aa72843d5a6a4fabe638f78c47686cc9632a294e"
+        },
+        "date": 1792306877472,
         "tool": "customBiggerIsBetter",
         "benches": [
           {
