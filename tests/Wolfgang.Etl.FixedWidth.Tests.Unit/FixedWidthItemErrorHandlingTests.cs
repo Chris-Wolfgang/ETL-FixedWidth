@@ -261,7 +261,8 @@ public class FixedWidthItemErrorHandlingTests
             CancellationToken.None
         );
 
-        Assert.Equal(new CountingLoader.Report(2), reports.Last());
-        Assert.Equal(2, reports.Last().Count);
+        var last = reports[reports.Count - 1];
+        Assert.Equal(new CountingLoader.Report(2), last);
+        Assert.Equal(2, last.Count);
     }
 }
