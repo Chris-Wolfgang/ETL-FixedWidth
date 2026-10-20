@@ -222,11 +222,11 @@ public sealed class ConcurrencyStressTests
         Assert.All
         (
             tasks,
-            task =>
-            {
-                Assert.Null(task.Exception);
-                Assert.Equal(TaskStatus.RanToCompletion, task.Status);
-            }
+            task => Assert.Equal
+            (
+                (Exception: (AggregateException?)null, Status: TaskStatus.RanToCompletion),
+                (task.Exception, task.Status)
+            )
         );
     }
 
