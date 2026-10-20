@@ -22,6 +22,7 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 /// </summary>
 public sealed class FixedWidthAccessorGeneratorTests
 {
+#if NET5_0_OR_GREATER
     private static PropertyInfo[] FieldProperties() =>
         typeof(GeneratedAccessorFixture)
             .GetProperties()
@@ -39,8 +40,6 @@ public sealed class FixedWidthAccessorGeneratorTests
     };
 
 
-
-#if NET5_0_OR_GREATER
 
     [Fact]
     public void Generator_registers_a_factory_that_creates_the_record()
