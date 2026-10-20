@@ -270,12 +270,14 @@ public sealed class FixedWidthSchemaBuilderTests
             Schema = plainSchema,   // schema is for PlainPerson, not PersonRecord
         });
 
-        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-        {
-            await foreach (var _ in extractor.ExtractAsync(CancellationToken.None).ConfigureAwait(false))
-            {
-            }
-        });
+        // ToListAsync rather than an empty await-foreach body: the extractor throws
+        // before the first item, so an empty loop body would never execute.
+        await Assert.ThrowsAsync<InvalidOperationException>
+        (
+            async () => await extractor
+                .ExtractAsync(CancellationToken.None)
+                .ToListAsync()
+        );
     }
 
 

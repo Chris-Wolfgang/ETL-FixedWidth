@@ -504,8 +504,17 @@ public class FixedWidthLineParserTests
         writer.Write("bc");
         writer.Write(new[] { 'd', 'e' }, 0, 2);
 
+#if NET6_0_OR_GREATER
+        // Not every net6.0+ build of the library writes through the span overload,
+        // so call it here to keep the double fully covered on every framework.
+        writer.Write("f".AsSpan());
+
+        Assert.Equal(4, writer.WriteCallCount);
+        Assert.Equal("abcdef", writer.ToString());
+#else
         Assert.Equal(3, writer.WriteCallCount);
         Assert.Equal("abcde", writer.ToString());
+#endif
         Assert.NotNull(writer.Encoding);
     }
 
