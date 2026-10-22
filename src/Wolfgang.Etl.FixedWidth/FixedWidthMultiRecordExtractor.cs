@@ -148,8 +148,9 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// <summary>
     /// Initializes a new <see cref="FixedWidthMultiRecordExtractor"/> that reads from the specified
     /// <see cref="Stream"/> using an internal <see cref="StreamReader"/> with a 64&#160;KB buffer.
-    /// The caller retains ownership of the stream. Set <see cref="Encoding"/> to decode with a
-    /// specific encoding (defaults to <see cref="Encoding.UTF8"/>).
+    /// The caller retains ownership of the stream. To decode with a specific encoding, set
+    /// <see cref="FixedWidthMultiRecordExtractorOptions.Encoding"/> on <paramref name="options"/>
+    /// (defaults to <see cref="System.Text.Encoding.UTF8"/>).
     /// </summary>
     /// <param name="stream">The readable source stream.</param>
     /// <param name="options">

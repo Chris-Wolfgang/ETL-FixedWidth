@@ -32,6 +32,8 @@ namespace Wolfgang.Etl.FixedWidth;
 ///   The internal writer is flushed automatically at the end of
 ///   <c>LoadWorkerAsync</c>, and <see cref="System.IDisposable.Dispose"/> must be called to release it.</item>
 /// </list>
+/// </remarks>
+/// <example>
 /// <code>
 /// // Stream-based (preferred for files — 64 KB buffer reduces syscall overhead):
 /// await using var stream = File.OpenWrite("output.txt");
@@ -50,7 +52,7 @@ namespace Wolfgang.Etl.FixedWidth;
 ///     FieldDelimiter = " | ",
 /// });
 /// </code>
-/// </remarks>
+/// </example>
 public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     where TRecord : notnull
 {
@@ -89,9 +91,11 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// <param name="writer">
     /// The <see cref="TextWriter"/> to write fixed-width records to.
     /// </param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">
+    /// An optional logger for diagnostic output. Pass <see langword="null"/> (the default) to disable logging.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// <paramref name="writer"/> or <paramref name="logger"/> is null.
+    /// <paramref name="writer"/> is null.
     /// </exception>
     public FixedWidthLoader
     (
