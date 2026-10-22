@@ -15,6 +15,12 @@ on:
 permissions:
   contents: read  # Default to read-only; the build-and-deploy job overrides with write
 
+# gh-pages writers (this workflow, docfx.yaml, benchmarks.yaml) share one group, so two deploys never
+# push to gh-pages at the same time. Never cancel a deploy mid-push: queue instead.
+concurrency:
+  group: gh-pages
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
     name: Build & Deploy All Versioned Docs

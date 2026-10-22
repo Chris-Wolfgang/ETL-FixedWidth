@@ -19,6 +19,12 @@ on:
 permissions:
   contents: read
 
+# A newer sweep supersedes a running one, so two overlapping runs cannot file the same
+# falsified property twice.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   fuzz:
     name: Property fuzz sweep
