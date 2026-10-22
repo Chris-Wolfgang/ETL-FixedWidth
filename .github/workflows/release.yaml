@@ -9,7 +9,9 @@ permissions:
   contents: read  # Default to read-only; individual jobs declare write where required
 
 env:
-  CODECOV_MINIMUM: 90
+  # Same gates as pr.yaml: production assemblies (src/) and test assemblies (tests/).
+  CODECOV_MINIMUM: 95
+  CODECOV_TEST_MINIMUM: 100
 
 concurrency:
   # Serialize releases so a duplicate / re-published Release event can't run two
@@ -222,6 +224,7 @@ jobs:
                   --configuration Release `
                   --no-build `
                   --no-restore `
+                  --settings coverlet.runsettings `
                   --collect:"XPlat Code Coverage" `
                   --results-directory "./TestResults" `
                   --logger "console;verbosity=minimal"
@@ -243,6 +246,7 @@ jobs:
                   --framework $fw `
                   --no-build `
                   --no-restore `
+                  --settings coverlet.runsettings `
                   --collect:"XPlat Code Coverage" `
                   --results-directory "./TestResults" `
                   --logger "console;verbosity=minimal"
@@ -277,7 +281,7 @@ jobs:
           $coverageFiles = Get-ChildItem -Path "TestResults" -Recurse -Filter "coverage.cobertura.xml" -ErrorAction SilentlyContinue
 
           if ($coverageFiles.Count -eq 0) {
-            Write-Error "❌ No coverage files found - coverage data is required to enforce the 90% threshold"
+            Write-Error "❌ No coverage files found - coverage data is required to enforce the coverage gates"
             exit 1
           }
 
@@ -296,7 +300,19 @@ jobs:
 
           # Parse coverage and enforce threshold per module (matching pr.yaml)
           $summaryContent = Get-Content CoverageReport/Summary.txt
-          $threshold = if ($env:CODECOV_MINIMUM) { [int]$env:CODECOV_MINIMUM } else { 90 }
+          $threshold = if ($env:CODECOV_MINIMUM) { [int]$env:CODECOV_MINIMUM } else { 95 }
+          $testThreshold = if ($env:CODECOV_TEST_MINIMUM) { [int]$env:CODECOV_TEST_MINIMUM } else { 100 }
+
+          # Test assemblies are identified by LOCATION (projects under tests/), never by
+          # name - the same rule as pr.yaml Stage 2.
+          $testAssemblies = @()
+          if (Test-Path "tests") {
+            Get-ChildItem -Path "tests" -Recurse -File -Include *.csproj,*.vbproj,*.fsproj | ForEach-Object {
+              $m = [regex]::Match((Get-Content $_.FullName -Raw), '<AssemblyName>([^<]+)</AssemblyName>')
+              $testAssemblies += $(if ($m.Success) { $m.Groups[1].Value.Trim() } else { $_.BaseName })
+            }
+          }
+          Write-Host "Test assemblies (gated at ${testThreshold}%): $($testAssemblies -join ', ')"
           $failedModules = @()
           $coverageFound = $false
 
@@ -307,13 +323,15 @@ jobs:
               $module = $matches[1]
               $coverage = [decimal]$matches[2]
 
-              Write-Host "Checking module: '$module' - Coverage: ${coverage}%" -ForegroundColor Cyan
+              $moduleThreshold = if ($testAssemblies -contains $module) { $testThreshold } else { $threshold }
 
-              if ($coverage -lt $threshold) {
-                Write-Host "  ❌ FAIL: Below ${threshold}% threshold" -ForegroundColor Red
-                $failedModules += "$module (${coverage}%)"
+              Write-Host "Checking module: '$module' - Coverage: ${coverage}% (gate ${moduleThreshold}%)" -ForegroundColor Cyan
+
+              if ($coverage -lt $moduleThreshold) {
+                Write-Host "  ❌ FAIL: Below ${moduleThreshold}% threshold" -ForegroundColor Red
+                $failedModules += "$module (${coverage}% < ${moduleThreshold}%)"
               } else {
-                Write-Host "  ✅ PASS: Meets ${threshold}% threshold" -ForegroundColor Green
+                Write-Host "  ✅ PASS: Meets ${moduleThreshold}% threshold" -ForegroundColor Green
               }
             }
           }
@@ -329,13 +347,13 @@ jobs:
             Write-Host "==========================================" -ForegroundColor Red
             Write-Host "❌ COVERAGE GATE FAILED" -ForegroundColor Red
             Write-Host "==========================================" -ForegroundColor Red
-            Write-Host "Modules below ${threshold}% coverage: $($failedModules -join ', ')" -ForegroundColor Red
+            Write-Host "Modules below their coverage gate: $($failedModules -join ', ')" -ForegroundColor Red
             exit 1
           }
 
           Write-Host ""
           Write-Host "==========================================" -ForegroundColor Green
-          Write-Host "✅ All modules meet ${threshold}% coverage threshold" -ForegroundColor Green
+          Write-Host "✅ All modules meet their coverage gate (src ${threshold}%, tests ${testThreshold}%)" -ForegroundColor Green
           Write-Host "==========================================" -ForegroundColor Green
 
       - name: Upload coverage report
