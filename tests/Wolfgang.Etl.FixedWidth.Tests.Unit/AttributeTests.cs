@@ -32,7 +32,7 @@ public class FixedWidthFieldAttributeTests
 
 
     [Fact]
-    public void Constructor_sets_Index_and_Length()
+    public void Constructor_when_index_and_length_given_sets_Index_and_Length()
     {
         var attr = new FixedWidthFieldAttribute
         (
@@ -149,7 +149,7 @@ public class FixedWidthSkipAttributeTests
 
 
     [Fact]
-    public void Constructor_sets_Index_and_Length()
+    public void Constructor_when_index_and_length_given_sets_Index_and_Length()
     {
         var attr = new FixedWidthSkipAttribute
         (
@@ -172,7 +172,7 @@ public class FixedWidthSkipAttributeTests
 
 
     [Fact]
-    public void Message_can_be_set_and_read()
+    public void Message_when_set_returns_the_assigned_value()
     {
         var attr = new FixedWidthSkipAttribute
         (

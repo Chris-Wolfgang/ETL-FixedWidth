@@ -11,7 +11,7 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 public class ConstructorOverloadResolutionTests
 {
     [Fact]
-    public void Positional_null_second_argument_binds_the_shipped_logger_overload()
+    public void Constructor_when_second_argument_is_a_positional_null_binds_the_shipped_logger_overload()
     {
         // (reader, null): the two-parameter (TextReader, ILogger?) candidate has every argument supplied, so it
         // beats (TextReader, Options?, ILogger?), which would need a default for the logger.
@@ -28,7 +28,7 @@ public class ConstructorOverloadResolutionTests
 
 
     [Fact]
-    public void Single_argument_call_binds_the_shipped_single_argument_overload()
+    public void Constructor_when_called_with_one_argument_binds_the_shipped_single_argument_overload()
     {
         // (reader): the exact-arity (TextReader) candidate beats both optional-parameter overloads.
         using var reader = new StringReader(string.Empty);
@@ -44,7 +44,7 @@ public class ConstructorOverloadResolutionTests
 
 
     [Fact]
-    public void Record_and_named_logger_shapes_bind_the_options_overload()
+    public void Constructor_when_given_a_record_or_a_named_logger_binds_the_options_overload()
     {
         using var reader = new StringReader(string.Empty);
         using var writer = new StringWriter();
