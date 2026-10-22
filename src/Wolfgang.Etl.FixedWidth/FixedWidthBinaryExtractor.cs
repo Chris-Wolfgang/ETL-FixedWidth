@@ -63,11 +63,6 @@ public sealed class FixedWidthBinaryExtractor<TRecord> : ExtractorBase<TRecord, 
 
 
 
-
-
-
-
-
     /// <summary>
     /// Initializes a new <see cref="FixedWidthBinaryExtractor{TRecord}"/> that reads fixed-length
     /// binary records from <paramref name="stream"/>. The caller retains ownership of the stream.
@@ -116,6 +111,7 @@ public sealed class FixedWidthBinaryExtractor<TRecord> : ExtractorBase<TRecord, 
     {
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }
+
 
 
     /// <summary>
