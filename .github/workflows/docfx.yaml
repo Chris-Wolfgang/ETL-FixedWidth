@@ -50,6 +50,13 @@ on:
 permissions:
   contents: read  # Default to read-only; the build-and-deploy job overrides with write
 
+# Same group as build-all-versions.yaml and benchmarks.yaml: gh-pages writers are serialised. A fixed name rather
+# than github.workflow, because when release.yaml calls this workflow github.workflow is the
+# caller's name. Never cancel a deploy mid-push: queue instead.
+concurrency:
+  group: gh-pages
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
     name: Build & Deploy Documentation
