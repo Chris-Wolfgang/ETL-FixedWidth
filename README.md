@@ -560,10 +560,10 @@ cd docfx_project
 docfx metadata  # Extract API metadata from source code
 docfx build     # Build HTML documentation
 
-# Documentation is generated in the docs/ folder at the repository root
+# Documentation is generated in docfx_project/_site/
 ```
 
-The documentation is automatically built and deployed to GitHub Pages when changes are pushed to the `main` branch.
+The documentation is built and deployed to GitHub Pages by `docfx.yaml`, which `release.yaml` calls when a GitHub Release is published (it can also be run manually).
 
 **Local Preview:**
 ```bash
@@ -576,7 +576,8 @@ docfx build --serve
 
 **Documentation Structure:**
 - `docfx_project/` - DocFX configuration and source files
-- `docs/` - Generated HTML documentation (published to GitHub Pages)
+- `docfx_project/_site/` - Generated HTML documentation (build output, published to GitHub Pages; not committed)
+- `docs/` - Hand-written repository documentation (ADRs, baselines, guides)
 - `docfx_project/index.md` - Main landing page content
 - `docfx_project/docs/` - Additional documentation articles
 - `docfx_project/api/` - Auto-generated API reference YAML files
@@ -593,8 +594,8 @@ hashes and the toolchain that produced them.
 
 ```bash
 # Download the manifest for a release, rebuild at the tag, and compare hashes.
-gh release download v0.8.0 --repo Chris-Wolfgang/ETL-FixedWidth --pattern reproducible-build-manifest.json
-git clone --depth 1 --branch v0.8.0 https://github.com/Chris-Wolfgang/ETL-FixedWidth
+gh release download v0.13.0 --repo Chris-Wolfgang/ETL-FixedWidth --pattern reproducible-build-manifest.json
+git clone --depth 1 --branch v0.13.0 https://github.com/Chris-Wolfgang/ETL-FixedWidth
 dotnet build ETL-FixedWidth/src/Wolfgang.Etl.FixedWidth/Wolfgang.Etl.FixedWidth.csproj -c Release -p:ContinuousIntegrationBuild=true
 find ETL-FixedWidth/src/Wolfgang.Etl.FixedWidth/bin/Release -name 'Wolfgang.Etl.FixedWidth.dll' -exec sha256sum {} \;
 ```
