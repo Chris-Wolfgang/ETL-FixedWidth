@@ -251,6 +251,83 @@ public sealed class FixedWidthBinaryLoaderTests
     }
 
 
+    private static Account[] ThreeAccounts() => new[]
+    {
+        new Account { AccountId = "ACCT0001", TransactionCount = 1, Balance = 1m },
+        new Account { AccountId = "ACCT0002", TransactionCount = 2, Balance = 2m },
+        new Account { AccountId = "ACCT0003", TransactionCount = 3, Balance = 3m },
+    };
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_SkipItemCount_is_set_skips_the_leading_records()
+    {
+        using var ms = new MemoryStream();
+        using (var loader = new FixedWidthBinaryLoader<Account>(ms, new FixedWidthBinaryLoaderOptions { SkipItemCount = 2 }))
+        {
+            await loader.LoadAsync(ToAsync(ThreeAccounts()), CancellationToken.None);
+
+            Assert.Equal(2, loader.CurrentSkippedItemCount);
+            Assert.Equal(1, loader.CurrentItemCount);
+        }
+
+        ms.Position = 0;
+        using var extractor = new FixedWidthBinaryExtractor<Account>(ms, options: null);
+        var read = await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
+
+        Assert.Equal
+        (
+            new[] { "ACCT0003" },
+            read.Select(a => a.AccountId).ToArray()
+        );
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_MaximumItemCount_is_set_stops_after_that_many_records()
+    {
+        using var ms = new MemoryStream();
+        using (var loader = new FixedWidthBinaryLoader<Account>(ms, new FixedWidthBinaryLoaderOptions { MaximumItemCount = 2 }))
+        {
+            await loader.LoadAsync(ToAsync(ThreeAccounts()), CancellationToken.None);
+
+            Assert.Equal(2, loader.CurrentItemCount);
+        }
+
+        ms.Position = 0;
+        using var extractor = new FixedWidthBinaryExtractor<Account>(ms, options: null);
+        var read = await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
+
+        Assert.Equal
+        (
+            new[] { "ACCT0001", "ACCT0002" },
+            read.Select(a => a.AccountId).ToArray()
+        );
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_a_record_is_null_throws_InvalidOperationException()
+    {
+        var accounts = new[] { new Account { AccountId = "ACCT0001" }, null! };
+        var logger = new SpyLogger<FixedWidthBinaryLoader<Account>>();
+        using var ms = new MemoryStream();
+        using var loader = new FixedWidthBinaryLoader<Account>(ms, options: null, logger: logger);
+
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>
+        (
+            async () => await loader.LoadAsync(ToAsync(accounts), CancellationToken.None)
+        );
+
+        Assert.Contains("item 2", ex.Message, StringComparison.Ordinal);
+        Assert.Contains(logger.Entries, e => e.Level == LogLevel.Error);
+    }
+
+
+
     private sealed class CollectingProgress : IProgress<FixedWidthReport>
     {
         public List<FixedWidthReport> Reports { get; } = new();
