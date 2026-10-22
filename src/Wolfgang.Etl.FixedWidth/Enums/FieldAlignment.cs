@@ -12,8 +12,8 @@ public enum FieldAlignment
     Left = 0,
 
     /// <summary>
-    /// The value is right-aligned and padded on the left.
-    /// This is the default alignment for numeric fields.
+    /// The value is right-aligned and padded on the left. Not applied automatically:
+    /// <see cref="Left"/> is the default for every field type, so set it explicitly for numbers.
     /// </summary>
     Right = 1,
 }
