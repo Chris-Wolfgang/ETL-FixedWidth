@@ -428,7 +428,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 | **Progress reporting** | Timer-based `IProgress<T>` reporting via `FixedWidthReport` (includes `CurrentLineNumber`) |
 | **Checkpoint / resume** | `TrackByteOffset` + `CurrentByteOffset` / `StartByteOffset` — persist a byte-offset checkpoint per record and resume a crashed run without re-reading the file |
 | **Zero-copy parsing** | `ReadOnlyMemory<char>` slicing avoids string allocations during field extraction |
-| **Span-based numerics** | `Span<char>`-based numeric parsing on net8.0+ for reduced allocation |
+| **Span-based numerics** | `Span<char>`-based numeric and date parsing on net5.0+ for reduced allocation |
 | **Source-generated accessors** | A bundled Roslyn generator emits direct-access factory/getter/setter delegates for `[FixedWidthField]` types at compile time — no reflection, no `Expression.Compile`, **Native AOT & trimming compatible**; falls back to compiled delegates on net462/netstandard2.0 |
 | **Schema introspection** | `FixedWidthSchema.For<T>()` exposes the resolved layout (positions, widths, types, skips); `ToDiagram()` renders it as a text table |
 | **Code-defined layout** | `FixedWidthSchemaBuilder<T>` defines a layout in fluent, type-safe code (no attributes required); pass it as `Schema` in the extractor/loader options record |

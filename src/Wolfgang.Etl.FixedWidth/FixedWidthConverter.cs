@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Globalization;
 using Wolfgang.Etl.FixedWidth.Exceptions;
@@ -37,6 +38,13 @@ namespace Wolfgang.Etl.FixedWidth;
 /// </remarks>
 public static class FixedWidthConverter
 {
+    // The boxed default of each value type an empty field resolves to. Boxing it once per type
+    // instead of once per empty field per record; a boxed value type is never mutated after it is
+    // assigned through the setter (assignment unboxes a copy), so one shared instance is safe.
+    private static readonly ConcurrentDictionary<Type, object> BoxedDefaults = new();
+
+
+
     // ------------------------------------------------------------------
     // Value converters
     // ------------------------------------------------------------------
@@ -352,20 +360,20 @@ public static class FixedWidthConverter
         if (span.IsEmpty)
         {
             return targetType.IsValueType
-                ? Activator.CreateInstance(targetType)!
+                ? BoxedDefaults.GetOrAdd(targetType, static t => Activator.CreateInstance(t)!)
                 : null;
         }
 
         if (targetType == typeof(DateTime) || targetType == typeof(DateTimeOffset) || targetType == typeof(TimeSpan))
         {
-#if NET8_0_OR_GREATER
+#if NET5_0_OR_GREATER
             return ParseDateTimeValueSpan(span, targetType, format);
 #else
             return ParseDateTimeValue(text.ToString(), targetType, format);
 #endif
         }
 
-#if NET8_0_OR_GREATER
+#if NET5_0_OR_GREATER
         var numericResult = ParseNumericSpan(span, targetType, numberStyles);
 #else
         var numericResult = ParseNumericString(text.ToString(), targetType, numberStyles);
@@ -429,11 +437,11 @@ public static class FixedWidthConverter
 
 
 
-#if !NET8_0_OR_GREATER
+#if !NET5_0_OR_GREATER
     /// <summary>
     /// Parses a <see cref="DateTime"/>, <see cref="DateTimeOffset"/>, or
     /// <see cref="TimeSpan"/> value from <paramref name="text"/> using the
-    /// required <paramref name="format"/> string. On net8+ this is replaced
+    /// required <paramref name="format"/> string. On net5.0+ this is replaced
     /// by <c>ParseDateTimeValueSpan</c> which avoids the string allocation.
     /// </summary>
     /// <exception cref="InvalidOperationException">
@@ -482,7 +490,7 @@ public static class FixedWidthConverter
     /// <summary>
     /// Parses a numeric value from <paramref name="text"/> using
     /// <paramref name="requestedStyle"/> (or the type's natural style when null) and
-    /// <see cref="CultureInfo.InvariantCulture"/>. The net8+ build uses the
+    /// <see cref="CultureInfo.InvariantCulture"/>. The net5.0+ build uses the
     /// allocation-free span overloads instead
     /// (<c>ParseNumericSpan</c>). Returns <see langword="null"/> when
     /// <paramref name="targetType"/> is not a supported numeric type.
@@ -528,7 +536,7 @@ public static class FixedWidthConverter
 
 
 
-#if NET8_0_OR_GREATER
+#if NET5_0_OR_GREATER
     /// <summary>
     /// Span-based replacement for the older-TFM <c>ParseDateTimeValue</c> that
     /// avoids the <see cref="string"/> allocation by parsing directly from the
