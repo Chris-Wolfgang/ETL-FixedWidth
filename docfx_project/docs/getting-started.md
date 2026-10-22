@@ -116,7 +116,11 @@ For multi-GB files, opt in to byte-offset tracking so a crashed run can resume w
 ```csharp
 // First run
 await using var stream = File.OpenRead("huge.dat");
-using var extractor = new FixedWidthExtractor<Record>(stream) { TrackByteOffset = true };
+using var extractor = new FixedWidthExtractor<Record>
+(
+    stream,
+    new FixedWidthExtractorStreamOptions<Record> { TrackByteOffset = true }
+);
 await foreach (var record in extractor.ExtractAsync(token))
 {
     Process(record);
@@ -125,7 +129,11 @@ await foreach (var record in extractor.ExtractAsync(token))
 
 // Resume after a crash
 await using var stream = File.OpenRead("huge.dat");
-using var extractor = new FixedWidthExtractor<Record>(stream) { StartByteOffset = LoadCheckpoint() };
+using var extractor = new FixedWidthExtractor<Record>
+(
+    stream,
+    new FixedWidthExtractorStreamOptions<Record> { StartByteOffset = LoadCheckpoint() }
+);
 await foreach (var record in extractor.ExtractAsync(token)) { /* the remainder */ }
 ```
 
@@ -163,7 +171,7 @@ Console.WriteLine(FixedWidthSchema.For<EmployeeRecord>().ToDiagram());
 
 ### Defining the layout in code
 
-When you can't decorate the record type, or the layout is chosen at runtime, build the schema with `FixedWidthSchemaBuilder<T>` and assign it to the extractor/loader `Schema` property instead of using attributes:
+When you can't decorate the record type, or the layout is chosen at runtime, build the schema with `FixedWidthSchemaBuilder<T>` and pass it as `Schema` in the extractor's or loader's options record instead of using attributes:
 
 ```csharp
 var schema = new FixedWidthSchemaBuilder<CustomerRecord>()
@@ -173,7 +181,11 @@ var schema = new FixedWidthSchemaBuilder<CustomerRecord>()
     .Field(r => r.Balance, index: 3, length: 9, alignment: FieldAlignment.Right, format: "0000000.00")
     .Build();
 
-using var extractor = new FixedWidthExtractor<CustomerRecord>(reader) { Schema = schema };
+using var extractor = new FixedWidthExtractor<CustomerRecord>
+(
+    reader,
+    new FixedWidthExtractorOptions<CustomerRecord> { Schema = schema }
+);
 ```
 
 The lambda selectors are type-safe (no magic strings) and `index` is the zero-based column ordinal, matching `[FixedWidthField(index, length)]`. A built schema is equivalent to an attribute-resolved one — same validation and the same `Fields` / `ToDiagram()` introspection — and overrides any attributes on the type when set. See the [SchemaBuilder example](examples.md#schemabuilder).
