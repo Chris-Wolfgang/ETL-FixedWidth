@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFrameworks>net462;net481;netstandard2.0;net5.0;net6.0;net7.0;net8.0;net10.0</TargetFrameworks>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
-    <LangVersion>latest</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
     <Version>0.13.0</Version>
     <!-- Pin AssemblyVersion to a fixed binding-stability baseline so consumers
@@ -28,10 +27,8 @@
     <Description>Extractor and Loader implementations for reading and writing fixed-width text files, built on Wolfgang.Etl.Abstractions.</Description>
     <PackageProjectUrl>https://github.com/Chris-Wolfgang/ETL-FixedWidth</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Chris-Wolfgang/ETL-FixedWidth</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <SignAssembly>False</SignAssembly>
     <PackageTags>ETL;Extract-Transform-Load;FixedWidth;Fixed-Width;Fixed-Length;Positional;FlatFile;Text-File;Data-Pipeline;Parser;Formatter;IAsyncEnumerable;Streaming;dotnet;Wolfgang-ETL;Wolfgang.Etl.Abstractions</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
