@@ -20,7 +20,7 @@ public class FixedWidthStandaloneOptionsRecordTests
 
 
     [Fact]
-    public void Records_do_not_derive_from_the_base_records_until_the_removal_wave()
+    public void BaseType_when_inspected_is_not_the_Abstractions_record_until_the_removal_wave()
     {
         Assert.IsNotAssignableFrom<ExtractorOptions>(new FixedWidthBinaryExtractorOptions());
         Assert.IsNotAssignableFrom<LoaderOptions>(new FixedWidthBinaryLoaderOptions());
@@ -57,7 +57,7 @@ public class FixedWidthStandaloneOptionsRecordTests
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public void ReportingInterval_and_MaximumItemCount_below_one_throw_at_init(int value)
+    public void Init_when_ReportingInterval_or_MaximumItemCount_is_below_one_throws(int value)
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => new FixedWidthBinaryExtractorOptions { ReportingInterval = value });
         Assert.Throws<ArgumentOutOfRangeException>(() => new FixedWidthBinaryExtractorOptions { MaximumItemCount = value });
@@ -70,7 +70,7 @@ public class FixedWidthStandaloneOptionsRecordTests
 
 
     [Fact]
-    public void Negative_SkipItemCount_and_null_ErrorPolicy_throw_at_init()
+    public void Init_when_SkipItemCount_is_negative_or_ErrorPolicy_is_null_throws()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => new FixedWidthBinaryExtractorOptions { SkipItemCount = -1 });
         Assert.Throws<ArgumentOutOfRangeException>(() => new FixedWidthBinaryLoaderOptions { SkipItemCount = -1 });
@@ -83,7 +83,7 @@ public class FixedWidthStandaloneOptionsRecordTests
 
 
     [Fact]
-    public void Projection_carries_every_shared_setting_to_the_base_record()
+    public void Projection_when_every_shared_setting_is_set_carries_each_to_the_base_record()
     {
         var policy = AnyPolicy;
 
@@ -108,7 +108,7 @@ public class FixedWidthStandaloneOptionsRecordTests
 
 
     [Fact]
-    public void With_expression_keeps_the_shared_settings_and_the_record_type()
+    public void WithExpression_when_one_member_changes_keeps_the_shared_settings_and_the_record_type()
     {
         var original = new FixedWidthBinaryExtractorOptions { SkipItemCount = 2, MaximumItemCount = 3 };
 

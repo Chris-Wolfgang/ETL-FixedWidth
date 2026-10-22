@@ -290,7 +290,7 @@ public sealed class FixedWidthMultiRecordExtractorTests
 
 
     [Fact]
-    public void When_and_Otherwise_validate_arguments()
+    public void WhenAndOtherwise_when_arguments_are_invalid_throw()
     {
         using var extractor = new FixedWidthMultiRecordExtractor(new StringReader(""));
 
@@ -396,7 +396,7 @@ public sealed class FixedWidthMultiRecordExtractorTests
 
 
     [Fact]
-    public void Internal_timer_ctor_accepts_a_logger_as_its_trailing_parameter()
+    public void Constructor_when_internal_timer_overload_takes_a_trailing_logger_constructs()
     {
         // Rule 6: the logger is last on internal constructors too. This overload previously took
         // no logger at all.

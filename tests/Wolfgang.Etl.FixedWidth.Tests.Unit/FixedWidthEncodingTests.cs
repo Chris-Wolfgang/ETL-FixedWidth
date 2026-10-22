@@ -84,7 +84,7 @@ public class FixedWidthEncodingTests
     }
 
     [Fact]
-    public void Options_Encoding_defaults_to_Utf8()
+    public void Encoding_when_options_leave_it_unset_defaults_to_Utf8()
     {
         // The default lives on the record's property initializer, not in a constructor body,
         // so no constructor can diverge from it.

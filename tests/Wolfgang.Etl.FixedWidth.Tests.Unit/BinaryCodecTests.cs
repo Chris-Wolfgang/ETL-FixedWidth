@@ -47,7 +47,7 @@ public sealed class BinaryCodecTests
 
 
     [Fact]
-    public void PackedDecimal_decodes_a_large_value_beyond_long_range()
+    public void PackedDecimalDecode_when_value_exceeds_long_range_decodes_it()
     {
         // 10 bytes -> 19 digits: 1234567890123456789 (fits in decimal, exceeds int)
         var actual = PackedDecimal.Decode(Hex("1234567890123456789C"), 0);
@@ -57,7 +57,7 @@ public sealed class BinaryCodecTests
 
 
     [Fact]
-    public void PackedDecimal_rejects_empty_negative_scale_and_bad_nibbles()
+    public void PackedDecimal_when_input_is_empty_or_scale_is_negative_or_a_nibble_is_invalid_throws()
     {
         Assert.Throws<ArgumentException>(() => PackedDecimal.Decode(ReadOnlySpan<byte>.Empty));
         Assert.Throws<ArgumentOutOfRangeException>(() => PackedDecimal.Decode(Hex("123C"), -1));
@@ -222,7 +222,7 @@ public sealed class BinaryCodecTests
 
 
     [Fact]
-    public void PackedDecimal_encode_clears_stale_bytes()
+    public void PackedDecimalEncode_when_buffer_holds_stale_bytes_clears_them()
     {
         var buffer = new byte[] { 0xFF, 0xFF, 0xFF };   // pre-dirtied
         PackedDecimal.Encode(123m, 0, buffer);          // 3 bytes -> 5 digits "00123", sign C
@@ -232,7 +232,7 @@ public sealed class BinaryCodecTests
 
 
     [Fact]
-    public void PackedDecimal_encode_sets_the_correct_sign_nibble()
+    public void PackedDecimalEncode_when_value_is_signed_sets_the_correct_sign_nibble()
     {
         var pos = new byte[1];
         PackedDecimal.Encode(0m, 0, pos);
