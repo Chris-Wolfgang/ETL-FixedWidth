@@ -25,6 +25,8 @@ public sealed class FixedWidthError
         Exception = exception ?? throw new ArgumentNullException(nameof(exception));
     }
 
+
+
     /// <summary>
     /// The 1-based physical source line number of the failed line — the same value as
     /// <see cref="FixedWidthExtractor{TRecord}.CurrentLineNumber"/> and the line number in the
@@ -32,11 +34,15 @@ public sealed class FixedWidthError
     /// </summary>
     public long ItemNumber { get; }
 
+
+
     /// <summary>
     /// The original source line that failed to parse, or <see langword="null"/> if the
     /// stage did not capture it.
     /// </summary>
     public string? RawContent { get; }
+
+
 
     /// <summary>
     /// The exception the record raised — typically a

@@ -110,6 +110,7 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
     }
 
 
+
     /// <summary>
     /// Binary-compatibility overload for 0.10.x callers. Equivalent to the constructor above with
     /// no logger.
@@ -129,7 +130,6 @@ public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBa
         : this(transform, logger: null)
     {
     }
-
 
 
 

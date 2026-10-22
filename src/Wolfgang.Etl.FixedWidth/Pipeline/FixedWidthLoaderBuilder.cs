@@ -71,6 +71,7 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
     public IFixedWidthLoaderBuilder<T> WriteHeader(bool writeHeader) => Set(o => o with { WriteHeader = writeHeader });
 
 
+
     public IFixedWidthLoaderBuilder<T> ValueConverter(Func<object, FieldContext, string> converter)
     {
         if (converter is null)
@@ -98,10 +99,13 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
     public IFixedWidthLoaderBuilder<T> FieldSeparator(char? separator) => Set(o => o with { FieldSeparator = separator });
 
 
+
     public IFixedWidthLoaderBuilder<T> FieldDelimiter(string? delimiter) => Set(o => o with { FieldDelimiter = delimiter });
 
 
+
     public IFixedWidthLoaderBuilder<T> IsDryRun(bool isDryRun) => Set(o => o with { IsDryRun = isDryRun });
+
 
 
     public Task RunAsync(IProgress<EtlPipelineProgress>? progress = null, CancellationToken token = default)

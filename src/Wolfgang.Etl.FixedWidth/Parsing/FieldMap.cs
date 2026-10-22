@@ -134,9 +134,11 @@ internal static class FieldMap
             {
                 if (prop.SetMethod == null || !prop.SetMethod.IsPublic)
                 {
-                    throw new InvalidOperationException(
+                    throw new InvalidOperationException
+                    (
                         $"Property '{prop.Name}' on '{type.FullName}' is decorated with " +
-                        "[FixedWidthField] but has no public setter.");
+                        "[FixedWidthField] but has no public setter."
+                    );
                 }
 
                 entries.Add(new ColumnEntry(prop, fieldAttr, fieldAttr.Index));
@@ -167,9 +169,11 @@ internal static class FieldMap
 
         if (duplicate != null)
         {
-            throw new InvalidOperationException(
+            throw new InvalidOperationException
+            (
                 $"Type '{type.FullName}' has duplicate column Index value {duplicate.Key}. " +
-                "Each [FixedWidthField] and [FixedWidthSkip] must have a unique Index.");
+                "Each [FixedWidthField] and [FixedWidthSkip] must have a unique Index."
+            );
         }
     }
 

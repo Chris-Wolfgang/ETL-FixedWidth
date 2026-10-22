@@ -51,11 +51,6 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
 
 
 
-
-
-
-
-
     /// <summary>
     /// Initializes a new <see cref="FixedWidthBinaryLoader{TRecord}"/> that writes fixed-length
     /// binary records to <paramref name="stream"/>. The caller retains ownership of the stream.
@@ -104,6 +99,7 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
     {
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }
+
 
 
     /// <summary>

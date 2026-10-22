@@ -51,6 +51,7 @@ public static class EtlPipelineFixedWidthExtensions
     }
 
 
+
     /// <summary>
     /// Begins a pipeline that reads fixed-width records from <paramref name="stream"/>. The caller
     /// retains ownership of the stream; only the extractor's internal reader is disposed.
@@ -77,6 +78,7 @@ public static class EtlPipelineFixedWidthExtensions
     }
 
 
+
     /// <summary>
     /// Begins a pipeline that reads fixed-width records from <paramref name="reader"/>. The caller
     /// retains ownership of the reader; nothing is disposed by the pipeline.
@@ -101,6 +103,7 @@ public static class EtlPipelineFixedWidthExtensions
 
         return FixedWidthExtractorBuilder<T>.FromReader(reader);
     }
+
 
 
     /// <summary>
@@ -160,6 +163,7 @@ public static class EtlPipelineFixedWidthExtensions
     }
 
 
+
     /// <summary>
     /// Terminates the pipeline by writing fixed-width records to <paramref name="stream"/>. The caller
     /// retains ownership of the stream; only the loader's internal writer is disposed.
@@ -184,6 +188,7 @@ public static class EtlPipelineFixedWidthExtensions
 
         return FixedWidthLoaderBuilder<T>.FromStream(pipeline, stream);
     }
+
 
 
     /// <summary>

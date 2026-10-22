@@ -55,20 +55,30 @@ public sealed class FixedWidthBinaryFieldAttribute : Attribute
         Type = type;
     }
 
+
+
     /// <summary>The zero-based column index within the record.</summary>
     public int Index { get; }
+
+
 
     /// <summary>The field width in bytes.</summary>
     public int ByteLength { get; }
 
+
+
     /// <summary>How the bytes are decoded.</summary>
     public BinaryFieldType Type { get; }
+
+
 
     /// <summary>
     /// The number of implied decimal places for a <see cref="BinaryFieldType.PackedDecimal"/> field
     /// (the <c>V</c> position in a COBOL picture). Ignored for other types. Default 0.
     /// </summary>
     public int Scale { get; set; }
+
+
 
     /// <summary>
     /// Whether a <see cref="BinaryFieldType.Binary"/> field is two's-complement signed. Ignored for
