@@ -233,7 +233,7 @@ internal static class FixedWidthLineParser
     /// <summary>
     /// Writes <paramref name="count"/> copies of <paramref name="padChar"/> to
     /// <paramref name="writer"/> without allocating an intermediate <see cref="string"/>.
-    /// On net8+ uses a stack-allocated span; on older targets falls back to a
+    /// On net5.0+ uses a stack-allocated span; on older targets falls back to a
     /// pooled <see cref="char"/> buffer.
     /// </summary>
     private static void WritePadding(TextWriter writer, char padChar, int count)
@@ -243,7 +243,7 @@ internal static class FixedWidthLineParser
             return;
         }
 
-#if NET8_0_OR_GREATER
+#if NET5_0_OR_GREATER
         // Stack-allocate a small buffer; field widths are typically tiny.
         const int stackBufferSize = 128;
         Span<char> buffer = stackalloc char[stackBufferSize];
@@ -325,7 +325,7 @@ internal static class FixedWidthLineParser
         }
 
         var padCount = attr.Length - text.Length;
-#if NET8_0_OR_GREATER
+#if NET5_0_OR_GREATER
         // Stack-allocate the full padded field so it can be written in a single
         // call when small enough — fields up to 256 chars use the stack path.
         const int stackFieldLimit = 256;

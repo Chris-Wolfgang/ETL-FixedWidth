@@ -335,6 +335,26 @@ public sealed class FixedWidthBinaryExtractorTests
         => Assert.Throws<InvalidOperationException>(() => new FixedWidthBinaryExtractor<DuplicateIndex>(new MemoryStream(), options: null));
 
 
+
+    [Fact]
+    public void GetResult_when_called_again_for_the_same_type_returns_the_cached_map()
+    {
+        var first = BinaryFieldMap.GetResult<Account>();
+        var second = BinaryFieldMap.GetResult(typeof(Account));
+
+        Assert.Same(first, second);
+    }
+
+
+    [Fact]
+    public void GetResult_when_the_layout_is_invalid_throws_on_every_call()
+    {
+        // An invalid layout throws from the build and is never cached.
+        Assert.Throws<InvalidOperationException>(() => BinaryFieldMap.GetResult<DuplicateIndex>());
+        Assert.Throws<InvalidOperationException>(() => BinaryFieldMap.GetResult<DuplicateIndex>());
+    }
+
+
     [Fact]
     public void Descriptor_with_an_unknown_field_type_throws_on_decode_and_encode()
     {
