@@ -229,7 +229,7 @@ public sealed class FixedWidthExtractorCheckpointTests
 
 #pragma warning disable CS0618 // Exercises the deprecated setter's guard until the setter is removed; the record's guard is covered in FixedWidthExtractorOptionsTests.
     [Fact]
-    public void StartByteOffset_rejects_a_negative_value()
+    public void StartByteOffset_when_negative_throws()
     {
         using var extractor = new FixedWidthExtractor<Rec>(new MemoryStream(Ascii(ThreeRecords)));
 
