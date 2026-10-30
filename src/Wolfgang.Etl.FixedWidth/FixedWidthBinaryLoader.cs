@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Binary;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 
 namespace Wolfgang.Etl.FixedWidth;
 
@@ -22,7 +24,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// The record type, whose <see cref="Attributes.FixedWidthBinaryFieldAttribute"/> properties define
 /// the byte layout.
 /// </typeparam>
-public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
+public sealed class FixedWidthBinaryLoader<[DynamicallyAccessedMembers(TrimmedMembers.Record)] TRecord> : LoaderBase<TRecord, FixedWidthReport>
     where TRecord : notnull
 {
     private readonly Stream _stream;

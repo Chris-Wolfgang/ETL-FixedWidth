@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Wolfgang.Etl.FixedWidth.Exceptions;
 using Wolfgang.Etl.FixedWidth.Parsing;
@@ -31,7 +33,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// await bulkCopy.WriteToServerAsync(reader);
 /// </code>
 /// </example>
-public sealed class FixedWidthDataReader<TRecord> : IDataReader
+public sealed class FixedWidthDataReader<[DynamicallyAccessedMembers(TrimmedMembers.Record)] TRecord> : IDataReader
     where TRecord : notnull
 {
     private const int DefaultBufferSize = 65536;
@@ -439,6 +441,11 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
 
 
     /// <inheritdoc/>
+#if NET8_0_OR_GREATER
+    [UnconditionalSuppressMessage("Trimming", "IL2073",
+        Justification = "The returned type is a mapped property's type, which cannot be annotated. IDataRecord.GetFieldType asks the caller to keep its public fields/properties; the mapped types are the scalar CLR types FixedWidth parses (#358).")]
+    [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
+#endif
     public Type GetFieldType(int i)
     {
         // ADO.NET convention: report the underlying value type for a nullable column (nullness is
@@ -608,6 +615,10 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     // ------------------------------------------------------------------
 
     /// <inheritdoc/>
+#if NET8_0_OR_GREATER
+    [UnconditionalSuppressMessage("Trimming", "IL2111",
+        Justification = "DataColumnCollection.Add(string, Type) keeps every member of typeof(System.Type) for the DataType column, including Type.TypeInitializer; this code never calls it (#358).")]
+#endif
     public DataTable GetSchemaTable()
     {
         var table = new DataTable("SchemaTable") { Locale = CultureInfo.InvariantCulture };
@@ -760,7 +771,7 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
         {
             var type = _fieldMap.Descriptors[i].Context.PropertyType;
             _current[i] = type.IsValueType && Nullable.GetUnderlyingType(type) == null
-                ? Activator.CreateInstance(type)
+                ? TrimSafeReflection.CreateValueTypeDefault(type)
                 : null;
         }
     }

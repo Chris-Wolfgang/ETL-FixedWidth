@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Globalization;
 using Wolfgang.Etl.FixedWidth.Exceptions;
+using Wolfgang.Etl.FixedWidth.Parsing;
 
 namespace Wolfgang.Etl.FixedWidth;
 
@@ -359,7 +360,7 @@ public static class FixedWidthConverter
         if (span.IsEmpty)
         {
             return targetType.IsValueType
-                ? BoxedDefaults.GetOrAdd(targetType, static t => Activator.CreateInstance(t)!)
+                ? BoxedDefaults.GetOrAdd(targetType, TrimSafeReflection.CreateValueTypeDefault)
                 : null;
         }
 
@@ -399,7 +400,7 @@ public static class FixedWidthConverter
     )
     {
         var str = text.ToString();
-        var converter = cachedConverter ?? TypeDescriptor.GetConverter(targetType);
+        var converter = cachedConverter ?? TrimSafeReflection.GetConverter(targetType);
         if (converter.CanConvertFrom(typeof(string)))
         {
             return converter.ConvertFromInvariantString(str)!;
