@@ -10,9 +10,10 @@
 # string in every repo ("AOT smoke (linux-x64)").
 #
 # No `paths:` filter on any trigger. A required check must report on every pull request: a
-# path-skipped workflow never reports (not even "skipped") and blocks the merge. The push to
-# main runs it on every main commit, so the check also exists on main's HEAD, which the
-# required-check rollout script (Apply-RequiredChecks.ps1) looks for before it adds the check.
+# path-skipped workflow never reports (not even "skipped") and blocks the merge. There is no
+# push trigger: before the check is made required, run it once on main with workflow_dispatch,
+# because the rollout script (Apply-RequiredChecks.ps1) only adds a check that already
+# succeeded on main's HEAD.
 #
 # PublishAot / PublishTrimmed / TrimmerSingleWarn belong in the AotSmoke csproj, never on the
 # `dotnet publish` command line: a -p: property is global and reaches every referenced project,
