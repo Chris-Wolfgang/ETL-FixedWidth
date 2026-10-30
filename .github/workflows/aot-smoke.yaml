@@ -73,7 +73,10 @@ jobs:
       - name: Assert no trim/AOT warnings from this library
         run: |
           set -euo pipefail
-          grep -E 'IL[0-9]{4}' aot-publish.log | grep -F "$LIBRARY_NAMESPACE" > library-warnings.txt || true
+          # MSBuild appends " [<path>.csproj]" to each warning line. The smoke project's path contains
+          # the library namespace, so it is stripped first or every warning (including ones from
+          # third-party code) would match.
+          grep -E 'IL[0-9]{4}' aot-publish.log | sed -E 's/ \[[^]]*\.csproj\]$//' | grep -F "$LIBRARY_NAMESPACE" > library-warnings.txt || true
           if [ -n "$ALLOWED_WARNING_REGEX" ]; then
             grep -vE "$ALLOWED_WARNING_REGEX" library-warnings.txt > unexpected-warnings.txt || true
           else
