@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Wolfgang.Etl.FixedWidth.Attributes;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 
 namespace Wolfgang.Etl.FixedWidth.Binary;
 
@@ -22,15 +24,25 @@ internal static class BinaryFieldMap
 
 
 
-    internal static BinaryRecordMap GetResult<T>() => GetResult(typeof(T));
+    internal static BinaryRecordMap GetResult<[DynamicallyAccessedMembers(TrimmedMembers.Record)] T>() => GetResult(typeof(T));
 
 
 
-    internal static BinaryRecordMap GetResult(Type type) => Cache.GetOrAdd(type, Build);
+    internal static BinaryRecordMap GetResult([DynamicallyAccessedMembers(TrimmedMembers.Record)] Type type)
+    {
+        // Not GetOrAdd(type, Build): a delegate to a method with an annotated parameter
+        // loses the annotation (IL2111). See FieldMap.GetResult.
+        if (Cache.TryGetValue(type, out var cached))
+        {
+            return cached;
+        }
+
+        return Cache.GetOrAdd(type, Build(type));
+    }
 
 
 
-    private static BinaryRecordMap Build(Type type)
+    private static BinaryRecordMap Build([DynamicallyAccessedMembers(TrimmedMembers.Record)] Type type)
     {
         // Anonymous type (not a ValueTuple) — net462/netstandard2.0 have no System.ValueTuple.
         var entries = type
@@ -105,7 +117,7 @@ internal static class BinaryFieldMap
     [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050",
         Justification = "Expression.Compile is RequiresDynamicCode but falls back to the interpreter under Native AOT, so the compiled factory still runs correctly (without JIT speed). See #153.")]
 #endif
-    private static Func<object> CompileFactory(Type type)
+    private static Func<object> CompileFactory([DynamicallyAccessedMembers(TrimmedMembers.Record)] Type type)
     {
         var ctor = type.GetConstructor(Type.EmptyTypes)
             ?? throw new InvalidOperationException($"Type '{type.FullName}' needs a public parameterless constructor for binary extraction.");

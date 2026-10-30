@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using Wolfgang.Etl.FixedWidth.Attributes;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 
 namespace Wolfgang.Etl.FixedWidth.Parsing;
 
@@ -25,8 +27,8 @@ internal static class FieldMap
     // Internal methods
     // ------------------------------------------------------------------
 
-    internal static FieldMapResult GetResult<T>()
-        => Cache.GetOrAdd(typeof(T), Resolve);
+    internal static FieldMapResult GetResult<[DynamicallyAccessedMembers(TrimmedMembers.Record)] T>()
+        => GetResult(typeof(T));
 
 
 
@@ -35,8 +37,18 @@ internal static class FieldMap
     /// <see cref="Type"/> rather than a compile-time type argument (for example
     /// <see cref="FixedWidthSchema.For(Type)"/>).
     /// </summary>
-    internal static FieldMapResult GetResult(Type type)
-        => Cache.GetOrAdd(type, Resolve);
+    internal static FieldMapResult GetResult([DynamicallyAccessedMembers(TrimmedMembers.Record)] Type type)
+    {
+        // Not GetOrAdd(type, Resolve): a delegate to a method with an annotated parameter
+        // loses the annotation (IL2111). Two threads that miss together both resolve the
+        // same immutable map; GetOrAdd keeps the first, so every caller sees one instance.
+        if (Cache.TryGetValue(type, out var cached))
+        {
+            return cached;
+        }
+
+        return Cache.GetOrAdd(type, Resolve(type));
+    }
 
 
 
@@ -91,7 +103,7 @@ internal static class FieldMap
 
 
 
-    private static FieldMapResult Resolve(Type type)
+    private static FieldMapResult Resolve([DynamicallyAccessedMembers(TrimmedMembers.Record)] Type type)
     {
         var entries = CollectEntries(type);
 
@@ -123,7 +135,7 @@ internal static class FieldMap
     /// Thrown when a property decorated with <see cref="FixedWidthFieldAttribute"/>
     /// has no public setter.
     /// </exception>
-    private static List<ColumnEntry> CollectEntries(Type type)
+    private static List<ColumnEntry> CollectEntries([DynamicallyAccessedMembers(TrimmedMembers.Record)] Type type)
     {
         var entries = new List<ColumnEntry>();
 
@@ -183,7 +195,7 @@ internal static class FieldMap
     /// Walks the sorted entries, accumulates start positions, and builds the
     /// <see cref="FieldMapResult"/>.
     /// </summary>
-    private static FieldMapResult BuildResult(Type type, List<ColumnEntry> entries)
+    private static FieldMapResult BuildResult([DynamicallyAccessedMembers(TrimmedMembers.Record)] Type type, List<ColumnEntry> entries)
     {
         var descriptors = new List<FieldDescriptor>();
         var position = 0;
@@ -265,7 +277,7 @@ internal static class FieldMap
     /// extraction, so it surfaces identical errors (duplicate indexes, a mapped field
     /// with no public setter).
     /// </summary>
-    internal static IReadOnlyList<ColumnLayout> GetColumnLayout(Type type)
+    internal static IReadOnlyList<ColumnLayout> GetColumnLayout([DynamicallyAccessedMembers(TrimmedMembers.Record)] Type type)
     {
         var entries = CollectEntries(type);
         if (entries.Count == 0)
