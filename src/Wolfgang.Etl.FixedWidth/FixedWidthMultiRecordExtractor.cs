@@ -8,6 +8,7 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Wolfgang.Etl.FixedWidth.Exceptions;
 using Wolfgang.Etl.FixedWidth.Parsing;
@@ -311,7 +312,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// <paramref name="recordType"/> has an invalid layout (for example duplicate column indexes
     /// or a mapped property with no public setter).
     /// </exception>
-    public FixedWidthMultiRecordExtractor When(Func<string, bool> predicate, Type recordType)
+    public FixedWidthMultiRecordExtractor When(Func<string, bool> predicate, [DynamicallyAccessedMembers(TrimmedMembers.Record)] Type recordType)
     {
         if (predicate == null)
         {
@@ -338,7 +339,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// <param name="recordType">The catch-all POCO type for unmatched lines.</param>
     /// <exception cref="ArgumentNullException"><paramref name="recordType"/> is <see langword="null"/>.</exception>
     /// <exception cref="InvalidOperationException"><paramref name="recordType"/> has an invalid layout.</exception>
-    public FixedWidthMultiRecordExtractor Otherwise(Type recordType)
+    public FixedWidthMultiRecordExtractor Otherwise([DynamicallyAccessedMembers(TrimmedMembers.Record)] Type recordType)
     {
         if (recordType == null)
         {

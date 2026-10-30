@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using System.Threading;
 using System.Threading.Tasks;
 using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 
 namespace Wolfgang.Etl.FixedWidth;
 
@@ -33,7 +35,11 @@ namespace Wolfgang.Etl.FixedWidth;
 /// await loader.LoadAsync(modern, token);
 /// </code>
 /// </example>
-public sealed class FixedWidthTransformer<TSource, TDestination> : TransformerBase<TSource, TDestination, FixedWidthReport>
+public sealed class FixedWidthTransformer
+<
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TSource,
+    [DynamicallyAccessedMembers(TrimmedMembers.Record)] TDestination
+> : TransformerBase<TSource, TDestination, FixedWidthReport>
     where TSource : notnull
     where TDestination : notnull
 {

@@ -1,9 +1,11 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 
 namespace Wolfgang.Etl.FixedWidth;
 
@@ -15,7 +17,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// sink) is disposed after the run, on success or failure, flushing the output to disk.
 /// </summary>
 /// <typeparam name="T">The record type consumed by the loader.</typeparam>
-internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
+internal sealed class FixedWidthLoaderBuilder<[DynamicallyAccessedMembers(TrimmedMembers.Record)] T> : IFixedWidthLoaderBuilder<T>
     where T : notnull
 {
     private readonly IEtlPipeline<T> _pipeline;
