@@ -9,3 +9,4 @@ for why we keep them and [TEMPLATE.md](TEMPLATE.md) for the shape.
 | [0002](0002-numberstyles-per-type-default.md) | Per-type default `NumberStyles` for field parsing |
 | [0003](0003-line-accounting-counters.md) | Four-way line accounting: items / skipped / rejected / filtered |
 | [0004](0004-line-endings-via-textwriter-newline.md) | Line-ending control via `TextWriter.NewLine`, not a `LineEnding` enum |
+| [0005](0005-trim-and-aot-annotations.md) | Trim / Native AOT annotations on the record-type entry points (proposed) |

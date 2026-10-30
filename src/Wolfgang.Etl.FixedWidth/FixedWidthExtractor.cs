@@ -50,7 +50,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;(reader);
 /// </code>
 /// </example>
-public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthReport>
+public class FixedWidthExtractor<[DynamicallyAccessedMembers(TrimmedMembers.Record)] TRecord> : ExtractorBase<TRecord, FixedWidthReport>
     where TRecord : notnull, new()
 {
     // ------------------------------------------------------------------
