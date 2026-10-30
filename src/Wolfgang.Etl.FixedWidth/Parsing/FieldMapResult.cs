@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 
 namespace Wolfgang.Etl.FixedWidth.Parsing;
 
@@ -85,7 +87,7 @@ internal sealed class FieldMapResult
     [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050",
         Justification = "Expression.Compile is RequiresDynamicCode but falls back to the interpreter when RuntimeFeature.IsDynamicCodeSupported is false, so the compiled activator still runs correctly under Native AOT (without JIT speed). See #153. The source-generated factory (preferred when registered) uses no dynamic code at all. See #13.")]
 #endif
-    internal static Func<object> CompileFactory(Type type)
+    internal static Func<object> CompileFactory([DynamicallyAccessedMembers(TrimmedMembers.Record)] Type type)
     {
         // Prefer a source-generated factory when one has been registered for this type.
         if (Generated.GeneratedAccessorRegistry.TryGetFactory(type, out var generated))
