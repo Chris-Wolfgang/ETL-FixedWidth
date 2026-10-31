@@ -80,14 +80,14 @@ jobs:
         run: dotnet restore benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks.csproj
 
       - name: Build (Release)
-        run: dotnet build -c Release --no-restore benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks.csproj
+        run: dotnet build -c Release -f net10.0 --no-restore benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks.csproj
 
       - name: Run benchmarks
         working-directory: benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks
         # ShortRun (~3-5 min). GitHub-hosted runners are noisy, so the delta is
         # reliable for allocations and double-digit time changes; the alert
         # threshold below is set accordingly to avoid false alarms.
-        run: dotnet run -c Release --no-build -- --filter "*" --job short --memory --exporters json
+        run: dotnet run -c Release -f net10.0 --no-build -- --filter "*" --job short --memory --exporters json
 
       - name: Merge per-class BDN reports
         id: locate
@@ -248,10 +248,10 @@ jobs:
           read -ra globs <<< "${REGRESSED_GLOBS:-*}"
           git worktree add --detach "$RUNNER_TEMP/base" "$BASE_SHA"
           dotnet restore "$RUNNER_TEMP/base/$BENCH_PROJECT"
-          dotnet build -c Release --no-restore "$RUNNER_TEMP/base/$BENCH_PROJECT"
+          dotnet build -c Release -f net10.0 --no-restore "$RUNNER_TEMP/base/$BENCH_PROJECT"
           (
             cd "$RUNNER_TEMP/base/$BENCH_DIR"
-            dotnet run -c Release --no-build -- --filter "${globs[@]}" --job short --iterationCount 10 --memory --exporters json
+            dotnet run -c Release -f net10.0 --no-build -- --filter "${globs[@]}" --job short --iterationCount 10 --memory --exporters json
             shopt -s nullglob
             reports=(BenchmarkDotNet.Artifacts/results/*-report-full-compressed.json)
             if [ ${#reports[@]} -eq 0 ]; then
@@ -269,10 +269,10 @@ jobs:
           set -euo pipefail
           read -ra globs <<< "${REGRESSED_GLOBS:-*}"
           dotnet restore "$BENCH_PROJECT"
-          dotnet build -c Release --no-restore "$BENCH_PROJECT"
+          dotnet build -c Release -f net10.0 --no-restore "$BENCH_PROJECT"
           (
             cd "$BENCH_DIR"
-            dotnet run -c Release --no-build -- --filter "${globs[@]}" --job short --iterationCount 10 --memory --exporters json
+            dotnet run -c Release -f net10.0 --no-build -- --filter "${globs[@]}" --job short --iterationCount 10 --memory --exporters json
             shopt -s nullglob
             reports=(BenchmarkDotNet.Artifacts/results/*-report-full-compressed.json)
             if [ ${#reports[@]} -eq 0 ]; then
