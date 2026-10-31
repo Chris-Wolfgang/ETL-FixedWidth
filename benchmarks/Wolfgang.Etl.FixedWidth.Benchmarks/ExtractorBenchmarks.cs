@@ -6,6 +6,9 @@ using BenchmarkDotNet.Attributes;
 
 namespace Wolfgang.Etl.FixedWidth.Benchmarks;
 
+// Runtime comparison (net6.0 vs net8.0 vs net10.0, #594): the project also targets net6.0 and
+// net8.0 so these cases can run side by side with `--runtimes net6.0 net8.0 net10.0`; see
+// docs/ALLOCATION-PROFILE.md. The benchmark workflows run net10.0 only.
 [MemoryDiagnoser]
 public class ExtractorBenchmarks
 {
