@@ -55,14 +55,14 @@ jobs:
         run: dotnet restore benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks.csproj
 
       - name: Build (Release)
-        run: dotnet build -c Release --no-restore benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks.csproj
+        run: dotnet build -c Release -f net10.0 --no-restore benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks.csproj
 
       - name: Run benchmarks
         working-directory: benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks
         # ShortRun keeps total runtime small (~3-5 min). GitHub-hosted runners
         # are noisy, so chart trends are reliable for allocations and double-digit
         # time changes; smaller deltas are not.
-        run: dotnet run -c Release --no-build -- --filter "*" --job short --memory --exporters json
+        run: dotnet run -c Release -f net10.0 --no-build -- --filter "*" --job short --memory --exporters json
 
       - name: Merge per-class BDN reports
         id: locate
