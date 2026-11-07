@@ -1,44 +1,58 @@
-name: AOT Smoke
-
-# Native-AOT / trim compatibility smoke test (#153).
+# Native AOT / trim smoke test (canonical).
 #
-# net8.0 / net10.0 consumers may publish with <PublishAot>true</PublishAot>, which
-# also trims. FixedWidth maps records with reflection (GetProperties) and
-# Expression.Compile accessors — both are AOT-legal (Expression.Compile falls back
-# to the interpreter) but the trimmer can silently remove the record property
-# metadata the mapping reflects over. This job publishes a tiny console consumer
-# with Native AOT on Linux, then RUNS the native binary: it exercises every public
-# path against a concrete record type and asserts the results, so a trim/AOT
-# regression exits non-zero and fails the check before merge. Native AOT can't be
-# published on the Windows dev box, so CI is the authoritative gate.
+# Publishes the repo's AotSmoke consumer with Native AOT on linux-x64 and runs the binary. Fails
+# when the publish fails, when the trim/AOT analyzers report a warning that points at this
+# library's code, or when the native binary exits non-zero.
+#
+# Every repo carries this file UNCHANGED apart from the three values in the `env:` block. The
+# file name, the workflow name, the job id and the job name are fixed fleet-wide, because a
+# required status check is matched by its exact job name: the ruleset entry is then the same
+# string in every repo ("AOT smoke (linux-x64)").
+#
+# No `paths:` filter on any trigger. A required check must report on every pull request: a
+# path-skipped workflow never reports (not even "skipped") and blocks the merge. There is no
+# push trigger: before the check is made required, run it once on main with workflow_dispatch,
+# because the rollout script (Apply-RequiredChecks.ps1) only adds a check that already
+# succeeded on main's HEAD.
+#
+# PublishAot / PublishTrimmed / TrimmerSingleWarn belong in the AotSmoke csproj, never on the
+# `dotnet publish` command line: a -p: property is global and reaches every referenced project,
+# including a net462 library target, where AOT is unsupported (NETSDK1207).
+name: AOT smoke
 
 on:
   pull_request:
-    branches:
-      - main
-      - vNext
-  push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
-
-permissions:
-  contents: read
+  # Lets release.yaml gate publishing on this same job (`uses: ./.github/workflows/aot-smoke.yaml`)
+  # from the tagged commit. No inputs: the three `env:` values below are this repo's own, so the
+  # PR run, the manual run and the release run are the same job.
+  workflow_call:
 
 concurrency:
   group: aot-smoke-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
+env:
+  # The AotSmoke consumer project. The published binary must be named after the csproj file.
+  SMOKE_PROJECT: tests/AotSmoke/Wolfgang.Etl.FixedWidth.AotSmoke.csproj
+  # A trim/AOT warning whose text contains this is a failure (the library's root namespace).
+  LIBRARY_NAMESPACE: Wolfgang.Etl.FixedWidth
+  # Optional. An extended regex of known, accepted warning lines from upstream code (for
+  # example an EF Core constructor). Leave empty unless an issue links the upstream limitation.
+  ALLOWED_WARNING_REGEX: ''
+
 jobs:
   aot-smoke:
-    name: AOT publish + run
+    name: AOT smoke (linux-x64)
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    env:
-      PROJ: tests/AotSmoke/Wolfgang.Etl.FixedWidth.AotSmoke.csproj
-      OUT: tests/AotSmoke/bin/Release/net10.0/linux-x64/publish/Wolfgang.Etl.FixedWidth.AotSmoke
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -46,26 +60,42 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: 10.0.x
 
       - name: Install Native AOT prerequisites
         run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
 
       - name: Publish Native AOT (linux-x64)
         run: |
-          dotnet publish "${{ env.PROJ }}" -c Release -r linux-x64 2>&1 | tee publish.log
+          set -euo pipefail
+          dotnet publish "$SMOKE_PROJECT" -c Release -r linux-x64 -o aot-out 2>&1 | tee aot-publish.log
 
-      - name: Report trim / AOT warnings (informational)
-        if: always()
+      - name: Assert no trim/AOT warnings from this library
         run: |
-          echo '### Trim / AOT analyzer warnings' >> "$GITHUB_STEP_SUMMARY"
-          if grep -oE 'IL[0-9]{4}' publish.log | sort | uniq -c > il.txt && [ -s il.txt ]; then
-            sed 's/^/    /' il.txt >> "$GITHUB_STEP_SUMMARY"
+          set -euo pipefail
+          # MSBuild appends " [<path>.csproj]" to each warning line. The smoke project's path contains
+          # the library namespace, so it is stripped first or every warning (including ones from
+          # third-party code) would match.
+          grep -E 'IL[0-9]{4}' aot-publish.log | sed -E 's/ \[[^]]*\.csproj\]$//' | grep -F "$LIBRARY_NAMESPACE" > library-warnings.txt || true
+          if [ -n "$ALLOWED_WARNING_REGEX" ]; then
+            grep -vE "$ALLOWED_WARNING_REGEX" library-warnings.txt > unexpected-warnings.txt || true
           else
-            echo 'None.' >> "$GITHUB_STEP_SUMMARY"
+            cp library-warnings.txt unexpected-warnings.txt
           fi
+          if [ -s unexpected-warnings.txt ]; then
+            echo "::error::Native AOT publish produced trim/AOT warnings from $LIBRARY_NAMESPACE:"
+            cat unexpected-warnings.txt
+            exit 1
+          fi
+          echo "No trim/AOT warnings from $LIBRARY_NAMESPACE."
 
-      - name: Run the native binary (the gate)
+      - name: Run the native binary
         run: |
-          test -x "${{ env.OUT }}" || { echo "native binary not produced at ${{ env.OUT }}"; exit 1; }
-          "${{ env.OUT }}"
+          set -euo pipefail
+          bin="aot-out/$(basename "$SMOKE_PROJECT" .csproj)"
+          if [ ! -x "$bin" ]; then
+            echo "::error::Native AOT binary not produced at $bin"
+            exit 1
+          fi
+          "$bin"
+          echo "Native AOT smoke exited 0."
