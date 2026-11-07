@@ -6,6 +6,7 @@ using System.Text;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Wolfgang.Etl.FixedWidth.Exceptions;
+using Wolfgang.Etl.FixedWidth.Parsing;
 
 namespace Wolfgang.Etl.FixedWidth.Binary;
 
@@ -31,7 +32,7 @@ internal sealed class BinaryFieldDescriptor
         Getter = getter;
         PropertyType = property.PropertyType;
         UnderlyingType = Nullable.GetUnderlyingType(PropertyType) ?? PropertyType;
-        TypeConverter = TypeDescriptor.GetConverter(PropertyType);
+        TypeConverter = TrimSafeReflection.GetConverter(PropertyType);
     }
 
 

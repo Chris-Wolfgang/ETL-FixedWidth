@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 using Wolfgang.Etl.FixedWidth.Enums;
 
 namespace Wolfgang.Etl.FixedWidth;
@@ -19,7 +21,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// source is drained — on success, failure, or cancellation.
 /// </summary>
 /// <typeparam name="T">The record type produced by the extractor.</typeparam>
-internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilder<T>
+internal sealed class FixedWidthExtractorBuilder<[DynamicallyAccessedMembers(TrimmedMembers.Record)] T> : IFixedWidthExtractorBuilder<T>
     where T : notnull, new()
 {
     private readonly string? _path;

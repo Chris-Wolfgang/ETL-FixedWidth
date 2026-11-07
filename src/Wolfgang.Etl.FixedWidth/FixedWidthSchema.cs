@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 using Wolfgang.Etl.FixedWidth.Parsing;
 
 namespace Wolfgang.Etl.FixedWidth;
@@ -59,7 +61,7 @@ public sealed class FixedWidthSchema
     /// validation as extraction/loading, so an invalid layout (duplicate column
     /// indexes, a mapped field with no public setter) throws here too.
     /// </summary>
-    public static FixedWidthSchema For<T>()
+    public static FixedWidthSchema For<[DynamicallyAccessedMembers(TrimmedMembers.Record)] T>()
         where T : notnull
         => For(typeof(T));
 
@@ -69,7 +71,7 @@ public sealed class FixedWidthSchema
     /// Resolves the schema for <paramref name="recordType"/>.
     /// </summary>
     /// <exception cref="ArgumentNullException"><paramref name="recordType"/> is <see langword="null"/>.</exception>
-    public static FixedWidthSchema For(Type recordType)
+    public static FixedWidthSchema For([DynamicallyAccessedMembers(TrimmedMembers.Record)] Type recordType)
     {
         if (recordType == null)
         {
