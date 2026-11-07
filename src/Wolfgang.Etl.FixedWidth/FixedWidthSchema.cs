@@ -36,6 +36,8 @@ public sealed class FixedWidthSchema
     {
         RecordType = recordType;
         Fields = fields;
+        SkipCount = fields.Count(f => f.IsSkip);
+        FieldCount = fields.Count - SkipCount;
         ExpectedLineWidth = expectedLineWidth;
         MapResult = mapResult;
     }
@@ -113,12 +115,12 @@ public sealed class FixedWidthSchema
 
 
     /// <summary>The number of mapped fields, excluding skipped columns.</summary>
-    public int FieldCount => Fields.Count(f => !f.IsSkip);
+    public int FieldCount { get; }
 
 
 
     /// <summary>The number of skipped columns.</summary>
-    public int SkipCount => Fields.Count(f => f.IsSkip);
+    public int SkipCount { get; }
 
 
 
