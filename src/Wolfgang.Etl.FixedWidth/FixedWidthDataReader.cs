@@ -73,6 +73,7 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     }
 
 
+
     /// <summary>
     /// Initializes a new <see cref="FixedWidthDataReader{TRecord}"/> from a <see cref="Stream"/> using the
     /// default options, with diagnostic logging.
@@ -85,8 +86,6 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
         : this(stream, options: null, logger: logger)
     {
     }
-
-
 
 
 
@@ -167,6 +166,7 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     }
 
 
+
     /// <summary>
     /// The <see cref="System.Text.Encoding"/> used by this instance. Superseded by
     /// <see cref="FixedWidthDataReaderOptions.Encoding"/>.
@@ -199,17 +199,27 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     /// <summary>The number of leading lines to treat as a header and skip. Default 0.</summary>
     public int HeaderLineCount { get; init; }
 
+
+
     /// <summary>The number of data rows to skip before the first row is served. Default 0.</summary>
     public long SkipItemCount { get; init; }
+
+
 
     /// <summary>The maximum number of data rows to serve. Default <see cref="long.MaxValue"/>.</summary>
     public long MaximumItemCount { get; init; } = long.MaxValue;
 
+
+
     /// <summary>How blank lines are handled. Default <see cref="BlankLineHandling.ThrowException"/>.</summary>
     public BlankLineHandling BlankLineHandling { get; init; } = BlankLineHandling.ThrowException;
 
+
+
     /// <summary>How malformed lines are handled. Default <see cref="MalformedLineHandling.ThrowException"/>.</summary>
     public MalformedLineHandling MalformedLineHandling { get; init; } = MalformedLineHandling.ThrowException;
+
+
 
     /// <summary>The inter-field delimiter used when the file was written, or <see langword="null"/> for none.</summary>
     public string? FieldDelimiter { get; init; }
@@ -277,7 +287,14 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
                     var delimiterWidth = string.IsNullOrEmpty(FieldDelimiter) ? 0 : FieldDelimiter!.Length;
 #pragma warning restore S8969
                     var expectedWidth = _fieldMap.ExpectedLineWidth + (delimiterWidth * Math.Max(0, _fieldMap.TotalColumnCount - 1));
-                    throw new LineTooShortException($"Blank line encountered at line {_currentLineNumber}.", _currentLineNumber, string.Empty, expectedWidth, 0);
+                    throw new LineTooShortException
+                    (
+                        $"Blank line encountered at line {_currentLineNumber}.",
+                        _currentLineNumber,
+                        string.Empty,
+                        expectedWidth,
+                        0
+                    );
                 }
 
                 // ReturnDefault — participates in the skip/max budgets like a data row.
@@ -333,14 +350,22 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     /// <inheritdoc/>
     public bool NextResult() => false;
 
+
+
     /// <inheritdoc/>
     public int Depth => 0;
+
+
 
     /// <inheritdoc/>
     public bool IsClosed => _closed;
 
+
+
     /// <inheritdoc/>
     public int RecordsAffected => -1;
+
+
 
     /// <inheritdoc/>
     public void Close()
@@ -371,8 +396,12 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     /// <inheritdoc/>
     public int FieldCount => _fieldMap.Descriptors.Count;
 
+
+
     /// <inheritdoc/>
     public string GetName(int i) => _names[i];
+
+
 
     /// <inheritdoc/>
     public int GetOrdinal(string name)
@@ -407,6 +436,8 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
 #pragma warning restore MA0012, S112
     }
 
+
+
     /// <inheritdoc/>
     public Type GetFieldType(int i)
     {
@@ -415,6 +446,8 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
         var type = _fieldMap.Descriptors[i].Context.PropertyType;
         return Nullable.GetUnderlyingType(type) ?? type;
     }
+
+
 
     /// <inheritdoc/>
     public string GetDataTypeName(int i) => GetFieldType(i).Name;
@@ -431,6 +464,8 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
         EnsureRow();
         return _current[i] ?? DBNull.Value;
     }
+
+
 
     /// <inheritdoc/>
     public int GetValues(object[] values)
@@ -450,6 +485,8 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
         return count;
     }
 
+
+
     /// <inheritdoc/>
     public bool IsDBNull(int i)
     {
@@ -457,47 +494,77 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
         return _current[i] == null;
     }
 
+
+
     /// <inheritdoc/>
     public object this[int i] => GetValue(i);
+
+
 
     /// <inheritdoc/>
     public object this[string name] => GetValue(GetOrdinal(name));
 
+
+
     /// <inheritdoc/>
     public bool GetBoolean(int i) => (bool)GetValue(i);
+
+
 
     /// <inheritdoc/>
     public byte GetByte(int i) => (byte)GetValue(i);
 
+
+
     /// <inheritdoc/>
     public char GetChar(int i) => (char)GetValue(i);
+
+
 
     /// <inheritdoc/>
     public DateTime GetDateTime(int i) => (DateTime)GetValue(i);
 
+
+
     /// <inheritdoc/>
     public decimal GetDecimal(int i) => (decimal)GetValue(i);
+
+
 
     /// <inheritdoc/>
     public double GetDouble(int i) => (double)GetValue(i);
 
+
+
     /// <inheritdoc/>
     public float GetFloat(int i) => (float)GetValue(i);
+
+
 
     /// <inheritdoc/>
     public Guid GetGuid(int i) => (Guid)GetValue(i);
 
+
+
     /// <inheritdoc/>
     public short GetInt16(int i) => (short)GetValue(i);
+
+
 
     /// <inheritdoc/>
     public int GetInt32(int i) => (int)GetValue(i);
 
+
+
     /// <inheritdoc/>
     public long GetInt64(int i) => (long)GetValue(i);
 
+
+
     /// <inheritdoc/>
     public string GetString(int i) => (string)GetValue(i);
+
+
 
     /// <inheritdoc/>
     public long GetBytes(int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length)
@@ -527,6 +594,8 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
         text.CopyTo((int)fieldoffset, buffer, bufferoffset, count);
         return count;
     }
+
+
 
     /// <inheritdoc/>
     public IDataReader GetData(int i)
@@ -591,6 +660,8 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
     // valid data line and flows through normal parsing (so a short one raises LineTooShortException
     // with its actual content/length, not the blank-line path).
     private static bool IsBlank(string line) => line.Length == 0;
+
+
 
     private void LogReadStarted()
     {
@@ -664,7 +735,7 @@ public sealed class FixedWidthDataReader<TRecord> : IDataReader
                     descriptor.Context.NumberStyles
                 );
             }
-            catch (Exception ex) when (!(ex is MalformedLineException))
+            catch (Exception ex) when (ex is not MalformedLineException)
             {
                 throw new FieldConversionException
                 (
