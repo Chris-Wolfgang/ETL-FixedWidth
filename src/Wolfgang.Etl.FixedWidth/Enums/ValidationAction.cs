@@ -12,7 +12,7 @@ public enum ValidationAction
 
     /// <summary>
     /// Skip the record. It is not yielded; the extractor increments
-    /// <c>CurrentSkippedItemCount</c> and continues with the next line.
+    /// <c>CurrentRejectedItemCount</c> and continues with the next line.
     /// </summary>
     Skip = 1,
 

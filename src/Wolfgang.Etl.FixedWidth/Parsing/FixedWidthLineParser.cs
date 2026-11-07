@@ -478,7 +478,7 @@ internal static class FixedWidthLineParser
     /// Converts and assigns a single field value from <paramref name="line"/>
     /// into the matching property on <paramref name="record"/>.
     /// </summary>
-    /// <exception cref="FieldConversionException"></exception>
+    /// <exception cref="FieldConversionException">The field text cannot be converted to the property type.</exception>
     private static void ParseField<T>
     (
         T record,

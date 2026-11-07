@@ -16,7 +16,8 @@ namespace Wolfgang.Etl.FixedWidth;
 /// Options are scoped to the <em>input shape</em> they configure, not to the type as a whole, so
 /// every property here is meaningful for the constructor it is passed to. The base-stage
 /// configuration (<c>ReportingInterval</c>, <c>MaximumItemCount</c>, <c>SkipItemCount</c>, <c>ErrorPolicy</c>)
-/// is inherited from the Abstractions record (ADR-0009).
+/// is carried on this record itself and projected onto <see cref="ExtractorOptions"/> for the base stage; the record does
+/// not derive from it until the 2026-12-15 wave (#486), see the projection method below.
 /// </para>
 /// </remarks>
 public sealed record FixedWidthBinaryExtractorOptions
