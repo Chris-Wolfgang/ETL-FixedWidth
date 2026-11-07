@@ -6,21 +6,29 @@ NuGet was built from that source and nothing else. This page is the **consumer
 side** of that guarantee: how *you* independently verify a release.
 
 > Related: [`reproducible-build.yaml`](../.github/workflows/reproducible-build.yaml)
-> proves the build is reproducible on every PR (it builds the same commit twice in
-> different paths and fails if the assemblies differ). This document is about a
-> third party reproducing it out-of-band.
+> proves the build is reproducible on every PR: it packs the same commit on Ubuntu
+> and on Windows (two operating systems, two checkout paths) and fails if any
+> per-TFM `.dll` or `.pdb` differs. This document is about a third party
+> reproducing it out-of-band.
 
 ## What is reproducible
 
-The unit of verification is the **compiled assembly** — one
-`Wolfgang.Etl.FixedWidth.dll` per target framework
-(`net462`, `net481`, `netstandard2.0`, `net8.0`, `net10.0`). These are
-byte-for-byte reproducible because the build sets:
+The unit of verification is the **compiled assembly and its symbols** — one
+`Wolfgang.Etl.FixedWidth.dll` and `Wolfgang.Etl.FixedWidth.pdb` per target framework
+(`net462`, `net481`, `netstandard2.0`, `net5.0`, `net6.0`, `net7.0`, `net8.0`,
+`net10.0`). These are byte-for-byte reproducible, on any operating system,
+because the build sets:
 
 - `Deterministic` (default) — no timestamps or random GUIDs baked into the IL;
 - `ContinuousIntegrationBuild=true` on CI — normalizes source paths to `/_/` so
   the checkout directory doesn't affect output;
-- `EmbedUntrackedSources` + SourceLink — provenance is embedded deterministically.
+- `EmbedUntrackedSources` + SourceLink — provenance is embedded deterministically;
+- `Directory.Build.targets` rewrites the SDK-generated sources (`AssemblyInfo.cs`,
+  `AssemblyAttributes.cs`, `GlobalUsings.g.cs`) to LF before compiling, so the
+  embedded source text and its hash do not depend on the OS newline;
+- `Directory.Build.props` compiles the .NET Framework TFMs against the
+  `Microsoft.NETFramework.ReferenceAssemblies` package on every OS, instead of the
+  installed targeting pack on Windows.
 
 > **NuGet packages (`.nupkg`) are *not* byte-for-byte reproducible.** A `.nupkg`
 > is a ZIP and records per-entry timestamps, so its hash varies between builds.
