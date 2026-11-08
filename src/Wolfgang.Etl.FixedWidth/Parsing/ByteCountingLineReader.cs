@@ -175,7 +175,8 @@ internal sealed class ByteCountingLineReader : TextReader
 
         var c = _buffer[_bufferPosition];
         _bufferPosition++;
-        _bytesConsumed += _encoding.GetByteCount(new[] { c });
+        // Count the char in place in the buffer rather than allocating a one-element array per call.
+        _bytesConsumed += _encoding.GetByteCount(_buffer, _bufferPosition - 1, 1);
         return c;
     }
 
