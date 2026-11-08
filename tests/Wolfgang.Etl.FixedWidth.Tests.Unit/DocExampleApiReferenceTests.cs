@@ -156,26 +156,90 @@ public class DocExampleApiReferenceTests
 
 
 
-    private static IEnumerable<string> EnumerateSourceFiles(string startDirectory)
+    private static string FindRepositoryRoot(string startDirectory)
     {
         // [CallerFilePath] is unreliable in CI (deterministic /_/ paths), so walk up
-        // from the test's base directory to the repo root and read the source tree.
+        // from the test's base directory to the repo root.
         var dir = new DirectoryInfo(startDirectory);
         while (dir != null)
         {
-            var srcDir = Path.Combine(dir.FullName, "src", "Wolfgang.Etl.FixedWidth");
-            if (Directory.Exists(srcDir))
+            if (Directory.Exists(Path.Combine(dir.FullName, "src", "Wolfgang.Etl.FixedWidth")))
             {
-                return Directory.EnumerateFiles(srcDir, "*.cs", SearchOption.AllDirectories)
-                    .Where(f => !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}")
-                             && !f.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}"))
-                    .ToList();
+                return dir.FullName;
             }
 
             dir = dir.Parent;
         }
 
         throw new DirectoryNotFoundException("Could not locate src/Wolfgang.Etl.FixedWidth from the test base directory.");
+    }
+
+
+
+    private static IEnumerable<string> EnumerateSourceFiles(string startDirectory)
+    {
+        var srcDir = Path.Combine(FindRepositoryRoot(startDirectory), "src", "Wolfgang.Etl.FixedWidth");
+
+        return Directory.EnumerateFiles(srcDir, "*.cs", SearchOption.AllDirectories)
+            .Where(f => !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}")
+                     && !f.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}"))
+            .ToList();
+    }
+
+
+
+    // new FixedWidthExtractor<T>(...) { Prop = ... } / new FixedWidthLoader<T>(...) { Prop = ... }
+    private static readonly Regex StageObjectInitializer = new
+    (
+        @"new\s+(?<type>FixedWidthExtractor|FixedWidthLoader)<[^>]+>\s*\([^;{]*?\)\s*\{\s*(?<prop>[A-Za-z_][A-Za-z0-9_]*)\s*=",
+        RegexOptions.Compiled
+    );
+
+
+
+    private static IEnumerable<string> ObsoleteSetterInitializers(string text)
+    {
+        return StageObjectInitializer.Matches(text)
+            .Cast<Match>()
+            .Select(m => (Type: string.Equals(m.Groups["type"].Value, "FixedWidthExtractor", StringComparison.Ordinal) ? typeof(FixedWidthExtractor<>) : typeof(FixedWidthLoader<>), Property: m.Groups["prop"].Value))
+            .Where(r => r.Type.GetProperty(r.Property)?.SetMethod?.GetCustomAttribute<ObsoleteAttribute>() != null
+                     || r.Type.GetProperty(r.Property)?.GetCustomAttribute<ObsoleteAttribute>() != null)
+            .Select(r => $"{StripArity(r.Type.Name)}.{r.Property}");
+    }
+
+
+
+    [Fact]
+    public void ObsoleteSetterInitializers_when_a_snippet_sets_a_deprecated_setter_reports_it()
+    {
+        var offenders = ObsoleteSetterInitializers("using var extractor = new FixedWidthExtractor<Record>(stream) { TrackByteOffset = true };");
+
+        Assert.Equal(new[] { "FixedWidthExtractor.TrackByteOffset" }, offenders.ToArray());
+    }
+
+
+
+    [Fact]
+    public void Documentation_snippets_do_not_configure_a_stage_through_obsolete_setters()
+    {
+        var root = FindRepositoryRoot(AppContext.BaseDirectory);
+        var markdown = new[] { Path.Combine(root, "README.md") }
+            .Concat(Directory.EnumerateFiles(Path.Combine(root, "docfx_project", "docs"), "*.md", SearchOption.AllDirectories))
+            .Select(f => (File: Path.GetFileName(f), Text: File.ReadAllText(f)));
+        var xmlExamples = EnumerateSourceFiles(AppContext.BaseDirectory)
+            .Select(f => (File: Path.GetFileName(f), Text: string.Join("\n", ExtractExampleCode(File.ReadAllText(f)))));
+
+        var offenders = markdown
+            .Concat(xmlExamples)
+            .SelectMany(d => ObsoleteSetterInitializers(d.Text).Select(o => $"{d.File}: {o}"))
+            .ToList();
+
+        Assert.True
+        (
+            offenders.Count == 0,
+            "Snippets configure an extractor/loader through an [Obsolete] setter; pass an options record instead:" +
+            Environment.NewLine + string.Join(Environment.NewLine, offenders)
+        );
     }
 
 
