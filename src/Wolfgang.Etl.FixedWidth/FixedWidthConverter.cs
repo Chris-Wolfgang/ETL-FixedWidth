@@ -28,7 +28,8 @@ namespace Wolfgang.Etl.FixedWidth;
 /// convert a header label to its padded string representation.
 /// </para>
 /// <para>
-/// <b>Value parsers</b> (<see cref="Func{T1,T2,TResult}"/> of <c>string, FieldContext, object</c>)
+/// <b>Value parsers</b> (<see cref="FixedWidthValueParser"/>: the field text as
+/// <see cref="ReadOnlyMemory{T}"/> of <see cref="char"/> plus its <see cref="FieldContext"/>)
 /// convert a raw string read from the file back to the target property type.
 /// <see cref="DefaultParser"/> is the built-in implementation used by
 /// <see cref="FixedWidthExtractor{TRecord}"/> by default.
@@ -213,6 +214,9 @@ public static class FixedWidthConverter
     ///   <item><see cref="DateTime"/>, <see cref="DateTimeOffset"/>, <see cref="TimeSpan"/>:
     ///   parsed with <see cref="FieldContext.Format"/> using
     ///   <see cref="CultureInfo.InvariantCulture"/>.</item>
+    ///   <item>Integral, floating-point, <see cref="decimal"/> and <see cref="bool"/> types:
+    ///   parsed directly with <see cref="CultureInfo.InvariantCulture"/> (and the field's
+    ///   <see cref="System.Globalization.NumberStyles"/> where set).</item>
     ///   <item>All other types: parsed via <see cref="TypeDescriptor"/> with
     ///   <see cref="CultureInfo.InvariantCulture"/>.</item>
     /// </list>

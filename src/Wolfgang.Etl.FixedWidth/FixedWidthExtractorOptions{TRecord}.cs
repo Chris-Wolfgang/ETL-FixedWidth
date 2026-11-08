@@ -60,7 +60,8 @@ public record FixedWidthExtractorOptions<TRecord> : ExtractorOptions
 
 
     /// <summary>
-    /// Optional callback invoked for each recoverable error. Defaults to <see langword="null"/>.
+    /// Optional callback invoked for each record-level error: every recoverable error, and also the
+    /// failure that aborts extraction (reported before it is rethrown). Defaults to <see langword="null"/>.
     /// </summary>
     public Action<FixedWidthError>? OnError { get; init; }
 
