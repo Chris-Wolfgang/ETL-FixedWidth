@@ -51,11 +51,6 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
 
 
 
-
-
-
-
-
     /// <summary>
     /// Initializes a new <see cref="FixedWidthBinaryLoader{TRecord}"/> that writes fixed-length
     /// binary records to <paramref name="stream"/>. The caller retains ownership of the stream.
@@ -106,6 +101,7 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
     }
 
 
+
     /// <summary>
     /// The <see cref="System.Text.Encoding"/> used by this instance. Superseded by
     /// <see cref="FixedWidthBinaryLoaderOptions.Encoding"/>.
@@ -151,9 +147,12 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
         {
             _logger.LogInformation
             (
-                "Binary load started for {RecordType}: RecordByteLength={RecordByteLength}",
+                "Binary load started for {RecordType}: RecordByteLength={RecordByteLength}, " +
+                "SkipItemCount={SkipItemCount}, MaximumItemCount={MaximumItemCount}",
                 typeof(TRecord).Name,
-                _map.RecordByteLength
+                _map.RecordByteLength,
+                SkipItemCount,
+                MaximumItemCount
             );
         }
 
@@ -162,6 +161,24 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
         await foreach (var item in items.WithCancellation(cancellationToken).ConfigureAwait(false))
         {
             cancellationToken.ThrowIfCancellationRequested();
+
+            // `is null` rather than default-equality: a value-type TRecord is never null, and its
+            // default value is a legitimate record.
+            if (item is null)
+            {
+                throw LogAndCreateNullRecordError();
+            }
+
+            if (CurrentSkippedItemCount < SkipItemCount)
+            {
+                IncrementCurrentSkippedItemCount();
+                continue;
+            }
+
+            if (CurrentItemCount >= MaximumItemCount)
+            {
+                break;
+            }
 
             Array.Clear(buffer, 0, buffer.Length);
             foreach (var descriptor in _map.Descriptors)
@@ -176,6 +193,26 @@ public sealed class FixedWidthBinaryLoader<TRecord> : LoaderBase<TRecord, FixedW
         }
 
         await _stream.FlushAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+
+
+    private InvalidOperationException LogAndCreateNullRecordError()
+    {
+        var ex = new InvalidOperationException
+        (
+            $"A null record was encountered at item {CurrentItemCount + CurrentSkippedItemCount + 1}. " +
+            "The loader writes what it is given — null records are not permitted."
+        );
+
+        _logger.LogError
+        (
+            ex,
+            "Null record encountered at item {ItemPosition}",
+            CurrentItemCount + CurrentSkippedItemCount + 1
+        );
+
+        return ex;
     }
 
 

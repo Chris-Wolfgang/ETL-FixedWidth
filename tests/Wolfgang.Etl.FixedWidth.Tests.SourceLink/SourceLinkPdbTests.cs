@@ -66,7 +66,7 @@ public class SourceLinkPdbTests
     /// their own mappings, so only entries pointing at this repo are asserted.
     /// </summary>
     [Fact]
-    public void Runtime_pdb_has_sourcelink_pointing_at_github_raw()
+    public void RuntimePdb_when_inspected_has_sourcelink_pointing_at_github_raw()
     {
         var mappings = ReadOurSourceLinkMappings();
 
@@ -199,7 +199,7 @@ public class SourceLinkPdbTests
         // defect instead. See AssertIsOurRawGitHubUrl.
         return documents
             .EnumerateObject()
-            .Select(entry => (Name: entry.Name, Url: entry.Value.GetString()))
+            .Select(entry => (entry.Name, Url: entry.Value.GetString()))
             .Where(entry => entry.Url is not null && entry.Url.Contains(RepoSlug, StringComparison.OrdinalIgnoreCase))
             .Select(entry => (entry.Name.TrimEnd('*'), entry.Url!.TrimEnd('*')))
             .ToList();

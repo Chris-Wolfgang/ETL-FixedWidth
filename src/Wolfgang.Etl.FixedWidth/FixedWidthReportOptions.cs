@@ -19,10 +19,14 @@ public sealed record FixedWidthReportOptions
     /// <summary>Gets the number of data records processed so far. Defaults to <c>0</c>.</summary>
     public int CurrentCount { get; init; }
 
+
+
     /// <summary>
     /// Gets the number of records skipped by the skip budget so far. Defaults to <c>0</c>.
     /// </summary>
     public int CurrentSkippedItemCount { get; init; }
+
+
 
     /// <summary>
     /// Gets the number of parsed records rejected so far. Extractor only — leave unset for a
@@ -30,11 +34,15 @@ public sealed record FixedWidthReportOptions
     /// </summary>
     public int CurrentRejectedItemCount { get; init; }
 
+
+
     /// <summary>
     /// Gets the number of physical lines read that produced no record. Extractor only — leave
     /// unset for a loader. Defaults to <c>0</c>.
     /// </summary>
     public int CurrentFilteredLineCount { get; init; }
+
+
 
     /// <summary>
     /// Gets the 1-based physical line number currently being processed. Defaults to <c>0</c>.
