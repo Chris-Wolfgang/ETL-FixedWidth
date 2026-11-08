@@ -244,16 +244,14 @@ public static class FixedWidthConverter
     public static readonly FixedWidthValueParser DefaultParser =
         (text, context) =>
         {
-            // An empty nullable field legitimately parses to null. The delegate is still
-            // declared as returning non-null `object` for source compatibility; #508
-            // re-annotates it as `object?` and drops this forgiveness.
+            // An empty nullable field legitimately parses to null.
             return ParseValue
             (
                 text,
                 context.PropertyType,
                 context.Format,
                 numberStyles: context.NumberStyles
-            )!;
+            );
         };
 
 
