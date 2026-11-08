@@ -446,6 +446,21 @@ public sealed class EtlPipelineFixedWidthExtensionsTests : IDisposable
     }
 
 
+    [Fact]
+    public void Dispose_when_the_temp_directory_is_already_gone_swallows_the_IOException()
+    {
+        // Directory.Delete on a missing path throws DirectoryNotFoundException (an IOException) on every OS,
+        // so this exercises the best-effort cleanup path deterministically; on Linux a leaked handle never
+        // makes the delete itself throw, which left the catch block unexecuted in CI.
+        var sut = new EtlPipelineFixedWidthExtensionsTests();
+        Directory.Delete(sut._tempDir, recursive: true);
+
+        var exception = Record.Exception(sut.Dispose);
+
+        Assert.Null(exception);
+    }
+
+
     // ------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------
