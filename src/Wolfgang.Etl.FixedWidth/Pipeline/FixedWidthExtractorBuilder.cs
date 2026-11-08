@@ -82,13 +82,17 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
     public IFixedWidthExtractorBuilder<T> HeaderLineCount(int count) => Set(o => o with { HeaderLineCount = count }, Touched.HeaderLineCount);
 
 
+
     public IFixedWidthExtractorBuilder<T> HasHeader(bool hasHeader) => Set(o => o with { HeaderLineCount = hasHeader ? 1 : 0 }, Touched.HeaderLineCount);
+
 
 
     public IFixedWidthExtractorBuilder<T> MalformedLineHandling(MalformedLineHandling handling) => Set(o => o with { MalformedLineHandling = handling }, Touched.MalformedLineHandling);
 
 
+
     public IFixedWidthExtractorBuilder<T> BlankLineHandling(BlankLineHandling handling) => Set(o => o with { BlankLineHandling = handling }, Touched.BlankLineHandling);
+
 
 
     public IFixedWidthExtractorBuilder<T> LineFilter(Func<string, LineAction> filter)
@@ -130,25 +134,33 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
     public IFixedWidthExtractorBuilder<T> FieldSeparator(char? separator) => Set(o => o with { FieldSeparator = separator }, Touched.FieldSeparator);
 
 
+
     public IFixedWidthExtractorBuilder<T> FieldDelimiter(string? delimiter) => Set(o => o with { FieldDelimiter = delimiter }, Touched.FieldDelimiter);
+
 
 
     public IEtlPipeline<TOut> Through<TOut>(ITransformAsync<T, TOut> transformer) where TOut : notnull => Pipeline().Through(transformer);
 
 
+
     public IEtlPipeline<TOut> Through<TOut>(ITransformWithCancellationAsync<T, TOut> transformer) where TOut : notnull => Pipeline().Through(transformer);
+
 
 
     public IEtlPipeline<TOut> Through<TOut>(Func<IAsyncEnumerable<T>, IAsyncEnumerable<TOut>> stage) where TOut : notnull => Pipeline().Through(stage);
 
 
+
     public IEtlPipeline<TOut> Through<TOut>(Func<IAsyncEnumerable<T>, CancellationToken, IAsyncEnumerable<TOut>> stage) where TOut : notnull => Pipeline().Through(stage);
+
 
 
     public IEtlPipelineSink To<TProgress>(LoaderBase<T, TProgress> loader) where TProgress : notnull => Pipeline().To(loader);
 
 
+
     public IAsyncEnumerable<T> AsAsyncEnumerable(CancellationToken token = default) => Pipeline().AsAsyncEnumerable(token);
+
 
 
     private IFixedWidthExtractorBuilder<T> Set
@@ -258,6 +270,7 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
 
         return extractor;
     }
+
 
 
     /// <summary>
