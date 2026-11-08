@@ -536,7 +536,7 @@ public sealed class FixedWidthBinaryExtractorTests
 
 
     [Fact]
-    public void Internal_timer_ctor_accepts_a_logger_as_its_trailing_parameter()
+    public void Constructor_when_internal_timer_overload_takes_a_trailing_logger_constructs()
     {
         // Rule 6: the logger is last on internal constructors too. This overload previously took
         // a timer but no logger, so a test could inject one or the other, never both.

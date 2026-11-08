@@ -66,7 +66,7 @@ public class SourceLinkPdbTests
     /// their own mappings, so only entries pointing at this repo are asserted.
     /// </summary>
     [Fact]
-    public void Runtime_pdb_has_sourcelink_pointing_at_github_raw()
+    public void RuntimePdb_when_inspected_has_sourcelink_pointing_at_github_raw()
     {
         var mappings = ReadOurSourceLinkMappings();
 
