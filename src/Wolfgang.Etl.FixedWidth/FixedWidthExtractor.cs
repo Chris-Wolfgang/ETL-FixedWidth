@@ -50,7 +50,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;(reader);
 /// </code>
 /// </example>
-public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthReport>
+public class FixedWidthExtractor<[DynamicallyAccessedMembers(TrimmedMembers.Record)] TRecord> : ExtractorBase<TRecord, FixedWidthReport>
     where TRecord : notnull, new()
 {
     // ------------------------------------------------------------------
@@ -69,6 +69,10 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
+
+    // _currentLineNumber is read by CreateProgressReport on a Timer threadpool thread
+    // and written by ExtractWorkerAsync on the async continuation thread.
+    // Interlocked.Read/Increment ensures atomicity on all targets including 32-bit net462.
     private long _currentLineNumber;
     private int _currentRejectedItemCount;
     private int _currentFilteredLineCount;
@@ -82,9 +86,6 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     private long _startByteOffset;
     private IDisposable? _resumeReader;   // the StreamReader re-created after a resume seek, disposed with this instance
 
-    // _currentLineNumber is read by CreateProgressReport on a Timer threadpool thread
-    // and written by ExtractWorkerAsync on the async continuation thread.
-    // Interlocked.Read/Increment ensures atomicity on all targets including 32-bit net462.
 
 
     // ------------------------------------------------------------------
@@ -99,16 +100,26 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <param name="reader">
     /// The <see cref="TextReader"/> to read fixed-width records from.
     /// </param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">
+    /// An optional logger for diagnostic output. Pass <see langword="null"/> (the default) to disable logging.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// <paramref name="reader"/> or <paramref name="logger"/> is null.
+    /// <paramref name="reader"/> is null.
     /// </exception>
     public FixedWidthExtractor
     (
         TextReader reader,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
-        : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null, options: null, encoding: null, timer: null, logger: logger)
+        : this
+        (
+            reader: reader ?? throw new ArgumentNullException(nameof(reader)),
+            stream: null,
+            options: null,
+            encoding: null,
+            timer: null,
+            logger: logger
+        )
     {
     }
 
@@ -186,6 +197,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     {
     }
 
+
+
     /// <summary>
     /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> from a <see cref="Stream"/> decoded with the
     /// supplied <see cref="Encoding"/>.
@@ -221,10 +234,6 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
 
 
-
-
-
-
     /// <summary>
     /// Initializes a new <see cref="FixedWidthExtractor{TRecord}"/> over the specified
     /// <see cref="Stream"/>, with the logger as the trailing optional parameter.
@@ -245,7 +254,15 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         FixedWidthExtractorStreamOptions<TRecord>? options = null,
         ILogger<FixedWidthExtractor<TRecord>>? logger = null
     )
-        : this(reader: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, encoding: options?.Encoding, timer: null, logger: logger)
+        : this
+        (
+            reader: null,
+            stream: stream ?? throw new ArgumentNullException(nameof(stream)),
+            options: options,
+            encoding: options?.Encoding,
+            timer: null,
+            logger: logger
+        )
     {
     }
 
@@ -337,6 +354,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     }
 
 
+
     /// <summary>
     /// Binary-compatibility overload for 0.10.x callers. Equivalent to the constructor above with
     /// no logger.
@@ -401,11 +419,17 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <see cref="Encoding.UTF8"/>), BOM detection, a 64 KB buffer, and
     /// <c>leaveOpen: true</c> so the caller retains stream ownership.
     /// </summary>
-    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
+    /// <remarks><paramref name="stream"/> is non-null: every caller has already checked it.</remarks>
     private static StreamReader CreateBufferedReader(Stream stream, Encoding? encoding)
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
-        return new StreamReader(stream, encoding: encoding ?? Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: DefaultBufferSize, leaveOpen: true);
+        return new StreamReader
+        (
+            stream,
+            encoding: encoding ?? Encoding.UTF8,
+            detectEncodingFromByteOrderMarks: true,
+            bufferSize: DefaultBufferSize,
+            leaveOpen: true
+        );
     }
 
 
@@ -423,7 +447,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <remarks>
     /// Defaults to <see cref="MalformedLineHandling.ThrowException"/>.
     /// When set to <see cref="MalformedLineHandling.Skip"/>, the line is skipped and
-    /// <c>CurrentSkippedItemCount</c> is incremented.
+    /// <c>CurrentRejectedItemCount</c> is incremented.
     /// When set to <see cref="MalformedLineHandling.ReturnDefault"/>, a default instance
     /// of <typeparamref name="TRecord"/> is yielded for the offending line.
     /// </remarks>
@@ -462,6 +486,8 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
 
     private Func<string, LineAction> _lineFilter = _ => LineAction.Process;
+
+
 
     /// <summary>
     /// A delegate invoked for every data line (after header and separator lines have been
@@ -507,7 +533,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <see cref="ValueParser"/> and field assignment but before the record is
     /// yielded. Return <see cref="ValidationResult.Accept"/> to yield it,
     /// <see cref="ValidationResult.Skip"/> to drop it (increments
-    /// <c>CurrentSkippedItemCount</c>), or <see cref="ValidationResult.Stop"/> to
+    /// <c>CurrentRejectedItemCount</c>), or <see cref="ValidationResult.Stop"/> to
     /// end extraction. <see langword="null"/> (the default) applies no validation.
     /// </summary>
     /// <example>
@@ -925,17 +951,10 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
 
 
 
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
     /// <inheritdoc/>
 #pragma warning disable MA0051 // async iterator methods cannot delegate 'yield return' to sub-methods
 #pragma warning disable CS1998 // async method lacks 'await' — intentionally synchronous; see comment below
     protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync([EnumeratorCancellation] CancellationToken token)
-#else
-    /// <inheritdoc/>
-#pragma warning disable MA0051 // async iterator methods cannot delegate 'yield return' to sub-methods
-#pragma warning disable CS1998 // async method lacks 'await' — intentionally synchronous; see comment below
-    protected override async IAsyncEnumerable<TRecord> ExtractWorkerAsync([System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
-#endif
 #pragma warning restore CS1998
 #pragma warning restore MA0051
     {
@@ -1551,6 +1570,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
         return _currentLineNumber <= HeaderLineCount
             || _currentLineNumber == separatorLineNo;
     }
+
 
 
     /// <summary>

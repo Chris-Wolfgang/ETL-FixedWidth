@@ -41,6 +41,7 @@ public interface IFixedWidthLoaderBuilder<T> : IEtlPipelineSink
     IFixedWidthLoaderBuilder<T> WriteHeader(bool writeHeader);
 
 
+
     /// <summary>
     /// Sets <see cref="FixedWidthLoader{T}.ValueConverter"/> — the delegate that renders a field value to
     /// its string form before padding.
@@ -48,6 +49,7 @@ public interface IFixedWidthLoaderBuilder<T> : IEtlPipelineSink
     /// <param name="converter">The value converter.</param>
     /// <returns>The same builder, for chaining.</returns>
     IFixedWidthLoaderBuilder<T> ValueConverter(Func<object, FieldContext, string> converter);
+
 
 
     /// <summary>
@@ -59,6 +61,7 @@ public interface IFixedWidthLoaderBuilder<T> : IEtlPipelineSink
     IFixedWidthLoaderBuilder<T> HeaderConverter(Func<string, FieldContext, string> converter);
 
 
+
     /// <summary>
     /// Sets <see cref="FixedWidthLoader{T}.FieldSeparator"/> — when non-null (and a header is written), a
     /// separator line of the given character is written after the header.
@@ -68,6 +71,7 @@ public interface IFixedWidthLoaderBuilder<T> : IEtlPipelineSink
     IFixedWidthLoaderBuilder<T> FieldSeparator(char? separator);
 
 
+
     /// <summary>
     /// Sets <see cref="FixedWidthLoader{T}.FieldDelimiter"/> — a string written between adjacent fields on
     /// every line, or <see langword="null"/> for pure fixed-width output.
@@ -75,6 +79,7 @@ public interface IFixedWidthLoaderBuilder<T> : IEtlPipelineSink
     /// <param name="delimiter">The field delimiter, or <see langword="null"/> for none.</param>
     /// <returns>The same builder, for chaining.</returns>
     IFixedWidthLoaderBuilder<T> FieldDelimiter(string? delimiter);
+
 
 
     /// <summary>

@@ -76,6 +76,8 @@ internal static class PackedDecimal
         return value;
     }
 
+
+
     /// <summary>
     /// Encodes <paramref name="value"/> as COMP-3 packed decimal into <paramref name="destination"/>,
     /// whose length is the field's byte width. The value is truncated (COBOL default, not rounded) to
@@ -106,7 +108,10 @@ internal static class PackedDecimal
         var digits = unscaled.ToString("F0", CultureInfo.InvariantCulture);
         if (digits.Length > maxDigits)
         {
-            throw new OverflowException($"Value '{value}' needs {digits.Length} digits but the {destination.Length}-byte packed-decimal field holds only {maxDigits}.");
+            throw new OverflowException
+            (
+                $"Value '{value}' needs {digits.Length} digits but the {destination.Length}-byte packed-decimal field holds only {maxDigits}."
+            );
         }
 
         var padded = digits.PadLeft(maxDigits, '0');

@@ -1,6 +1,8 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 
 namespace Wolfgang.Etl.FixedWidth;
 
@@ -34,7 +36,7 @@ public static class EtlPipelineFixedWidthExtensions
     /// <param name="path">The path of the fixed-width file to read.</param>
     /// <returns>A fluent <see cref="IFixedWidthExtractorBuilder{T}"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="path"/> is <see langword="null"/>.</exception>
-    public static IFixedWidthExtractorBuilder<T> FixedWidthExtractor<T>(this EtlPipeline pipeline, string path)
+    public static IFixedWidthExtractorBuilder<T> FixedWidthExtractor<[DynamicallyAccessedMembers(TrimmedMembers.Record)] T>(this EtlPipeline pipeline, string path)
         where T : notnull, new()
     {
         if (pipeline is null)
@@ -51,6 +53,7 @@ public static class EtlPipelineFixedWidthExtensions
     }
 
 
+
     /// <summary>
     /// Begins a pipeline that reads fixed-width records from <paramref name="stream"/>. The caller
     /// retains ownership of the stream; only the extractor's internal reader is disposed.
@@ -60,7 +63,7 @@ public static class EtlPipelineFixedWidthExtensions
     /// <param name="stream">The stream to read from.</param>
     /// <returns>A fluent <see cref="IFixedWidthExtractorBuilder{T}"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="stream"/> is <see langword="null"/>.</exception>
-    public static IFixedWidthExtractorBuilder<T> FixedWidthExtractor<T>(this EtlPipeline pipeline, Stream stream)
+    public static IFixedWidthExtractorBuilder<T> FixedWidthExtractor<[DynamicallyAccessedMembers(TrimmedMembers.Record)] T>(this EtlPipeline pipeline, Stream stream)
         where T : notnull, new()
     {
         if (pipeline is null)
@@ -77,6 +80,7 @@ public static class EtlPipelineFixedWidthExtensions
     }
 
 
+
     /// <summary>
     /// Begins a pipeline that reads fixed-width records from <paramref name="reader"/>. The caller
     /// retains ownership of the reader; nothing is disposed by the pipeline.
@@ -86,7 +90,7 @@ public static class EtlPipelineFixedWidthExtensions
     /// <param name="reader">The reader to read from.</param>
     /// <returns>A fluent <see cref="IFixedWidthExtractorBuilder{T}"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="reader"/> is <see langword="null"/>.</exception>
-    public static IFixedWidthExtractorBuilder<T> FixedWidthExtractor<T>(this EtlPipeline pipeline, TextReader reader)
+    public static IFixedWidthExtractorBuilder<T> FixedWidthExtractor<[DynamicallyAccessedMembers(TrimmedMembers.Record)] T>(this EtlPipeline pipeline, TextReader reader)
         where T : notnull, new()
     {
         if (pipeline is null)
@@ -103,6 +107,7 @@ public static class EtlPipelineFixedWidthExtensions
     }
 
 
+
     /// <summary>
     /// Begins a pipeline from an already-configured <see cref="T:Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1"/>.
     /// The caller retains ownership of the instance; nothing is disposed by the pipeline. The returned
@@ -113,7 +118,7 @@ public static class EtlPipelineFixedWidthExtensions
     /// <param name="extractor">The extractor that seeds the pipeline.</param>
     /// <returns>A fluent <see cref="IFixedWidthExtractorBuilder{T}"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="extractor"/> is <see langword="null"/>.</exception>
-    public static IFixedWidthExtractorBuilder<T> FixedWidthExtractor<T>(this EtlPipeline pipeline, FixedWidthExtractor<T> extractor)
+    public static IFixedWidthExtractorBuilder<T> FixedWidthExtractor<[DynamicallyAccessedMembers(TrimmedMembers.Record)] T>(this EtlPipeline pipeline, FixedWidthExtractor<T> extractor)
         where T : notnull, new()
     {
         if (pipeline is null)
@@ -143,7 +148,7 @@ public static class EtlPipelineFixedWidthExtensions
     /// <param name="path">The path of the fixed-width file to write. An existing file is overwritten.</param>
     /// <returns>A fluent <see cref="IFixedWidthLoaderBuilder{T}"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="path"/> is <see langword="null"/>.</exception>
-    public static IFixedWidthLoaderBuilder<T> FixedWidthLoader<T>(this IEtlPipeline<T> pipeline, string path)
+    public static IFixedWidthLoaderBuilder<T> FixedWidthLoader<[DynamicallyAccessedMembers(TrimmedMembers.Record)] T>(this IEtlPipeline<T> pipeline, string path)
         where T : notnull
     {
         if (pipeline is null)
@@ -160,6 +165,7 @@ public static class EtlPipelineFixedWidthExtensions
     }
 
 
+
     /// <summary>
     /// Terminates the pipeline by writing fixed-width records to <paramref name="stream"/>. The caller
     /// retains ownership of the stream; only the loader's internal writer is disposed.
@@ -169,7 +175,7 @@ public static class EtlPipelineFixedWidthExtensions
     /// <param name="stream">The stream to write to.</param>
     /// <returns>A fluent <see cref="IFixedWidthLoaderBuilder{T}"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="stream"/> is <see langword="null"/>.</exception>
-    public static IFixedWidthLoaderBuilder<T> FixedWidthLoader<T>(this IEtlPipeline<T> pipeline, Stream stream)
+    public static IFixedWidthLoaderBuilder<T> FixedWidthLoader<[DynamicallyAccessedMembers(TrimmedMembers.Record)] T>(this IEtlPipeline<T> pipeline, Stream stream)
         where T : notnull
     {
         if (pipeline is null)
@@ -186,6 +192,7 @@ public static class EtlPipelineFixedWidthExtensions
     }
 
 
+
     /// <summary>
     /// Terminates the pipeline by writing fixed-width records to <paramref name="writer"/>. The caller
     /// retains ownership of the writer and is responsible for flushing it; nothing is disposed by the
@@ -196,7 +203,7 @@ public static class EtlPipelineFixedWidthExtensions
     /// <param name="writer">The writer to write to.</param>
     /// <returns>A fluent <see cref="IFixedWidthLoaderBuilder{T}"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> or <paramref name="writer"/> is <see langword="null"/>.</exception>
-    public static IFixedWidthLoaderBuilder<T> FixedWidthLoader<T>(this IEtlPipeline<T> pipeline, TextWriter writer)
+    public static IFixedWidthLoaderBuilder<T> FixedWidthLoader<[DynamicallyAccessedMembers(TrimmedMembers.Record)] T>(this IEtlPipeline<T> pipeline, TextWriter writer)
         where T : notnull
     {
         if (pipeline is null)

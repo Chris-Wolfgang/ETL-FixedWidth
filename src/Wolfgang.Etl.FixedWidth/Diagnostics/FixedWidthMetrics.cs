@@ -98,6 +98,7 @@ internal static class FixedWidthMetrics
     internal static bool DurationEnabled => OperationDuration.Enabled;
 
 
+
     /// <summary>
     /// Builds the tag set shared by every measurement of a single operation.
     /// </summary>
@@ -131,6 +132,7 @@ internal static class FixedWidthMetrics
     }
 
 
+
     /// <summary>Records one successfully loaded item, if a listener is subscribed.</summary>
     internal static void RecordLoaded(in TagList tags)
     {
@@ -141,6 +143,7 @@ internal static class FixedWidthMetrics
     }
 
 
+
     /// <summary>Records one skipped item, if a listener is subscribed.</summary>
     internal static void RecordSkipped(in TagList tags)
     {
@@ -149,6 +152,7 @@ internal static class FixedWidthMetrics
             ItemsSkipped.Add(1, tags);
         }
     }
+
 
 
     /// <summary>Records one physical line read, if a listener is subscribed.</summary>
@@ -168,6 +172,7 @@ internal static class FixedWidthMetrics
     /// throws.
     /// </summary>
     internal static DurationScope MeasureDuration(TagList tags) => new(tags);
+
 
 
     /// <summary>
