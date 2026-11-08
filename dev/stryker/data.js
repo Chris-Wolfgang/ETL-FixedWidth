@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792306884737,
+  "lastUpdate": 1794143939214,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-FixedWidth",
   "entries": {
     "Mutation score": [
@@ -102,6 +102,33 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/Chris-Wolfgang/ETL-FixedWidth/commit/aa72843d5a6a4fabe638f78c47686cc9632a294e"
         },
         "date": 1792306877472,
+        "tool": "customBiggerIsBetter",
+        "benches": [
+          {
+            "name": "Mutation score",
+            "value": 74.74,
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang",
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "6dd187bc03c204b88fa78516eaf4ca5bfc63b7fd",
+          "message": "ci(aot): adopt the canonical AOT smoke workflow (#619)\n\n* ci(aot): adopt the canonical AOT smoke workflow\n\nReplace aot-smoke.yaml with the fleet-canonical file, setting only the\nthree env values for this repo:\n\n- SMOKE_PROJECT: tests/AotSmoke/Wolfgang.Etl.FixedWidth.AotSmoke.csproj\n- LIBRARY_NAMESPACE: Wolfgang.Etl.FixedWidth\n- ALLOWED_WARNING_REGEX: '' (no known accepted upstream warning)\n\nThe job is now \"AOT smoke (linux-x64)\" (was \"AOT publish + run\"), trim/AOT\nwarnings from this library fail the job instead of only being listed in\nthe step summary, and the workflow gains workflow_call so release.yaml can\ngate publishing on it. The vNext pull_request and main push triggers of\nthe old file are not part of the canonical file.\n\nRefs #524\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n* ci(aot): sync the header comment with the canonical file\n\nThe canonical aot-smoke.yaml now explains that it has no push trigger and\nthat the check must be run once on main with workflow_dispatch before it\nis made required. Only the comment changes.\n\nRefs #524\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n* ci(aot): strip the MSBuild project suffix before the namespace match\n\nMSBuild appends \" [<path>.csproj]\" to every warning line, and the smoke\nproject's path contains the library namespace, so every IL warning\n(including third-party ones) matched LIBRARY_NAMESPACE. Sync with the\ncanonical file, which strips that suffix with sed before grep -F.\n\nRefs #524\n\nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Sonnet 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-08T03:23:19Z",
+          "url": "https://github.com/Chris-Wolfgang/ETL-FixedWidth/commit/6dd187bc03c204b88fa78516eaf4ca5bfc63b7fd"
+        },
+        "date": 1794143934286,
         "tool": "customBiggerIsBetter",
         "benches": [
           {
