@@ -99,9 +99,11 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <param name="reader">
     /// The <see cref="TextReader"/> to read fixed-width records from.
     /// </param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">
+    /// An optional logger for diagnostic output. Pass <see langword="null"/> (the default) to disable logging.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// <paramref name="reader"/> or <paramref name="logger"/> is null.
+    /// <paramref name="reader"/> is null.
     /// </exception>
     public FixedWidthExtractor
     (
@@ -423,7 +425,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <remarks>
     /// Defaults to <see cref="MalformedLineHandling.ThrowException"/>.
     /// When set to <see cref="MalformedLineHandling.Skip"/>, the line is skipped and
-    /// <c>CurrentSkippedItemCount</c> is incremented.
+    /// <c>CurrentRejectedItemCount</c> is incremented.
     /// When set to <see cref="MalformedLineHandling.ReturnDefault"/>, a default instance
     /// of <typeparamref name="TRecord"/> is yielded for the offending line.
     /// </remarks>
@@ -507,7 +509,7 @@ public class FixedWidthExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthRep
     /// <see cref="ValueParser"/> and field assignment but before the record is
     /// yielded. Return <see cref="ValidationResult.Accept"/> to yield it,
     /// <see cref="ValidationResult.Skip"/> to drop it (increments
-    /// <c>CurrentSkippedItemCount</c>), or <see cref="ValidationResult.Stop"/> to
+    /// <c>CurrentRejectedItemCount</c>), or <see cref="ValidationResult.Stop"/> to
     /// end extraction. <see langword="null"/> (the default) applies no validation.
     /// </summary>
     /// <example>
