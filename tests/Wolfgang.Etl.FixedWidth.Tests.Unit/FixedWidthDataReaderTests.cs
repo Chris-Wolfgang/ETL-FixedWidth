@@ -47,7 +47,7 @@ public sealed class FixedWidthDataReaderTests
 
 
     [Fact]
-    public void Read_serves_fields_by_ordinal_name_and_typed_accessor()
+    public void Read_when_a_record_is_available_serves_fields_by_ordinal_name_and_typed_accessor()
     {
         using var reader = Reader(Line("Alice", "Smith", 30, "42"));
 
@@ -300,7 +300,7 @@ public sealed class FixedWidthDataReaderTests
 
 
     [Fact]
-    public void Typed_accessors_return_the_field_clr_values()
+    public void TypedAccessors_when_called_return_the_field_clr_values()
     {
         var line =
             "True".PadRight(5) + "12".PadRight(4) + "X" + "123".PadRight(6) +
@@ -325,7 +325,7 @@ public sealed class FixedWidthDataReaderTests
 
 
     [Fact]
-    public void Non_forward_and_unsupported_members_behave_as_documented()
+    public void UnsupportedMembers_when_called_behave_as_documented()
     {
         using var reader = Reader(Line("Alice", "Smith", 30, "1"));
 
