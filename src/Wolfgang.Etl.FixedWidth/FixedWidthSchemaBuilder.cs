@@ -104,6 +104,7 @@ public sealed class FixedWidthSchemaBuilder<T>
     }
 
 
+
     /// <summary>
     /// Adds a skipped column — a range in the file mapped to no property. Its width still contributes to
     /// the positions of later fields.
@@ -119,6 +120,7 @@ public sealed class FixedWidthSchemaBuilder<T>
         _entries.Add(new Entry(property: null, field: null, attribute));
         return this;
     }
+
 
 
     /// <summary>
