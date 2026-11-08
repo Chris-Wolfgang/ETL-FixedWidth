@@ -289,11 +289,12 @@ public static class FixedWidthConverter
             if (string.IsNullOrEmpty(context.Format))
             {
                 throw new InvalidOperationException
-                    (
-                        $"Property '{context.PropertyName}' is of type '{value.GetType().Name}' " +
-                        "but no Format was specified on the [FixedWidthField] attribute. " +
-                        "Fixed-width date and time fields require an explicit format string " +
-                        "(e.g. \"yyyyMMdd\", \"HHmmss\").");
+                (
+                    $"Property '{context.PropertyName}' is of type '{value.GetType().Name}' " +
+                    "but no Format was specified on the [FixedWidthField] attribute. " +
+                    "Fixed-width date and time fields require an explicit format string " +
+                    "(e.g. \"yyyyMMdd\", \"HHmmss\")."
+                );
             }
 
             return ((IFormattable)value).ToString
@@ -302,8 +303,6 @@ public static class FixedWidthConverter
                 CultureInfo.InvariantCulture
             );
         }
-
-
 
         // All other IFormattable types — use InvariantCulture, apply Format if supplied.
         if (value is IFormattable formattable)

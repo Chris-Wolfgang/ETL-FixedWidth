@@ -305,9 +305,11 @@ internal static class FixedWidthLineParser
         var attr = descriptor.Attribute;
         var prop = descriptor.Property;
         var getter = descriptor.Getter
-            ?? throw new InvalidOperationException(
+            ?? throw new InvalidOperationException
+            (
                 $"Property '{prop.Name}' has no public getter. " +
-                "The loader requires readable properties to format field values.");
+                "The loader requires readable properties to format field values."
+            );
         var text = converter(getter(record!)!, descriptor.Context);
 
         if (text.Length > attr.Length)
@@ -505,11 +507,18 @@ internal static class FixedWidthLineParser
             // Fast path: when using the default parser, pass the cached TypeConverter
             // to avoid TypeDescriptor.GetConverter on every field of every record.
             var converted = ReferenceEquals(valueParser, FixedWidthConverter.DefaultParser)
-                ? FixedWidthConverter.ParseValue(value, descriptor.Context.PropertyType, descriptor.Context.Format, descriptor.TypeConverter, descriptor.Context.NumberStyles)
+                ? FixedWidthConverter.ParseValue
+                (
+                    value,
+                    descriptor.Context.PropertyType,
+                    descriptor.Context.Format,
+                    descriptor.TypeConverter,
+                    descriptor.Context.NumberStyles
+                )
                 : valueParser(value, descriptor.Context);
             descriptor.Setter(record!, converted);
         }
-        catch (Exception ex) when (!(ex is MalformedLineException))
+        catch (Exception ex) when (ex is not MalformedLineException)
         {
             throw new FieldConversionException
             (
@@ -524,5 +533,4 @@ internal static class FixedWidthLineParser
             );
         }
     }
-
 }
