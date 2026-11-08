@@ -22,6 +22,10 @@ namespace Wolfgang.Etl.FixedWidth;
 internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilder<T>
     where T : notnull, new()
 {
+    // Same 64 KB buffer as the FixedWidthExtractor / FixedWidthLoader Stream constructors
+    // ("preferred for files"); the StreamReader / StreamWriter path ctors default to a 1 K-char buffer (#594).
+    private const int PathBufferSize = 65536;
+
     private readonly string? _path;
     private readonly Stream? _stream;
     private readonly TextReader? _reader;
@@ -82,13 +86,17 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
     public IFixedWidthExtractorBuilder<T> HeaderLineCount(int count) => Set(o => o with { HeaderLineCount = count }, Touched.HeaderLineCount);
 
 
+
     public IFixedWidthExtractorBuilder<T> HasHeader(bool hasHeader) => Set(o => o with { HeaderLineCount = hasHeader ? 1 : 0 }, Touched.HeaderLineCount);
+
 
 
     public IFixedWidthExtractorBuilder<T> MalformedLineHandling(MalformedLineHandling handling) => Set(o => o with { MalformedLineHandling = handling }, Touched.MalformedLineHandling);
 
 
+
     public IFixedWidthExtractorBuilder<T> BlankLineHandling(BlankLineHandling handling) => Set(o => o with { BlankLineHandling = handling }, Touched.BlankLineHandling);
+
 
 
     public IFixedWidthExtractorBuilder<T> LineFilter(Func<string, LineAction> filter)
@@ -130,25 +138,33 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
     public IFixedWidthExtractorBuilder<T> FieldSeparator(char? separator) => Set(o => o with { FieldSeparator = separator }, Touched.FieldSeparator);
 
 
+
     public IFixedWidthExtractorBuilder<T> FieldDelimiter(string? delimiter) => Set(o => o with { FieldDelimiter = delimiter }, Touched.FieldDelimiter);
+
 
 
     public IEtlPipeline<TOut> Through<TOut>(ITransformAsync<T, TOut> transformer) where TOut : notnull => Pipeline().Through(transformer);
 
 
+
     public IEtlPipeline<TOut> Through<TOut>(ITransformWithCancellationAsync<T, TOut> transformer) where TOut : notnull => Pipeline().Through(transformer);
+
 
 
     public IEtlPipeline<TOut> Through<TOut>(Func<IAsyncEnumerable<T>, IAsyncEnumerable<TOut>> stage) where TOut : notnull => Pipeline().Through(stage);
 
 
+
     public IEtlPipeline<TOut> Through<TOut>(Func<IAsyncEnumerable<T>, CancellationToken, IAsyncEnumerable<TOut>> stage) where TOut : notnull => Pipeline().Through(stage);
+
 
 
     public IEtlPipelineSink To<TProgress>(LoaderBase<T, TProgress> loader) where TProgress : notnull => Pipeline().To(loader);
 
 
+
     public IAsyncEnumerable<T> AsAsyncEnumerable(CancellationToken token = default) => Pipeline().AsAsyncEnumerable(token);
+
 
 
     private IFixedWidthExtractorBuilder<T> Set
@@ -251,13 +267,14 @@ internal sealed class FixedWidthExtractorBuilder<T> : IFixedWidthExtractorBuilde
         else
         {
             // Path source: the builder owns the reader it opens, so dispose it once drained.
-            var reader = new StreamReader(_path!, _encoding, detectEncodingFromByteOrderMarks: true);
+            var reader = new StreamReader(_path!, _encoding, detectEncodingFromByteOrderMarks: true, bufferSize: PathBufferSize);
             extractor = new FixedWidthExtractor<T>(reader, _options);
             ownedResources = new object?[] { reader };
         }
 
         return extractor;
     }
+
 
 
     /// <summary>

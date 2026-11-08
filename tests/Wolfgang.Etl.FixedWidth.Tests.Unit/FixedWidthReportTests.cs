@@ -56,7 +56,7 @@ public class FixedWidthReportTests
 #pragma warning disable CS0618 // Type or member is obsolete
 
     [Fact]
-    public void Constructor_sets_all_properties()
+    public void Constructor_when_all_arguments_given_sets_all_properties()
     {
         var report = new FixedWidthReport
         (
