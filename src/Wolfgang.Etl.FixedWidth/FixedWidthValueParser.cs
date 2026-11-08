@@ -16,6 +16,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// and field length.
 /// </param>
 /// <returns>
-/// A value assignable to the target property's CLR type.
+/// A value assignable to the target property's CLR type, or <see langword="null"/>
+/// when the field has no value (for example an empty field mapped to a nullable property).
 /// </returns>
-public delegate object FixedWidthValueParser(ReadOnlyMemory<char> text, FieldContext context);
+public delegate object? FixedWidthValueParser(ReadOnlyMemory<char> text, FieldContext context);
