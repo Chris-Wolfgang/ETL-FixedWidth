@@ -369,7 +369,7 @@ jobs:
     needs: validate-release
     permissions:
       contents: read
-    uses: ./.github/workflows/aot-smoke.yaml
+    uses: ./.github/workflows/aot-smoke.yaml  # zizmor: ignore[self-repository]
 
   # Pack and validate NuGet package
   pack-and-validate:
