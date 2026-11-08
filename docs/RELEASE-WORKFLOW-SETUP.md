@@ -6,7 +6,7 @@ This guide explains how to configure a repository to use the standard `release.y
 
 The release workflow triggers when you **publish a GitHub Release** and implements a comprehensive validation and automatic deployment process that:
 - ✅ Tests all target frameworks per test project on Windows
-- ✅ Enforces 90% code coverage threshold
+- ✅ Enforces the coverage gates (`CODECOV_MINIMUM` for production assemblies, `CODECOV_TEST_MINIMUM` for test assemblies, set in `release.yaml`'s `env:` to match `pr.yaml`)
 - ✅ Validates NuGet package integrity with smoke tests
 - ✅ Automatically publishes to NuGet.org after validation passes
 - ✅ Eliminates duplicate build work for faster releases
@@ -15,25 +15,24 @@ The release workflow triggers when you **publish a GitHub Release** and implemen
 
 Complete the following one-time setup so that the workflow can publish releases:
 
-### Add NuGet API Key Secret
+### Configure NuGet Trusted Publishing
 
-**Location:** Settings → Secrets and variables → Actions → New repository secret
+The workflow publishes with **NuGet Trusted Publishing (OIDC)** — there is **no `NUGET_API_KEY` secret** to create or rotate. The `NuGet/login` step exchanges the workflow's OIDC token for a short-lived (1-hour) API key immediately before `dotnet nuget push`.
 
-1. Click **"New repository secret"**
-2. **Name:** `NUGET_API_KEY`
-3. **Value:** Your NuGet.org API key
-   - Get your key from [NuGet.org Account → API Keys](https://www.nuget.org/account/apikeys)
-   - Recommended scopes: **Push new packages and package versions**
-   - Set expiration date (recommended: 1 year)
-4. Click **"Add secret"**
+**Location:** nuget.org → your account → **Trusted Publishing** → **Add policy**
 
-**What this does:** Allows the workflow to authenticate with NuGet.org and publish packages. The workflow validates this secret exists before attempting to publish.
+1. **Repository owner:** `Chris-Wolfgang`
+2. **Repository:** `ETL-FixedWidth`
+3. **Workflow file:** `release.yaml`
+4. Save the policy. The publishing job already declares `id-token: write`, which OIDC token issuance requires.
+
+**What this does:** Lets only `release.yaml` in this repository obtain a temporary push key for the package. If a stray `NUGET_API_KEY` secret still exists from the old mechanism, it is unused and can be removed.
 
 ### Verify Branch Protection Rules
 
 **Location:** Settings → Branches → main (or Settings → Rules → Rulesets)
 
-> **Note:** Repos created from `repo-template` ship with `scripts/Setup-BranchRuleset.ps1`, which configures branch protection interactively (option `[1]` for single-developer mode, `[2]` for multi-developer mode). The script may not be present in older repos — if it is missing, configure the equivalent settings manually using the checklist below.
+> **Note:** The branch ruleset is created by `repo-template`'s `scripts/Setup-BranchRuleset.ps1` (option `[1]` for single-developer mode, `[2]` for multi-developer mode). This repository carries `scripts/Fix-BranchRuleset.ps1`, which replaces an outdated ruleset by running `Setup-BranchRuleset.ps1`; that script is not in this repository, so run it from a `repo-template` checkout, or configure the equivalent settings manually using the checklist below.
 
 Ensure the following settings are enabled:
 
@@ -72,7 +71,7 @@ The workflow triggers automatically when the release is published.
 
 1. **Job 1: validate-release** (3-10 minutes)
    - Runs all framework tests with coverage
-   - Enforces 90% coverage threshold
+   - Enforces the `CODECOV_MINIMUM` / `CODECOV_TEST_MINIMUM` coverage gates
    - Uploads coverage report
    - ✅ Auto-passes if tests succeed
 
@@ -83,9 +82,9 @@ The workflow triggers automatically when the release is published.
    - ✅ Auto-passes if packages are valid
 
 3. **Job 3: publish-nuget** (1-2 minutes)
-   - Validates NUGET_API_KEY secret
+   - Obtains a temporary API key through NuGet Trusted Publishing (`NuGet/login`)
    - Publishes packages to NuGet.org automatically
-   - ✅ Auto-completes if secret is valid
+   - ✅ Auto-completes if the Trusted Publishing policy matches
 
 ### Monitoring the Workflow
 
@@ -95,13 +94,13 @@ The workflow triggers automatically when the release is published.
 
 ## Troubleshooting
 
-### "NUGET_API_KEY secret not configured" Error
+### NuGet login (Trusted Publishing) fails
 
-**Problem:** The `publish-nuget` job fails with secret validation error.
+**Problem:** The `NuGet/login` step in the publishing job fails to obtain a key.
 
 **Solution:**
-1. Verify the secret name is exactly `NUGET_API_KEY` (case-sensitive)
-2. Re-add the secret in Settings → Secrets → Actions
+1. Check the Trusted Publishing policy on nuget.org: owner `Chris-Wolfgang`, repository `ETL-FixedWidth`, workflow file `release.yaml` (exact, case-sensitive)
+2. Confirm the publishing job still declares `permissions: id-token: write`
 3. Re-run the workflow from the Actions tab (do not re-publish the release)
 
 ### Tests Fail on Specific Framework
@@ -114,7 +113,7 @@ The workflow triggers automatically when the release is published.
 3. Test locally: `dotnet test --framework net462`
 4. Push fix, then re-publish the release (or re-run the workflow from the Actions tab)
 
-### Coverage Below 90% Threshold
+### Coverage Below the Gate
 
 **Problem:** Workflow fails at coverage validation step.
 
@@ -139,7 +138,7 @@ The workflow triggers automatically when the release is published.
 Before creating a production GitHub Release (e.g., `v1.0.0`):
 
 - [ ] All tests pass on all platforms (pr.yaml workflow)
-- [ ] Code coverage meets 90% threshold
+- [ ] Code coverage meets the `CODECOV_MINIMUM` (src) and `CODECOV_TEST_MINIMUM` (tests) gates
 - [ ] Security scan shows no critical issues
 - [ ] Version numbers updated in `.csproj` files
 - [ ] `CHANGELOG.md` updated with release notes (if applicable)
@@ -172,7 +171,7 @@ Before creating a production GitHub Release (e.g., `v1.0.0`):
 │  • Restore & Build                                          │
 │  • Test all frameworks (net5.0-10.0, net462-481)           │
 │  • Collect coverage                                         │
-│  • Enforce 90% threshold                                    │
+│  • Enforce the src / test coverage gates                    │
 │  • Upload coverage artifacts                                │
 └─────────────────────────────────────────────────────────────┘
                             │
@@ -189,7 +188,7 @@ Before creating a production GitHub Release (e.g., `v1.0.0`):
 ┌─────────────────────────────────────────────────────────────┐
 │  Job 3: publish-nuget (Windows)                             │
 │  • Download packages                                        │
-│  • Validate NUGET_API_KEY                                   │
+│  • NuGet/login (Trusted Publishing, OIDC)                   │
 │  • Publish to NuGet.org automatically                       │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -199,10 +198,10 @@ Before creating a production GitHub Release (e.g., `v1.0.0`):
 | Issue | Before | After |
 |-------|--------|-------|
 | **Framework Coverage** | Default framework only | All frameworks (net5.0-10.0, net462-481) |
-| **Code Coverage** | Not enforced | 90% threshold enforced |
+| **Code Coverage** | Not enforced | src and test-assembly gates enforced |
 | **Package Validation** | None | Smoke test installation |
 | **Deployment** | Incomplete publish script | Automatic publishing after validation |
-| **Secret Validation** | None | Validates before publishing |
+| **Publishing credential** | Long-lived API key | Trusted Publishing (short-lived OIDC key) |
 | **GitHub Releases** | Not used as trigger | Workflow triggered by published release |
 | **Build Efficiency** | Duplicate builds in each job | Build once per job with dependencies |
 | **Test Logging** | No logger parameter | Console logging with verbosity |
