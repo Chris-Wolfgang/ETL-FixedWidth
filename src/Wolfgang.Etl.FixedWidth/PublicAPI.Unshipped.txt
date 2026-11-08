@@ -1,1 +1,3 @@
 #nullable enable
+*REMOVED*virtual Wolfgang.Etl.FixedWidth.FixedWidthValueParser.Invoke(System.ReadOnlyMemory<char> text, Wolfgang.Etl.FixedWidth.FieldContext! context) -> object!
+virtual Wolfgang.Etl.FixedWidth.FixedWidthValueParser.Invoke(System.ReadOnlyMemory<char> text, Wolfgang.Etl.FixedWidth.FieldContext! context) -> object?

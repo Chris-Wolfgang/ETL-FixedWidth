@@ -172,7 +172,7 @@ public class FixedWidthExtractorOptionsTests
 
 
     [Fact]
-    public void With_expression_preserves_unset_members()
+    public void WithExpression_when_one_member_changes_preserves_the_unset_members()
     {
         var baseline = new FixedWidthExtractorOptions<PersonRecord> { HeaderLineCount = 3, FieldSeparator = '-' };
 
