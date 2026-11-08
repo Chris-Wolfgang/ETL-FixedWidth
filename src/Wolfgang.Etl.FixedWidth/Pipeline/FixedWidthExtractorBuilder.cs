@@ -24,6 +24,10 @@ namespace Wolfgang.Etl.FixedWidth;
 internal sealed class FixedWidthExtractorBuilder<[DynamicallyAccessedMembers(TrimmedMembers.Record)] T> : IFixedWidthExtractorBuilder<T>
     where T : notnull, new()
 {
+    // Same 64 KB buffer as the FixedWidthExtractor / FixedWidthLoader Stream constructors
+    // ("preferred for files"); the StreamReader / StreamWriter path ctors default to a 1 K-char buffer (#594).
+    private const int PathBufferSize = 65536;
+
     private readonly string? _path;
     private readonly Stream? _stream;
     private readonly TextReader? _reader;
@@ -265,7 +269,7 @@ internal sealed class FixedWidthExtractorBuilder<[DynamicallyAccessedMembers(Tri
         else
         {
             // Path source: the builder owns the reader it opens, so dispose it once drained.
-            var reader = new StreamReader(_path!, _encoding, detectEncodingFromByteOrderMarks: true);
+            var reader = new StreamReader(_path!, _encoding, detectEncodingFromByteOrderMarks: true, bufferSize: PathBufferSize);
             extractor = new FixedWidthExtractor<T>(reader, _options);
             ownedResources = new object?[] { reader };
         }

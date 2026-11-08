@@ -199,7 +199,7 @@ public class SourceLinkPdbTests
         // defect instead. See AssertIsOurRawGitHubUrl.
         return documents
             .EnumerateObject()
-            .Select(entry => (Name: entry.Name, Url: entry.Value.GetString()))
+            .Select(entry => (entry.Name, Url: entry.Value.GetString()))
             .Where(entry => entry.Url is not null && entry.Url.Contains(RepoSlug, StringComparison.OrdinalIgnoreCase))
             .Select(entry => (entry.Name.TrimEnd('*'), entry.Url!.TrimEnd('*')))
             .ToList();
