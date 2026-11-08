@@ -157,7 +157,11 @@ Processing a multi-GB fixed-width export can take a while; if the pipeline crash
 ```csharp
 // First run — checkpoint after each record
 await using var stream = File.OpenRead("huge.dat");
-using var extractor = new FixedWidthExtractor<Record>(stream) { TrackByteOffset = true };
+using var extractor = new FixedWidthExtractor<Record>
+(
+    stream,
+    new FixedWidthExtractorStreamOptions<Record> { TrackByteOffset = true }
+);
 await foreach (var record in extractor.ExtractAsync(token))
 {
     Process(record);
@@ -166,7 +170,11 @@ await foreach (var record in extractor.ExtractAsync(token))
 
 // After a crash — seek straight to the next unread line, skipping everything already done
 await using var stream = File.OpenRead("huge.dat");
-using var extractor = new FixedWidthExtractor<Record>(stream) { StartByteOffset = LoadCheckpoint() };
+using var extractor = new FixedWidthExtractor<Record>
+(
+    stream,
+    new FixedWidthExtractorStreamOptions<Record> { StartByteOffset = LoadCheckpoint() }
+);
 await foreach (var record in extractor.ExtractAsync(token)) { /* only the remainder */ }
 ```
 
@@ -210,7 +218,7 @@ Total width: 24  |  Columns: 3 (2 fields + 1 skip)  |  Delimiter: none
 
 ### Defining the layout in code
 
-When you can't decorate the record type — a third-party POCO, or a layout chosen at runtime — build the schema with `FixedWidthSchemaBuilder<T>` instead of attributes, then hand it to the extractor or loader via its `Schema` property:
+When you can't decorate the record type — a third-party POCO, or a layout chosen at runtime — build the schema with `FixedWidthSchemaBuilder<T>` instead of attributes, then pass it in the extractor's or loader's options record (`FixedWidthExtractorOptions<T>.Schema` / `FixedWidthLoaderOptions.Schema`):
 
 ```csharp
 var schema = new FixedWidthSchemaBuilder<CustomerRecord>()
@@ -220,10 +228,14 @@ var schema = new FixedWidthSchemaBuilder<CustomerRecord>()
     .Field(r => r.Balance, index: 3, length: 9, alignment: FieldAlignment.Right, format: "0000000.00")
     .Build();
 
-using var extractor = new FixedWidthExtractor<CustomerRecord>(reader) { Schema = schema };
+using var extractor = new FixedWidthExtractor<CustomerRecord>
+(
+    reader,
+    new FixedWidthExtractorOptions<CustomerRecord> { Schema = schema }
+);
 ```
 
-The builder uses lambda expressions for type-safe, refactor-proof property references — no magic strings. `index` is the zero-based column ordinal (the same value as `[FixedWidthField(index, length)]`); start positions are computed from the column lengths. A schema built this way is **equivalent** to one resolved from attributes: it validates the same way (duplicate index, no public setter) and is fully introspectable via `Fields` / `ToDiagram()`. Setting `Schema` overrides any attributes on the type.
+The builder uses lambda expressions for type-safe, refactor-proof property references — no magic strings. `index` is the zero-based column ordinal (the same value as `[FixedWidthField(index, length)]`); start positions are computed from the column lengths. A schema built this way is **equivalent** to one resolved from attributes: it validates the same way (duplicate index, no public setter) and is fully introspectable via `Fields` / `ToDiagram()`. A `Schema` in the options overrides any attributes on the type.
 
 See the [SchemaBuilder](examples/SchemaBuilder) example for a runnable walk-through.
 
@@ -369,7 +381,7 @@ await EtlPipeline
     .RunAsync();
 ```
 
-Every source and sink has **path**, `Stream`, and `TextReader`/`TextWriter` overloads (plus an existing-`FixedWidthExtractor<T>` overload). **Path** factories own the file stream they open and dispose it when the run finishes, on success or failure; caller-supplied streams, readers, and writers are always left open. The builder methods (`HeaderLineCount`, `MalformedLineHandling`, `FieldDelimiter`, `Encoding`, `WriteHeader`, `ValueConverter`, `IsDryRun`, …) map 1:1 to the `FixedWidthExtractor<T>` / `FixedWidthLoader<T>` properties.
+Every source and sink has **path**, `Stream`, and `TextReader`/`TextWriter` overloads (plus an existing-`FixedWidthExtractor<T>` overload). **Path** factories own the file stream they open and dispose it when the run finishes, on success or failure; caller-supplied streams, readers, and writers are always left open. The builder methods (`HeaderLineCount`, `MalformedLineHandling`, `FieldDelimiter`, `Encoding`, `WriteHeader`, `ValueConverter`, `IsDryRun`, …) map to the same-named settings of the extractor / loader options records. The mapping is partial: `Schema`, `OnError`, `TrackByteOffset` and `StartByteOffset` have no builder method, so for those construct the extractor with its options record and pass it to the overload that takes an existing `FixedWidthExtractor<T>`; the loader side has no such overload, so a loader `Schema` is not reachable from the pipeline builder.
 
 See the [PipelineExtensions](examples/PipelineExtensions) example for a complete, runnable walk-through.
 
@@ -419,7 +431,7 @@ See the [Metrics](examples/Metrics) example for a runnable `MeterListener` walk-
 | **Span-based numerics** | `Span<char>`-based numeric parsing on net8.0+ for reduced allocation |
 | **Source-generated accessors** | A bundled Roslyn generator emits direct-access factory/getter/setter delegates for `[FixedWidthField]` types at compile time — no reflection, no `Expression.Compile`, **Native AOT & trimming compatible**; falls back to compiled delegates on net462/netstandard2.0 |
 | **Schema introspection** | `FixedWidthSchema.For<T>()` exposes the resolved layout (positions, widths, types, skips); `ToDiagram()` renders it as a text table |
-| **Code-defined layout** | `FixedWidthSchemaBuilder<T>` defines a layout in fluent, type-safe code (no attributes required); assign it to the extractor/loader `Schema` property |
+| **Code-defined layout** | `FixedWidthSchemaBuilder<T>` defines a layout in fluent, type-safe code (no attributes required); pass it as `Schema` in the extractor/loader options record |
 | **Binary / mainframe** | `FixedWidthBinaryExtractor<T>` / `FixedWidthBinaryLoader<T>` read/write fixed-length binary records with COBOL `COMP` / `COMP-3` fields via `[FixedWidthBinaryField]` |
 | **Format transformation** | `FixedWidthTransformer<TSource, TDestination>` projects one layout to another in a single streaming pass, with optional `ByMatchingProperties()` auto-mapping |
 | **Multi-record-type files** | `FixedWidthMultiRecordExtractor` routes each line to a different POCO by a discriminator predicate (`.When(…)` / `.Otherwise(…)`), for header/detail/trailer batch files |
