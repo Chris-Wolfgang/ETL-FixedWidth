@@ -233,7 +233,7 @@ internal static class FixedWidthLineParser
     /// <summary>
     /// Writes <paramref name="count"/> copies of <paramref name="padChar"/> to
     /// <paramref name="writer"/> without allocating an intermediate <see cref="string"/>.
-    /// On net8+ uses a stack-allocated span; on older targets falls back to a
+    /// On net5.0+ uses a stack-allocated span; on older targets falls back to a
     /// pooled <see cref="char"/> buffer.
     /// </summary>
     private static void WritePadding(TextWriter writer, char padChar, int count)
@@ -243,7 +243,7 @@ internal static class FixedWidthLineParser
             return;
         }
 
-#if NET8_0_OR_GREATER
+#if NET5_0_OR_GREATER
         // Stack-allocate a small buffer; field widths are typically tiny.
         const int stackBufferSize = 128;
         Span<char> buffer = stackalloc char[stackBufferSize];
@@ -305,9 +305,11 @@ internal static class FixedWidthLineParser
         var attr = descriptor.Attribute;
         var prop = descriptor.Property;
         var getter = descriptor.Getter
-            ?? throw new InvalidOperationException(
+            ?? throw new InvalidOperationException
+            (
                 $"Property '{prop.Name}' has no public getter. " +
-                "The loader requires readable properties to format field values.");
+                "The loader requires readable properties to format field values."
+            );
         var text = converter(getter(record!)!, descriptor.Context);
 
         if (text.Length > attr.Length)
@@ -325,7 +327,7 @@ internal static class FixedWidthLineParser
         }
 
         var padCount = attr.Length - text.Length;
-#if NET8_0_OR_GREATER
+#if NET5_0_OR_GREATER
         // Stack-allocate the full padded field so it can be written in a single
         // call when small enough — fields up to 256 chars use the stack path.
         const int stackFieldLimit = 256;
@@ -478,7 +480,7 @@ internal static class FixedWidthLineParser
     /// Converts and assigns a single field value from <paramref name="line"/>
     /// into the matching property on <paramref name="record"/>.
     /// </summary>
-    /// <exception cref="FieldConversionException"></exception>
+    /// <exception cref="FieldConversionException">The field text cannot be converted to the property type.</exception>
     private static void ParseField<T>
     (
         T record,
@@ -505,11 +507,18 @@ internal static class FixedWidthLineParser
             // Fast path: when using the default parser, pass the cached TypeConverter
             // to avoid TypeDescriptor.GetConverter on every field of every record.
             var converted = ReferenceEquals(valueParser, FixedWidthConverter.DefaultParser)
-                ? FixedWidthConverter.ParseValue(value, descriptor.Context.PropertyType, descriptor.Context.Format, descriptor.TypeConverter, descriptor.Context.NumberStyles)
+                ? FixedWidthConverter.ParseValue
+                (
+                    value,
+                    descriptor.Context.PropertyType,
+                    descriptor.Context.Format,
+                    descriptor.TypeConverter,
+                    descriptor.Context.NumberStyles
+                )
                 : valueParser(value, descriptor.Context);
             descriptor.Setter(record!, converted);
         }
-        catch (Exception ex) when (!(ex is MalformedLineException))
+        catch (Exception ex) when (ex is not MalformedLineException)
         {
             throw new FieldConversionException
             (
@@ -524,5 +533,4 @@ internal static class FixedWidthLineParser
             );
         }
     }
-
 }

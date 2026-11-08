@@ -37,6 +37,7 @@ internal static class BinaryInteger
     }
 
 
+
     /// <summary>
     /// Decodes a big-endian binary integer as an <b>unsigned</b> magnitude. Unlike
     /// <see cref="Decode"/> (which returns <see cref="long"/>), this preserves the full 0…2⁶⁴−1
@@ -63,6 +64,7 @@ internal static class BinaryInteger
 
         return magnitude;
     }
+
 
 
     /// <summary>
@@ -94,6 +96,8 @@ internal static class BinaryInteger
             bits >>= 8;
         }
     }
+
+
 
     /// <summary>
     /// Encodes an <b>unsigned</b> <paramref name="value"/> as a big-endian binary integer into

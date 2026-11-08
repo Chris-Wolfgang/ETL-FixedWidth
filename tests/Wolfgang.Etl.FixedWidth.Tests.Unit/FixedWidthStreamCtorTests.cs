@@ -136,7 +136,7 @@ public class FixedWidthExtractorStreamCtorTests
 
 
     [Fact]
-    public void Dispose_can_be_called_multiple_times_without_error()
+    public void Dispose_when_called_more_than_once_does_not_throw()
     {
         using var stream = ToStream(PersonLine);
         var extractor = new FixedWidthExtractor<PersonRecord>(stream);
@@ -278,7 +278,7 @@ public class FixedWidthLoaderStreamCtorTests
 
 
     [Fact]
-    public void Dispose_can_be_called_multiple_times_without_error()
+    public void Dispose_when_called_more_than_once_does_not_throw()
     {
         using var stream = new MemoryStream();
         var loader = new FixedWidthLoader<PersonRecord>(stream);
