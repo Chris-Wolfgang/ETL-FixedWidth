@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Wolfgang.Etl.FixedWidth.Attributes;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Wolfgang.Etl.FixedWidth.Parsing;
 
@@ -35,7 +37,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// );
 /// </code>
 /// </example>
-public sealed class FixedWidthSchemaBuilder<T>
+public sealed class FixedWidthSchemaBuilder<[DynamicallyAccessedMembers(TrimmedMembers.Record)] T>
     where T : notnull
 {
     private readonly List<Entry> _entries = new();

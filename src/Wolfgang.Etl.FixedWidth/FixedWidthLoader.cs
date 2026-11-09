@@ -53,7 +53,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// });
 /// </code>
 /// </example>
-public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
+public class FixedWidthLoader<[DynamicallyAccessedMembers(TrimmedMembers.Record)] TRecord> : LoaderBase<TRecord, FixedWidthReport>
     where TRecord : notnull
 {
     // ------------------------------------------------------------------
