@@ -34,9 +34,7 @@ env:
   # This is LINE coverage; branch coverage legitimately can't reach 100%
   # (compiler-generated async state machines), and the gate reads only the
   # line-coverage column that ReportGenerator puts at end-of-row.
-  # Repository floor (template: 100). Test-assembly coverage sits below 100 here;
-  # raised toward 100 in the tracking issue, never lowered.
-  CODECOV_TEST_MINIMUM: 93
+  CODECOV_TEST_MINIMUM: 100
 
 on:
   pull_request:
