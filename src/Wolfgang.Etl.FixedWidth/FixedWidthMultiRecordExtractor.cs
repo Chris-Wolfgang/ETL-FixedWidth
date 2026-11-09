@@ -80,13 +80,14 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     private readonly List<Rule> _rules = new();
     private bool _progressTimerWired;
     private Rule? _fallback;
-    private long _currentLineNumber;
-    private int _currentRejectedItemCount;
-    private int _currentFilteredLineCount;
 
     // _currentLineNumber is read by CreateProgressReport on a Timer threadpool thread and
     // written by ExtractWorkerAsync on the async continuation thread. Interlocked keeps the
     // read/write atomic on all targets including 32-bit net462.
+    private long _currentLineNumber;
+    private int _currentRejectedItemCount;
+    private int _currentFilteredLineCount;
+
 
 
     // ------------------------------------------------------------------
@@ -121,11 +122,17 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// <param name="logger">The logger; <see langword="null"/> logs nothing.</param>
     /// <exception cref="ArgumentNullException"><paramref name="reader"/> is <see langword="null"/>.</exception>
     [SuppressMessage("ApiDesign", "RS0026:Do not add multiple public overloads with optional parameters", Justification = "Shipped shape; unlike the single-record stages there is no hidden (TextReader) overload to fall back on, so dropping either default is a source break. The constructor set is settled in the 2026-12-15 removal wave (#373 / #343).")]
-    public FixedWidthMultiRecordExtractor(TextReader reader, FixedWidthMultiRecordExtractorOptions? options, ILogger<FixedWidthMultiRecordExtractor>? logger = null)
+    public FixedWidthMultiRecordExtractor
+    (
+        TextReader reader,
+        FixedWidthMultiRecordExtractorOptions? options,
+        ILogger<FixedWidthMultiRecordExtractor>? logger = null
+    )
         : this(reader: reader ?? throw new ArgumentNullException(nameof(reader)), stream: null,
                options: options, timer: null, logger: logger)
     {
     }
+
 
 
     /// <summary>
@@ -143,13 +150,12 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
 
 
 
-
-
     /// <summary>
     /// Initializes a new <see cref="FixedWidthMultiRecordExtractor"/> that reads from the specified
     /// <see cref="Stream"/> using an internal <see cref="StreamReader"/> with a 64&#160;KB buffer.
-    /// The caller retains ownership of the stream. Set <see cref="Encoding"/> to decode with a
-    /// specific encoding (defaults to <see cref="Encoding.UTF8"/>).
+    /// The caller retains ownership of the stream. To decode with a specific encoding, set
+    /// <see cref="FixedWidthMultiRecordExtractorOptions.Encoding"/> on <paramref name="options"/>
+    /// (defaults to <see cref="System.Text.Encoding.UTF8"/>).
     /// </summary>
     /// <param name="stream">The readable source stream.</param>
     /// <param name="options">
@@ -244,6 +250,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
         _progressTimer = timer;
         _logger = logger ?? (ILogger)NullLogger.Instance;
     }
+
 
 
     /// <summary>
@@ -509,17 +516,10 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
 
 
 
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
     /// <inheritdoc/>
 #pragma warning disable MA0051 // async iterator methods cannot delegate 'yield return' to sub-methods
 #pragma warning disable CS1998 // async method lacks 'await' — intentionally synchronous; see comment below
     protected override async IAsyncEnumerable<object> ExtractWorkerAsync([EnumeratorCancellation] CancellationToken token)
-#else
-    /// <inheritdoc/>
-#pragma warning disable MA0051
-#pragma warning disable CS1998
-    protected override async IAsyncEnumerable<object> ExtractWorkerAsync([System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
-#endif
 #pragma warning restore CS1998
 #pragma warning restore MA0051
     {

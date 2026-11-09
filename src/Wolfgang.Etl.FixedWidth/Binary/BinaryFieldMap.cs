@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -13,9 +14,23 @@ namespace Wolfgang.Etl.FixedWidth.Binary;
 /// </summary>
 internal static class BinaryFieldMap
 {
+    // One map per record type, like FieldMap.Cache: building it reflects over the type and
+    // compiles a getter, setter and factory expression per field, which is far too costly to
+    // repeat for every extractor / loader instance. A type whose layout is invalid throws from
+    // Build and is never cached, so every construction reports the same error.
+    private static readonly ConcurrentDictionary<Type, BinaryRecordMap> Cache = new();
+
+
+
     internal static BinaryRecordMap GetResult<T>() => GetResult(typeof(T));
 
-    internal static BinaryRecordMap GetResult(Type type)
+
+
+    internal static BinaryRecordMap GetResult(Type type) => Cache.GetOrAdd(type, Build);
+
+
+
+    private static BinaryRecordMap Build(Type type)
     {
         // Anonymous type (not a ValueTuple) — net462/netstandard2.0 have no System.ValueTuple.
         var entries = type
@@ -23,7 +38,7 @@ internal static class BinaryFieldMap
             .Select(p => new
             {
                 Property = p,
-                Attribute = (FixedWidthBinaryFieldAttribute?)Attribute.GetCustomAttribute(p, typeof(FixedWidthBinaryFieldAttribute)),
+                Attribute = p.GetCustomAttribute<FixedWidthBinaryFieldAttribute>(),
             })
             .Where(x => x.Attribute != null)
             .OrderBy(x => x.Attribute!.Index)

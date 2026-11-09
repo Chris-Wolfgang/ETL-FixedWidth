@@ -119,14 +119,14 @@ public sealed class ByteCountingLineReaderTests
 
 
     [Fact]
-    public void Rejects_a_non_positive_buffer_size()
+    public void Constructor_when_buffer_size_is_not_positive_throws()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => new ByteCountingLineReader(new StringReader(string.Empty), Encoding.ASCII, 0, 0));
     }
 
 
     [Fact]
-    public void Peek_and_Read_advance_and_count_bytes()
+    public void PeekAndRead_when_called_advance_and_count_bytes()
     {
         using var reader = new ByteCountingLineReader(new StringReader("AB"), Encoding.ASCII);
 

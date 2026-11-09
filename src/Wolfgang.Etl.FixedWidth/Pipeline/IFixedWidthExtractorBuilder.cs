@@ -31,6 +31,7 @@ public interface IFixedWidthExtractorBuilder<T> : IEtlPipeline<T>
     IFixedWidthExtractorBuilder<T> Encoding(Encoding encoding);
 
 
+
     /// <summary>
     /// Sets <see cref="FixedWidthExtractor{T}.HeaderLineCount"/> — the number of header lines to skip
     /// before the first record.
@@ -38,6 +39,7 @@ public interface IFixedWidthExtractorBuilder<T> : IEtlPipeline<T>
     /// <param name="count">The number of leading lines to skip.</param>
     /// <returns>The same builder, for chaining.</returns>
     IFixedWidthExtractorBuilder<T> HeaderLineCount(int count);
+
 
 
     /// <summary>
@@ -49,6 +51,7 @@ public interface IFixedWidthExtractorBuilder<T> : IEtlPipeline<T>
     IFixedWidthExtractorBuilder<T> HasHeader(bool hasHeader);
 
 
+
     /// <summary>
     /// Sets <see cref="FixedWidthExtractor{T}.MalformedLineHandling"/> — how a line that is too short or
     /// cannot be converted is handled.
@@ -58,12 +61,14 @@ public interface IFixedWidthExtractorBuilder<T> : IEtlPipeline<T>
     IFixedWidthExtractorBuilder<T> MalformedLineHandling(MalformedLineHandling handling);
 
 
+
     /// <summary>
     /// Sets <see cref="FixedWidthExtractor{T}.BlankLineHandling"/> — how a zero-length line is handled.
     /// </summary>
     /// <param name="handling">The blank-line policy.</param>
     /// <returns>The same builder, for chaining.</returns>
     IFixedWidthExtractorBuilder<T> BlankLineHandling(BlankLineHandling handling);
+
 
 
     /// <summary>
@@ -75,6 +80,7 @@ public interface IFixedWidthExtractorBuilder<T> : IEtlPipeline<T>
     IFixedWidthExtractorBuilder<T> LineFilter(Func<string, LineAction> filter);
 
 
+
     /// <summary>
     /// Sets <see cref="FixedWidthExtractor{T}.RecordValidator"/> — a per-record callback that can accept,
     /// skip, or stop after parsing.
@@ -82,6 +88,7 @@ public interface IFixedWidthExtractorBuilder<T> : IEtlPipeline<T>
     /// <param name="validator">The record validator.</param>
     /// <returns>The same builder, for chaining.</returns>
     IFixedWidthExtractorBuilder<T> RecordValidator(Func<T, ValidationResult> validator);
+
 
 
     /// <summary>
@@ -93,6 +100,7 @@ public interface IFixedWidthExtractorBuilder<T> : IEtlPipeline<T>
     IFixedWidthExtractorBuilder<T> ValueParser(FixedWidthValueParser parser);
 
 
+
     /// <summary>
     /// Sets <see cref="FixedWidthExtractor{T}.FieldSeparator"/> — when non-null, the line after the
     /// header is treated as a separator and skipped.
@@ -100,6 +108,7 @@ public interface IFixedWidthExtractorBuilder<T> : IEtlPipeline<T>
     /// <param name="separator">The separator character, or <see langword="null"/> for none.</param>
     /// <returns>The same builder, for chaining.</returns>
     IFixedWidthExtractorBuilder<T> FieldSeparator(char? separator);
+
 
 
     /// <summary>

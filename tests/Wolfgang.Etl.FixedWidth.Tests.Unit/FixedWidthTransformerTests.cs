@@ -205,7 +205,7 @@ public class FixedWidthTransformerTests
 
 
     [Fact]
-    public void NoParameterlessCtor_keeps_the_name_it_was_built_with()
+    public void NoParameterlessCtor_when_constructed_keeps_its_name()
     {
         // ByMatchingProperties rejects this type by reflection; this pins its shape.
         Assert.Equal("a", new NoParameterlessCtor("a").Name);

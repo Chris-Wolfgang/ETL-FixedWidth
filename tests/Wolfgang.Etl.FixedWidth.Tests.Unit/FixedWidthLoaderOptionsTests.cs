@@ -124,7 +124,7 @@ public class FixedWidthLoaderOptionsTests
 
 
     [Fact]
-    public void With_expression_preserves_unset_members()
+    public void WithExpression_when_one_member_changes_preserves_the_unset_members()
     {
         var baseline = new FixedWidthLoaderStreamOptions { WriteHeader = true, Encoding = Encoding.Unicode };
 
