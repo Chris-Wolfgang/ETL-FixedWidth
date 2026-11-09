@@ -40,3 +40,13 @@ updates:
       pip-tooling:
         patterns:
           - "*"
+    # semgrep pins mcp==1.29.0 and opentelemetry-instrumentation-requests~=0.58b0,
+    # while semgrep.txt lifts both past the Dependabot alerts fixed in #583, #650
+    # and #651 (the workflow installs with --no-deps). No resolver can satisfy
+    # both, so every weekly pip-tooling run fails with
+    # dependency_file_not_resolvable. These three move by hand (version and hash
+    # lines only) until semgrep relaxes its pins.
+    ignore:
+      - dependency-name: "semgrep"
+      - dependency-name: "mcp"
+      - dependency-name: "opentelemetry-*"
