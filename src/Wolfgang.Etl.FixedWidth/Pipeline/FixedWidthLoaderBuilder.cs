@@ -1,9 +1,11 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Wolfgang.Etl.Abstractions;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 
 namespace Wolfgang.Etl.FixedWidth;
 
@@ -15,9 +17,13 @@ namespace Wolfgang.Etl.FixedWidth;
 /// sink) is disposed after the run, on success or failure, flushing the output to disk.
 /// </summary>
 /// <typeparam name="T">The record type consumed by the loader.</typeparam>
-internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
+internal sealed class FixedWidthLoaderBuilder<[DynamicallyAccessedMembers(TrimmedMembers.Record)] T> : IFixedWidthLoaderBuilder<T>
     where T : notnull
 {
+    // Same 64 KB buffer as the FixedWidthExtractor / FixedWidthLoader Stream constructors
+    // ("preferred for files"); the StreamReader / StreamWriter path ctors default to a 1 K-char buffer (#594).
+    private const int PathBufferSize = 65536;
+
     private readonly IEtlPipeline<T> _pipeline;
     private readonly string? _path;
     private readonly Stream? _stream;
@@ -71,6 +77,7 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
     public IFixedWidthLoaderBuilder<T> WriteHeader(bool writeHeader) => Set(o => o with { WriteHeader = writeHeader });
 
 
+
     public IFixedWidthLoaderBuilder<T> ValueConverter(Func<object, FieldContext, string> converter)
     {
         if (converter is null)
@@ -98,10 +105,13 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
     public IFixedWidthLoaderBuilder<T> FieldSeparator(char? separator) => Set(o => o with { FieldSeparator = separator });
 
 
+
     public IFixedWidthLoaderBuilder<T> FieldDelimiter(string? delimiter) => Set(o => o with { FieldDelimiter = delimiter });
 
 
+
     public IFixedWidthLoaderBuilder<T> IsDryRun(bool isDryRun) => Set(o => o with { IsDryRun = isDryRun });
+
 
 
     public Task RunAsync(IProgress<EtlPipelineProgress>? progress = null, CancellationToken token = default)
@@ -125,7 +135,7 @@ internal sealed class FixedWidthLoaderBuilder<T> : IFixedWidthLoaderBuilder<T>
         {
             // Path sink: the builder owns the writer it opens. Disposing it after the run flushes the
             // file to disk and closes it.
-            var writer = new StreamWriter(_path!, append: false, _encoding);
+            var writer = new StreamWriter(_path!, append: false, _encoding, bufferSize: PathBufferSize);
             loader = new FixedWidthLoader<T>(writer, _options);
             owned = writer;
         }

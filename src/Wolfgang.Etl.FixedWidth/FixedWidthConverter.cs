@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Globalization;
 using Wolfgang.Etl.FixedWidth.Exceptions;
+using Wolfgang.Etl.FixedWidth.Parsing;
 
 namespace Wolfgang.Etl.FixedWidth;
 
@@ -28,7 +30,8 @@ namespace Wolfgang.Etl.FixedWidth;
 /// convert a header label to its padded string representation.
 /// </para>
 /// <para>
-/// <b>Value parsers</b> (<see cref="Func{T1,T2,TResult}"/> of <c>string, FieldContext, object</c>)
+/// <b>Value parsers</b> (<see cref="FixedWidthValueParser"/>: the field text as
+/// <see cref="ReadOnlyMemory{T}"/> of <see cref="char"/> plus its <see cref="FieldContext"/>)
 /// convert a raw string read from the file back to the target property type.
 /// <see cref="DefaultParser"/> is the built-in implementation used by
 /// <see cref="FixedWidthExtractor{TRecord}"/> by default.
@@ -36,6 +39,13 @@ namespace Wolfgang.Etl.FixedWidth;
 /// </remarks>
 public static class FixedWidthConverter
 {
+    // The boxed default of each value type an empty field resolves to. Boxing it once per type
+    // instead of once per empty field per record; a boxed value type is never mutated after it is
+    // assigned through the setter (assignment unboxes a copy), so one shared instance is safe.
+    private static readonly ConcurrentDictionary<Type, object> BoxedDefaults = new();
+
+
+
     // ------------------------------------------------------------------
     // Value converters
     // ------------------------------------------------------------------
@@ -213,6 +223,9 @@ public static class FixedWidthConverter
     ///   <item><see cref="DateTime"/>, <see cref="DateTimeOffset"/>, <see cref="TimeSpan"/>:
     ///   parsed with <see cref="FieldContext.Format"/> using
     ///   <see cref="CultureInfo.InvariantCulture"/>.</item>
+    ///   <item>Integral, floating-point, <see cref="decimal"/> and <see cref="bool"/> types:
+    ///   parsed directly with <see cref="CultureInfo.InvariantCulture"/> (and the field's
+    ///   <see cref="System.Globalization.NumberStyles"/> where set).</item>
     ///   <item>All other types: parsed via <see cref="TypeDescriptor"/> with
     ///   <see cref="CultureInfo.InvariantCulture"/>.</item>
     /// </list>
@@ -244,16 +257,14 @@ public static class FixedWidthConverter
     public static readonly FixedWidthValueParser DefaultParser =
         (text, context) =>
         {
-            // An empty nullable field legitimately parses to null. The delegate is still
-            // declared as returning non-null `object` for source compatibility; #508
-            // re-annotates it as `object?` and drops this forgiveness.
+            // An empty nullable field legitimately parses to null.
             return ParseValue
             (
                 text,
                 context.PropertyType,
                 context.Format,
                 numberStyles: context.NumberStyles
-            )!;
+            );
         };
 
 
@@ -279,11 +290,12 @@ public static class FixedWidthConverter
             if (string.IsNullOrEmpty(context.Format))
             {
                 throw new InvalidOperationException
-                    (
-                        $"Property '{context.PropertyName}' is of type '{value.GetType().Name}' " +
-                        "but no Format was specified on the [FixedWidthField] attribute. " +
-                        "Fixed-width date and time fields require an explicit format string " +
-                        "(e.g. \"yyyyMMdd\", \"HHmmss\").");
+                (
+                    $"Property '{context.PropertyName}' is of type '{value.GetType().Name}' " +
+                    "but no Format was specified on the [FixedWidthField] attribute. " +
+                    "Fixed-width date and time fields require an explicit format string " +
+                    "(e.g. \"yyyyMMdd\", \"HHmmss\")."
+                );
             }
 
             return ((IFormattable)value).ToString
@@ -292,8 +304,6 @@ public static class FixedWidthConverter
                 CultureInfo.InvariantCulture
             );
         }
-
-
 
         // All other IFormattable types — use InvariantCulture, apply Format if supplied.
         if (value is IFormattable formattable)
@@ -350,20 +360,20 @@ public static class FixedWidthConverter
         if (span.IsEmpty)
         {
             return targetType.IsValueType
-                ? Activator.CreateInstance(targetType)!
+                ? BoxedDefaults.GetOrAdd(targetType, TrimSafeReflection.CreateValueTypeDefault)
                 : null;
         }
 
         if (targetType == typeof(DateTime) || targetType == typeof(DateTimeOffset) || targetType == typeof(TimeSpan))
         {
-#if NET8_0_OR_GREATER
+#if NET5_0_OR_GREATER
             return ParseDateTimeValueSpan(span, targetType, format);
 #else
             return ParseDateTimeValue(text.ToString(), targetType, format);
 #endif
         }
 
-#if NET8_0_OR_GREATER
+#if NET5_0_OR_GREATER
         var numericResult = ParseNumericSpan(span, targetType, numberStyles);
 #else
         var numericResult = ParseNumericString(text.ToString(), targetType, numberStyles);
@@ -390,7 +400,7 @@ public static class FixedWidthConverter
     )
     {
         var str = text.ToString();
-        var converter = cachedConverter ?? TypeDescriptor.GetConverter(targetType);
+        var converter = cachedConverter ?? TrimSafeReflection.GetConverter(targetType);
         if (converter.CanConvertFrom(typeof(string)))
         {
             return converter.ConvertFromInvariantString(str)!;
@@ -427,11 +437,11 @@ public static class FixedWidthConverter
 
 
 
-#if !NET8_0_OR_GREATER
+#if !NET5_0_OR_GREATER
     /// <summary>
     /// Parses a <see cref="DateTime"/>, <see cref="DateTimeOffset"/>, or
     /// <see cref="TimeSpan"/> value from <paramref name="text"/> using the
-    /// required <paramref name="format"/> string. On net8+ this is replaced
+    /// required <paramref name="format"/> string. On net5.0+ this is replaced
     /// by <c>ParseDateTimeValueSpan</c> which avoids the string allocation.
     /// </summary>
     /// <exception cref="InvalidOperationException">
@@ -480,7 +490,7 @@ public static class FixedWidthConverter
     /// <summary>
     /// Parses a numeric value from <paramref name="text"/> using
     /// <paramref name="requestedStyle"/> (or the type's natural style when null) and
-    /// <see cref="CultureInfo.InvariantCulture"/>. The net8+ build uses the
+    /// <see cref="CultureInfo.InvariantCulture"/>. The net5.0+ build uses the
     /// allocation-free span overloads instead
     /// (<c>ParseNumericSpan</c>). Returns <see langword="null"/> when
     /// <paramref name="targetType"/> is not a supported numeric type.
@@ -526,7 +536,7 @@ public static class FixedWidthConverter
 
 
 
-#if NET8_0_OR_GREATER
+#if NET5_0_OR_GREATER
     /// <summary>
     /// Span-based replacement for the older-TFM <c>ParseDateTimeValue</c> that
     /// avoids the <see cref="string"/> allocation by parsing directly from the

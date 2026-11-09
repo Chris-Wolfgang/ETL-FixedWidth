@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Wolfgang.Etl.FixedWidth.Attributes;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Wolfgang.Etl.FixedWidth.Parsing;
 
@@ -14,8 +16,8 @@ namespace Wolfgang.Etl.FixedWidth;
 /// Builds a <see cref="FixedWidthSchema"/> for <typeparamref name="T"/> from a fluent, type-safe code
 /// API instead of <c>[FixedWidthField]</c> / <c>[FixedWidthSkip]</c> attributes (#23). Use it when the
 /// record type is not yours to decorate, when you prefer configuration-as-code, or when the layout is
-/// built dynamically. The resulting schema is equivalent to one resolved from attributes — assign it to
-/// <see cref="FixedWidthExtractor{TRecord}.Schema"/> / <see cref="FixedWidthLoader{TRecord}.Schema"/> to
+/// built dynamically. The resulting schema is equivalent to one resolved from attributes — pass it as
+/// <see cref="FixedWidthExtractorOptions{TRecord}.Schema"/> / <see cref="FixedWidthLoaderOptions.Schema"/> to
 /// use it, or inspect it with <see cref="FixedWidthSchema.Fields"/> / <see cref="FixedWidthSchema.ToDiagram"/>.
 /// </summary>
 /// <typeparam name="T">The record type the schema describes.</typeparam>
@@ -28,10 +30,14 @@ namespace Wolfgang.Etl.FixedWidth;
 ///     .Field(r =&gt; r.Balance, index: 3, length: 9, alignment: FieldAlignment.Right, format: "0000000.00")
 ///     .Build();
 ///
-/// var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;(reader) { Schema = schema };
+/// var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;
+/// (
+///     reader,
+///     new FixedWidthExtractorOptions&lt;CustomerRecord&gt; { Schema = schema }
+/// );
 /// </code>
 /// </example>
-public sealed class FixedWidthSchemaBuilder<T>
+public sealed class FixedWidthSchemaBuilder<[DynamicallyAccessedMembers(TrimmedMembers.Record)] T>
     where T : notnull
 {
     private readonly List<Entry> _entries = new();
@@ -100,6 +106,7 @@ public sealed class FixedWidthSchemaBuilder<T>
     }
 
 
+
     /// <summary>
     /// Adds a skipped column — a range in the file mapped to no property. Its width still contributes to
     /// the positions of later fields.
@@ -115,6 +122,7 @@ public sealed class FixedWidthSchemaBuilder<T>
         _entries.Add(new Entry(property: null, field: null, attribute));
         return this;
     }
+
 
 
     /// <summary>

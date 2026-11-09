@@ -6,6 +6,7 @@ using System.Text;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Enums;
 using Wolfgang.Etl.FixedWidth.Exceptions;
+using Wolfgang.Etl.FixedWidth.Parsing;
 
 namespace Wolfgang.Etl.FixedWidth.Binary;
 
@@ -15,7 +16,14 @@ namespace Wolfgang.Etl.FixedWidth.Binary;
 /// </summary>
 internal sealed class BinaryFieldDescriptor
 {
-    internal BinaryFieldDescriptor(PropertyInfo property, FixedWidthBinaryFieldAttribute attribute, int byteOffset, Action<object, object?> setter, Func<object, object?> getter)
+    internal BinaryFieldDescriptor
+    (
+        PropertyInfo property,
+        FixedWidthBinaryFieldAttribute attribute,
+        int byteOffset,
+        Action<object, object?> setter,
+        Func<object, object?> getter
+    )
     {
         Property = property;
         Attribute = attribute;
@@ -24,24 +32,38 @@ internal sealed class BinaryFieldDescriptor
         Getter = getter;
         PropertyType = property.PropertyType;
         UnderlyingType = Nullable.GetUnderlyingType(PropertyType) ?? PropertyType;
-        TypeConverter = TypeDescriptor.GetConverter(PropertyType);
+        TypeConverter = TrimSafeReflection.GetConverter(PropertyType);
     }
 
 
 
     internal PropertyInfo Property { get; }
 
+
+
     internal FixedWidthBinaryFieldAttribute Attribute { get; }
+
+
 
     internal int ByteOffset { get; }
 
+
+
     internal Action<object, object?> Setter { get; }
+
+
 
     internal Func<object, object?> Getter { get; }
 
+
+
     internal Type PropertyType { get; }
 
+
+
     internal Type UnderlyingType { get; }
+
+
 
     internal TypeConverter TypeConverter { get; }
 
@@ -91,13 +113,23 @@ internal sealed class BinaryFieldDescriptor
                 var text = Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
                 if (text.Length > length)
                 {
-                    throw new FieldOverflowException($"Value '{text}' is {text.Length} characters, longer than the {length}-byte field '{Property.Name}'.", Property.Name, length, text.Length);
+                    throw new FieldOverflowException
+                    (
+                        $"Value '{text}' is {text.Length} characters, longer than the {length}-byte field '{Property.Name}'.",
+                        Property.Name,
+                        length,
+                        text.Length
+                    );
                 }
 
                 var encoded = encoding.GetBytes(text.PadRight(length));
                 if (encoded.Length != length)
                 {
-                    throw new InvalidOperationException($"Text field '{Property.Name}' encoded to {encoded.Length} bytes for a {length}-byte field; binary records require a single-byte encoding for text fields.");
+                    throw new InvalidOperationException
+                    (
+                        $"Text field '{Property.Name}' encoded to {encoded.Length} bytes for a {length}-byte field; " +
+                        "binary records require a single-byte encoding for text fields."
+                    );
                 }
 
                 encoded.CopyTo(span);

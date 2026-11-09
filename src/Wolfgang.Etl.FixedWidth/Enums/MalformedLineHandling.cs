@@ -14,7 +14,8 @@ public enum MalformedLineHandling
 
     /// <summary>
     /// Skip the malformed line entirely and continue processing the next line.
-    /// The skipped line count is tracked via <c>CurrentSkippedItemCount</c>.
+    /// The rejected line is counted in <c>CurrentRejectedItemCount</c> (and in the base
+    /// <c>CurrentErrorItemCount</c>).
     /// </summary>
     Skip = 1,
 

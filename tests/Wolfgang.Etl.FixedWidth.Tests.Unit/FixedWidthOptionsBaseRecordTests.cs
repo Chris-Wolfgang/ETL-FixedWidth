@@ -97,7 +97,7 @@ public class FixedWidthOptionsBaseRecordTests
 
 
     [Fact]
-    public void With_expression_preserves_the_inherited_settings()
+    public void WithExpression_when_one_member_changes_preserves_the_inherited_settings()
     {
         var original = new FixedWidthExtractorStreamOptions<PersonRecord> { SkipItemCount = 2, MaximumItemCount = 3 };
 

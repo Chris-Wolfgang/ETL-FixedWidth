@@ -47,7 +47,7 @@ internal sealed class FieldDescriptor
         );
         Getter = ResolveGetter(property);
         Setter = ResolveSetter(property);
-        TypeConverter = TypeDescriptor.GetConverter(property.PropertyType);
+        TypeConverter = TrimSafeReflection.GetConverter(property.PropertyType);
     }
 
 

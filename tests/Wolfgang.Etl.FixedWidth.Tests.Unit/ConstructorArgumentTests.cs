@@ -240,7 +240,7 @@ public class ConstructorArgumentTests
 
 
     [Fact]
-    public void Loader_writer_timer_ctor_accepts_a_null_logger()
+    public void LoaderConstructor_when_writer_timer_and_null_logger_constructs()
     {
         using var sut = new FixedWidthLoader<PersonRecord>(NewWriter(), new ManualProgressTimer(), logger: null);
 
@@ -324,7 +324,7 @@ public class ConstructorArgumentTests
 
 
     [Fact]
-    public void MultiRecord_reader_ctor_accepts_a_null_logger()
+    public void MultiRecordConstructor_when_reader_and_null_logger_constructs()
     {
         using var sut = new FixedWidthMultiRecordExtractor(NewReader(), logger: null);
 
@@ -334,7 +334,7 @@ public class ConstructorArgumentTests
 
 
     [Fact]
-    public void MultiRecord_stream_ctor_accepts_null_options_and_logger()
+    public void MultiRecordConstructor_when_stream_with_null_options_and_logger_constructs()
     {
         using var sut = new FixedWidthMultiRecordExtractor(NewStream(), options: null, logger: null);
 
@@ -344,7 +344,7 @@ public class ConstructorArgumentTests
 
 
     [Fact]
-    public void MultiRecord_reader_timer_ctor_accepts_a_null_logger()
+    public void MultiRecordConstructor_when_reader_timer_and_null_logger_constructs()
     {
         using var sut = new FixedWidthMultiRecordExtractor(NewReader(), new ManualProgressTimer(), logger: null);
 
@@ -354,7 +354,7 @@ public class ConstructorArgumentTests
 
 
     [Fact]
-    public void MultiRecord_stream_timer_ctor_accepts_null_options_and_logger()
+    public void MultiRecordConstructor_when_stream_timer_with_null_options_and_logger_constructs()
     {
         using var sut = new FixedWidthMultiRecordExtractor(NewStream(), new ManualProgressTimer(), options: null, logger: null);
 
@@ -526,7 +526,7 @@ public class ConstructorArgumentTests
 
 
     [Fact]
-    public void Transformer_ctor_accepts_a_null_logger()
+    public void TransformerConstructor_when_logger_is_null_constructs()
     {
         var sut = new FixedWidthTransformer<PersonRecord, PersonRecord>(r => r, logger: null);
 
@@ -536,7 +536,7 @@ public class ConstructorArgumentTests
 
 
     [Fact]
-    public void Transformer_timer_ctor_accepts_a_null_logger()
+    public void TransformerConstructor_when_timer_and_null_logger_constructs()
     {
         var sut = new FixedWidthTransformer<PersonRecord, PersonRecord>(r => r, new ManualProgressTimer(), logger: null);
 
@@ -560,7 +560,7 @@ public class ConstructorArgumentTests
 
 
     [Fact]
-    public void Report_options_ctor_accepts_a_default_options_instance()
+    public void ReportConstructor_when_options_are_default_constructs()
     {
         var sut = new FixedWidthReport(new FixedWidthReportOptions());
 
@@ -722,7 +722,7 @@ public class ConstructorArgumentTests
 
 
     [Fact]
-    public void Obsolete_encoding_ctors_apply_the_supplied_encoding()
+    public void ObsoleteConstructors_when_given_an_encoding_apply_it()
     {
         using var extractor = new FixedWidthExtractor<PersonRecord>(NewStream(), Encoding.Unicode);
         using var loader = new FixedWidthLoader<PersonRecord>(NewStream(), Encoding.Unicode);
@@ -734,7 +734,7 @@ public class ConstructorArgumentTests
 
 
     [Fact]
-    public void Obsolete_encoding_ctors_treat_a_null_encoding_as_the_default()
+    public void ObsoleteConstructors_when_encoding_is_null_use_the_default()
     {
         // The removed constructors declared Encoding? encoding = null, so null was a legal value
         // meaning "use the default" - it must not produce an options record with a null Encoding.
@@ -748,7 +748,7 @@ public class ConstructorArgumentTests
 
 
     [Fact]
-    public void Obsolete_logger_encoding_ctors_construct()
+    public void ObsoleteConstructors_when_given_logger_and_encoding_construct()
     {
         using var extractor = new FixedWidthExtractor<PersonRecord>(NewStream(), new SpyLogger<FixedWidthExtractor<PersonRecord>>(), Encoding.UTF8);
         using var loader = new FixedWidthLoader<PersonRecord>(NewStream(), new SpyLogger<FixedWidthLoader<PersonRecord>>(), Encoding.UTF8);

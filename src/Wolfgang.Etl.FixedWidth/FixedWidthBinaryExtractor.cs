@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Binary;
+using Wolfgang.Etl.FixedWidth.Diagnostics;
 
 namespace Wolfgang.Etl.FixedWidth;
 
@@ -34,7 +36,7 @@ namespace Wolfgang.Etl.FixedWidth;
 /// }
 /// </code>
 /// </example>
-public sealed class FixedWidthBinaryExtractor<TRecord> : ExtractorBase<TRecord, FixedWidthReport>
+public sealed class FixedWidthBinaryExtractor<[DynamicallyAccessedMembers(TrimmedMembers.Record)] TRecord> : ExtractorBase<TRecord, FixedWidthReport>
     where TRecord : notnull, new()
 {
     private readonly Stream _stream;
@@ -60,11 +62,6 @@ public sealed class FixedWidthBinaryExtractor<TRecord> : ExtractorBase<TRecord, 
         : this(stream, options: null, logger: logger)
     {
     }
-
-
-
-
-
 
 
 
@@ -116,6 +113,7 @@ public sealed class FixedWidthBinaryExtractor<TRecord> : ExtractorBase<TRecord, 
     {
         _progressTimer = timer ?? throw new ArgumentNullException(nameof(timer));
     }
+
 
 
     /// <summary>

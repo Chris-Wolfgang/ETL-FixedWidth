@@ -32,6 +32,8 @@ namespace Wolfgang.Etl.FixedWidth;
 ///   The internal writer is flushed automatically at the end of
 ///   <c>LoadWorkerAsync</c>, and <see cref="System.IDisposable.Dispose"/> must be called to release it.</item>
 /// </list>
+/// </remarks>
+/// <example>
 /// <code>
 /// // Stream-based (preferred for files — 64 KB buffer reduces syscall overhead):
 /// await using var stream = File.OpenWrite("output.txt");
@@ -50,8 +52,8 @@ namespace Wolfgang.Etl.FixedWidth;
 ///     FieldDelimiter = " | ",
 /// });
 /// </code>
-/// </remarks>
-public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
+/// </example>
+public class FixedWidthLoader<[DynamicallyAccessedMembers(TrimmedMembers.Record)] TRecord> : LoaderBase<TRecord, FixedWidthReport>
     where TRecord : notnull
 {
     // ------------------------------------------------------------------
@@ -70,11 +72,12 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     private readonly ILogger _logger;
     private readonly IProgressTimer? _progressTimer;
     private bool _progressTimerWired;
-    private long _currentLineNumber;
 
     // _currentLineNumber is read by CreateProgressReport on a Timer threadpool thread
     // and written by LoadWorkerAsync on the async continuation thread.
     // Interlocked.Read/Increment ensures atomicity on all targets including 32-bit net462.
+    private long _currentLineNumber;
+
 
 
     // ------------------------------------------------------------------
@@ -89,16 +92,26 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// <param name="writer">
     /// The <see cref="TextWriter"/> to write fixed-width records to.
     /// </param>
-    /// <param name="logger">The logger instance for diagnostic output.</param>
+    /// <param name="logger">
+    /// An optional logger for diagnostic output. Pass <see langword="null"/> (the default) to disable logging.
+    /// </param>
     /// <exception cref="ArgumentNullException">
-    /// <paramref name="writer"/> or <paramref name="logger"/> is null.
+    /// <paramref name="writer"/> is null.
     /// </exception>
     public FixedWidthLoader
     (
         TextWriter writer,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
-        : this(writer: writer ?? throw new ArgumentNullException(nameof(writer)), stream: null, options: null, encoding: null, timer: null, logger: logger)
+        : this
+        (
+            writer: writer ?? throw new ArgumentNullException(nameof(writer)),
+            stream: null,
+            options: null,
+            encoding: null,
+            timer: null,
+            logger: logger
+        )
     {
     }
 
@@ -176,6 +189,8 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     {
     }
 
+
+
     /// <summary>
     /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> from a <see cref="Stream"/> decoded with the
     /// supplied <see cref="Encoding"/>.
@@ -211,10 +226,6 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
 
 
 
-
-
-
-
     /// <summary>
     /// Initializes a new <see cref="FixedWidthLoader{TRecord}"/> over the specified
     /// <see cref="Stream"/>, with the logger as the trailing optional parameter.
@@ -235,7 +246,15 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
         FixedWidthLoaderStreamOptions? options = null,
         ILogger<FixedWidthLoader<TRecord>>? logger = null
     )
-        : this(writer: null, stream: stream ?? throw new ArgumentNullException(nameof(stream)), options: options, encoding: options?.Encoding, timer: null, logger: logger)
+        : this
+        (
+            writer: null,
+            stream: stream ?? throw new ArgumentNullException(nameof(stream)),
+            options: options,
+            encoding: options?.Encoding,
+            timer: null,
+            logger: logger
+        )
     {
     }
 
@@ -324,6 +343,7 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     }
 
 
+
     /// <summary>
     /// Binary-compatibility overload for 0.10.x callers. Equivalent to the constructor above with
     /// no logger.
@@ -383,11 +403,16 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// <see cref="Encoding.UTF8"/>), a 64 KB buffer, and <c>leaveOpen: true</c>
     /// so the caller retains stream ownership.
     /// </summary>
-    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
+    /// <remarks><paramref name="stream"/> is non-null: every caller has already checked it.</remarks>
     private static StreamWriter CreateBufferedWriter(Stream stream, Encoding? encoding)
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
-        return new StreamWriter(stream, encoding: encoding ?? Encoding.UTF8, bufferSize: DefaultBufferSize, leaveOpen: true);
+        return new StreamWriter
+        (
+            stream,
+            encoding: encoding ?? Encoding.UTF8,
+            bufferSize: DefaultBufferSize,
+            leaveOpen: true
+        );
     }
 
 
@@ -571,6 +596,8 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
     /// without a data race.
     /// </remarks>
     public long CurrentLineNumber => Interlocked.Read(ref _currentLineNumber);
+
+
 
     /// <summary>
     /// Creates a progress report snapshot for the current loader state.
@@ -951,7 +978,4 @@ public class FixedWidthLoader<TRecord> : LoaderBase<TRecord, FixedWidthReport>
 
         return ex;
     }
-
-
-
 }
