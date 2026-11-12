@@ -1,9 +1,6 @@
 {
   "stryker-config": {
-    "project": "src/Wolfgang.Etl.FixedWidth/Wolfgang.Etl.FixedWidth.csproj",
-    "test-projects": [
-      "tests/Wolfgang.Etl.FixedWidth.Tests.Unit/Wolfgang.Etl.FixedWidth.Tests.Unit.csproj"
-    ],
+    "project": "Wolfgang.Etl.FixedWidth.csproj",
     "target-framework": "net10.0",
     "reporters": [
       "html",
