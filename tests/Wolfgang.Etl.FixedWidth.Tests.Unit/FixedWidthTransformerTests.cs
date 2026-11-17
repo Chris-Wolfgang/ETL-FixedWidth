@@ -96,6 +96,7 @@ public class FixedWidthTransformerTests
 
 
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     private sealed class IntSource
     {
         public int Foo { get; set; }
@@ -109,6 +110,7 @@ public class FixedWidthTransformerTests
 
 
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     private sealed class NullableDestination
     {
         public int? Foo { get; set; }
