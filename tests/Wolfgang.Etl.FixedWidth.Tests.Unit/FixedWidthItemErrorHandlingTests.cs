@@ -55,6 +55,50 @@ public class FixedWidthItemErrorHandlingTests
 
 
     [Fact]
+    public async Task ErrorPolicy_is_consulted_when_MalformedLineHandling_is_ThrowException()
+    {
+        var calls = 0;
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad), new FixedWidthExtractorOptions<PersonRecord>
+        {
+            ErrorPolicy = _ =>
+            {
+                calls++;
+                return ItemErrorAction.Skip;
+            },
+        });
+
+        var yielded = await Drain(extractor);
+
+        Assert.Equal(2, yielded.Count);   // Carol, Dan - the two bad lines were skipped by the policy
+        Assert.Equal(2, calls);
+    }
+
+
+    [Fact]
+    public async Task Default_ErrorPolicy_still_aborts_on_a_malformed_line()
+    {
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad));
+
+        await Assert.ThrowsAsync<FieldConversionException>(async () => await Drain(extractor));
+    }
+
+
+    [Fact]
+    public async Task MalformedLineHandling_Skip_wins_over_an_aborting_ErrorPolicy()
+    {
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad), new FixedWidthExtractorOptions<PersonRecord>
+        {
+            MalformedLineHandling = MalformedLineHandling.Skip,
+            ErrorPolicy = _ => ItemErrorAction.Abort,
+        });
+
+        var yielded = await Drain(extractor);
+
+        Assert.Equal(2, yielded.Count);
+    }
+
+
+    [Fact]
     public async Task Validator_reject_is_not_a_base_error_item()
     {
         // The one line parses fine but the validator rejects it. That is a business decision,
