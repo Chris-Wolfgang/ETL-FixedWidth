@@ -336,6 +336,112 @@ public sealed class FixedWidthBinaryExtractorTests
 
 
 
+    [ExcludeFromCodeCoverage]
+    private sealed class TooWideInteger
+    {
+        [FixedWidthBinaryField(0, 9, BinaryFieldType.Binary)]
+        public long Value { get; set; }
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class NegativeScale
+    {
+        [FixedWidthBinaryField(0, 4, BinaryFieldType.PackedDecimal, Scale = -1)]
+        public decimal Value { get; set; }
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class GetOnly
+    {
+        [FixedWidthBinaryField(0, 4, BinaryFieldType.Text)]
+        public string Value { get; } = string.Empty;
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class SetOnly
+    {
+        private string _value = string.Empty;
+
+        [FixedWidthBinaryField(0, 4, BinaryFieldType.Text)]
+        public string Value { private get => _value; set => _value = value; }
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class NoParameterlessCtor
+    {
+        public NoParameterlessCtor(int ignored) => Id = ignored;
+
+        [FixedWidthBinaryField(0, 4, BinaryFieldType.Binary)]
+        public int Id { get; set; }
+    }
+
+
+    [Fact]
+    public void GetResult_when_a_binary_integer_is_wider_than_8_bytes_throws_naming_the_property()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() => BinaryFieldMap.GetResult<TooWideInteger>());
+
+        Assert.Contains(nameof(TooWideInteger.Value), ex.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(TooWideInteger), ex.Message, StringComparison.Ordinal);
+    }
+
+
+    [Fact]
+    public void GetResult_when_Scale_is_negative_throws_naming_the_property()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() => BinaryFieldMap.GetResult<NegativeScale>());
+
+        Assert.Contains("Scale", ex.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(NegativeScale.Value), ex.Message, StringComparison.Ordinal);
+    }
+
+
+    [Fact]
+    public void GetResult_when_a_property_has_no_public_setter_throws_naming_the_property()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() => BinaryFieldMap.GetResult<GetOnly>());
+
+        Assert.Contains("setter", ex.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(GetOnly.Value), ex.Message, StringComparison.Ordinal);
+    }
+
+
+    [Fact]
+    public void GetResult_when_a_property_has_no_public_getter_throws_naming_the_property()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() => BinaryFieldMap.GetResult<SetOnly>());
+
+        Assert.Contains("getter", ex.Message, StringComparison.Ordinal);
+    }
+
+
+    [Fact]
+    public async Task Loader_writes_a_type_without_a_parameterless_constructor()
+    {
+        using var stream = new MemoryStream();
+        using var loader = new FixedWidthBinaryLoader<NoParameterlessCtor>(stream, options: null);
+
+        await loader.LoadAsync(new[] { new NoParameterlessCtor(7) }.ToAsyncEnumerable(), CancellationToken.None);
+
+        Assert.Equal(new byte[] { 0, 0, 0, 7 }, stream.ToArray());
+    }
+
+
+    [Fact]
+    public void Factory_for_a_type_without_a_parameterless_constructor_throws_when_invoked()
+    {
+        var map = BinaryFieldMap.GetResult<NoParameterlessCtor>();
+
+        var ex = Assert.Throws<InvalidOperationException>(() => map.Factory());
+
+        Assert.Contains("parameterless constructor", ex.Message, StringComparison.Ordinal);
+    }
+
+
     [Fact]
     public void GetResult_when_called_again_for_the_same_type_returns_the_cached_map()
     {
