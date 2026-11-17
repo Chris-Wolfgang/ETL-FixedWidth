@@ -373,6 +373,13 @@ public static class FixedWidthConverter
 #endif
         }
 
+#if NET6_0_OR_GREATER
+        if (TryParseDateOnlyTimeOnly(span, targetType, format, out var dateOrTime))
+        {
+            return dateOrTime;
+        }
+#endif
+
 #if NET5_0_OR_GREATER
         var numericResult = ParseNumericSpan(span, targetType, numberStyles);
 #else
@@ -385,6 +392,38 @@ public static class FixedWidthConverter
 
         return ParseViaTypeConverter(text, targetType, cachedConverter);
     }
+
+
+
+#if NET6_0_OR_GREATER
+    /// <summary>
+    /// Format is honoured on write for every <see cref="IFormattable"/>; this mirrors it on read for
+    /// <see cref="DateOnly"/> / <see cref="TimeOnly"/> so output written with a compact format
+    /// (e.g. "yyyyMMdd") can be read back. Without a Format the TypeConverter fallback applies.
+    /// </summary>
+    private static bool TryParseDateOnlyTimeOnly(ReadOnlySpan<char> span, Type targetType, string? format, out object? result)
+    {
+        result = null;
+        if (string.IsNullOrEmpty(format))
+        {
+            return false;
+        }
+
+        if (targetType == typeof(DateOnly))
+        {
+            result = DateOnly.ParseExact(span, format.AsSpan(), CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        if (targetType == typeof(TimeOnly))
+        {
+            result = TimeOnly.ParseExact(span, format.AsSpan(), CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        return false;
+    }
+#endif
 
 
 

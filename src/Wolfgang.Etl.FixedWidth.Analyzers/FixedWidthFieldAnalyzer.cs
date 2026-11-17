@@ -154,17 +154,24 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (TryGetLength(attribute, out var length) && format!.Length > length)
+        // Compare the minimum WRITTEN width, not the pattern length: quoted literals, escapes and
+        // optional/variable-width specifiers make the two differ. Anything not provably too wide
+        // (standard single-character specifiers, variable-width tokens) is not reported.
+        if (TryGetLength(attribute, out var length))
         {
-            context.ReportDiagnostic(Diagnostic.Create
-            (
-                FixedWidthDiagnostics.FormatWiderThanField,
-                location,
-                format,
-                format.Length,
-                property.Name,
-                length
-            ));
+            var minimumWidth = MinimumFormattedWidth(format!);
+            if (minimumWidth > length)
+            {
+                context.ReportDiagnostic(Diagnostic.Create
+                (
+                    FixedWidthDiagnostics.FormatWiderThanField,
+                    location,
+                    format,
+                    minimumWidth,
+                    property.Name,
+                    length
+                ));
+            }
         }
     }
 
@@ -244,6 +251,78 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
         return SymbolEqualityComparer.Default.Equals(type, known.DateTime)
             || (known.DateTimeOffset is not null && SymbolEqualityComparer.Default.Equals(type, known.DateTimeOffset))
             || (known.TimeSpan is not null && SymbolEqualityComparer.Default.Equals(type, known.TimeSpan));
+    }
+
+
+
+    /// <summary>
+    /// The smallest number of characters a custom date/time or time-span <paramref name="format"/>
+    /// can write. Quoted literals and backslash escapes count as their literal text; a
+    /// single-character pattern is a standard specifier (width unknown) and counts as 0; optional
+    /// (<c>F</c>), zone (<c>z</c>, <c>K</c>) and era (<c>g</c>) tokens count as 0 and name-based
+    /// tokens (<c>MMM</c>, <c>ddd</c>) as 3, so the result never exceeds the real width.
+    /// </summary>
+    internal static int MinimumFormattedWidth(string format)
+    {
+        if (format.Length == 1)
+        {
+            return 0;
+        }
+
+        var width = 0;
+        var i = 0;
+        while (i < format.Length)
+        {
+            var c = format[i];
+            if (c == '\'' || c == '"')
+            {
+                var close = format.IndexOf(c, i + 1);
+                var end = close < 0 ? format.Length : close;
+                width += end - i - 1;
+                i = end + 1;
+            }
+            else if (c == '\\')
+            {
+                width += i + 1 < format.Length ? 1 : 0;
+                i += 2;
+            }
+            else if (c == '%')
+            {
+                i++;
+            }
+            else
+            {
+                var run = 1;
+                while (i + run < format.Length && format[i + run] == c)
+                {
+                    run++;
+                }
+
+                width += TokenMinimumWidth(c, run);
+                i += run;
+            }
+        }
+
+        return width;
+    }
+
+
+
+    private static int TokenMinimumWidth(char token, int run)
+    {
+        switch (token)
+        {
+            case 'F':
+            case 'z':
+            case 'K':
+            case 'g':
+                return 0;
+            case 'M':
+            case 'd':
+                return run >= 3 ? 3 : run;
+            default:
+                return run;
+        }
     }
 
 
