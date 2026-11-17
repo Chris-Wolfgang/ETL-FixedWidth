@@ -220,13 +220,12 @@ public sealed class FixedWidthAccessorGeneratorOutputTests
         GeneratorDriver driver = CSharpGeneratorDriver.Create(new FixedWidthAccessorGenerator().AsSourceGenerator());
         driver.RunGeneratorsAndUpdateCompilation(compilation, out var updated, out _);
 
-        var errors = updated
-            .GetDiagnostics()
-            .Where(d => d.Severity == DiagnosticSeverity.Error)
-            .Select(d => d.ToString())
-            .ToArray();
-
-        Assert.Empty(errors);
+        Assert.Empty
+        (
+            updated
+                .GetDiagnostics()
+                .Where(d => d.Severity == DiagnosticSeverity.Error)
+        );
     }
 
 
