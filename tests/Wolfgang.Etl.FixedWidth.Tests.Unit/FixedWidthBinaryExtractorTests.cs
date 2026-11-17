@@ -336,6 +336,7 @@ public sealed class FixedWidthBinaryExtractorTests
 
 
 
+    [ExcludeFromCodeCoverage]
     private sealed class TooWideInteger
     {
         [FixedWidthBinaryField(0, 9, BinaryFieldType.Binary)]
@@ -343,6 +344,7 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
+    [ExcludeFromCodeCoverage]
     private sealed class NegativeScale
     {
         [FixedWidthBinaryField(0, 4, BinaryFieldType.PackedDecimal, Scale = -1)]
@@ -350,6 +352,7 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
+    [ExcludeFromCodeCoverage]
     private sealed class GetOnly
     {
         [FixedWidthBinaryField(0, 4, BinaryFieldType.Text)]
@@ -357,6 +360,7 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
+    [ExcludeFromCodeCoverage]
     private sealed class SetOnly
     {
         private string _value = string.Empty;
@@ -368,6 +372,7 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
+    [ExcludeFromCodeCoverage]
     private sealed class NoParameterlessCtor
     {
         public NoParameterlessCtor(int ignored) => Id = ignored;
