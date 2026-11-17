@@ -704,6 +704,42 @@ public class FixedWidthLoaderTests
 
 
 
+    private sealed class TwoFieldRecord
+    {
+        [FixedWidthField(0, 5)]
+        public string Name { get; set; } = string.Empty;
+
+
+
+        [FixedWidthField(1, 5, Alignment = FieldAlignment.Right, Pad = '0')]
+        public int Num { get; set; }
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_a_later_field_overflows_leaves_no_partial_line_in_the_output()
+    {
+        var writer = new StringWriter { NewLine = "\n" };
+        var loader = new FixedWidthLoader<TwoFieldRecord>(writer);
+
+        await Assert.ThrowsAsync<FieldOverflowException>
+        (
+            async () => await loader.LoadAsync
+            (
+                new[]
+                {
+                    new TwoFieldRecord { Name = "OK", Num = 1 },
+                    new TwoFieldRecord { Name = "AB", Num = 1234567 },
+                }.ToAsyncEnumerable()
+            )
+        );
+
+        Assert.Equal("OK   00001\n", writer.ToString());
+    }
+
+
+
     // ------------------------------------------------------------------
     // TruncateHeader converter
     // ------------------------------------------------------------------

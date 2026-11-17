@@ -555,7 +555,10 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
 
         string? line;
 #pragma warning disable CA1849, VSTHRD103, S6966 // ReadLine is intentionally synchronous
-        while ((line = reader.ReadLine()) != null)
+        // Check the cap BEFORE reading: a line read past it would be discarded, losing a record
+        // for a caller-owned reader.
+        while ((dataLinesSkipped < SkipItemCount || CurrentItemCount < MaximumItemCount)
+            && (line = reader.ReadLine()) != null)
 #pragma warning restore CA1849, VSTHRD103, S6966
         {
             token.ThrowIfCancellationRequested();
@@ -594,15 +597,6 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
                 dataLinesSkipped++;
                 IncrementCurrentSkippedItemCount();
                 continue;
-            }
-
-            if (CurrentItemCount >= MaximumItemCount)
-            {
-                // Mirror FixedWidthExtractor: the line was read but won't be yielded, so count it
-                // as filtered and log completion before ending early.
-                IncrementFilteredLineCount();
-                LogExtractionCompleted();
-                yield break;
             }
 
             if (!TryParseLine(line, rule, out var record))

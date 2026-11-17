@@ -66,6 +66,36 @@ public sealed class BinaryCodecTests
     }
 
 
+    [Theory]
+    [InlineData("1230")]   // sign nibble 0x0 is a digit, not a sign
+    [InlineData("1239")]   // sign nibble 0x9
+    [InlineData("0005")]
+    public void PackedDecimalDecode_when_the_sign_nibble_is_a_digit_throws(string hex)
+    {
+        _ = hex ?? throw new ArgumentNullException(nameof(hex));
+
+        Assert.Throws<FormatException>(() => PackedDecimal.Decode(Hex(hex), 0));
+    }
+
+
+
+    [Theory]
+    [InlineData("-0.004", "00-00-0C")]   // truncates to zero -> positive zero, not 0x0D
+    [InlineData("-0.0", "00-00-0C")]
+    [InlineData("-0.01", "00-00-1D")]    // non-zero magnitude keeps its sign
+    [InlineData("0.004", "00-00-0C")]
+    public void PackedDecimalEncode_never_writes_negative_zero(string value, string expectedHex)
+    {
+        _ = value ?? throw new ArgumentNullException(nameof(value));
+
+        var buffer = new byte[3];
+        PackedDecimal.Encode(decimal.Parse(value, CultureInfo.InvariantCulture), 2, buffer);
+
+        Assert.Equal(expectedHex, BitConverter.ToString(buffer));
+    }
+
+
+
     // -------------------- COMP big-endian integer --------------------
 
     [Theory]

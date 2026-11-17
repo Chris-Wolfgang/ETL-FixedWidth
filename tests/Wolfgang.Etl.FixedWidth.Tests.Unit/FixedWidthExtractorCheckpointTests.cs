@@ -50,6 +50,52 @@ public sealed class FixedWidthExtractorCheckpointTests
 
 
     [Fact]
+    public async Task MaximumItemCount_does_not_read_past_the_cap_so_the_checkpoint_is_exact()
+    {
+        var bytes = Ascii(ThreeRecords + "JKL00004\n");
+        var options = new FixedWidthExtractorStreamOptions<Rec>
+        {
+            TrackByteOffset = true,
+            MaximumItemCount = 2,
+        };
+
+        long checkpoint;
+        using (var first = new FixedWidthExtractor<Rec>(new MemoryStream(bytes), options))
+        {
+            var firstBatch = await first.ExtractAsync(CancellationToken.None).ToListAsync();
+
+            Assert.Equal(new[] { "ABC", "DEF" }, firstBatch.Select(r => r.Code));
+            checkpoint = first.CurrentByteOffset;
+            Assert.Equal(18, checkpoint);
+            Assert.Equal(0, (int)first.CurrentFilteredLineCount);
+        }
+
+        using var second = new FixedWidthExtractor<Rec>(new MemoryStream(bytes), new FixedWidthExtractorStreamOptions<Rec>
+        {
+            TrackByteOffset = true,
+            StartByteOffset = checkpoint,
+            MaximumItemCount = 2,
+        });
+
+        var secondBatch = await second.ExtractAsync(CancellationToken.None).ToListAsync();
+
+        Assert.Equal(new[] { "GHI", "JKL" }, secondBatch.Select(r => r.Code));
+    }
+
+
+    [Fact]
+    public async Task MaximumItemCount_leaves_the_next_line_unread_in_a_caller_owned_reader()
+    {
+        using var reader = new StringReader(ThreeRecords);
+        using var extractor = new FixedWidthExtractor<Rec>(reader, new FixedWidthExtractorOptions<Rec> { MaximumItemCount = 1 });
+
+        await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
+
+        Assert.Equal("DEF00002", reader.ReadLine());
+    }
+
+
+    [Fact]
     public async Task Resume_from_a_checkpoint_yields_only_the_remaining_records()
     {
         var bytes = Ascii(ThreeRecords);
