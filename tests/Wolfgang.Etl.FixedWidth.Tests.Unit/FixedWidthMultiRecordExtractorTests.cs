@@ -278,6 +278,21 @@ public sealed class FixedWidthMultiRecordExtractorTests
 
 
     [Fact]
+    public async Task MaximumItemCount_leaves_the_next_line_unread_in_a_caller_owned_reader()
+    {
+        using var reader = new StringReader(SampleFile);
+        using var extractor = new FixedWidthMultiRecordExtractor(reader, new FixedWidthMultiRecordExtractorOptions { MaximumItemCount = 1 })
+            .When(l => l[0] == 'H', typeof(HeaderRecord))
+            .When(l => l[0] == 'D', typeof(DetailRecord))
+            .When(l => l[0] == 'T', typeof(TrailerRecord));
+
+        await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
+
+        Assert.Equal("D00000001John Smith", reader.ReadLine());
+    }
+
+
+    [Fact]
     public void Constructor_validates_arguments()
     {
         Assert.Throws<ArgumentNullException>(() => new FixedWidthMultiRecordExtractor((TextReader)null!));
