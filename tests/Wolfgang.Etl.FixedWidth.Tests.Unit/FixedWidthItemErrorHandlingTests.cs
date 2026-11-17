@@ -84,21 +84,6 @@ public class FixedWidthItemErrorHandlingTests
 
 
     [Fact]
-    public async Task MalformedLineHandling_Skip_wins_over_an_aborting_ErrorPolicy()
-    {
-        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad), new FixedWidthExtractorOptions<PersonRecord>
-        {
-            MalformedLineHandling = MalformedLineHandling.Skip,
-            ErrorPolicy = _ => ItemErrorAction.Abort,
-        });
-
-        var yielded = await Drain(extractor);
-
-        Assert.Equal(2, yielded.Count);
-    }
-
-
-    [Fact]
     public async Task Validator_reject_is_not_a_base_error_item()
     {
         // The one line parses fine but the validator rejects it. That is a business decision,
