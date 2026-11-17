@@ -336,6 +336,172 @@ public sealed class FixedWidthBinaryExtractorTests
 
 
 
+    [ExcludeFromCodeCoverage]
+    private sealed class TooWideInteger
+    {
+        [FixedWidthBinaryField(0, 9, BinaryFieldType.Binary)]
+        public long Value { get; set; }
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class NegativeScale
+    {
+        [FixedWidthBinaryField(0, 4, BinaryFieldType.PackedDecimal, Scale = -1)]
+        public decimal Value { get; set; }
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class GetOnly
+    {
+        [FixedWidthBinaryField(0, 4, BinaryFieldType.Text)]
+        public string Value { get; } = string.Empty;
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class SetOnly
+    {
+        private string _value = string.Empty;
+
+        [FixedWidthBinaryField(0, 4, BinaryFieldType.Text)]
+        public string Value { private get => _value; set => _value = value; }
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class NoParameterlessCtor
+    {
+        public NoParameterlessCtor(int ignored) => Id = ignored;
+
+        [FixedWidthBinaryField(0, 4, BinaryFieldType.Binary)]
+        public int Id { get; set; }
+    }
+
+
+    private sealed class TextDates
+    {
+        [FixedWidthBinaryField(0, 8, BinaryFieldType.Text, Format = "yyyyMMdd")]
+        public DateTime Day { get; set; }
+
+        [FixedWidthBinaryField(1, 6, BinaryFieldType.Text, Format = "hhmmss")]
+        public TimeSpan Elapsed { get; set; }
+
+        [FixedWidthBinaryField(2, 8, BinaryFieldType.Text, Format = "yyyyMMdd")]
+        public DateTime? OptionalDay { get; set; }
+    }
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class TextDateWithoutFormat
+    {
+        [FixedWidthBinaryField(0, 20, BinaryFieldType.Text)]
+        public DateTime When { get; set; }
+    }
+
+
+    [Fact]
+    public async Task Text_fields_with_a_Format_round_trip_dates_and_times()
+    {
+        var original = new TextDates
+        {
+            Day = new DateTime(2026, 11, 16),
+            Elapsed = new TimeSpan(13, 5, 9),
+            OptionalDay = new DateTime(2027, 1, 2),
+        };
+
+        using var stream = new MemoryStream();
+        using (var loader = new FixedWidthBinaryLoader<TextDates>(stream, options: null))
+        {
+            await loader.LoadAsync(new[] { original }.ToAsyncEnumerable(), CancellationToken.None);
+        }
+
+        Assert.Equal("202611161305092027010" + "2", Encoding.ASCII.GetString(stream.ToArray()));
+
+        using var readStream = new MemoryStream(stream.ToArray());
+        using var extractor = new FixedWidthBinaryExtractor<TextDates>(readStream, options: null);
+        var read = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+
+        Assert.Equal(original.Day, read.Day);
+        Assert.Equal(original.Elapsed, read.Elapsed);
+        Assert.Equal(original.OptionalDay, read.OptionalDay);
+    }
+
+
+    [Fact]
+    public void GetResult_when_a_date_text_field_has_no_Format_throws_naming_the_property_and_attribute()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() => BinaryFieldMap.GetResult<TextDateWithoutFormat>());
+
+        Assert.Contains(nameof(TextDateWithoutFormat.When), ex.Message, StringComparison.Ordinal);
+        Assert.Contains("[FixedWidthBinaryField]", ex.Message, StringComparison.Ordinal);
+        Assert.Contains("Format", ex.Message, StringComparison.Ordinal);
+    }
+
+
+    [Fact]
+    public void GetResult_when_a_binary_integer_is_wider_than_8_bytes_throws_naming_the_property()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() => BinaryFieldMap.GetResult<TooWideInteger>());
+
+        Assert.Contains(nameof(TooWideInteger.Value), ex.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(TooWideInteger), ex.Message, StringComparison.Ordinal);
+    }
+
+
+    [Fact]
+    public void GetResult_when_Scale_is_negative_throws_naming_the_property()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() => BinaryFieldMap.GetResult<NegativeScale>());
+
+        Assert.Contains("Scale", ex.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(NegativeScale.Value), ex.Message, StringComparison.Ordinal);
+    }
+
+
+    [Fact]
+    public void GetResult_when_a_property_has_no_public_setter_throws_naming_the_property()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() => BinaryFieldMap.GetResult<GetOnly>());
+
+        Assert.Contains("setter", ex.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(GetOnly.Value), ex.Message, StringComparison.Ordinal);
+    }
+
+
+    [Fact]
+    public void GetResult_when_a_property_has_no_public_getter_throws_naming_the_property()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() => BinaryFieldMap.GetResult<SetOnly>());
+
+        Assert.Contains("getter", ex.Message, StringComparison.Ordinal);
+    }
+
+
+    [Fact]
+    public async Task Loader_writes_a_type_without_a_parameterless_constructor()
+    {
+        using var stream = new MemoryStream();
+        using var loader = new FixedWidthBinaryLoader<NoParameterlessCtor>(stream, options: null);
+
+        await loader.LoadAsync(new[] { new NoParameterlessCtor(7) }.ToAsyncEnumerable(), CancellationToken.None);
+
+        Assert.Equal(new byte[] { 0, 0, 0, 7 }, stream.ToArray());
+    }
+
+
+    [Fact]
+    public void Factory_for_a_type_without_a_parameterless_constructor_throws_when_invoked()
+    {
+        var map = BinaryFieldMap.GetResult<NoParameterlessCtor>();
+
+        var ex = Assert.Throws<InvalidOperationException>(() => map.Factory());
+
+        Assert.Contains("parameterless constructor", ex.Message, StringComparison.Ordinal);
+    }
+
+
     [Fact]
     public void GetResult_when_called_again_for_the_same_type_returns_the_cached_map()
     {

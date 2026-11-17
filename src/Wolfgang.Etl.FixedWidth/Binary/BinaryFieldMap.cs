@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Diagnostics;
+using Wolfgang.Etl.FixedWidth.Enums;
 
 namespace Wolfgang.Etl.FixedWidth.Binary;
 
@@ -73,11 +74,59 @@ internal static class BinaryFieldMap
                 throw new InvalidOperationException($"Duplicate [FixedWidthBinaryField] index {attribute.Index} on type '{type.FullName}'.");
             }
 
+            ValidateField(type, entry.Property, attribute);
             descriptors.Add(new BinaryFieldDescriptor(entry.Property, attribute, offset, CompileSetter(entry.Property), CompileGetter(entry.Property)));
             offset += attribute.ByteLength;
         }
 
-        return new BinaryRecordMap(descriptors.AsReadOnly(), offset, CompileFactory(type));
+        return new BinaryRecordMap(descriptors.AsReadOnly(), offset, CreateFactory(type));
+    }
+
+
+
+    private static bool IsTemporal(Type propertyType)
+    {
+        var type = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+        return type == typeof(DateTime) || type == typeof(DateTimeOffset) || type == typeof(TimeSpan);
+    }
+
+
+
+    private static void ValidateField(Type type, PropertyInfo property, FixedWidthBinaryFieldAttribute attribute)
+    {
+        var where = $"[FixedWidthBinaryField] property '{property.Name}' on type '{type.FullName}'";
+
+        if (property.GetMethod == null || !property.GetMethod.IsPublic)
+        {
+            throw new InvalidOperationException($"The {where} has no public getter, which is required to write the field.");
+        }
+
+        if (property.SetMethod == null || !property.SetMethod.IsPublic)
+        {
+            throw new InvalidOperationException($"The {where} has no public setter, which is required to read the field.");
+        }
+
+        if (attribute.Type == BinaryFieldType.Binary && (attribute.ByteLength < 1 || attribute.ByteLength > 8))
+        {
+            throw new InvalidOperationException
+            (
+                $"The {where} is a binary integer field of {attribute.ByteLength} bytes; binary integer fields must be 1-8 bytes."
+            );
+        }
+
+        if (attribute.Type == BinaryFieldType.Text && string.IsNullOrEmpty(attribute.Format) && IsTemporal(property.PropertyType))
+        {
+            throw new InvalidOperationException
+            (
+                $"The {where} is a {property.PropertyType.Name} text field and needs a Format on its " +
+                "[FixedWidthBinaryField] attribute (e.g. Format = \"yyyyMMdd\") so it can be read back."
+            );
+        }
+
+        if (attribute.Type == BinaryFieldType.PackedDecimal && attribute.Scale < 0)
+        {
+            throw new InvalidOperationException($"The {where} has a negative Scale ({attribute.Scale}); Scale must be zero or greater.");
+        }
     }
 
 
@@ -117,11 +166,22 @@ internal static class BinaryFieldMap
     [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("AOT", "IL3050",
         Justification = "Expression.Compile is RequiresDynamicCode but falls back to the interpreter under Native AOT, so the compiled factory still runs correctly (without JIT speed). See #153.")]
 #endif
-    private static Func<object> CompileFactory([DynamicallyAccessedMembers(TrimmedMembers.Record)] Type type)
-    {
-        var ctor = type.GetConstructor(Type.EmptyTypes)
-            ?? throw new InvalidOperationException($"Type '{type.FullName}' needs a public parameterless constructor for binary extraction.");
+    private static Func<object> CompileFactory(ConstructorInfo ctor)
+        => Expression.Lambda<Func<object>>(Expression.Convert(Expression.New(ctor), typeof(object))).Compile();
 
-        return Expression.Lambda<Func<object>>(Expression.Convert(Expression.New(ctor), typeof(object))).Compile();
+
+
+    // A loader never constructs a record, so a missing parameterless constructor must not fail map
+    // construction: the factory throws only when an extractor actually asks for an instance.
+    private static Func<object> CreateFactory([DynamicallyAccessedMembers(TrimmedMembers.Record)] Type type)
+    {
+        var ctor = type.GetConstructor(Type.EmptyTypes);
+        if (ctor == null)
+        {
+            var message = $"Type '{type.FullName}' needs a public parameterless constructor for binary extraction.";
+            return () => throw new InvalidOperationException(message);
+        }
+
+        return CompileFactory(ctor);
     }
 }

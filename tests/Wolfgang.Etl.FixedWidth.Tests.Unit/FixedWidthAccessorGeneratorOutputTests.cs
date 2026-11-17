@@ -18,7 +18,7 @@ namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
 /// </summary>
 public sealed class FixedWidthAccessorGeneratorOutputTests
 {
-    private static string RunGenerator(string source)
+    private static CSharpCompilation CreateCompilation(string source)
     {
         var references = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")!)
             .Split(Path.PathSeparator)
@@ -26,14 +26,20 @@ public sealed class FixedWidthAccessorGeneratorOutputTests
             .Select(path => (MetadataReference)MetadataReference.CreateFromFile(path))
             .Append(MetadataReference.CreateFromFile(typeof(FixedWidthFieldAttribute).Assembly.Location));
 
-        var compilation = CSharpCompilation.Create
+        return CSharpCompilation.Create
         (
             "FixedWidthGeneratorTestAssembly",
             new[] { CSharpSyntaxTree.ParseText(source) },
             references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
+    }
 
+
+
+    private static string RunGenerator(string source)
+    {
+        var compilation = CreateCompilation(source);
         GeneratorDriver driver = CSharpGeneratorDriver.Create(new FixedWidthAccessorGenerator().AsSourceGenerator());
         driver = driver.RunGenerators(compilation);
 
@@ -125,7 +131,7 @@ public sealed class FixedWidthAccessorGeneratorOutputTests
 
 
     [Fact]
-    public void Emits_a_factory_for_a_struct()
+    public void Generates_nothing_for_a_struct()
     {
         var output = RunGenerator(
             "using Wolfgang.Etl.FixedWidth.Attributes;\n" +
@@ -133,7 +139,93 @@ public sealed class FixedWidthAccessorGeneratorOutputTests
             "public struct Rec\n{\n" +
             "    [FixedWidthField(0, 5)] public string Name { get; set; }\n}\n");
 
-        Assert.Contains("RegisterFactory(typeof(global::Consumer.Rec)", output, StringComparison.Ordinal);
+        Assert.DoesNotContain("FixedWidthAccessors_", output, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public void Omits_the_factory_for_a_type_with_required_members()
+    {
+        var output = RunGenerator(
+            "using Wolfgang.Etl.FixedWidth.Attributes;\n" +
+            "namespace Consumer;\n" +
+            "public class Req\n{\n" +
+            "    [FixedWidthField(0, 5)] public required string Name { get; set; }\n}\n");
+
+        Assert.Contains("Set_Name", output, StringComparison.Ordinal);
+        Assert.DoesNotContain("RegisterFactory", output, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public void Omits_the_factory_when_a_base_class_has_required_members()
+    {
+        var output = RunGenerator(
+            "using Wolfgang.Etl.FixedWidth.Attributes;\n" +
+            "namespace Consumer;\n" +
+            "public class Base\n{\n    public required string Id { get; set; }\n}\n" +
+            "public class Derived : Base\n{\n" +
+            "    [FixedWidthField(0, 5)] public string Name { get; set; } = \"\";\n}\n");
+
+        Assert.DoesNotContain("RegisterFactory(typeof(global::Consumer.Derived)", output, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public void Emits_the_factory_when_the_constructor_sets_required_members()
+    {
+        var output = RunGenerator(
+            "using System.Diagnostics.CodeAnalysis;\n" +
+            "using Wolfgang.Etl.FixedWidth.Attributes;\n" +
+            "namespace Consumer;\n" +
+            "public class Req\n{\n" +
+            "    [SetsRequiredMembers] public Req() { Name = \"\"; }\n" +
+            "    [FixedWidthField(0, 5)] public required string Name { get; set; }\n}\n");
+
+        Assert.Contains("RegisterFactory(typeof(global::Consumer.Req)", output, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public void Escapes_a_keyword_named_property_in_member_access()
+    {
+        var output = RunGenerator(
+            "using Wolfgang.Etl.FixedWidth.Attributes;\n" +
+            "namespace Consumer;\n" +
+            "public class Kw\n{\n" +
+            "    [FixedWidthField(0, 5)] public string @class { get; set; } = \"\";\n}\n");
+
+        Assert.Contains(").@class;", output, StringComparison.Ordinal);
+        Assert.Contains(").@class = ", output, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public void Generated_source_compiles_without_errors_for_the_problem_shapes()
+    {
+        var source =
+            "using System.Diagnostics.CodeAnalysis;\n" +
+            "using Wolfgang.Etl.FixedWidth.Attributes;\n" +
+            "namespace Consumer;\n" +
+            "public struct S { [FixedWidthField(0, 5)] public string Name { get; set; } }\n" +
+            "public class Req { [FixedWidthField(0, 5)] public required string Name { get; set; } }\n" +
+            "public class Kw { [FixedWidthField(0, 5)] public string @class { get; set; } = \"\"; }\n";
+
+        var compilation = CreateCompilation(source);
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(new FixedWidthAccessorGenerator().AsSourceGenerator());
+        driver.RunGeneratorsAndUpdateCompilation(compilation, out var updated, out _);
+
+        Assert.Empty
+        (
+            updated
+                .GetDiagnostics()
+                .Where(d => d.Severity == DiagnosticSeverity.Error)
+        );
     }
 
 

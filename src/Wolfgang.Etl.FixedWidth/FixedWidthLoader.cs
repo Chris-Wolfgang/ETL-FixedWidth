@@ -731,6 +731,12 @@ public class FixedWidthLoader<[DynamicallyAccessedMembers(TrimmedMembers.Record)
         // flushes nothing below.
         var target = IsDryRun ? TextWriter.Null : _writer;
 
+        // Each record is formatted into this reusable buffer and written to the target in one call
+        // only after every field succeeded, so a field that fails mid-record (overflow, converter
+        // exception) never leaves a truncated, unterminated line in the output.
+        var lineBuffer = new StringBuilder();
+        using var lineWriter = new StringWriter(lineBuffer, System.Globalization.CultureInfo.InvariantCulture);
+
         if (WriteHeader)
         {
             await WriteHeaderAsync(fieldMap, target).ConfigureAwait(false);
@@ -762,15 +768,24 @@ public class FixedWidthLoader<[DynamicallyAccessedMembers(TrimmedMembers.Record)
                 break;
             }
 
+            lineBuffer.Clear();
             FixedWidthLineParser.WriteRecord
             (
-                target,
+                lineWriter,
                 item,
                 fieldMap,
                 ValueConverter,
                 FieldDelimiter
             );
             Interlocked.Increment(ref _currentLineNumber);
+#if NET6_0_OR_GREATER
+            foreach (var chunk in lineBuffer.GetChunks())
+            {
+                await target.WriteAsync(chunk, token).ConfigureAwait(false);
+            }
+#else
+            await target.WriteAsync(lineBuffer.ToString()).ConfigureAwait(false);
+#endif
             await target.WriteLineAsync().ConfigureAwait(false);
             IncrementCurrentItemCount();
             if (metricsEnabled)
