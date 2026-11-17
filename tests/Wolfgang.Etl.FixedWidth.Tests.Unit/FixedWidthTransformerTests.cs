@@ -96,6 +96,78 @@ public class FixedWidthTransformerTests
 
 
 
+    private sealed class IntSource
+    {
+        public int Foo { get; set; }
+
+        public string Name { get; set; } = string.Empty;
+
+        public string this[int index] => Name[index].ToString();
+
+        public static int Shared { get; set; }
+    }
+
+
+
+    private sealed class NullableDestination
+    {
+        public int? Foo { get; set; }
+
+        public string Name { get; set; } = string.Empty;
+
+        public string this[int index]
+        {
+            get => Name[index].ToString();
+            set => Name = value + index;
+        }
+
+        public static int Shared { get; set; }
+    }
+
+
+
+    private sealed class ObjectDestination
+    {
+        public object? Foo { get; set; }
+    }
+
+
+
+    [Fact]
+    public async Task ByMatchingProperties_converts_a_value_type_to_its_nullable_form()
+    {
+        using var transformer = FixedWidthTransformer<IntSource, NullableDestination>.ByMatchingProperties();
+
+        var result = Assert.Single
+        (
+            await transformer
+                .TransformAsync(ToAsync(new[] { new IntSource { Foo = 7, Name = "x" } }), CancellationToken.None)
+                .ToListAsync()
+        );
+
+        Assert.Equal(7, result.Foo);
+        Assert.Equal("x", result.Name);
+    }
+
+
+
+    [Fact]
+    public async Task ByMatchingProperties_boxes_a_value_type_into_an_object_property()
+    {
+        using var transformer = FixedWidthTransformer<IntSource, ObjectDestination>.ByMatchingProperties();
+
+        var result = Assert.Single
+        (
+            await transformer
+                .TransformAsync(ToAsync(new[] { new IntSource { Foo = 9 } }), CancellationToken.None)
+                .ToListAsync()
+        );
+
+        Assert.Equal(9, result.Foo);
+    }
+
+
+
     [Fact]
     public async Task SkipItemCount_and_MaximumItemCount_are_honored()
     {
