@@ -366,9 +366,7 @@ public sealed class FixedWidthBinaryExtractorTests
         private string _value = string.Empty;
 
         [FixedWidthBinaryField(0, 4, BinaryFieldType.Text)]
-        public string Value { set => _value = value; }
-
-        public string Peek => _value;
+        public string Value { private get => _value; set => _value = value; }
     }
 
 
