@@ -395,6 +395,7 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
+    [ExcludeFromCodeCoverage]
     private sealed class TextDateWithoutFormat
     {
         [FixedWidthBinaryField(0, 20, BinaryFieldType.Text)]
