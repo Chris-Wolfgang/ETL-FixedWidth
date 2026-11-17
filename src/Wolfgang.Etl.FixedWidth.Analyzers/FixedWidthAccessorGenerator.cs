@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Wolfgang.Etl.FixedWidth.Analyzers;
@@ -75,6 +76,22 @@ public sealed class FixedWidthAccessorGenerator : IIncrementalGenerator
 
 
 
+    private static void AppendMember(StringBuilder members, IPropertySymbol property, bool canGet, bool canSet)
+    {
+        if (members.Length > 0)
+        {
+            members.Append(GroupSeparator);
+        }
+
+        var castType = property.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        members.Append(property.Name)
+            .Append(FieldSeparator).Append(castType)
+            .Append(FieldSeparator).Append(canGet ? '1' : '0')
+            .Append(FieldSeparator).Append(canSet ? '1' : '0');
+    }
+
+
+
     private static AccessorModel? BuildModel(GeneratorAttributeSyntaxContext context)
     {
         if (context.TargetSymbol.ContainingType is not { } type)
@@ -82,13 +99,14 @@ public sealed class FixedWidthAccessorGenerator : IIncrementalGenerator
             return null;
         }
 
-        // Only concrete, accessible, non-generic classes/structs can host generated
-        // accessors emitted into the consumer assembly. Anything else falls back to the
+        // Only concrete, accessible, non-generic classes can host generated accessors
+        // emitted into the consumer assembly. Anything else (including structs, whose
+        // setters would assign through an unboxed copy - CS0445) falls back to the
         // reflection path at runtime.
         if (type.IsGenericType
             || type.IsStatic
             || !IsAccessible(type)
-            || type.TypeKind is not (TypeKind.Class or TypeKind.Struct))
+            || type.TypeKind != TypeKind.Class)
         {
             return null;
         }
@@ -111,16 +129,7 @@ public sealed class FixedWidthAccessorGenerator : IIncrementalGenerator
                 continue;
             }
 
-            if (members.Length > 0)
-            {
-                members.Append(GroupSeparator);
-            }
-
-            var castType = property.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-            members.Append(property.Name)
-                .Append(FieldSeparator).Append(castType)
-                .Append(FieldSeparator).Append(canGet ? '1' : '0')
-                .Append(FieldSeparator).Append(canSet ? '1' : '0');
+            AppendMember(members, property, canGet, canSet);
         }
 
         var canConstruct = CanConstruct(type);
@@ -167,12 +176,12 @@ public sealed class FixedWidthAccessorGenerator : IIncrementalGenerator
         {
             if (member.CanGet)
             {
-                builder.AppendLine($"        internal static object? Get_{member.Name}(object instance) => (({type})instance).{member.Name};");
+                builder.AppendLine($"        internal static object? Get_{member.Name}(object instance) => (({type})instance).{Escape(member.Name)};");
             }
 
             if (member.CanSet)
             {
-                builder.AppendLine($"        internal static void Set_{member.Name}(object instance, object? value) => (({type})instance).{member.Name} = ({member.CastType})value!;");
+                builder.AppendLine($"        internal static void Set_{member.Name}(object instance, object? value) => (({type})instance).{Escape(member.Name)} = ({member.CastType})value!;");
             }
         }
 
@@ -272,6 +281,16 @@ public sealed class FixedWidthAccessorGenerator : IIncrementalGenerator
 
 
 
+    // A property declared as @class has the metadata name "class"; emitting it bare is
+    // invalid syntax, so keyword names are re-escaped at the member-access sites.
+    private static string Escape(string name)
+        => SyntaxFacts.GetKeywordKind(name) != SyntaxKind.None
+            || SyntaxFacts.GetContextualKeywordKind(name) != SyntaxKind.None
+                ? "@" + name
+                : name;
+
+
+
     private static bool HasFieldAttribute(IPropertySymbol property)
         => property.GetAttributes().Any(a => string.Equals(a.AttributeClass?.ToDisplayString(), FieldAttributeFullName, System.StringComparison.Ordinal));
 
@@ -304,14 +323,42 @@ public sealed class FixedWidthAccessorGenerator : IIncrementalGenerator
             return false;
         }
 
-        // Structs are always constructible via new S(). A class needs an accessible
-        // parameterless constructor (the generated code lives in the consumer assembly,
-        // so an internal constructor is reachable too).
-        return type.TypeKind == TypeKind.Struct
-            || type.InstanceConstructors.Any(c =>
-                c.Parameters.Length == 0
-                && c.DeclaredAccessibility is Accessibility.Public or Accessibility.Internal or Accessibility.ProtectedOrInternal);
+        // A class needs an accessible parameterless constructor (the generated code lives
+        // in the consumer assembly, so an internal constructor is reachable too). When the
+        // type (or a base) declares required members, "new T()" is only legal if that
+        // constructor is marked [SetsRequiredMembers]; otherwise the factory is omitted and
+        // the runtime falls back to reflection (CS9035 otherwise).
+        var hasRequired = HasRequiredMembers(type);
+        return type.InstanceConstructors.Any(c =>
+            c.Parameters.Length == 0
+            && c.DeclaredAccessibility is Accessibility.Public or Accessibility.Internal or Accessibility.ProtectedOrInternal
+            && (!hasRequired || SetsRequiredMembers(c)));
     }
+
+
+
+    private static bool HasRequiredMembers(INamedTypeSymbol type)
+    {
+        for (INamedTypeSymbol? current = type; current is not null; current = current.BaseType)
+        {
+            if (current.GetMembers().Any(m => m is IPropertySymbol { IsRequired: true } or IFieldSymbol { IsRequired: true }))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+
+    private static bool SetsRequiredMembers(IMethodSymbol constructor)
+        => constructor.GetAttributes().Any(a => string.Equals
+        (
+            a.AttributeClass?.ToDisplayString(),
+            "System.Diagnostics.CodeAnalysis.SetsRequiredMembersAttribute",
+            System.StringComparison.Ordinal
+        ));
 
 
 
