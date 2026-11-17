@@ -109,12 +109,15 @@ internal static class FieldMap
 
         if (entries.Count == 0 || entries.TrueForAll(e => e.IsSkip))
         {
-            return new FieldMapResult
+            // A silent empty map reads every line as an all-default record and writes blank
+            // lines - the documented symptom of attribute trimming under AOT - so fail loudly,
+            // as the binary field map and the schema builder do.
+            throw new InvalidOperationException
             (
-                Array.AsReadOnly(Array.Empty<FieldDescriptor>()),
-                expectedLineWidth: 0,
-                totalColumnCount: 0,
-                factory: FieldMapResult.CompileFactory(type)
+                $"Type '{type.FullName}' has no [FixedWidthField] properties, " +
+                "so there is nothing to map. Decorate at least one public property with " +
+                "[FixedWidthField]; if the attributes exist, they may have been " +
+                "trimmed (add a [DynamicDependency] / TrimmerRootDescriptor for the record type)."
             );
         }
 
