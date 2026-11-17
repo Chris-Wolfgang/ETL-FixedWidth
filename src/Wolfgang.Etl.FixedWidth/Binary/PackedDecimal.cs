@@ -20,7 +20,7 @@ internal static class PackedDecimal
     /// <returns>The decoded value, with sign and implied decimal point applied.</returns>
     /// <exception cref="ArgumentException"><paramref name="bytes"/> is empty.</exception>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="scale"/> is negative.</exception>
-    /// <exception cref="FormatException">A digit nibble is not in the range 0–9.</exception>
+    /// <exception cref="FormatException">A digit nibble is not in the range 0–9, or the sign nibble is below 0xA.</exception>
     internal static decimal Decode(ReadOnlySpan<byte> bytes, int scale = 0)
     {
         if (bytes.Length == 0)
@@ -60,9 +60,15 @@ internal static class PackedDecimal
             }
         }
 
-        // Low nibble of the final byte is the sign. Convention: 0xD and 0xB are negative; every other
-        // nibble (0xC, 0xF unsigned, 0xA, 0xE) is positive.
+        // Low nibble of the final byte is the sign. Convention: 0xD and 0xB are negative; the other
+        // sign nibbles (0xC, 0xF unsigned, 0xA, 0xE) are positive. 0x0-0x9 are digits, not signs, so
+        // they mean misaligned or zoned data and are rejected like an invalid digit nibble.
         var sign = bytes[last] & 0x0F;
+        if (sign < 0x0A)
+        {
+            throw new FormatException($"Invalid packed-decimal sign nibble 0x{sign:X} at byte {last}.");
+        }
+
         if (sign == 0x0D || sign == 0x0B)
         {
             value = -value;
@@ -101,8 +107,11 @@ internal static class PackedDecimal
             throw new ArgumentOutOfRangeException(nameof(scale), scale, "Scale cannot be negative.");
         }
 
-        var negative = value < 0;
         var unscaled = Math.Truncate(Math.Abs(value) * Pow10(scale));
+
+        // Take the sign from the truncated magnitude so a value that truncates to zero (-0.004 at
+        // scale 2) encodes as +0 (0x0C), not negative zero (0x0D).
+        var negative = value < 0 && unscaled != 0;
 
         var maxDigits = (destination.Length * 2) - 1;
         var digits = unscaled.ToString("F0", CultureInfo.InvariantCulture);
