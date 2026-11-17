@@ -853,7 +853,9 @@ public class FixedWidthExtractor<[DynamicallyAccessedMembers(TrimmedMembers.Reco
     /// The number of physical lines read that did not produce a record and were
     /// neither skipped by the budget nor rejected: header lines, the separator line,
     /// blank lines dropped per <see cref="BlankLineHandling"/>, lines dropped by
-    /// <see cref="LineFilter"/>, and the line that triggered early termination. With
+    /// <see cref="LineFilter"/>, and a line that stopped extraction (a <see cref="LineAction.Stop"/>
+    /// from <see cref="LineFilter"/> or a validator stop). Reaching <c>MaximumItemCount</c> does not
+    /// read or count a further line. With
     /// <see cref="CurrentLineNumber"/> this closes the line accounting:
     /// <c>CurrentLineNumber = CurrentItemCount + CurrentSkippedItemCount +
     /// CurrentRejectedItemCount + CurrentFilteredLineCount</c>.
@@ -996,7 +998,10 @@ public class FixedWidthExtractor<[DynamicallyAccessedMembers(TrimmedMembers.Reco
 
         string? line;
 #pragma warning disable CA1849, VSTHRD103, S6966 // ReadLine is intentionally synchronous — see comment above
-        while ((line = activeReader.ReadLine()) != null)
+        // The cap is checked BEFORE reading the next line: a line read past the cap would be
+        // discarded, advancing CurrentByteOffset (and a caller-owned reader) past a record that was
+        // never yielded and losing it on checkpoint resume.
+        while (!IsMaximumReached(dataLinesSkipped) && (line = activeReader.ReadLine()) != null)
 #pragma warning restore CA1849, VSTHRD103, S6966
         {
             token.ThrowIfCancellationRequested();
@@ -1047,14 +1052,6 @@ public class FixedWidthExtractor<[DynamicallyAccessedMembers(TrimmedMembers.Reco
                     continue;
                 }
 
-                if (CurrentItemCount >= MaximumItemCount)
-                {
-                    IncrementFilteredLineCount();
-                    LogDebugMaxReached();
-                    LogExtractionCompleted();
-                    yield break;
-                }
-
                 LogDebugBlankLineYieldedAsDefault();
                 IncrementCurrentItemCount();
                 if (metricsEnabled)
@@ -1092,14 +1089,6 @@ public class FixedWidthExtractor<[DynamicallyAccessedMembers(TrimmedMembers.Reco
                 continue;
             }
 
-            if (CurrentItemCount >= MaximumItemCount)
-            {
-                IncrementFilteredLineCount();
-                LogDebugMaxReached();
-                LogExtractionCompleted();
-                yield break;
-            }
-
             if (!TryParseLine(line, fieldMap, out var record))
             {
                 continue;
@@ -1127,6 +1116,23 @@ public class FixedWidthExtractor<[DynamicallyAccessedMembers(TrimmedMembers.Reco
         }
 
         LogExtractionCompleted();
+    }
+
+
+
+    /// <summary>
+    /// True once the skip budget is spent and <see cref="ExtractorBase{TSource, TProgress}.MaximumItemCount"/>
+    /// records have been yielded, so the extractor can stop without reading another line.
+    /// </summary>
+    private bool IsMaximumReached(long dataLinesSkipped)
+    {
+        if (dataLinesSkipped < SkipItemCount || CurrentItemCount < MaximumItemCount)
+        {
+            return false;
+        }
+
+        LogDebugMaxReached();
+        return true;
     }
 
 

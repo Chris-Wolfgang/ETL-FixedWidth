@@ -178,7 +178,7 @@ using var extractor = new FixedWidthExtractor<Record>
 await foreach (var record in extractor.ExtractAsync(token)) { /* only the remainder */ }
 ```
 
-Terminators (`\n`, `\r`, `\r\n`), multi-byte UTF-8, and a leading byte-order mark are all counted exactly, so a saved offset is a precise byte position. Tracking is **opt-in** — it wraps the reader in a byte-counting decoder, so the default read path keeps its throughput — and requires the `Stream` constructor (seekable for resume). On resume, header lines are not re-skipped and `SkipItemCount` applies from the resumed position. `CurrentLineNumber` is available for diagnostics independently of checkpointing.
+Terminators (`\n`, `\r`, `\r\n`), multi-byte UTF-8, and a leading byte-order mark are all counted exactly, so a saved offset is a precise byte position. Tracking is **opt-in** — it wraps the reader in a byte-counting decoder, so the default read path keeps its throughput — and requires the `Stream` constructor (seekable for resume). On resume, header lines are not re-skipped and `SkipItemCount` applies from the resumed position. `CurrentLineNumber` is available for diagnostics independently of checkpointing; after a resume it counts lines from the resumed position, not from the start of the file, so line numbers in errors are relative to the checkpoint.
 
 ### Inspecting the layout
 
