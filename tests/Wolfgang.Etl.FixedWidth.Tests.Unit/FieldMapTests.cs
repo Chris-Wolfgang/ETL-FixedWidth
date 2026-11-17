@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Parsing;
 using Xunit;
@@ -220,11 +222,51 @@ public class FieldMapTests
     // ------------------------------------------------------------------
 
     [Fact]
-    public void GetResult_when_type_has_no_FixedWidthField_annotations_returns_empty_descriptors()
+    public void GetResult_when_type_has_no_FixedWidthField_annotations_throws()
     {
-        var fieldMap = FieldMap.GetResult<UnannotatedRecord>();
+        var ex = Assert.Throws<InvalidOperationException>(() => FieldMap.GetResult<UnannotatedRecord>());
 
-        Assert.Empty(fieldMap.Descriptors);
+        Assert.Contains(nameof(UnannotatedRecord), ex.Message, StringComparison.Ordinal);
+        Assert.Contains("[FixedWidthField]", ex.Message, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public async Task Extractor_when_type_has_no_FixedWidthField_annotations_throws()
+    {
+        using var extractor = new FixedWidthExtractor<UnannotatedRecord>(new System.IO.StringReader("AAAAA\n"));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        {
+            await foreach (var _ in extractor.ExtractAsync(System.Threading.CancellationToken.None))
+            {
+            }
+        });
+    }
+
+
+
+    [Fact]
+    public async Task Loader_when_type_has_no_FixedWidthField_annotations_throws()
+    {
+        using var writer = new System.IO.StringWriter();
+        using var loader = new FixedWidthLoader<UnannotatedRecord>(writer);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await loader.LoadAsync(new[] { new UnannotatedRecord() }.ToAsyncEnumerable(), System.Threading.CancellationToken.None));
+    }
+
+
+
+    [Fact]
+    public void DataReader_when_type_has_no_FixedWidthField_annotations_throws()
+    {
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            using var reader = new FixedWidthDataReader<UnannotatedRecord>(new System.IO.StringReader("AAAAA\n"));
+            reader.Read();
+        });
     }
 
 
