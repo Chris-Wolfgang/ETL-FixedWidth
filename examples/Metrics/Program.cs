@@ -71,7 +71,11 @@ var input =
     "Carol     White     035\n";
 
 // Metrics are zero-config — the MeterListener subscribed above turns them on; there is no flag to set.
-var extractor = new FixedWidthExtractor<Person>(new StringReader(input)) { SkipItemCount = 1 };
+var extractor = new FixedWidthExtractor<Person>
+(
+    new StringReader(input),
+    new FixedWidthExtractorOptions<Person> { SkipItemCount = 1 }
+);
 
 var people = new List<Person>();
 await foreach (var person in extractor.ExtractAsync(CancellationToken.None))
