@@ -238,11 +238,7 @@ public class FieldMapTests
         using var extractor = new FixedWidthExtractor<UnannotatedRecord>(new System.IO.StringReader("AAAAA\n"));
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-        {
-            await foreach (var _ in extractor.ExtractAsync(System.Threading.CancellationToken.None))
-            {
-            }
-        });
+            await extractor.ExtractAsync(System.Threading.CancellationToken.None).ToListAsync());
     }
 
 
@@ -262,11 +258,7 @@ public class FieldMapTests
     [Fact]
     public void DataReader_when_type_has_no_FixedWidthField_annotations_throws()
     {
-        Assert.Throws<InvalidOperationException>(() =>
-        {
-            using var reader = new FixedWidthDataReader<UnannotatedRecord>(new System.IO.StringReader("AAAAA\n"));
-            reader.Read();
-        });
+        Assert.Throws<InvalidOperationException>(() => new FixedWidthDataReader<UnannotatedRecord>(new System.IO.StringReader("AAAAA\n")));
     }
 
 
