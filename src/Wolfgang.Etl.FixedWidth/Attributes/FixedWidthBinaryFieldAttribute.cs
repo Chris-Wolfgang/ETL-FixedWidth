@@ -81,6 +81,17 @@ public sealed class FixedWidthBinaryFieldAttribute : Attribute
 
 
     /// <summary>
+    /// The format string for a <see cref="BinaryFieldType.Text"/> field, applied when writing any
+    /// <see cref="IFormattable"/> value and when parsing <see cref="DateTime"/>,
+    /// <see cref="DateTimeOffset"/> and <see cref="TimeSpan"/> (e.g. <c>"yyyyMMdd"</c> for a text
+    /// date). Required for those three types; ignored for other field types. Default
+    /// <see langword="null"/>.
+    /// </summary>
+    public string? Format { get; set; }
+
+
+
+    /// <summary>
     /// Whether a <see cref="BinaryFieldType.Binary"/> field is two's-complement signed. Ignored for
     /// other types. Default <see langword="true"/>.
     /// </summary>

@@ -84,6 +84,14 @@ internal static class BinaryFieldMap
 
 
 
+    private static bool IsTemporal(Type propertyType)
+    {
+        var type = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+        return type == typeof(DateTime) || type == typeof(DateTimeOffset) || type == typeof(TimeSpan);
+    }
+
+
+
     private static void ValidateField(Type type, PropertyInfo property, FixedWidthBinaryFieldAttribute attribute)
     {
         var where = $"[FixedWidthBinaryField] property '{property.Name}' on type '{type.FullName}'";
@@ -103,6 +111,15 @@ internal static class BinaryFieldMap
             throw new InvalidOperationException
             (
                 $"The {where} is a binary integer field of {attribute.ByteLength} bytes; binary integer fields must be 1-8 bytes."
+            );
+        }
+
+        if (attribute.Type == BinaryFieldType.Text && string.IsNullOrEmpty(attribute.Format) && IsTemporal(property.PropertyType))
+        {
+            throw new InvalidOperationException
+            (
+                $"The {where} is a {property.PropertyType.Name} text field and needs a Format on its " +
+                "[FixedWidthBinaryField] attribute (e.g. Format = \"yyyyMMdd\") so it can be read back."
             );
         }
 
