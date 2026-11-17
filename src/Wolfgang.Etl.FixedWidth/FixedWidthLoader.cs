@@ -781,10 +781,10 @@ public class FixedWidthLoader<[DynamicallyAccessedMembers(TrimmedMembers.Record)
 #if NET6_0_OR_GREATER
             foreach (var chunk in lineBuffer.GetChunks())
             {
-                target.Write(chunk.Span);
+                await target.WriteAsync(chunk, token).ConfigureAwait(false);
             }
 #else
-            target.Write(lineBuffer.ToString());
+            await target.WriteAsync(lineBuffer.ToString()).ConfigureAwait(false);
 #endif
             await target.WriteLineAsync().ConfigureAwait(false);
             IncrementCurrentItemCount();
