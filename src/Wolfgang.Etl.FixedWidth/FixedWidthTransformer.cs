@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -295,8 +296,8 @@ public sealed class FixedWidthTransformer
                 "for FixedWidthTransformer.ByMatchingProperties()."
             );
 
-        var destinationProperties = typeof(TDestination).GetProperties()
-            .Where(p => p.SetMethod != null && p.SetMethod.IsPublic)
+        var destinationProperties = typeof(TDestination).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(p => p.SetMethod != null && p.SetMethod.IsPublic && p.GetIndexParameters().Length == 0)
             .ToDictionary(p => p.Name, StringComparer.Ordinal);
 
         var source = Expression.Parameter(typeof(TSource), "source");
@@ -304,18 +305,26 @@ public sealed class FixedWidthTransformer
 
         var body = new List<Expression> { Expression.Assign(destination, Expression.New(constructor)) };
 
-        foreach (var sourceProperty in typeof(TSource).GetProperties()
-                     .Where(p => p.GetMethod != null && p.GetMethod.IsPublic))
+        foreach (var sourceProperty in typeof(TSource).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                     .Where(p => p.GetMethod != null && p.GetMethod.IsPublic && p.GetIndexParameters().Length == 0))
         {
             if (destinationProperties.TryGetValue(sourceProperty.Name, out var destinationProperty)
                 && destinationProperty.PropertyType.IsAssignableFrom(sourceProperty.PropertyType))
             {
+                // IsAssignableFrom is also true for int -> int? and value type -> object/interface,
+                // which need an explicit conversion node in an expression tree.
+                Expression value = Expression.Property(source, sourceProperty);
+                if (destinationProperty.PropertyType != sourceProperty.PropertyType)
+                {
+                    value = Expression.Convert(value, destinationProperty.PropertyType);
+                }
+
                 body.Add
                 (
                     Expression.Assign
                     (
                         Expression.Property(destination, destinationProperty),
-                        Expression.Property(source, sourceProperty)
+                        value
                     )
                 );
             }
