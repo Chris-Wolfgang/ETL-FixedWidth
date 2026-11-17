@@ -203,14 +203,15 @@ public sealed class FixedWidthBinaryExtractor<[DynamicallyAccessedMembers(Trimme
                 continue;
             }
 
-            var record = (TRecord)_map.Factory();
+            // Boxed while the setters run so a struct record is populated, not a copy of it.
+            var boxed = _map.Factory();
             foreach (var descriptor in _map.Descriptors)
             {
-                descriptor.Setter(record, descriptor.Decode(buffer, ResolvedEncoding));
+                descriptor.Setter(boxed, descriptor.Decode(buffer, ResolvedEncoding));
             }
 
             IncrementCurrentItemCount();
-            yield return record;
+            yield return (TRecord)boxed;
         }
     }
 

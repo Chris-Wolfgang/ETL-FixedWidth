@@ -210,8 +210,11 @@ internal sealed class FieldDescriptor
         var instance = Expression.Parameter(typeof(object), "instance");
         var value = Expression.Parameter(typeof(object), "value");
 
-        // (DeclaringType)instance
-        var castInstance = Expression.Convert(instance, property.DeclaringType!);
+        // (DeclaringType)instance. For a value type, Unbox yields a reference into the boxed
+        // instance so the assignment mutates it; Convert would unbox to a temporary copy.
+        Expression castInstance = property.DeclaringType!.IsValueType
+            ? Expression.Unbox(instance, property.DeclaringType)
+            : Expression.Convert(instance, property.DeclaringType);
 
         // (PropertyType)value — handles unboxing for value types
         var castValue = Expression.Convert(value, property.PropertyType);
