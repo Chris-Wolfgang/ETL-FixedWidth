@@ -46,11 +46,11 @@ internal static class FixedWidthDiagnostics
     (
         id: "FW005",
         title: "Format pattern is wider than the fixed-width field",
-        messageFormat: "The Format '{0}' ({1} characters) on property '{2}' is wider than the field length {3}; the formatted value overflows the field when writing",
+        messageFormat: "The Format '{0}' (writes at least {1} characters) on property '{2}' is wider than the field length {3}; the formatted value overflows the field when writing",
         category: Category,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        description: "For a date/time field, the literal Format pattern is the width of the written value. A pattern wider than the declared field length produces a value that overflows the field, throwing FieldOverflowException on write.",
+        description: "For a date/time field, the minimum width the custom Format pattern can write (quoted literals and escapes count as their text; optional and variable-width tokens count conservatively) is compared with the declared field length. A pattern that always writes more than the field holds overflows it, throwing FieldOverflowException on write. Standard single-character specifiers are not checked.",
         helpLinkUri: HelpLinkBase
     );
 
