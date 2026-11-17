@@ -282,9 +282,7 @@ public sealed class FixedWidthMultiRecordExtractorTests
     {
         using var reader = new StringReader(SampleFile);
         using var extractor = new FixedWidthMultiRecordExtractor(reader, new FixedWidthMultiRecordExtractorOptions { MaximumItemCount = 1 })
-            .When(l => l[0] == 'H', typeof(HeaderRecord))
-            .When(l => l[0] == 'D', typeof(DetailRecord))
-            .When(l => l[0] == 'T', typeof(TrailerRecord));
+            .When(l => l[0] == 'H', typeof(HeaderRecord));
 
         await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
 
