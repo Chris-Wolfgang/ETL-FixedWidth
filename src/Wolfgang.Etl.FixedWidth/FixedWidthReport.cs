@@ -138,7 +138,8 @@ public record FixedWidthReport : Report
     /// (Extractor only.) The number of physical lines read that did not produce a
     /// record and were neither skipped by the budget nor rejected: header lines, the
     /// separator line, blank lines dropped per <see cref="BlankLineHandling"/>, lines
-    /// dropped by <c>LineFilter</c>, and the line that triggered early termination.
+    /// dropped by <c>LineFilter</c>, and a line that stopped extraction (a filter or validator stop;
+    /// reaching <c>MaximumItemCount</c> does not read or count a further line).
     /// With <see cref="CurrentLineNumber"/> this closes the line accounting:
     /// <c>CurrentLineNumber = CurrentItemCount + CurrentSkippedItemCount +
     /// CurrentRejectedItemCount + CurrentFilteredLineCount</c>. Always <c>0</c> for the loader.

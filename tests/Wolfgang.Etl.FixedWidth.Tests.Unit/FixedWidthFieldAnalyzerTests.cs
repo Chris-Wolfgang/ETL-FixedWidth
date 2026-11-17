@@ -123,6 +123,36 @@ public sealed class FixedWidthFieldAnalyzerTests
 
 
 
+    [Theory]
+    [InlineData("DateTime", 8, "yyyy'-'MM")]        // quoted literal: pattern is 9 chars, writes 7
+    [InlineData("TimeSpan", 5, "hh\\\\:mm")]          // escaped separator: pattern is 6 chars, writes 5
+    [InlineData("DateTime", 8, "O")]                 // standard specifier: width unknown, not checked
+    [InlineData("DateTime", 3, "MMMM")]              // name token: at least 3 characters
+    [InlineData("DateTime", 1, "%d")]                // single custom specifier
+    [InlineData("DateTime", 3, "'ab")]               // unterminated literal counts its text
+    [InlineData("DateTime", 4, "yyyy\\\\")]            // dangling escape adds nothing
+    [InlineData("DateTime", 8, "yyyyMMddFFzKg")]     // optional / zone / era tokens add nothing
+    public async Task Does_not_report_FW005_when_the_minimum_formatted_width_fits(string type, int length, string format)
+    {
+        var diagnostics = await AnalyzeAsync(Wrap(
+            $"    [FixedWidthField(0, {length}, Format = \"{format}\")] public {type} When {{ get; set; }}"));
+
+        Assert.DoesNotContain(diagnostics, d => string.Equals(d.Id, "FW005", StringComparison.Ordinal));
+    }
+
+
+
+    [Fact]
+    public async Task Reports_FW005_when_a_quoted_literal_makes_the_value_too_wide()
+    {
+        var diagnostics = await AnalyzeAsync(Wrap(
+            "    [FixedWidthField(0, 8, Format = \"yyyyMMdd'T'\")] public DateTime When { get; set; }"));
+
+        Assert.Contains(diagnostics, d => string.Equals(d.Id, "FW005", StringComparison.Ordinal));
+    }
+
+
+
     [Fact]
     public async Task Reports_FW007_for_a_property_without_a_public_setter()
     {
