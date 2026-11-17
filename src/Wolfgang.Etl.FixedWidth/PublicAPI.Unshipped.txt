@@ -1,3 +1,5 @@
 #nullable enable
 *REMOVED*virtual Wolfgang.Etl.FixedWidth.FixedWidthValueParser.Invoke(System.ReadOnlyMemory<char> text, Wolfgang.Etl.FixedWidth.FieldContext! context) -> object!
 virtual Wolfgang.Etl.FixedWidth.FixedWidthValueParser.Invoke(System.ReadOnlyMemory<char> text, Wolfgang.Etl.FixedWidth.FieldContext! context) -> object?
+Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Format.get -> string?
+Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Format.set -> void

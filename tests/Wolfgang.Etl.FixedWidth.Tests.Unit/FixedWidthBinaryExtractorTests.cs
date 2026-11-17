@@ -377,6 +377,65 @@ public sealed class FixedWidthBinaryExtractorTests
     }
 
 
+    private sealed class TextDates
+    {
+        [FixedWidthBinaryField(0, 8, BinaryFieldType.Text, Format = "yyyyMMdd")]
+        public DateTime Day { get; set; }
+
+        [FixedWidthBinaryField(1, 6, BinaryFieldType.Text, Format = "hhmmss")]
+        public TimeSpan Elapsed { get; set; }
+
+        [FixedWidthBinaryField(2, 8, BinaryFieldType.Text, Format = "yyyyMMdd")]
+        public DateTime? OptionalDay { get; set; }
+    }
+
+
+    private sealed class TextDateWithoutFormat
+    {
+        [FixedWidthBinaryField(0, 20, BinaryFieldType.Text)]
+        public DateTime When { get; set; }
+    }
+
+
+    [Fact]
+    public async Task Text_fields_with_a_Format_round_trip_dates_and_times()
+    {
+        var original = new TextDates
+        {
+            Day = new DateTime(2026, 11, 16),
+            Elapsed = new TimeSpan(13, 5, 9),
+            OptionalDay = new DateTime(2027, 1, 2),
+        };
+
+        using var stream = new MemoryStream();
+        using (var loader = new FixedWidthBinaryLoader<TextDates>(stream, options: null))
+        {
+            await loader.LoadAsync(new[] { original }.ToAsyncEnumerable(), CancellationToken.None);
+        }
+
+        Assert.Equal("202611161305092027010" + "2", Encoding.ASCII.GetString(stream.ToArray()));
+
+        using var readStream = new MemoryStream(stream.ToArray());
+        using var extractor = new FixedWidthBinaryExtractor<TextDates>(readStream, options: null);
+        var read = Assert.Single(await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+
+        Assert.Equal(original.Day, read.Day);
+        Assert.Equal(original.Elapsed, read.Elapsed);
+        Assert.Equal(original.OptionalDay, read.OptionalDay);
+    }
+
+
+    [Fact]
+    public void GetResult_when_a_date_text_field_has_no_Format_throws_naming_the_property_and_attribute()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() => BinaryFieldMap.GetResult<TextDateWithoutFormat>());
+
+        Assert.Contains(nameof(TextDateWithoutFormat.When), ex.Message, StringComparison.Ordinal);
+        Assert.Contains("[FixedWidthBinaryField]", ex.Message, StringComparison.Ordinal);
+        Assert.Contains("Format", ex.Message, StringComparison.Ordinal);
+    }
+
+
     [Fact]
     public void GetResult_when_a_binary_integer_is_wider_than_8_bytes_throws_naming_the_property()
     {

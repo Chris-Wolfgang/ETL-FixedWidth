@@ -82,7 +82,7 @@ internal sealed class BinaryFieldDescriptor
         {
             case BinaryFieldType.Text:
                 var text = encoding.GetString(record, ByteOffset, length).TrimEnd();
-                return FixedWidthConverter.ParseValue(text.AsMemory(), PropertyType, format: null, TypeConverter, numberStyles: null);
+                return FixedWidthConverter.ParseValue(text.AsMemory(), PropertyType, Attribute.Format, TypeConverter, numberStyles: null);
 
             case BinaryFieldType.PackedDecimal:
                 return Coerce(PackedDecimal.Decode(new ReadOnlySpan<byte>(record, ByteOffset, length), Attribute.Scale));
@@ -110,7 +110,9 @@ internal sealed class BinaryFieldDescriptor
         switch (Attribute.Type)
         {
             case BinaryFieldType.Text:
-                var text = Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
+                var text = value is IFormattable formattable && !string.IsNullOrEmpty(Attribute.Format)
+                    ? formattable.ToString(Attribute.Format, CultureInfo.InvariantCulture)
+                    : Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
                 if (text.Length > length)
                 {
                     throw new FieldOverflowException
