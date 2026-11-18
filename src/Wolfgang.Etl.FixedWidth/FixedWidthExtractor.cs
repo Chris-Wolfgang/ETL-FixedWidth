@@ -1433,7 +1433,9 @@ public class FixedWidthExtractor<[DynamicallyAccessedMembers(TrimmedMembers.Reco
                 return ItemErrorAction.Skip;
 
             case MalformedLineHandling.ThrowException:
-                return ItemErrorAction.Abort;
+                // The default: defer to the Abstractions-level ErrorPolicy (whose default aborts), so
+                // a caller-supplied ErrorPolicy such as Skip is honoured instead of ignored.
+                return base.OnItemError(context!);
 
             default:
                 throw new InvalidOperationException

@@ -236,6 +236,31 @@ public sealed class FixedWidthMultiRecordExtractorTests
 
 
     [Fact]
+    public async Task ErrorPolicy_is_consulted_when_MalformedLineHandling_is_ThrowException()
+    {
+        var calls = 0;
+        using var extractor = new FixedWidthMultiRecordExtractor
+        (
+            new StringReader("D001\nD00000002Jane Doe  \n"),
+            new FixedWidthMultiRecordExtractorOptions
+            {
+                ErrorPolicy = _ =>
+                {
+                    calls++;
+                    return Wolfgang.Etl.Abstractions.ItemErrorAction.Skip;
+                },
+            }
+        );
+        extractor.When(l => l[0] == 'D', typeof(DetailRecord));
+
+        var records = await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
+
+        Assert.Single(records);
+        Assert.Equal(1, calls);
+    }
+
+
+    [Fact]
     public async Task ReturnDefault_malformed_handling_is_not_supported()
     {
         using var extractor = new FixedWidthMultiRecordExtractor(new StringReader("D001\n"))

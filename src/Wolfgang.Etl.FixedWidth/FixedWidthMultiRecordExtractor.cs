@@ -720,7 +720,7 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
     /// Translates <see cref="MalformedLineHandling"/> into the base per-item error policy and reports
     /// the failure to the <see cref="OnError"/> dead-letter sink. <see cref="MalformedLineHandling.Skip"/>
     /// maps to <see cref="ItemErrorAction.Skip"/>; <see cref="MalformedLineHandling.ThrowException"/>
-    /// (the default) maps to <see cref="ItemErrorAction.Abort"/>. <see cref="MalformedLineHandling.ReturnDefault"/>
+    /// (the default) defers to the configured <c>ErrorPolicy</c>, which aborts unless replaced. <see cref="MalformedLineHandling.ReturnDefault"/>
     /// is rejected up front, so it never reaches this hook.
     /// </summary>
     protected override ItemErrorAction OnItemError(ItemErrorContext context)
@@ -734,9 +734,10 @@ public sealed class FixedWidthMultiRecordExtractor : ExtractorBase<object, Fixed
             OnError?.Invoke(new FixedWidthError(context.ItemNumber, context.RawContent?.Invoke(), context.Exception));
         }
 
+        // ThrowException (the default) defers to the Abstractions-level ErrorPolicy, whose default aborts.
         return MalformedLineHandling == MalformedLineHandling.Skip
             ? ItemErrorAction.Skip
-            : ItemErrorAction.Abort;
+            : base.OnItemError(context!);
     }
 
 
