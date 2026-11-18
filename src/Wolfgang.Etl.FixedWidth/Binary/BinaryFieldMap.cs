@@ -140,7 +140,9 @@ internal static class BinaryFieldMap
         var value = Expression.Parameter(typeof(object), "value");
         var assign = Expression.Assign
         (
-            Expression.Property(Expression.Convert(instance, property.DeclaringType!), property),
+            Expression.Property(property.DeclaringType!.IsValueType
+                ? Expression.Unbox(instance, property.DeclaringType)
+                : Expression.Convert(instance, property.DeclaringType), property),
             Expression.Convert(value, property.PropertyType)
         );
 
@@ -175,6 +177,11 @@ internal static class BinaryFieldMap
     // construction: the factory throws only when an extractor actually asks for an instance.
     private static Func<object> CreateFactory([DynamicallyAccessedMembers(TrimmedMembers.Record)] Type type)
     {
+        if (type.IsValueType)
+        {
+            return Expression.Lambda<Func<object>>(Expression.Convert(Expression.New(type), typeof(object))).Compile();
+        }
+
         var ctor = type.GetConstructor(Type.EmptyTypes);
         if (ctor == null)
         {

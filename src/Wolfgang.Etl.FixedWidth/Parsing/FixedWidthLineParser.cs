@@ -460,14 +460,16 @@ internal static class FixedWidthLineParser
             );
         }
 
-        var record = (T)fieldMap.Factory();
+        // Keep the instance boxed while the setters run: for a struct record each setter mutates
+        // the box, and unboxing once at the end yields the fully populated value.
+        var record = fieldMap.Factory();
 
         foreach (var descriptor in fieldMap.Descriptors)
         {
             ParseField(record, descriptor, line, lineNumber, delimiterWidth, valueParser);
         }
 
-        return record;
+        return (T)record;
     }
 
 
@@ -481,9 +483,9 @@ internal static class FixedWidthLineParser
     /// into the matching property on <paramref name="record"/>.
     /// </summary>
     /// <exception cref="FieldConversionException">The field text cannot be converted to the property type.</exception>
-    private static void ParseField<T>
+    private static void ParseField
     (
-        T record,
+        object record,
         FieldDescriptor descriptor,
         string line,
         long lineNumber,
@@ -516,7 +518,7 @@ internal static class FixedWidthLineParser
                     descriptor.Context.NumberStyles
                 )
                 : valueParser(value, descriptor.Context);
-            descriptor.Setter(record!, converted);
+            descriptor.Setter(record, converted);
         }
         catch (Exception ex) when (ex is not MalformedLineException)
         {

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Diagnostics;
 using Wolfgang.Etl.FixedWidth.Enums;
@@ -81,7 +82,7 @@ public sealed class FixedWidthSchemaBuilder<[DynamicallyAccessedMembers(TrimmedM
             throw new ArgumentNullException(nameof(selector));
         }
 
-        var property = ResolveProperty(selector);
+        var property = PropertySelector.Resolve(selector);
         if (property.SetMethod is null || !property.SetMethod.IsPublic)
         {
             throw new InvalidOperationException
@@ -178,36 +179,6 @@ public sealed class FixedWidthSchemaBuilder<[DynamicallyAccessedMembers(TrimmedM
         );
 
         return new FixedWidthSchema(typeof(T), fields.AsReadOnly(), position, mapResult);
-    }
-
-
-
-    private static PropertyInfo ResolveProperty<TProperty>(Expression<Func<T, TProperty>> selector)
-    {
-        var body = selector.Body;
-
-        // Unwrap the Convert node the compiler inserts when a value-type property is used through the
-        // Func<T, TProperty> boxing (e.g. r => r.Age where TProperty is object).
-        if (body is UnaryExpression { NodeType: ExpressionType.Convert } unary)
-        {
-            body = unary.Operand;
-        }
-
-        // Require a property accessed directly on the record parameter (r => r.Name). A nested or
-        // foreign member access (r => r.Address.Street, or a captured variable) has a non-parameter
-        // Expression and would compile a delegate that casts the record to the wrong declaring type
-        // and fail at runtime — reject it here with a clear message instead.
-        if (body is MemberExpression { Member: PropertyInfo property, Expression: ParameterExpression })
-        {
-            return property;
-        }
-
-        throw new ArgumentException
-        (
-            "The selector must be a simple property access directly on the record, for example "
-            + "'r => r.Name'. Nested (r => r.Address.Street) and captured member accesses are not supported.",
-            nameof(selector)
-        );
     }
 
 

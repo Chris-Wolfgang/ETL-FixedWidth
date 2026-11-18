@@ -7,6 +7,7 @@ using Wolfgang.Etl.FixedWidth.Enums;
 using Wolfgang.Etl.FixedWidth.Exceptions;
 using Xunit;
 using System.Linq;
+using Wolfgang.Etl.TestKit;
 using Wolfgang.Etl.TestKit.Xunit;
 
 namespace Wolfgang.Etl.FixedWidth.Tests.Unit;
@@ -51,6 +52,35 @@ public class FixedWidthItemErrorHandlingTests
         Assert.Equal(2, yielded.Count);                     // Carol, Dan
         Assert.Equal(2, extractor.CurrentErrorItemCount);   // Eve, Foo — genuine parse failures
         Assert.Equal(2, extractor.CurrentRejectedItemCount);// same two (no validator here)
+    }
+
+
+    [Fact]
+    public async Task ErrorPolicy_is_consulted_when_MalformedLineHandling_is_ThrowException()
+    {
+        var calls = 0;
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad), new FixedWidthExtractorOptions<PersonRecord>
+        {
+            ErrorPolicy = _ =>
+            {
+                calls++;
+                return ItemErrorAction.Skip;
+            },
+        });
+
+        var yielded = await Drain(extractor);
+
+        Assert.Equal(2, yielded.Count);   // Carol, Dan - the two bad lines were skipped by the policy
+        Assert.Equal(2, calls);
+    }
+
+
+    [Fact]
+    public async Task Default_ErrorPolicy_still_aborts_on_a_malformed_line()
+    {
+        var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad));
+
+        await Assert.ThrowsAsync<FieldConversionException>(async () => await Drain(extractor));
     }
 
 
@@ -134,12 +164,12 @@ public class FixedWidthItemErrorHandlingTests
     public async Task Pipeline_ErrorItemCount_surfaces_the_malformed_skips()
     {
         var reports = new List<EtlPipelineProgress>();
-        var progress = new SyncProgress(reports.Add);
+        var progress = new SynchronousProgress<EtlPipelineProgress>(reports.Add);
         var extractor = new FixedWidthExtractor<PersonRecord>(new StringReader(GoodBadGoodBad), new FixedWidthExtractorOptions<PersonRecord>
         {
             MalformedLineHandling = MalformedLineHandling.Skip,
         });
-        var loader = new CountingLoader();
+        var loader = new TestLoader<PersonRecord>(collectItems: true);
 
         await EtlPipeline
             .Create()
@@ -151,7 +181,7 @@ public class FixedWidthItemErrorHandlingTests
         Assert.Equal(2, final.ExtractedItemCount);
         Assert.Equal(2, final.LoadedItemCount);
         Assert.Equal(2, final.ErrorItemCount);
-        Assert.Equal(2, loader.Loaded.Count);
+        Assert.Equal(2, loader.GetCollectedItems()!.Count);
     }
 
 
@@ -204,65 +234,5 @@ public class FixedWidthItemErrorHandlingTests
         }
 
         return result;
-    }
-
-
-    private sealed class SyncProgress : System.IProgress<EtlPipelineProgress>
-    {
-        private readonly System.Action<EtlPipelineProgress> _report;
-
-        public SyncProgress(System.Action<EtlPipelineProgress> report) => _report = report;
-
-        public void Report(EtlPipelineProgress value) => _report(value);
-    }
-
-
-    private sealed class CountingLoader : LoaderBase<PersonRecord, CountingLoader.Report>
-    {
-        public List<PersonRecord> Loaded { get; } = new();
-
-        protected override async Task LoadWorkerAsync(IAsyncEnumerable<PersonRecord> items, CancellationToken token)
-        {
-            await foreach (var item in items.WithCancellation(token).ConfigureAwait(false))
-            {
-                Loaded.Add(item);
-                IncrementCurrentItemCount();
-            }
-        }
-
-        protected override Report CreateProgressReport() => new(CurrentItemCount);
-
-        // Non-positional record with a get-only property + ctor rather than a positional
-        // record: a positional parameter compiles an `init` setter, which needs
-        // System.Runtime.CompilerServices.IsExternalInit — absent on net462-481 and
-        // netcoreapp3.1. This form keeps value equality without it.
-        public sealed record Report
-        {
-            public Report(int count) => Count = count;
-
-            public int Count { get; }
-        }
-    }
-
-
-
-    [Fact]
-    public async Task CountingLoader_final_progress_report_carries_the_loaded_count()
-    {
-        // The pipeline tests above read the loader's Loaded list, never its progress
-        // report; this pins the report the CountingLoader double produces.
-        var loader = new CountingLoader();
-        var reports = new List<CountingLoader.Report>();
-
-        await loader.LoadAsync
-        (
-            new[] { new PersonRecord(), new PersonRecord() }.ToAsyncEnumerable(),
-            new SynchronousProgress<CountingLoader.Report>(reports.Add),
-            CancellationToken.None
-        );
-
-        var last = reports[reports.Count - 1];
-        Assert.Equal(new CountingLoader.Report(2), last);
-        Assert.Equal(2, last.Count);
     }
 }
