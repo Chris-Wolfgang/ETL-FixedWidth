@@ -45,16 +45,21 @@ internal static class BinaryFieldMap
 
     private static BinaryRecordMap Build([DynamicallyAccessedMembers(TrimmedMembers.Record)] Type type)
     {
-        // Anonymous type (not a ValueTuple) — net462/netstandard2.0 have no System.ValueTuple.
-        var entries = type
-            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Select(p => new
+        // A small class (not a ValueTuple) - net462/netstandard2.0 have no System.ValueTuple. Collecting the
+        // attributed properties in a loop keeps Attribute non-null by construction, so no null-forgiving
+        // operator is needed downstream.
+        var found = new List<FieldEntry>();
+        foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        {
+            var attribute = property.GetCustomAttribute<FixedWidthBinaryFieldAttribute>();
+            if (attribute != null)
             {
-                Property = p,
-                Attribute = p.GetCustomAttribute<FixedWidthBinaryFieldAttribute>(),
-            })
-            .Where(x => x.Attribute != null)
-            .OrderBy(x => x.Attribute!.Index)
+                found.Add(new FieldEntry(property, attribute));
+            }
+        }
+
+        var entries = found
+            .OrderBy(x => x.Attribute.Index)
             .ToList();
 
         if (entries.Count == 0)
@@ -68,7 +73,7 @@ internal static class BinaryFieldMap
 
         foreach (var entry in entries)
         {
-            var attribute = entry.Attribute!;
+            var attribute = entry.Attribute;
             if (!seen.Add(attribute.Index))
             {
                 throw new InvalidOperationException($"Duplicate [FixedWidthBinaryField] index {attribute.Index} on type '{type.FullName}'.");
@@ -80,6 +85,25 @@ internal static class BinaryFieldMap
         }
 
         return new BinaryRecordMap(descriptors.AsReadOnly(), offset, CreateFactory(type));
+    }
+
+
+
+    private sealed class FieldEntry
+    {
+        internal FieldEntry(PropertyInfo property, FixedWidthBinaryFieldAttribute attribute)
+        {
+            Property = property;
+            Attribute = attribute;
+        }
+
+
+
+        internal PropertyInfo Property { get; }
+
+
+
+        internal FixedWidthBinaryFieldAttribute Attribute { get; }
     }
 
 

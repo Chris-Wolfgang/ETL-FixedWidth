@@ -200,7 +200,7 @@ public class DocExampleApiReferenceTests
     private static IEnumerable<string> ObsoleteSetterInitializers(string text)
     {
         return StageObjectInitializer.Matches(text)
-            .Cast<Match>()
+            .OfType<Match>()
             .Select(m => (Type: string.Equals(m.Groups["type"].Value, "FixedWidthExtractor", StringComparison.Ordinal) ? typeof(FixedWidthExtractor<>) : typeof(FixedWidthLoader<>), Property: m.Groups["prop"].Value))
             .Where(r => r.Type.GetProperty(r.Property)?.SetMethod?.GetCustomAttribute<ObsoleteAttribute>() != null
                      || r.Type.GetProperty(r.Property)?.GetCustomAttribute<ObsoleteAttribute>() != null)
