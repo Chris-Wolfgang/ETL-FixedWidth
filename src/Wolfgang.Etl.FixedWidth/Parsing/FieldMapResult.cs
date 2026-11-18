@@ -95,6 +95,12 @@ internal sealed class FieldMapResult
             return generated;
         }
 
+        if (type.IsValueType)
+        {
+            // A struct always has an implicit parameterless constructor (GetConstructor returns null for it).
+            return Expression.Lambda<Func<object>>(Expression.Convert(Expression.New(type), typeof(object))).Compile();
+        }
+
         var ctor = type.GetConstructor(Type.EmptyTypes);
         if (ctor == null)
         {
