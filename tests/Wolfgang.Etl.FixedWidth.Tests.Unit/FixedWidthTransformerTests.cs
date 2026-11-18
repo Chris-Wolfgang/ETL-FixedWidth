@@ -206,7 +206,7 @@ public class FixedWidthTransformerTests
     {
         using var transformer = new FixedWidthTransformer<Src, Dst>(s => new Dst { Name = s.Name });
 
-        async IAsyncEnumerable<Src> WithNull()
+        static async IAsyncEnumerable<Src> WithNull()
         {
             await Task.CompletedTask;
             yield return new Src { Name = "alice" };
