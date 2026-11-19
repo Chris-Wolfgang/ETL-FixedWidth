@@ -1,116 +1,106 @@
-# Reproducible builds — verify it yourself
+# Verifying a release of Wolfgang.Etl.FixedWidth
 
-`Wolfgang.Etl.FixedWidth` is built deterministically, so anyone can rebuild the
-exact same compiled assemblies from the tagged source and confirm the release on
-NuGet was built from that source and nothing else. This page is the **consumer
-side** of that guarantee: how *you* independently verify a release.
+Anyone can check that a published release of Wolfgang.Etl.FixedWidth was built from the tagged source, without
+trusting this repository's CI. This page is for a consumer who has never seen the repository.
 
-> Related: [`reproducible-build.yaml`](../.github/workflows/reproducible-build.yaml)
-> proves the build is reproducible on every PR: it packs the same commit on Ubuntu
-> and on Windows (two operating systems, two checkout paths) and fails if any
-> per-TFM `.dll` or `.pdb` differs. This document is about a third party
-> reproducing it out-of-band.
+## What "reproducible" means here
 
-## What is reproducible
+The same tag, built with the SDK recorded in the release's `BUILD-MANIFEST.txt`, **on Linux**, gives:
 
-The unit of verification is the **compiled assembly and its symbols** — one
-`Wolfgang.Etl.FixedWidth.dll` and `Wolfgang.Etl.FixedWidth.pdb` per target framework
-(`net462`, `net481`, `netstandard2.0`, `net5.0`, `net6.0`, `net7.0`, `net8.0`,
-`net10.0`). These are byte-for-byte reproducible, on any operating system,
-because the build sets:
+- byte-identical `.dll` and `.pdb` files for every target framework, and
+- `.nupkg` / `.snupkg` packages whose **entries** match the published packages entry by entry.
 
-- `Deterministic` (default) — no timestamps or random GUIDs baked into the IL;
-- `ContinuousIntegrationBuild=true` on CI — normalizes source paths to `/_/` so
-  the checkout directory doesn't affect output;
-- `EmbedUntrackedSources` + SourceLink — provenance is embedded deterministically;
-- `Directory.Build.targets` rewrites the SDK-generated sources (`AssemblyInfo.cs`,
-  `AssemblyAttributes.cs`, `GlobalUsings.g.cs`) to LF before compiling, so the
-  embedded source text and its hash do not depend on the OS newline;
-- `Directory.Build.props` compiles the .NET Framework TFMs against the
-  `Microsoft.NETFramework.ReferenceAssemblies` package on every OS, instead of the
-  installed targeting pack on Windows.
+What is expected to differ, and is never compared:
 
-> **NuGet packages (`.nupkg`) are *not* byte-for-byte reproducible.** A `.nupkg`
-> is a ZIP and records per-entry timestamps, so its hash varies between builds.
-> The manifest lists the package hashes for reference, but **verify the
-> assemblies**, not the package.
+- **the package file itself** (`.nupkg` / `.snupkg` as a zip): NuGet stamps every zip entry with the pack time, so
+  two packs of the same commit never give the same zip bytes, even on one machine. Compare the entries.
+- **a build on another operating system**: cross-OS identity is reported by the
+  [Reproducible Build workflow](https://github.com/Chris-Wolfgang/ETL-FixedWidth/actions/workflows/reproducible-build.yaml), not promised.
 
-## The per-release manifest
+Every pull request is checked the same way: the workflow packs the commit twice on Ubuntu and fails unless both
+packs are identical by the rules above.
 
-Every GitHub release attaches **`reproducible-build-manifest.json`**, produced by
-[`release.yaml`](../.github/workflows/release.yaml) from the exact build that was
-published. It records the expected assembly hashes plus the toolchain that
-produced them:
+## What a release publishes
 
-```jsonc
-{
-  "tag": "v0.8.0",
-  "commit": "…",
-  "dotnetSdk": "10.0.100",          // the SDK you must use to reproduce
-  "runnerOs": "Windows",
-  "buildConfiguration": "Release",
-  "assemblies": [
-    { "tfm": "net10.0", "file": "Wolfgang.Etl.FixedWidth.dll", "sha256": "…" },
-    …
-  ],
-  "packages": [                      // reference only — not byte-reproducible
-    { "file": "Wolfgang.Etl.FixedWidth.0.8.0.nupkg", "sha256": "…" }
-  ]
-}
-```
+Each GitHub Release carries, next to the packages:
 
-Download it from the release page, or with the CLI:
+| Asset | Contents |
+|---|---|
+| `SHA256SUMS.txt` | `<sha256>  <tfm>/<file>` for every `.dll`/`.pdb`, and `<sha256>  <package-file>` for every `.nupkg`/`.snupkg` |
+| `BUILD-MANIFEST.txt` | exact SDK version (`dotnet --version`), runner image and version, commit SHA, tag, and the `CI` / `ContinuousIntegrationBuild` / `Deterministic` values |
 
-```bash
-gh release download v0.8.0 --repo Chris-Wolfgang/ETL-FixedWidth --pattern reproducible-build-manifest.json
-```
+Both are subjects of the release's build-provenance attestation, so step 5 below covers them as well as the packages.
 
-## Reproduce it
+## Verify a release
 
-You need the **same .NET SDK version** the manifest records in `dotnetSdk`
-(a different SDK ships a different Roslyn and may emit different IL). Install it
-from <https://dotnet.microsoft.com/download/dotnet>.
+You need git, the GitHub CLI (`gh`), Python 3 and a Linux machine (or container).
 
-```bash
-# 1. Clone the source at the exact published tag.
-git clone --depth 1 --branch v0.8.0 https://github.com/Chris-Wolfgang/ETL-FixedWidth
-cd ETL-FixedWidth
+1. **Clone the tag.**
 
-# 2. Build Release with the CI determinism flag (matches the release build).
-dotnet build src/Wolfgang.Etl.FixedWidth/Wolfgang.Etl.FixedWidth.csproj \
-  -c Release -p:ContinuousIntegrationBuild=true
+   ```bash
+   TAG=v1.2.3   # the release you are checking
+   git clone --branch "$TAG" --depth 1 https://github.com/Chris-Wolfgang/ETL-FixedWidth.git
+   cd ETL-FixedWidth
+   gh release download "$TAG" --repo Chris-Wolfgang/ETL-FixedWidth --dir ../release
+   cat ../release/BUILD-MANIFEST.txt
+   ```
 
-# 3. Hash each per-TFM assembly and compare against the manifest.
-find src/Wolfgang.Etl.FixedWidth/bin/Release -name 'Wolfgang.Etl.FixedWidth.dll' \
-  -exec sha256sum {} \;
-```
+2. **Install the recorded SDK.** `global.json` pins the major version; install the exact version that
+   `BUILD-MANIFEST.txt` names (for example with `dotnet-install.sh --version <sdk>`), and check that `dotnet --version`
+   prints it from inside the clone.
 
-If your `sha256` values match the manifest's `assemblies[].sha256`, the published
-release is reproducible from source on your machine.
+3. **Pack exactly as the workflow does**, once per packable project under `src/`:
 
-## If a hash does not match
+   ```bash
+   export CI=true
+   for proj in $(git ls-files 'src/*.csproj' 'src/**/*.csproj'); do
+     [ "$(dotnet msbuild "$proj" -getProperty:IsPackable | tr -d '[:space:]')" = "true" ] || continue
+     dotnet pack "$proj" -c Release -p:ContinuousIntegrationBuild=true -p:Deterministic=true -o ../rebuilt
+   done
+   ```
 
-A mismatch is worth reporting — it may be a determinism regression, a
-toolchain difference, or something more serious.
+4. **Compare.**
 
-1. Double-check you used the **exact** `dotnetSdk` from the manifest
-   (`dotnet --version` must match) and passed `-p:ContinuousIntegrationBuild=true`.
-2. [Open an issue](https://github.com/Chris-Wolfgang/ETL-FixedWidth/issues/new)
-   titled `reproducible-build discrepancy: <tag>` and include: the tag, your
-   `dotnet --version`, your OS, and the assembly hashes you got versus the
-   manifest's. Label it `maintenance - security`.
+   ```bash
+   # Assemblies and symbols, keyed <tfm>/<file> exactly as in SHA256SUMS.txt.
+   for d in $(git ls-files 'src/*.csproj' 'src/**/*.csproj' | xargs -n1 dirname); do
+     [ -d "$d/bin/Release" ] || continue
+     (cd "$d/bin/Release" && find . -mindepth 2 -maxdepth 2 \( -name '*.dll' -o -name '*.pdb' \) \
+       | sed 's|^\./||' | xargs sha256sum)
+   done | sort -u -k2 > ../rebuilt-assemblies.txt
+   grep -vE '\.s?nupkg$' ../release/SHA256SUMS.txt | sort -k2 | diff - ../rebuilt-assemblies.txt \
+     && echo "Assemblies and symbols: identical"
 
-## Publish a third-party verification attestation
+   # Packages, entry by entry.
+   python3 - ../release ../rebuilt <<'PY'
+   import hashlib, pathlib, sys, zipfile
+   def entries(p):
+       with zipfile.ZipFile(p) as z:
+           return {e.filename: hashlib.sha256(z.read(e)).hexdigest() for e in z.infolist() if not e.is_dir()}
+   ok = True
+   for pub in sorted(pathlib.Path(sys.argv[1]).glob("*.*nupkg")):
+       mine = pathlib.Path(sys.argv[2]) / pub.name
+       same = mine.exists() and entries(pub) == entries(mine)
+       ok &= same
+       print(("identical entries: " if same else "DIFFERS: ") + pub.name)
+   sys.exit(0 if ok else 1)
+   PY
+   ```
 
-Independent verifications make the guarantee stronger than a single publisher's
-claim. If you reproduced a release, you can publish an attestation others can
-find:
+5. **Check the provenance** of the downloaded assets against this repository:
 
-- **Reproducible Builds conventions** — follow
-  <https://reproducible-builds.org/docs/> to record your environment and result.
-- **[vouchsafe.io](https://vouchsafe.io/)** (or a similar attestation service) —
-  publish a signed statement that tag `vX.Y.Z` reproduced to the manifest hashes
-  in your environment, and link it back on the release discussion.
+   ```bash
+   for f in ../release/*; do gh attestation verify "$f" --repo Chris-Wolfgang/ETL-FixedWidth; done
+   ```
 
-Link your attestation in a comment on the release so future consumers can find
-corroborating verifications.
+## Releases cut before the standard
+
+A tag cut before this repository took the reproducible-builds pieces (literal copyright year, LF-normalized generated
+sources, the reference-assemblies pin, `global.json`) has no `SHA256SUMS.txt` or `BUILD-MANIFEST.txt`, and its copyright
+attribute may carry the year it was built in. To rebuild such a tag, pass the original year
+(`-p:Copyright="Copyright (c) <year> <holder>"`) and expect only the Linux-to-Linux comparison to hold.
+
+In this repository, releases up to and including v0.13.x attach `reproducible-build-manifest.json` instead: the
+per-framework `Wolfgang.Etl.FixedWidth.dll` SHA-256 hashes and the SDK that built them. Compare those hashes with
+`find src/Wolfgang.Etl.FixedWidth/bin/Release -name Wolfgang.Etl.FixedWidth.dll -exec sha256sum {} \;` after step 3.
+Later releases attach that file as well as `SHA256SUMS.txt` and `BUILD-MANIFEST.txt`.
