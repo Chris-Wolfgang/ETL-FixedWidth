@@ -279,6 +279,25 @@ using var extractor = new FixedWidthBinaryExtractor<AccountRecord>(stream, Encod
 
 Writing is symmetric — `FixedWidthBinaryLoader<T>` encodes each field back to its `COMP`/`COMP-3`/text bytes. See the [BinaryRecords](examples/BinaryRecords) example for a runnable write → read round trip.
 
+### Encodings, cultures and limits
+
+- **Culture.** Parsing and formatting always use `CultureInfo.InvariantCulture`: `.` is the decimal separator and no group separators are expected. For decimal-comma data such as `0001234,56`, supply a `ValueParser` (extractor) or `ValueConverter` (loader) for the affected fields:
+
+  ```csharp
+  var german = CultureInfo.GetCultureInfo("de-DE");
+
+  var options = new FixedWidthExtractorOptions<InvoiceRecord>
+  {
+      ValueParser = (text, context) => context.PropertyType == typeof(decimal)
+          ? decimal.Parse(text.Span.Trim(), NumberStyles.Number, german)
+          : FixedWidthConverter.DefaultParser(text, context),
+  };
+  ```
+
+- **Endianness.** `COMP` (`BinaryFieldType.Binary`) integers are read and written **big-endian** only, as mainframes store them. Little-endian binary integers are not supported.
+- **Width units.** Text-file field widths (`[FixedWidthField(index, length)]`) count UTF-16 `char`s, not bytes. With a multi-byte encoding (UTF-8 CJK text, for example) a line's byte length differs from its character length; when a layout is defined in bytes, use the binary extractor/loader, whose widths are always bytes.
+- **Temporal formats.** `DateTime`, `DateTimeOffset` and `TimeSpan` fields need a `Format` (e.g. `"yyyyMMdd"`, `"HHmmss"`) to be parsed. On the .NET 6+ targets `DateOnly` and `TimeOnly` honour `[FixedWidthField(Format = ...)]` when parsing as well as when writing, so loader output reads back. In binary records a `BinaryFieldType.Text` field takes `[FixedWidthBinaryField(..., Format = "yyyyMMdd")]`; a `DateTime` / `DateTimeOffset` / `TimeSpan` text field without a `Format` is rejected when the field map is built.
+
 ### Transforming between layouts
 
 To reformat a fixed-width file from one layout to another — reordering, adding/removing, or format-converting fields (a common mainframe-migration task) — `FixedWidthTransformer<TSource, TDestination>` is the projection stage between an extractor and a loader:
@@ -602,7 +621,9 @@ The library is built **deterministically**, so you can rebuild the exact
 assemblies from the tagged source and confirm a NuGet release was built from that
 source and nothing else. Every GitHub release attaches a
 `reproducible-build-manifest.json` with the expected per-framework assembly
-hashes and the toolchain that produced them.
+hashes and the toolchain that produced them; releases after v0.13.x also attach
+`SHA256SUMS.txt` (every `.dll`/`.pdb` and package) and `BUILD-MANIFEST.txt`
+(exact SDK, runner image, commit), both covered by the build-provenance attestation.
 
 ```bash
 # Download the manifest for a release, rebuild at the tag, and compare hashes.
