@@ -23,6 +23,9 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <IsPackable>false</IsPackable>
+    <!-- Not a test project: the pr.yaml ARM64 stages (repo-template) fail on a project under
+         tests/ that has neither Microsoft.NET.Test.Sdk nor this explicit opt-out. -->
+    <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 
   <ItemGroup>
