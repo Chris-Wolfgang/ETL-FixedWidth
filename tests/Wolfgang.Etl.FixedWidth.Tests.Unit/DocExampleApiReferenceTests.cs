@@ -199,12 +199,22 @@ public class DocExampleApiReferenceTests
 
     private static IEnumerable<string> ObsoleteSetterInitializers(string text)
     {
-        return StageObjectInitializer.Matches(text)
-            .OfType<Match>()
-            .Select(m => (Type: string.Equals(m.Groups["type"].Value, "FixedWidthExtractor", StringComparison.Ordinal) ? typeof(FixedWidthExtractor<>) : typeof(FixedWidthLoader<>), Property: m.Groups["prop"].Value))
-            .Where(r => r.Type.GetProperty(r.Property)?.SetMethod?.GetCustomAttribute<ObsoleteAttribute>() != null
-                     || r.Type.GetProperty(r.Property)?.GetCustomAttribute<ObsoleteAttribute>() != null)
-            .Select(r => $"{StripArity(r.Type.Name)}.{r.Property}");
+        // An explicitly typed foreach (rather than .Cast<Match>() / .OfType<Match>()) compiles on every
+        // target framework: MatchCollection is only IEnumerable<Match> on modern TFMs, and InspectCode,
+        // which analyses a modern TFM, reports either LINQ call as redundant.
+        foreach (Match m in StageObjectInitializer.Matches(text))
+        {
+            var type = string.Equals(m.Groups["type"].Value, "FixedWidthExtractor", StringComparison.Ordinal)
+                ? typeof(FixedWidthExtractor<>)
+                : typeof(FixedWidthLoader<>);
+            var property = m.Groups["prop"].Value;
+
+            if (type.GetProperty(property)?.SetMethod?.GetCustomAttribute<ObsoleteAttribute>() != null
+                || type.GetProperty(property)?.GetCustomAttribute<ObsoleteAttribute>() != null)
+            {
+                yield return $"{StripArity(type.Name)}.{property}";
+            }
+        }
     }
 
 
