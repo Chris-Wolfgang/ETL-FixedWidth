@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1795007158226,
+  "lastUpdate": 1795180282947,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-FixedWidth",
   "entries": {
     "BenchmarkDotNet": [
@@ -12936,6 +12936,222 @@ window.BENCHMARK_DATA = {
             "value": 370377790.6666667,
             "unit": "ns",
             "range": "± 1194186.9165295411"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "210299580+Chris-Wolfgang@users.noreply.github.com",
+            "name": "Chris Wolfgang",
+            "username": "Chris-Wolfgang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d44102d73ee4ece1784e612427e5b8b3017c1a4c",
+          "message": "docs(readme): state the five-leg test matrix (#723)\n\nTemplate text from repo-template#844.\n\nRefs #657\n\nCo-authored-by: Claude Opus 5.5 <noreply@anthropic.com>",
+          "timestamp": "2026-11-20T08:06:00-05:00",
+          "tree_id": "576bf3f0654927dcaaf901652945942f2fc90de5",
+          "url": "https://github.com/Chris-Wolfgang/ETL-FixedWidth/commit/d44102d73ee4ece1784e612427e5b8b3017c1a4c"
+        },
+        "date": 1795180280291,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.DateTimeBenchmarks.Extract_Memory(RecordCount: 10000)",
+            "value": 4128799.5104166665,
+            "unit": "ns",
+            "range": "± 42539.87999259857"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.DateTimeBenchmarks.Load_Memory(RecordCount: 10000)",
+            "value": 3256434.2578125,
+            "unit": "ns",
+            "range": "± 7686.161947404909"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_TextReader(RecordCount: 1000)",
+            "value": 354519.4612630208,
+            "unit": "ns",
+            "range": "± 3754.277536566662"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_Stream(RecordCount: 1000)",
+            "value": 448532.234375,
+            "unit": "ns",
+            "range": "± 5453.154948543146"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_TextReader_1KB(RecordCount: 1000)",
+            "value": 386540.7158203125,
+            "unit": "ns",
+            "range": "± 3598.2957999943596"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_Stream_64KB(RecordCount: 1000)",
+            "value": 454474.8395182292,
+            "unit": "ns",
+            "range": "± 9148.178022733802"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_TextReader(RecordCount: 10000)",
+            "value": 3585688.84375,
+            "unit": "ns",
+            "range": "± 38268.11107104911"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_Stream(RecordCount: 10000)",
+            "value": 3685547.3046875,
+            "unit": "ns",
+            "range": "± 65665.70824178049"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_TextReader_1KB(RecordCount: 10000)",
+            "value": 3725202.2174479165,
+            "unit": "ns",
+            "range": "± 43942.098306265834"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_Stream_64KB(RecordCount: 10000)",
+            "value": 3909070.09375,
+            "unit": "ns",
+            "range": "± 39245.464637981575"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_TextReader(RecordCount: 100000)",
+            "value": 37410657.88095238,
+            "unit": "ns",
+            "range": "± 140014.34081839022"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_Stream(RecordCount: 100000)",
+            "value": 34802573.177777775,
+            "unit": "ns",
+            "range": "± 315615.4745891159"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_TextReader_1KB(RecordCount: 100000)",
+            "value": 38736696.589743584,
+            "unit": "ns",
+            "range": "± 213621.1494393212"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_Stream_64KB(RecordCount: 100000)",
+            "value": 35473524.95555556,
+            "unit": "ns",
+            "range": "± 409827.5712766153"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_TextWriter(RecordCount: 1000)",
+            "value": 241328.3732096354,
+            "unit": "ns",
+            "range": "± 1243.6418014590522"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_Stream(RecordCount: 1000)",
+            "value": 367864.6555989583,
+            "unit": "ns",
+            "range": "± 1611.648276517059"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_TextWriter_1KB(RecordCount: 1000)",
+            "value": 536814.2900390625,
+            "unit": "ns",
+            "range": "± 18099.67391351788"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_Stream_64KB(RecordCount: 1000)",
+            "value": 487401.1728515625,
+            "unit": "ns",
+            "range": "± 4176.749233878023"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_TextWriter(RecordCount: 10000)",
+            "value": 3413167.1510416665,
+            "unit": "ns",
+            "range": "± 23726.939633703903"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_Stream(RecordCount: 10000)",
+            "value": 2976137.8098958335,
+            "unit": "ns",
+            "range": "± 22003.370161009843"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_TextWriter_1KB(RecordCount: 10000)",
+            "value": 4473151.018229167,
+            "unit": "ns",
+            "range": "± 52488.307814181906"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_Stream_64KB(RecordCount: 10000)",
+            "value": 3319780.60546875,
+            "unit": "ns",
+            "range": "± 13313.222067904739"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_TextWriter(RecordCount: 100000)",
+            "value": 28862053.5625,
+            "unit": "ns",
+            "range": "± 50242.577840887665"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_Stream(RecordCount: 100000)",
+            "value": 28123315.302083332,
+            "unit": "ns",
+            "range": "± 520401.61157455016"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_TextWriter_1KB(RecordCount: 100000)",
+            "value": 69937205.16666667,
+            "unit": "ns",
+            "range": "± 3947906.0446966165"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_Stream_64KB(RecordCount: 100000)",
+            "value": 28869251.03125,
+            "unit": "ns",
+            "range": "± 594650.21991815"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 0)",
+            "value": 517454.2294921875,
+            "unit": "ns",
+            "range": "± 9775.822609184219"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 1)",
+            "value": 534979.0686848959,
+            "unit": "ns",
+            "range": "± 19089.062210888456"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 1000)",
+            "value": 986038.2805989584,
+            "unit": "ns",
+            "range": "± 14913.661353393169"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 10000)",
+            "value": 4348246,
+            "unit": "ns",
+            "range": "± 5669.039870303121"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 100000)",
+            "value": 37498192.571428575,
+            "unit": "ns",
+            "range": "± 306867.49671411514"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 1000000)",
+            "value": 353699568.3333333,
+            "unit": "ns",
+            "range": "± 2389474.759024739"
           }
         ]
       }
