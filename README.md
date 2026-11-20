@@ -621,7 +621,9 @@ The library is built **deterministically**, so you can rebuild the exact
 assemblies from the tagged source and confirm a NuGet release was built from that
 source and nothing else. Every GitHub release attaches a
 `reproducible-build-manifest.json` with the expected per-framework assembly
-hashes and the toolchain that produced them.
+hashes and the toolchain that produced them; releases after v0.13.x also attach
+`SHA256SUMS.txt` (every `.dll`/`.pdb` and package) and `BUILD-MANIFEST.txt`
+(exact SDK, runner image, commit), both covered by the build-provenance attestation.
 
 ```bash
 # Download the manifest for a release, rebuild at the tag, and compare hashes.
