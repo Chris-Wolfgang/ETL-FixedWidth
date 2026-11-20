@@ -1,13 +1,14 @@
 # Native AOT / trim smoke test (canonical).
 #
-# Publishes the repo's AotSmoke consumer with Native AOT on linux-x64 and runs the binary. Fails
+# Publishes the repo's AotSmoke consumer with Native AOT on linux-x64 and linux-arm64 (one job per
+# leg, each its own required check) and runs the binary. Fails
 # when the publish fails, when the trim/AOT analyzers report a warning that points at this
 # library's code, or when the native binary exits non-zero.
 #
 # Every repo carries this file UNCHANGED apart from the three values in the `env:` block. The
 # file name, the workflow name, the job id and the job name are fixed fleet-wide, because a
 # required status check is matched by its exact job name: the ruleset entry is then the same
-# string in every repo ("AOT smoke (linux-x64)").
+# string in every repo ("AOT smoke (linux-x64)", "AOT smoke (linux-arm64)").
 #
 # No `paths:` filter on any trigger. A required check must report on every pull request: a
 # path-skipped workflow never reports (not even "skipped") and blocks the merge. There is no
@@ -71,6 +72,65 @@ jobs:
         run: |
           set -euo pipefail
           dotnet publish "$SMOKE_PROJECT" -c Release -r linux-x64 -o aot-out 2>&1 | tee aot-publish.log
+
+      - name: Assert no trim/AOT warnings from this library
+        run: |
+          set -euo pipefail
+          # MSBuild appends " [<path>.csproj]" to each warning line. The smoke project's path contains
+          # the library namespace, so it is stripped first or every warning (including ones from
+          # third-party code) would match.
+          grep -E 'IL[0-9]{4}' aot-publish.log | sed -E 's/ \[[^]]*\.csproj\]$//' | grep -F "$LIBRARY_NAMESPACE" > library-warnings.txt || true
+          if [ -n "$ALLOWED_WARNING_REGEX" ]; then
+            grep -vE "$ALLOWED_WARNING_REGEX" library-warnings.txt > unexpected-warnings.txt || true
+          else
+            cp library-warnings.txt unexpected-warnings.txt
+          fi
+          if [ -s unexpected-warnings.txt ]; then
+            echo "::error::Native AOT publish produced trim/AOT warnings from $LIBRARY_NAMESPACE:"
+            cat unexpected-warnings.txt
+            exit 1
+          fi
+          echo "No trim/AOT warnings from $LIBRARY_NAMESPACE."
+
+      - name: Run the native binary
+        run: |
+          set -euo pipefail
+          bin="aot-out/$(basename "$SMOKE_PROJECT" .csproj)"
+          if [ ! -x "$bin" ]; then
+            echo "::error::Native AOT binary not produced at $bin"
+            exit 1
+          fi
+          "$bin"
+          echo "Native AOT smoke exited 0."
+
+  aot-smoke-arm64:
+    name: AOT smoke (linux-arm64)
+    # The native binary is per-architecture, so the managed ARM64 stages in pr.yaml do not
+    # cover it. The arm64 runner is free on public repositories only, so a private copy skips it.
+    runs-on: ubuntu-24.04-arm
+    if: ${{ !github.event.repository.private }}
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: |
+            10.0.x
+            11.0.x
+
+      - name: Install Native AOT prerequisites
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
+
+      - name: Publish Native AOT (linux-arm64)
+        run: |
+          set -euo pipefail
+          dotnet publish "$SMOKE_PROJECT" -c Release -r linux-arm64 -o aot-out 2>&1 | tee aot-publish.log
 
       - name: Assert no trim/AOT warnings from this library
         run: |
