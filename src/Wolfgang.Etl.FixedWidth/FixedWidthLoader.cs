@@ -786,7 +786,11 @@ public class FixedWidthLoader<[DynamicallyAccessedMembers(TrimmedMembers.Record)
 #else
             await target.WriteAsync(lineBuffer.ToString()).ConfigureAwait(false);
 #endif
+#if NET11_0_OR_GREATER
+            await target.WriteLineAsync(token).ConfigureAwait(false);
+#else
             await target.WriteLineAsync().ConfigureAwait(false);
+#endif
             IncrementCurrentItemCount();
             if (metricsEnabled)
             {
