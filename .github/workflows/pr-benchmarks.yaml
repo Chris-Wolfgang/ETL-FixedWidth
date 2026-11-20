@@ -75,6 +75,7 @@ jobs:
         with:
           dotnet-version: |
             10.0.x
+            11.0.x
 
       - name: Restore
         run: dotnet restore benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks/Wolfgang.Etl.FixedWidth.Benchmarks.csproj
@@ -221,6 +222,7 @@ jobs:
         with:
           dotnet-version: |
             10.0.x
+            11.0.x
       - name: Locate the base commit
         # On a pull_request event HEAD is GitHub's synthetic refs/pull/N/merge
         # commit (the PR merged onto the current base tip), so the merge-base
