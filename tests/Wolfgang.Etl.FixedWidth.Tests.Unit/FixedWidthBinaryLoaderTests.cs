@@ -109,6 +109,102 @@ public sealed class FixedWidthBinaryLoaderTests
     }
 
 
+    [ExcludeFromCodeCoverage]
+    public sealed class ShortCounter
+    {
+        [FixedWidthBinaryField(0, 4, BinaryFieldType.Text)]
+        public string Id { get; set; } = string.Empty;
+
+        [FixedWidthBinaryField(1, 2, BinaryFieldType.Binary)]
+        public int Count { get; set; }
+
+        [FixedWidthBinaryField(2, 2, BinaryFieldType.PackedDecimal)]
+        public decimal Amount { get; set; }
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_a_binary_integer_does_not_fit_throws_FieldConversionException_with_record_context()
+    {
+        var records = new[]
+        {
+            new ShortCounter { Id = "A001", Count = 1, Amount = 1m },
+            new ShortCounter { Id = "A002", Count = 100_000, Amount = 1m },   // does not fit 2 signed bytes
+        };
+        using var ms = new MemoryStream();
+        using var loader = new FixedWidthBinaryLoader<ShortCounter>(ms, options: null);
+
+        var ex = await Assert.ThrowsAsync<Exceptions.FieldConversionException>(async () =>
+            await loader.LoadAsync(ToAsync(records), CancellationToken.None));
+
+        Assert.IsType<OverflowException>(ex.InnerException);
+        Assert.Equal(2, ex.LineNumber);
+        Assert.Equal(nameof(ShortCounter.Count), ex.FieldName);
+        Assert.Equal(4L, ex.ByteOffset);
+        Assert.Equal("100000", ex.RawValue);
+        Assert.Equal(typeof(int), ex.ExpectedType);
+        Assert.Contains("Record 2", ex.Message, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_a_packed_decimal_does_not_fit_throws_FieldConversionException()
+    {
+        var records = new[] { new ShortCounter { Id = "A001", Count = 1, Amount = 12345m } };   // 3 digits max
+        using var ms = new MemoryStream();
+        using var loader = new FixedWidthBinaryLoader<ShortCounter>(ms, options: null);
+
+        var ex = await Assert.ThrowsAsync<Exceptions.FieldConversionException>(async () =>
+            await loader.LoadAsync(ToAsync(records), CancellationToken.None));
+
+        Assert.IsType<OverflowException>(ex.InnerException);
+        Assert.Equal(1, ex.LineNumber);
+        Assert.Equal(nameof(ShortCounter.Amount), ex.FieldName);
+        Assert.Equal(6L, ex.ByteOffset);
+    }
+
+
+
+    [ExcludeFromCodeCoverage]
+    public sealed class TextAsInteger
+    {
+        [FixedWidthBinaryField(0, 4, BinaryFieldType.Binary)]
+        public string Code { get; set; } = string.Empty;
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_a_value_cannot_be_converted_for_a_binary_integer_throws_FieldConversionException()
+    {
+        var records = new[] { new TextAsInteger { Code = "ABC" } };
+        using var ms = new MemoryStream();
+        using var loader = new FixedWidthBinaryLoader<TextAsInteger>(ms, options: null);
+
+        var ex = await Assert.ThrowsAsync<Exceptions.FieldConversionException>(async () =>
+            await loader.LoadAsync(ToAsync(records), CancellationToken.None));
+
+        Assert.IsType<FormatException>(ex.InnerException);
+        Assert.Equal(1, ex.LineNumber);
+        Assert.Equal(nameof(TextAsInteger.Code), ex.FieldName);
+        Assert.Equal("ABC", ex.RawValue);
+        Assert.Equal(string.Empty, ex.LineContent);
+    }
+
+
+
+    [Fact]
+    public void FieldConversionException_when_built_with_the_text_constructor_has_no_byte_offset()
+    {
+        var ex = new Exceptions.FieldConversionException("m", 1, "line", "Field", typeof(int), "x", new FormatException());
+
+        Assert.Null(ex.ByteOffset);
+    }
+
+
+
     private sealed class ReadOnlyStream : MemoryStream
     {
         public override bool CanWrite => false;

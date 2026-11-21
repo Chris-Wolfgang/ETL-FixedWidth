@@ -207,11 +207,27 @@ public sealed class FixedWidthBinaryExtractor<[DynamicallyAccessedMembers(Trimme
             var boxed = _map.Factory();
             foreach (var descriptor in _map.Descriptors)
             {
-                descriptor.Setter(boxed, descriptor.Decode(buffer, ResolvedEncoding));
+                descriptor.Setter(boxed, DecodeField(descriptor, buffer));
             }
 
             IncrementCurrentItemCount();
             yield return (TRecord)boxed;
+        }
+    }
+
+
+
+    // A codec failure is rethrown as a FieldConversionException naming the record, byte offset and
+    // property (#686), so one corrupt field in a large file can be traced back to its record.
+    private object? DecodeField(BinaryFieldDescriptor descriptor, byte[] buffer)
+    {
+        try
+        {
+            return descriptor.Decode(buffer, ResolvedEncoding);
+        }
+        catch (Exception ex) when (BinaryFieldDescriptor.IsCodecFailure(ex))
+        {
+            throw descriptor.CreateDecodeError(Interlocked.Read(ref _currentRecordNumber), buffer, ex);
         }
     }
 

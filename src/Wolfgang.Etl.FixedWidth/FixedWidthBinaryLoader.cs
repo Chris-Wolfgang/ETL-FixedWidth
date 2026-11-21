@@ -185,7 +185,7 @@ public sealed class FixedWidthBinaryLoader<[DynamicallyAccessedMembers(TrimmedMe
             Array.Clear(buffer, 0, buffer.Length);
             foreach (var descriptor in _map.Descriptors)
             {
-                descriptor.Encode(item, buffer, ResolvedEncoding);
+                EncodeField(descriptor, item, buffer);
             }
 
             await _stream.WriteAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false);
@@ -195,6 +195,22 @@ public sealed class FixedWidthBinaryLoader<[DynamicallyAccessedMembers(TrimmedMe
         }
 
         await _stream.FlushAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+
+
+    // A codec failure is rethrown as a FieldConversionException naming the record, byte offset and
+    // property (#686). The record number is the 1-based position of the record being written.
+    private void EncodeField(BinaryFieldDescriptor descriptor, TRecord item, byte[] buffer)
+    {
+        try
+        {
+            descriptor.Encode(item, buffer, ResolvedEncoding);
+        }
+        catch (Exception ex) when (BinaryFieldDescriptor.IsCodecFailure(ex))
+        {
+            throw descriptor.CreateEncodeError(Interlocked.Read(ref _currentRecordNumber) + 1, item, ex);
+        }
     }
 
 
