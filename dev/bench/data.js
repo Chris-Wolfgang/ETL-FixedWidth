@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1795185080437,
+  "lastUpdate": 1795224086192,
   "repoUrl": "https://github.com/Chris-Wolfgang/ETL-FixedWidth",
   "entries": {
     "BenchmarkDotNet": [
@@ -13368,6 +13368,222 @@ window.BENCHMARK_DATA = {
             "value": 206846864.55555555,
             "unit": "ns",
             "range": "± 14380454.369018823"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7cf515a4a0e3cb41e109590a25ea333bba1e3ec6",
+          "message": "Bump the dotnet-dependencies group with 10 updates (#729)\n\nBumps coverlet.collector from 10.1.0 to 10.1.1\nBumps cyclonedx from 6.3.1 to 6.3.2\nBumps dotnet-reportgenerator-globaltool from 5.6.0 to 5.6.1\nBumps jetbrains.resharper.globaltools from 2026.3.0 to 2026.3.0.1\nBumps Meziantou.Analyzer from 3.0.339 to 3.0.341\nBumps Microsoft.CodeAnalysis.Analyzers from 5.9.0 to 5.12.0\nBumps Microsoft.CodeAnalysis.CSharp from 5.9.0 to 5.12.0\nBumps microsoft.cst.devskim.cli from 1.0.100 to 1.0.103\nBumps nuget-license from 4.0.18 to 4.0.19\nBumps SonarAnalyzer.CSharp from 10.36.0.15337 to 10.37.0.15768\n\n---\nupdated-dependencies:\n- dependency-name: coverlet.collector\n  dependency-version: 10.1.1\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: coverlet.collector\n  dependency-version: 10.1.1\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: coverlet.collector\n  dependency-version: 10.1.1\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: coverlet.collector\n  dependency-version: 10.1.1\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: coverlet.collector\n  dependency-version: 10.1.1\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: cyclonedx\n  dependency-version: 6.3.2\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: dotnet-reportgenerator-globaltool\n  dependency-version: 5.6.1\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: jetbrains.resharper.globaltools\n  dependency-version: 2026.3.0.1\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Meziantou.Analyzer\n  dependency-version: 3.0.341\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.CodeAnalysis.Analyzers\n  dependency-version: 5.12.0\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.CodeAnalysis.CSharp\n  dependency-version: 5.12.0\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n- dependency-name: Microsoft.CodeAnalysis.CSharp\n  dependency-version: 5.12.0\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n- dependency-name: microsoft.cst.devskim.cli\n  dependency-version: 1.0.103\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: nuget-license\n  dependency-version: 4.0.19\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: dotnet-dependencies\n- dependency-name: SonarAnalyzer.CSharp\n  dependency-version: 10.37.0.15768\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: dotnet-dependencies\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\nCo-authored-by: Chris Wolfgang <210299580+Chris-Wolfgang@users.noreply.github.com>",
+          "timestamp": "2026-11-20T20:15:28-05:00",
+          "tree_id": "814305b93bab6e07b94474133fb0b053f3c23eec",
+          "url": "https://github.com/Chris-Wolfgang/ETL-FixedWidth/commit/7cf515a4a0e3cb41e109590a25ea333bba1e3ec6"
+        },
+        "date": 1795224084043,
+        "tool": "benchmarkdotnet",
+        "benches": [
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.DateTimeBenchmarks.Extract_Memory(RecordCount: 10000)",
+            "value": 2607019.06640625,
+            "unit": "ns",
+            "range": "± 10533.899173713226"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.DateTimeBenchmarks.Load_Memory(RecordCount: 10000)",
+            "value": 2211484.7955729165,
+            "unit": "ns",
+            "range": "± 37926.98475424311"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_TextReader(RecordCount: 1000)",
+            "value": 202829.36319986978,
+            "unit": "ns",
+            "range": "± 318.4507151313914"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_Stream(RecordCount: 1000)",
+            "value": 266482.67561848956,
+            "unit": "ns",
+            "range": "± 5853.724256871776"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_TextReader_1KB(RecordCount: 1000)",
+            "value": 218649.15299479166,
+            "unit": "ns",
+            "range": "± 1746.6488326409403"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_Stream_64KB(RecordCount: 1000)",
+            "value": 262011.29329427084,
+            "unit": "ns",
+            "range": "± 867.2156077796503"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_TextReader(RecordCount: 10000)",
+            "value": 2058539.6341145833,
+            "unit": "ns",
+            "range": "± 3679.5024314637685"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_Stream(RecordCount: 10000)",
+            "value": 2142162.5963541665,
+            "unit": "ns",
+            "range": "± 23384.08837008029"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_TextReader_1KB(RecordCount: 10000)",
+            "value": 2220055.0299479165,
+            "unit": "ns",
+            "range": "± 2772.4819072063096"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_Stream_64KB(RecordCount: 10000)",
+            "value": 2163590.6276041665,
+            "unit": "ns",
+            "range": "± 5532.478266832104"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_TextReader(RecordCount: 100000)",
+            "value": 20791055.177083332,
+            "unit": "ns",
+            "range": "± 159517.25166709762"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.Memory_Stream(RecordCount: 100000)",
+            "value": 20709275.729166668,
+            "unit": "ns",
+            "range": "± 51981.7647437009"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_TextReader_1KB(RecordCount: 100000)",
+            "value": 22295467.5,
+            "unit": "ns",
+            "range": "± 56567.39040410016"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.ExtractorBenchmarks.File_Stream_64KB(RecordCount: 100000)",
+            "value": 21450462.666666668,
+            "unit": "ns",
+            "range": "± 47646.44494452747"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_TextWriter(RecordCount: 1000)",
+            "value": 168557.02709960938,
+            "unit": "ns",
+            "range": "± 601.0636309705995"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_Stream(RecordCount: 1000)",
+            "value": 226595.91202799478,
+            "unit": "ns",
+            "range": "± 1164.4617466687782"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_TextWriter_1KB(RecordCount: 1000)",
+            "value": 266021.5227864583,
+            "unit": "ns",
+            "range": "± 3275.6072488056816"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_Stream_64KB(RecordCount: 1000)",
+            "value": 285016.92073567706,
+            "unit": "ns",
+            "range": "± 2137.0577094115174"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_TextWriter(RecordCount: 10000)",
+            "value": 2258896.78125,
+            "unit": "ns",
+            "range": "± 1689.8168889044557"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_Stream(RecordCount: 10000)",
+            "value": 2059897.7734375,
+            "unit": "ns",
+            "range": "± 38866.14241440294"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_TextWriter_1KB(RecordCount: 10000)",
+            "value": 2794573.0442708335,
+            "unit": "ns",
+            "range": "± 23600.4248452615"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_Stream_64KB(RecordCount: 10000)",
+            "value": 2054437.8919270833,
+            "unit": "ns",
+            "range": "± 44104.7375731237"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_TextWriter(RecordCount: 100000)",
+            "value": 22153726.927083332,
+            "unit": "ns",
+            "range": "± 179609.48291426818"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.Memory_Stream(RecordCount: 100000)",
+            "value": 22177586.947916668,
+            "unit": "ns",
+            "range": "± 490404.83233527123"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_TextWriter_1KB(RecordCount: 100000)",
+            "value": 26270161.354166668,
+            "unit": "ns",
+            "range": "± 148098.14922275167"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.LoaderBenchmarks.File_Stream_64KB(RecordCount: 100000)",
+            "value": 17712454.885416668,
+            "unit": "ns",
+            "range": "± 146625.37975521386"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 0)",
+            "value": 290359.29801432294,
+            "unit": "ns",
+            "range": "± 17815.89072027378"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 1)",
+            "value": 316204.6767578125,
+            "unit": "ns",
+            "range": "± 16205.244549701887"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 1000)",
+            "value": 656202.9156901041,
+            "unit": "ns",
+            "range": "± 26648.545686354817"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 10000)",
+            "value": 2492888.45703125,
+            "unit": "ns",
+            "range": "± 94311.1938902493"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 100000)",
+            "value": 24206024.6875,
+            "unit": "ns",
+            "range": "± 348355.6323741444"
+          },
+          {
+            "name": "Wolfgang.Etl.FixedWidth.Benchmarks.PeakMemoryBenchmarks.Extract_PeakMemory(RecordCount: 1000000)",
+            "value": 222094244.88888893,
+            "unit": "ns",
+            "range": "± 862478.1982923342"
           }
         ]
       }
