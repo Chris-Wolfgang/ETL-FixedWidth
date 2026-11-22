@@ -158,6 +158,59 @@ internal sealed class BinaryFieldDescriptor
         }
     }
 
+    // True for the failures the codecs (PackedDecimal, BinaryInteger, FixedWidthConverter, Convert.ToXxx)
+    // raise for bad data or an unrepresentable value. Layout and encoding errors (InvalidOperationException,
+    // FieldOverflowException) are not wrapped.
+    internal static bool IsCodecFailure(Exception ex)
+        => ex is FormatException || ex is OverflowException || ex is ArgumentException;
+
+
+
+    // Wraps a decode failure in a FieldConversionException that names the record, the field's byte
+    // offset and the property, with the record and field bytes in hex.
+    internal FieldConversionException CreateDecodeError(long recordNumber, byte[] record, Exception innerException)
+    {
+        var fieldBytes = BitConverter.ToString(record, ByteOffset, Attribute.ByteLength);
+
+        return new FieldConversionException
+        (
+            $"Record {recordNumber}: could not decode the {Attribute.Type} field at byte offset {ByteOffset} " +
+            $"(bytes {fieldBytes}) to type '{PropertyType.Name}' for property '{Property.Name}': {innerException.Message}",
+            recordNumber,
+            BitConverter.ToString(record),
+            Property.Name,
+            PropertyType,
+            fieldBytes,
+            ByteOffset,
+            innerException
+        );
+    }
+
+
+
+    // Wraps an encode failure in a FieldConversionException that names the record, the field's byte
+    // offset and the property, with the property value as the raw value. No record bytes exist yet,
+    // so the record content is empty.
+    internal FieldConversionException CreateEncodeError(long recordNumber, object record, Exception innerException)
+    {
+        var rawValue = Convert.ToString(Getter(record), CultureInfo.InvariantCulture) ?? string.Empty;
+
+        return new FieldConversionException
+        (
+            $"Record {recordNumber}: could not encode value '{rawValue}' of property '{Property.Name}' as the " +
+            $"{Attribute.Type} field at byte offset {ByteOffset}: {innerException.Message}",
+            recordNumber,
+            string.Empty,
+            Property.Name,
+            PropertyType,
+            rawValue,
+            ByteOffset,
+            innerException
+        );
+    }
+
+
+
     // Convert the decoded numeric to the property's underlying type BEFORE boxing, so the compiled
     // setter's unbox matches for both T and T? (a boxed long won't unbox to int?).
     private object Coerce(object value)

@@ -10,6 +10,7 @@ using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Attributes;
 using Wolfgang.Etl.FixedWidth.Binary;
 using Wolfgang.Etl.FixedWidth.Enums;
+using Wolfgang.Etl.FixedWidth.Exceptions;
 using Xunit;
 using Wolfgang.Etl.TestKit.Xunit;
 
@@ -622,8 +623,12 @@ public sealed class FixedWidthBinaryExtractorTests
 
         using var extractor = new FixedWidthBinaryExtractor<SignedBig>(new MemoryStream(data), options: null);
 
-        await Assert.ThrowsAnyAsync<OverflowException>(async () =>
+        var ex = await Assert.ThrowsAsync<FieldConversionException>(async () =>
             await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+
+        Assert.IsAssignableFrom<OverflowException>(ex.InnerException);
+        Assert.Equal(1, ex.LineNumber);
+        Assert.Equal(nameof(SignedBig.Value), ex.FieldName);
     }
 
 
@@ -671,8 +676,97 @@ public sealed class FixedWidthBinaryExtractorTests
         var data = new byte[] { 0x01, 0x23, 0x45, 0x6C };   // 0123456 @ Scale 2 = 1234.56 (fractional)
         using var extractor = new FixedWidthBinaryExtractor<FractionalToInt>(new MemoryStream(data), options: null);
 
-        await Assert.ThrowsAnyAsync<OverflowException>(async () =>
+        var ex = await Assert.ThrowsAsync<FieldConversionException>(async () =>
             await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+
+        Assert.IsType<OverflowException>(ex.InnerException);
+        Assert.Equal(1, ex.LineNumber);
+        Assert.Equal(nameof(FractionalToInt.Amount), ex.FieldName);
+    }
+
+
+
+    [Fact]
+    public async Task ExtractAsync_when_a_packed_decimal_digit_nibble_is_corrupt_throws_FieldConversionException_with_record_context()
+    {
+        var corrupt = new byte[] { 0x00, 0x01, 0x23, 0x4F, 0x6C };   // 0xF is not a digit nibble
+        var data = Concat(Record("ACCT0001", 1, Balance1234_56), Record("ACCT0002", 2, corrupt));
+        using var extractor = new FixedWidthBinaryExtractor<Account>(new MemoryStream(data), options: null);
+
+        var ex = await Assert.ThrowsAsync<FieldConversionException>(async () =>
+            await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+
+        Assert.IsType<FormatException>(ex.InnerException);
+        Assert.Equal(2, ex.LineNumber);
+        Assert.Equal(nameof(Account.Balance), ex.FieldName);
+        Assert.Equal(12L, ex.ByteOffset);
+        Assert.Equal(typeof(decimal), ex.ExpectedType);
+        Assert.Equal("00-01-23-4F-6C", ex.RawValue);
+        Assert.Equal(BitConverter.ToString(data, 17, 17), ex.LineContent);
+        Assert.Contains("Record 2", ex.Message, StringComparison.Ordinal);
+        Assert.Contains("byte offset 12", ex.Message, StringComparison.Ordinal);
+    }
+
+
+
+    [Fact]
+    public async Task ExtractAsync_when_a_skipped_record_precedes_the_corrupt_one_reports_the_record_number_in_the_file()
+    {
+        var corrupt = new byte[] { 0x00, 0x01, 0x23, 0x45, 0x67 };   // 0x7 is not a sign nibble
+        var data = Concat(Record("ACCT0001", 1, Balance1234_56), Record("ACCT0002", 2, corrupt));
+        using var extractor = new FixedWidthBinaryExtractor<Account>
+        (
+            new MemoryStream(data),
+            new FixedWidthBinaryExtractorOptions { SkipItemCount = 1 }
+        );
+
+        var ex = await Assert.ThrowsAsync<FieldConversionException>(async () =>
+            await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+
+        Assert.IsType<FormatException>(ex.InnerException);
+        Assert.Equal(2, ex.LineNumber);
+        Assert.Equal(nameof(Account.Balance), ex.FieldName);
+    }
+
+
+
+    [ExcludeFromCodeCoverage]
+    private sealed class TextNumber
+    {
+        [FixedWidthBinaryField(0, 4, BinaryFieldType.Text)]
+        public int Code { get; set; }
+    }
+
+
+
+    [Fact]
+    public async Task ExtractAsync_when_a_text_field_does_not_parse_throws_FieldConversionException()
+    {
+        var data = Encoding.ASCII.GetBytes("ABCD");
+        using var extractor = new FixedWidthBinaryExtractor<TextNumber>(new MemoryStream(data), options: null);
+
+        var ex = await Assert.ThrowsAsync<FieldConversionException>(async () =>
+            await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+
+        Assert.IsType<FormatException>(ex.InnerException);
+        Assert.Equal(1, ex.LineNumber);
+        Assert.Equal(nameof(TextNumber.Code), ex.FieldName);
+        Assert.Equal(0L, ex.ByteOffset);
+    }
+
+
+
+    [Theory]
+    [InlineData(typeof(FormatException), true)]
+    [InlineData(typeof(OverflowException), true)]
+    [InlineData(typeof(ArgumentException), true)]
+    [InlineData(typeof(ArgumentOutOfRangeException), true)]
+    [InlineData(typeof(InvalidOperationException), false)]
+    public void IsCodecFailure_when_exception_type_varies_wraps_only_data_and_value_errors(Type exceptionType, bool expected)
+    {
+        var ex = (Exception)Activator.CreateInstance(exceptionType)!;
+
+        Assert.Equal(expected, BinaryFieldDescriptor.IsCodecFailure(ex));
     }
 
 
