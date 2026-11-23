@@ -1,7 +1,1 @@
 #nullable enable
-*REMOVED*virtual Wolfgang.Etl.FixedWidth.FixedWidthValueParser.Invoke(System.ReadOnlyMemory<char> text, Wolfgang.Etl.FixedWidth.FieldContext! context) -> object!
-virtual Wolfgang.Etl.FixedWidth.FixedWidthValueParser.Invoke(System.ReadOnlyMemory<char> text, Wolfgang.Etl.FixedWidth.FieldContext! context) -> object?
-Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Format.get -> string?
-Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Format.set -> void
-Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.ByteOffset.get -> long?
-Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.FieldConversionException(string! message, long recordNumber, string! recordContent, string! fieldName, System.Type! expectedType, string! rawValue, long byteOffset, System.Exception! innerException) -> void

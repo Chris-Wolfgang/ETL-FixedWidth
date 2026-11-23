@@ -489,7 +489,7 @@ static Wolfgang.Etl.FixedWidth.FixedWidthReport.operator ==(Wolfgang.Etl.FixedWi
 static Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.operator !=(Wolfgang.Etl.FixedWidth.FixedWidthReportOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthReportOptions? right) -> bool
 static Wolfgang.Etl.FixedWidth.FixedWidthReportOptions.operator ==(Wolfgang.Etl.FixedWidth.FixedWidthReportOptions? left, Wolfgang.Etl.FixedWidth.FixedWidthReportOptions? right) -> bool
 virtual Wolfgang.Etl.FixedWidth.FixedWidthReport.Equals(Wolfgang.Etl.FixedWidth.FixedWidthReport? other) -> bool
-virtual Wolfgang.Etl.FixedWidth.FixedWidthValueParser.Invoke(System.ReadOnlyMemory<char> text, Wolfgang.Etl.FixedWidth.FieldContext! context) -> object!
+virtual Wolfgang.Etl.FixedWidth.FixedWidthValueParser.Invoke(System.ReadOnlyMemory<char> text, Wolfgang.Etl.FixedWidth.FieldContext! context) -> object?
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor.FixedWidthMultiRecordExtractor(System.IO.TextReader! reader, Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions? options, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor!>? logger = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>.FixedWidthTransformer(System.Func<TSource, TDestination>! transform, Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions? options, Microsoft.Extensions.Logging.ILogger<Wolfgang.Etl.FixedWidth.FixedWidthTransformer<TSource, TDestination>!>? logger = null) -> void
 Wolfgang.Etl.FixedWidth.FixedWidthTransformerOptions
@@ -525,3 +525,7 @@ Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ReportingInterval.
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.ReportingInterval.init -> void
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.SkipItemCount.get -> int
 Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions.SkipItemCount.init -> void
+Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Format.get -> string?
+Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Format.set -> void
+Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.ByteOffset.get -> long?
+Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.FieldConversionException(string! message, long recordNumber, string! recordContent, string! fieldName, System.Type! expectedType, string! rawValue, long byteOffset, System.Exception! innerException) -> void
