@@ -20,6 +20,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 
+## [0.14.0] - 2026-11-23
+
+### Added
+
+- `FixedWidthBinaryExtractor` and `FixedWidthBinaryLoader` now throw `FieldConversionException` with the record number, the field's byte offset (new `FieldConversionException.ByteOffset`), the property name and the original error as `InnerException` when a field cannot be decoded or encoded; this changes the exception type from the bare `FormatException` / `OverflowException` / `ArgumentException` thrown before, so catch blocks for those types must catch `FieldConversionException` instead. (#732)
+- `[FixedWidthBinaryField]` gains `Format` so binary `Text` fields mapped to `DateTime`, `DateTimeOffset` or `TimeSpan` (and any `IFormattable`) can be written and read back; a temporal text field without a `Format` now fails at map build with a message naming the property. (#700)
+- Wolfgang.Etl.FixedWidth now also targets net11.0, and its unit tests run on it. The repository builds with the .NET 11 SDK (global.json); no target framework is removed. (#669)
+- The net8.0 and net10.0 assemblies declare `IsAotCompatible` / `IsTrimmable`: the record-type generic parameters and `Type` parameters carry `[DynamicallyAccessedMembers(PublicProperties | PublicParameterlessConstructor)]`, so a trimmed or Native AOT app keeps the members the mapper reads. A consumer that forwards its own unannotated generic `T` into these types gets IL2091 in a trimmed build until it annotates `T` the same way. See ADR 0005. (#358)
+- `FixedWidthValueParser` now returns `object?`, so a custom parser can return `null` for a field with no value without a null-forgiving `!`; code that assigns the result to a non-nullable `object` may see new nullable warnings. (#586)
+
+### Fixed
+
+- Analyzer FW005 now compares the minimum written width of a `Format` pattern with the field length instead of the pattern length, so quoted literals and escapes no longer cause false positives and standard single-character specifiers are no longer misjudged. (#698)
+- Binary stages now validate the record layout when the map is built - binary integer length (1-8 bytes), non-negative `Scale`, and public getter/setter - with errors that name the type and property, and `FixedWidthBinaryLoader` no longer requires a parameterless constructor on the record type. (#699)
+- `FixedWidthBinaryLoader` now honours `SkipItemCount` and `MaximumItemCount`, and rejects a null record with an `InvalidOperationException` instead of a `NullReferenceException`. (#586)
+- `[FixedWidthField(Format = ...)]` is now honoured when parsing `DateOnly` and `TimeOnly` (net6.0 and later), so loader output written with a compact format such as `yyyyMMdd` can be read back by the extractor. (#697)
+- A record type with no `[FixedWidthField]` properties now throws `InvalidOperationException` (naming the type and mentioning attribute trimming) from the text extractor, loader and data reader instead of silently yielding default records or writing blank lines. (#694)
+- `FixedWidthExtractor` and `FixedWidthMultiRecordExtractor` now consult the configured `ErrorPolicy` when `MalformedLineHandling` is `ThrowException` (the default, whose default policy still aborts), so a caller-supplied `ErrorPolicy` such as `Skip` is honoured instead of ignored. (#702)
+- `FixedWidthExtractor` and `FixedWidthMultiRecordExtractor` no longer read (and discard) one extra line when `MaximumItemCount` is reached, so `CurrentByteOffset` is an exact checkpoint after a capped run and no record is lost on resume. (#692)
+- The accessor source generator no longer emits uncompilable code for struct records, types with `required` members, or properties named with a C# keyword; those shapes now fall back to the reflection path (structs and `required` types) or are emitted with an escaped identifier (keyword names). (#691)
+- `FixedWidthLoader` no longer leaves a truncated, unterminated line in the output when a field of a record fails mid-write (for example a `FieldOverflowException`); each line is formatted in a buffer and written only once every field has succeeded. (#696)
+- `PackedDecimal` (COMP-3) decoding now rejects a sign nibble below 0xA with `FormatException`, and encoding no longer writes negative zero (`0x0D`) for a value that truncates to zero. (#695)
+- Struct (`record struct`) record types now work with the text and binary extractors: the factory and field setters operate on the boxed instance, so fields are no longer lost, and the misleading "no public parameterless constructor" error is gone. (#701)
+- `FixedWidthTransformer.ByMatchingProperties()` no longer throws for same-named properties that need a conversion (`int` to `int?`, value type to `object`) and ignores static properties and indexers. (#693)
+
+### Documentation
+
+- README, the DocFX getting-started guide and the `FixedWidthSchemaBuilder` example configure extractors through the options records instead of the deprecated object-initializer setters. (#586)
+- XML documentation now matches the code: skipped and rejected records are counted in `CurrentRejectedItemCount`, `FieldAlignment.Right` is not a numeric default, and the binary / multi-record options records describe their standalone shape. (#586)
+
+### Internal
+
+- Updated Wolfgang.Etl.Abstractions, Wolfgang.Etl.TestKit and Wolfgang.Etl.TestKit.Xunit to 0.27.0 (src, tests and examples); no API or behaviour change. Built with warnings as errors and the unit suite passes on net10.0, net8.0 and net48. (#705)
+- Updated Wolfgang.Etl.Abstractions, Wolfgang.Etl.TestKit and Wolfgang.Etl.TestKit.Xunit to 0.28.0 (src, tests and examples). The 0.28.0 breaking change (Faulty doubles no longer count the failing item) does not affect this repository, which uses none of them. (#714)
+- `PackageValidationBaselineVersion` advances to 0.13.0 now that the package is on the NuGet CDN, so the next release validates its API surface against what actually shipped. (#519)
+- The doc-example test helper enumerates regex matches with an indexed loop instead of a LINQ cast call, clearing a RedundantEnumerableCastCall finding that the previous OfType rewrite re-created, and compiling without nullable warnings on netcoreapp3.1. Test-only; no library change. (#710)
+- Source formatting follows the repository conventions (three blank lines between members, Allman argument lists and throws); no behaviour change. (#586)
+- Removed four InspectCode findings without behaviour change: BinaryFieldMap collects its attributed properties in a loop instead of a LINQ pipeline needing null-forgiving operators (S8969), and two test helpers were tidied (S9415, RedundantEnumerableCastCall). (#710)
+- The library now builds against Microsoft.Extensions.Logging.Abstractions, System.Diagnostics.DiagnosticSource and Microsoft.Bcl.AsyncInterfaces 10.0.14 and Wolfgang.Etl.Abstractions 0.26.1 (patch updates); no API or behaviour change. (#625)
+- The fluent pipeline path source and sink (`FixedWidthExtractor<T>(path)` / `FixedWidthLoader<T>(path)`) open their `StreamReader` / `StreamWriter` with the same 64 KB buffer the extractor and loader Stream constructors use, instead of the 1 K-char default. (#586)
+- Test projects use one xunit runner / coverlet / Test SDK version per target-framework slot, the src project drops properties `Directory.Build.props` already sets, and the FW003-FW008 analyzer rules are recorded as shipped in 0.9.0. (#586)
+- FixedWidthSchemaBuilder now resolves its property selector with Wolfgang.Etl.Abstractions PropertySelector.Resolve instead of a private copy; the same selectors are accepted and rejected (ArgumentException), only the exception message text comes from Abstractions. (#706)
+- Regenerated .github/requirements/semgrep.txt so the OpenTelemetry packages move to 1.45.2 (GHSA-mf5v-w3w3-f6cg), and restored the mcp==1.30.0 override: Dependabot had bumped it to 2.3.0 in semgrep-overrides.txt, but mcp 2.x removed mcp.server.fastmcp, which semgrep imports, so semgrep crashes under it. CI tooling only; no library change. (#711)
+- net5.0, net6.0 and net7.0 builds now take the span-based (allocation-free) numeric, date and padding paths that were gated on net8.0; the binary field map is built once per record type; empty value-type fields reuse one boxed default per type. (#586)
+- Tests use the TestKit TestLoader<T> in place of a hand-written counting loader and SynchronousProgress in place of a private progress double; the test that only exercised the removed double is gone. No library change. (#707)
+
 ## [0.13.0] - 2026-09-22
 
 ### Added
