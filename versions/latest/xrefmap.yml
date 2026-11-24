@@ -51,6 +51,19 @@ references:
   isSpec: "True"
   fullName: Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.ByteLength
   nameWithType: FixedWidthBinaryFieldAttribute.ByteLength
+- uid: Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Format
+  name: Format
+  href: api/Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.html#Wolfgang_Etl_FixedWidth_Attributes_FixedWidthBinaryFieldAttribute_Format
+  commentId: P:Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Format
+  fullName: Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Format
+  nameWithType: FixedWidthBinaryFieldAttribute.Format
+- uid: Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Format*
+  name: Format
+  href: api/Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.html#Wolfgang_Etl_FixedWidth_Attributes_FixedWidthBinaryFieldAttribute_Format_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Format
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Format
+  nameWithType: FixedWidthBinaryFieldAttribute.Format
 - uid: Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.Index
   name: Index
   href: api/Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute.html#Wolfgang_Etl_FixedWidth_Attributes_FixedWidthBinaryFieldAttribute_Index
@@ -562,6 +575,15 @@ references:
   fullName.vb: Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.New(String, Long, String, String, System.Type, String, System.Exception)
   nameWithType: FieldConversionException.FieldConversionException(string, long, string, string, Type, string, Exception)
   nameWithType.vb: FieldConversionException.New(String, Long, String, String, Type, String, Exception)
+- uid: Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.#ctor(System.String,System.Int64,System.String,System.String,System.Type,System.String,System.Int64,System.Exception)
+  name: FieldConversionException(string, long, string, string, Type, string, long, Exception)
+  href: api/Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.html#Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException__ctor_System_String_System_Int64_System_String_System_String_System_Type_System_String_System_Int64_System_Exception_
+  commentId: M:Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.#ctor(System.String,System.Int64,System.String,System.String,System.Type,System.String,System.Int64,System.Exception)
+  name.vb: New(String, Long, String, String, Type, String, Long, Exception)
+  fullName: Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.FieldConversionException(string, long, string, string, System.Type, string, long, System.Exception)
+  fullName.vb: Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.New(String, Long, String, String, System.Type, String, Long, System.Exception)
+  nameWithType: FieldConversionException.FieldConversionException(string, long, string, string, Type, string, long, Exception)
+  nameWithType.vb: FieldConversionException.New(String, Long, String, String, Type, String, Long, Exception)
 - uid: Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.#ctor*
   name: FieldConversionException
   href: api/Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.html#Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException__ctor_
@@ -572,6 +594,19 @@ references:
   fullName.vb: Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.New
   nameWithType: FieldConversionException.FieldConversionException
   nameWithType.vb: FieldConversionException.New
+- uid: Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.ByteOffset
+  name: ByteOffset
+  href: api/Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.html#Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException_ByteOffset
+  commentId: P:Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.ByteOffset
+  fullName: Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.ByteOffset
+  nameWithType: FieldConversionException.ByteOffset
+- uid: Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.ByteOffset*
+  name: ByteOffset
+  href: api/Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.html#Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException_ByteOffset_
+  commentId: Overload:Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.ByteOffset
+  isSpec: "True"
+  fullName: Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.ByteOffset
+  nameWithType: FieldConversionException.ByteOffset
 - uid: Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.ExpectedType
   name: ExpectedType
   href: api/Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.html#Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException_ExpectedType

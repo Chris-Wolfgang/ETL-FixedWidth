@@ -1,0 +1,146 @@
+Summary
+  Generated on: 11/24/2026 - 12:43:57 AM
+  Coverage date: 11/24/2026 - 12:43:45 AM - 11/24/2026 - 12:43:54 AM
+  Parser: MultiReport (5x Cobertura)
+  Assemblies: 7
+  Classes: 112
+  Files: 101
+  Line coverage: 99.3%
+  Covered lines: 10502
+  Uncovered lines: 68
+  Coverable lines: 10570
+  Total lines: 28110
+  Branch coverage: 86% (1737 of 2018)
+  Covered branches: 1737
+  Total branches: 2018
+  Method coverage: 99.6% (1664 of 1670)
+  Full method coverage: 98.2% (1641 of 1670)
+  Covered methods: 1664
+  Fully covered methods: 1641
+  Total methods: 1670
+
+Wolfgang.Etl.FixedWidth                                                            98.1%
+  Wolfgang.Etl.FixedWidth.Attributes.FixedWidthBinaryFieldAttribute                 100%
+  Wolfgang.Etl.FixedWidth.Attributes.FixedWidthFieldAttribute                       100%
+  Wolfgang.Etl.FixedWidth.Attributes.FixedWidthSkipAttribute                        100%
+  Wolfgang.Etl.FixedWidth.Binary.BinaryFieldDescriptor                              100%
+  Wolfgang.Etl.FixedWidth.Binary.BinaryFieldMap                                     100%
+  Wolfgang.Etl.FixedWidth.Binary.BinaryInteger                                      100%
+  Wolfgang.Etl.FixedWidth.Binary.BinaryRecordMap                                    100%
+  Wolfgang.Etl.FixedWidth.Binary.PackedDecimal                                      100%
+  Wolfgang.Etl.FixedWidth.Diagnostics.FixedWidthMetrics                            98.4%
+  Wolfgang.Etl.FixedWidth.EtlPipelineFixedWidthExtensions                           100%
+  Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException                       100%
+  Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException                         100%
+  Wolfgang.Etl.FixedWidth.Exceptions.LineTooShortException                          100%
+  Wolfgang.Etl.FixedWidth.Exceptions.MalformedLineException                         100%
+  Wolfgang.Etl.FixedWidth.FieldContext                                              100%
+  Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor<T>                              100%
+  Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions                          100%
+  Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader<T>                                 100%
+  Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoaderOptions                             100%
+  Wolfgang.Etl.FixedWidth.FixedWidthConverter                                      96.4%
+  Wolfgang.Etl.FixedWidth.FixedWidthDataReader<T>                                  93.5%
+  Wolfgang.Etl.FixedWidth.FixedWidthDataReaderOptions                               100%
+  Wolfgang.Etl.FixedWidth.FixedWidthError                                           100%
+  Wolfgang.Etl.FixedWidth.FixedWidthExtractor<T>                                   94.9%
+  Wolfgang.Etl.FixedWidth.FixedWidthExtractorBuilder<T>                            96.5%
+  Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions<T>                             100%
+  Wolfgang.Etl.FixedWidth.FixedWidthExtractorStreamOptions<T>                       100%
+  Wolfgang.Etl.FixedWidth.FixedWidthFieldInfo                                       100%
+  Wolfgang.Etl.FixedWidth.FixedWidthLoader<T>                                        98%
+  Wolfgang.Etl.FixedWidth.FixedWidthLoaderBuilder<T>                                100%
+  Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions                                   100%
+  Wolfgang.Etl.FixedWidth.FixedWidthLoaderStreamOptions                             100%
+  Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractor                            100%
+  Wolfgang.Etl.FixedWidth.FixedWidthMultiRecordExtractorOptions                     100%
+  Wolfgang.Etl.FixedWidth.FixedWidthReport                                          100%
+  Wolfgang.Etl.FixedWidth.FixedWidthReportOptions                                   100%
+  Wolfgang.Etl.FixedWidth.FixedWidthSchema                                          100%
+  Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>                                100%
+  Wolfgang.Etl.FixedWidth.FixedWidthTransformer<T1, T2>                            98.9%
+  Wolfgang.Etl.FixedWidth.Generated.GeneratedAccessorRegistry                      97.1%
+  Wolfgang.Etl.FixedWidth.Parsing.ByteCountingLineReader                            100%
+  Wolfgang.Etl.FixedWidth.Parsing.FieldDescriptor                                   100%
+  Wolfgang.Etl.FixedWidth.Parsing.FieldMap                                           99%
+  Wolfgang.Etl.FixedWidth.Parsing.FieldMapResult                                    100%
+  Wolfgang.Etl.FixedWidth.Parsing.FixedWidthLineParser                              100%
+  Wolfgang.Etl.FixedWidth.Parsing.FixedWidthMemoryExtensions                        100%
+  Wolfgang.Etl.FixedWidth.Parsing.TrimSafeReflection                                100%
+  Wolfgang.Etl.FixedWidth.ValidationResult                                          100%
+
+Wolfgang.Etl.FixedWidth.Analyzers                                                  97.2%
+  Wolfgang.Etl.FixedWidth.Analyzers.FixedWidthAccessorGenerator                    97.3%
+  Wolfgang.Etl.FixedWidth.Analyzers.FixedWidthDiagnostics                           100%
+  Wolfgang.Etl.FixedWidth.Analyzers.FixedWidthFieldAnalyzer                        96.1%
+
+Wolfgang.Etl.FixedWidth.Tests.Concurrency                                           100%
+  Wolfgang.Etl.FixedWidth.Tests.Concurrency.ConcurrencyStressTests                  100%
+
+Wolfgang.Etl.FixedWidth.Tests.Fuzz                                                  100%
+  Wolfgang.Etl.FixedWidth.Tests.Fuzz.FixedWidthFuzzTests                            100%
+
+Wolfgang.Etl.FixedWidth.Tests.Snapshot                                              100%
+  Wolfgang.Etl.FixedWidth.Tests.Snapshot.FormatterSnapshotTests                     100%
+
+Wolfgang.Etl.FixedWidth.Tests.SourceLink                                            100%
+  Wolfgang.Etl.FixedWidth.Tests.SourceLink.SourceLinkPdbTests                       100%
+
+Wolfgang.Etl.FixedWidth.Tests.Unit                                                  100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.BinaryCodecTests                               100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.ByteCountingLineReaderTests                    100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.ConstructorArgumentTests                       100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.ConstructorOverloadResolutionTests             100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.DirectWriteTests                               100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.DocExampleApiReferenceTests                    100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.EtlPipelineFixedWidthExtensionsTests           100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FieldContextTests                              100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FieldMapTests                                  100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthAccessorGeneratorOutputTests         100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthAccessorGeneratorTests               100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthBinaryExtractorTests                 100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthBinaryLoaderTests                    100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthConverterTests                       100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthDataReaderTests                      100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthDateOnlyTimeOnlyTests                100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthEncodingTests                        100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthExtractorCheckpointTests             100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthExtractorLoggingTests                100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthExtractorOptionsTests                100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthExtractorStreamCtorTests             100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthExtractorTests                       100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthFieldAnalyzerTests                   100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthFieldAttributeTests                  100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthItemErrorHandlingTests               100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthLineAccountingTests                  100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthLineParserTests                      100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthLoaderDryRunTests                    100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthLoaderLoggingTests                   100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthLoaderOptionsTests                   100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthLoaderStreamCtorTests                100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthLoaderTests                          100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthLoggingCompletionTests               100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthMetricsTests                         100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthMultiRecordExtractorTests            100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthNumberStylesTests                    100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthOptionsBaseRecordTests               100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthRecordValidatorTests                 100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthReportTests                          100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthSchemaBuilderTests                   100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthSchemaTests                          100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthSkipAttributeTests                   100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthStandaloneOptionsRecordTests         100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthStructRecordTests                    100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthTransformerContractTests             100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.FixedWidthTransformerTests                     100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.GeneratedAccessorRegistryTests                 100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.Globalization.CultureInvarianceTests           100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.Globalization.CultureSwapper                   100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.HeaderRecord                                   100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.LineLengthValidationTests                      100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.LogEntry                                       100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.NullableParsingTests                           100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.PersonRecord                                   100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.SpyLogger<T>                                   100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.TestModels.GeneratedAccessorFixture            100%
+  Wolfgang.Etl.FixedWidth.Tests.Unit.TestModels.GeneratedAccessorInitOnlyFixture    100%

@@ -6,7 +6,7 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="title" content="Class FieldConversionException | Wolfgang.Etl.FixedWidth Documentation ">
       
-      <meta name="description" content="The exception thrown when a field&#39;s raw string value cannot be converted to the target property type during a fixed-width read (extract) operation. Derives from .">
+      <meta name="description" content="The exception thrown when a field&#39;s raw string value cannot be converted to the target property type during a fixed-width read (extract) operation, or when a  /  field cannot be decoded or encoded. Derives from .">
       <link rel="icon" href="../favicon.svg">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.13.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.14.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,17 +75,18 @@
 
 
   <h1 id="Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException" data-uid="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException" class="text-break">
-Class FieldConversionException  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldConversionException.cs/#L11"><i class="bi bi-code-slash"></i></a>
+Class FieldConversionException  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldConversionException.cs/#L16"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
-    <dl><dt>Namespace</dt><dd><a class="xref" href="Wolfgang.html">Wolfgang</a>.<a class="xref" href="Wolfgang.Etl.html">Etl</a>.<a class="xref" href="Wolfgang.Etl.FixedWidth.html">FixedWidth</a>.<a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.html">Exceptions</a></dd></dl>
+    <dl><dt>Namespace</dt><dd><span class="xref">Wolfgang</span>.<span class="xref">Etl</span>.<a class="xref" href="Wolfgang.Etl.FixedWidth.html">FixedWidth</a>.<a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.html">Exceptions</a></dd></dl>
   <dl><dt>Assembly</dt><dd>Wolfgang.Etl.FixedWidth.dll</dd></dl>
   </div>
 
   <div class="markdown summary"><p>The exception thrown when a field's raw string value cannot be converted to the
-target property type during a fixed-width read (extract) operation. Derives from
-<a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.MalformedLineException.html">MalformedLineException</a>.</p>
+target property type during a fixed-width read (extract) operation, or when a
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor-1.html">FixedWidthBinaryExtractor&lt;TRecord&gt;</a> / <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader-1.html">FixedWidthBinaryLoader&lt;TRecord&gt;</a>
+field cannot be decoded or encoded. Derives from <a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.MalformedLineException.html">MalformedLineException</a>.</p>
 </div>
   <div class="markdown conceptual"></div>
 
@@ -173,6 +174,10 @@ target property type during a fixed-width read (extract) operation. Derives from
 
 
 
+  <h2 id="Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException_remarks">Remarks</h2>
+  <div class="markdown level0 remarks"><p>For the binary stages <a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.MalformedLineException.html#Wolfgang_Etl_FixedWidth_Exceptions_MalformedLineException_LineNumber">LineNumber</a> is the 1-based record number and
+<a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.html#Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException_ByteOffset">ByteOffset</a> is the 0-based offset of the field within the record.</p>
+</div>
 
 
   <h2 class="section" id="constructors">Constructors
@@ -183,7 +188,7 @@ target property type during a fixed-width read (extract) operation. Derives from
 
   <h3 id="Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException__ctor_System_String_System_Int64_System_String_System_String_System_Type_System_String_System_Exception_" data-uid="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.#ctor(System.String,System.Int64,System.String,System.String,System.Type,System.String,System.Exception)">
   FieldConversionException(string, long, string, string, Type, string, Exception)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldConversionException.cs/#L28"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldConversionException.cs/#L33"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Initializes a new instance of <a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.html">FieldConversionException</a> with full context.</p>
@@ -230,15 +235,103 @@ target property type during a fixed-width read (extract) operation. Derives from
 
 
 
+  <a id="Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException__ctor_" data-uid="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.#ctor*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException__ctor_System_String_System_Int64_System_String_System_String_System_Type_System_String_System_Int64_System_Exception_" data-uid="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.#ctor(System.String,System.Int64,System.String,System.String,System.Type,System.String,System.Int64,System.Exception)">
+  FieldConversionException(string, long, string, string, Type, string, long, Exception)
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldConversionException.cs/#L70"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Initializes a new instance of <a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.html">FieldConversionException</a> for a field of a
+fixed-length binary record, carrying the field's byte offset within the record.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FieldConversionException(string message, long recordNumber, string recordContent, string fieldName, Type expectedType, string rawValue, long byteOffset, Exception innerException)</code></pre>
+  </div>
+
+  <h4 class="section">Parameters</h4>
+  <dl class="parameters">
+    <dt><code>message</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>A message that describes the error.</p>
+</dd>
+    <dt><code>recordNumber</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></dt>
+    <dd><p>The 1-based number of the offending record.</p>
+</dd>
+    <dt><code>recordContent</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>A printable form of the offending record (for example its bytes in hex).</p>
+</dd>
+    <dt><code>fieldName</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>The name of the property whose value could not be converted.</p>
+</dd>
+    <dt><code>expectedType</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></dt>
+    <dd><p>The CLR type of the property.</p>
+</dd>
+    <dt><code>rawValue</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></dt>
+    <dd><p>A printable form of the value that failed conversion (for example the field's bytes in hex).</p>
+</dd>
+    <dt><code>byteOffset</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a></dt>
+    <dd><p>The 0-based offset of the field within the record.</p>
+</dd>
+    <dt><code>innerException</code> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.exception">Exception</a></dt>
+    <dd><p>The underlying conversion exception.</p>
+</dd>
+  </dl>
+
+
+
+
+
+
+
+
+
+
+
+
   <h2 class="section" id="properties">Properties
 </h2>
+
+
+  <a id="Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException_ByteOffset_" data-uid="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.ByteOffset*"></a>
+
+  <h3 id="Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException_ByteOffset" data-uid="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.ByteOffset">
+  ByteOffset
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldConversionException.cs/#L126"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>The 0-based offset of the field within a fixed-length binary record, or
+<a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a> when the error came from a text (line-based) stage.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public long? ByteOffset { get; }</code></pre>
+  </div>
+
+
+
+
+
+  <h4 class="section">Property Value</h4>
+  <dl class="parameters">
+    <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int64">long</a>?</dt>
+    <dd></dd>
+  </dl>
+
+
+
+
+
+
 
 
   <a id="Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException_ExpectedType_" data-uid="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.ExpectedType*"></a>
 
   <h3 id="Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException_ExpectedType" data-uid="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.ExpectedType">
   ExpectedType
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldConversionException.cs/#L67"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldConversionException.cs/#L111"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The CLR type the raw string value was being converted to.</p>
@@ -270,7 +363,7 @@ target property type during a fixed-width read (extract) operation. Derives from
 
   <h3 id="Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException_FieldName" data-uid="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.FieldName">
   FieldName
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldConversionException.cs/#L60"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldConversionException.cs/#L104"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The name of the property whose value could not be converted.</p>
@@ -302,7 +395,7 @@ target property type during a fixed-width read (extract) operation. Derives from
 
   <h3 id="Wolfgang_Etl_FixedWidth_Exceptions_FieldConversionException_RawValue" data-uid="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.RawValue">
   RawValue
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldConversionException.cs/#L74"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldConversionException.cs/#L118"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>The raw string value extracted from the line that failed conversion.</p>
@@ -334,7 +427,7 @@ target property type during a fixed-width read (extract) operation. Derives from
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldConversionException.cs/#L11" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/Exceptions/FieldConversionException.cs/#L16" class="edit-link">Edit this page</a>
         </div>
 
 

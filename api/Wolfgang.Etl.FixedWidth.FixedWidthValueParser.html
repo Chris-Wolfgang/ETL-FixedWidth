@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.13.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthValueParser.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthValueParser%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.14.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthValueParser.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthValueParser%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,11 +75,11 @@
 
 
   <h1 id="Wolfgang_Etl_FixedWidth_FixedWidthValueParser" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthValueParser" class="text-break">
-Delegate FixedWidthValueParser  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthValueParser.cs/#L21"><i class="bi bi-code-slash"></i></a>
+Delegate FixedWidthValueParser  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthValueParser.cs/#L22"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
-    <dl><dt>Namespace</dt><dd><a class="xref" href="Wolfgang.html">Wolfgang</a>.<a class="xref" href="Wolfgang.Etl.html">Etl</a>.<a class="xref" href="Wolfgang.Etl.FixedWidth.html">FixedWidth</a></dd></dl>
+    <dl><dt>Namespace</dt><dd><span class="xref">Wolfgang</span>.<span class="xref">Etl</span>.<a class="xref" href="Wolfgang.Etl.FixedWidth.html">FixedWidth</a></dd></dl>
   <dl><dt>Assembly</dt><dd>Wolfgang.Etl.FixedWidth.dll</dd></dl>
   </div>
 
@@ -90,7 +90,7 @@ The <code class="paramref">text</code> is a zero-copy slice of the source line â
   <div class="markdown conceptual"></div>
 
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public delegate object FixedWidthValueParser(ReadOnlyMemory&lt;char&gt; text, FieldContext context)</code></pre>
+    <pre><code class="lang-csharp hljs">public delegate object? FixedWidthValueParser(ReadOnlyMemory&lt;char&gt; text, FieldContext context)</code></pre>
   </div>
 
   <h4 class="section">Parameters</h4>
@@ -108,7 +108,8 @@ and field length.</p>
   <h4 class="section">Returns</h4>
   <dl class="parameters">
     <dt><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></dt>
-    <dd><p>A value assignable to the target property's CLR type.</p>
+    <dd><p>A value assignable to the target property's CLR type, or <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/null">null</a>
+when the field has no value (for example an empty field mapped to a nullable property).</p>
 </dd>
   </dl>
 
@@ -126,7 +127,7 @@ and field length.</p>
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthValueParser.cs/#L21" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthValueParser.cs/#L22" class="edit-link">Edit this page</a>
         </div>
 
 

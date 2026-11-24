@@ -6,7 +6,7 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="title" content="Class FixedWidthSchemaBuilder&lt;T&gt; | Wolfgang.Etl.FixedWidth Documentation ">
       
-      <meta name="description" content="Builds a  for T from a fluent, type-safe code API instead of [FixedWidthField] / [FixedWidthSkip] attributes (#23). Use it when the record type is not yours to decorate, when you prefer configuration-as-code, or when the layout is built dynamically. The resulting schema is equivalent to one resolved from attributes — assign it to  /  to use it, or inspect it with  / .">
+      <meta name="description" content="Builds a  for T from a fluent, type-safe code API instead of [FixedWidthField] / [FixedWidthSkip] attributes (#23). Use it when the record type is not yours to decorate, when you prefer configuration-as-code, or when the layout is built dynamically. The resulting schema is equivalent to one resolved from attributes — pass it as  /  to use it, or inspect it with  / .">
       <link rel="icon" href="../favicon.svg">
       <link rel="stylesheet" href="../public/docfx.min.css">
       <link rel="stylesheet" href="../public/main.css">
@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.13.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.14.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder%601%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,19 +75,19 @@
 
 
   <h1 id="Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1" class="text-break">
-Class FixedWidthSchemaBuilder&lt;T&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthSchemaBuilder.cs/#L34"><i class="bi bi-code-slash"></i></a>
+Class FixedWidthSchemaBuilder&lt;T&gt;  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthSchemaBuilder.cs/#L41"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
-    <dl><dt>Namespace</dt><dd><a class="xref" href="Wolfgang.html">Wolfgang</a>.<a class="xref" href="Wolfgang.Etl.html">Etl</a>.<a class="xref" href="Wolfgang.Etl.FixedWidth.html">FixedWidth</a></dd></dl>
+    <dl><dt>Namespace</dt><dd><span class="xref">Wolfgang</span>.<span class="xref">Etl</span>.<a class="xref" href="Wolfgang.Etl.FixedWidth.html">FixedWidth</a></dd></dl>
   <dl><dt>Assembly</dt><dd>Wolfgang.Etl.FixedWidth.dll</dd></dl>
   </div>
 
   <div class="markdown summary"><p>Builds a <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchema.html">FixedWidthSchema</a> for <code class="typeparamref">T</code> from a fluent, type-safe code
 API instead of <code>[FixedWidthField]</code> / <code>[FixedWidthSkip]</code> attributes (#23). Use it when the
 record type is not yours to decorate, when you prefer configuration-as-code, or when the layout is
-built dynamically. The resulting schema is equivalent to one resolved from attributes — assign it to
-<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractor_1_Schema">Schema</a> / <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoader-1.html#Wolfgang_Etl_FixedWidth_FixedWidthLoader_1_Schema">Schema</a> to
+built dynamically. The resulting schema is equivalent to one resolved from attributes — pass it as
+<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions-1.html#Wolfgang_Etl_FixedWidth_FixedWidthExtractorOptions_1_Schema">Schema</a> / <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.html#Wolfgang_Etl_FixedWidth_FixedWidthLoaderOptions_Schema">Schema</a> to
 use it, or inspect it with <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchema.html#Wolfgang_Etl_FixedWidth_FixedWidthSchema_Fields">Fields</a> / <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchema.html#Wolfgang_Etl_FixedWidth_FixedWidthSchema_ToDiagram">ToDiagram()</a>.</p>
 </div>
   <div class="markdown conceptual"></div>
@@ -148,7 +148,11 @@ use it, or inspect it with <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWi
     .Field(r =&gt; r.Balance, index: 3, length: 9, alignment: FieldAlignment.Right, format: "0000000.00")
     .Build();
 
-var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;(reader) { Schema = schema };</code></pre>
+var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;
+(
+    reader,
+    new FixedWidthExtractorOptions&lt;CustomerRecord&gt; { Schema = schema }
+);</code></pre>
 
 
 
@@ -161,7 +165,7 @@ var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;(reader) { Schema =
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1_Build" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Build">
   Build()
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthSchemaBuilder.cs/#L127"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthSchemaBuilder.cs/#L136"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Validates the accumulated fields and skips and produces the immutable <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthSchema.html">FixedWidthSchema</a>.</p>
@@ -200,7 +204,7 @@ var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;(reader) { Schema =
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1_Field__1_System_Linq_Expressions_Expression_System_Func__0___0___System_Int32_System_Int32_Wolfgang_Etl_FixedWidth_Enums_FieldAlignment_System_Char_System_String_System_String_System_Nullable_System_Globalization_NumberStyles__System_Boolean_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Field``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Int32,System.Int32,Wolfgang.Etl.FixedWidth.Enums.FieldAlignment,System.Char,System.String,System.String,System.Nullable{System.Globalization.NumberStyles},System.Boolean)">
   Field&lt;TProperty&gt;(Expression&lt;Func&lt;T, TProperty&gt;&gt;, int, int, FieldAlignment, char, string?, string?, NumberStyles?, bool)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthSchemaBuilder.cs/#L60"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthSchemaBuilder.cs/#L67"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Adds a mapped field. The <code class="paramref">index</code> is a zero-based column ordinal (matching
@@ -286,7 +290,7 @@ all lower-indexed columns, so indexes only need to be unique, not contiguous.</p
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthSchemaBuilder_1_Skip_System_Int32_System_Int32_System_String_" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder`1.Skip(System.Int32,System.Int32,System.String)">
   Skip(int, int, string?)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthSchemaBuilder.cs/#L112"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthSchemaBuilder.cs/#L120"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Adds a skipped column — a range in the file mapped to no property. Its width still contributes to
@@ -338,7 +342,7 @@ the positions of later fields.</p>
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthSchemaBuilder.cs/#L34" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthSchemaBuilder.cs/#L41" class="edit-link">Edit this page</a>
         </div>
 
 

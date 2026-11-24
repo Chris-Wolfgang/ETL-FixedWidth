@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<coverage version="1.0" date="2026-07-14_00-45-05" tag="">
+  <assembly name="Wolfgang.Etl.FixedWidth">
+    <class name="Wolfgang.Etl.FixedWidth.Attributes.FixedWidthFieldAttribute" coveredlines="27" coverablelines="27" totallines="156" coveredbranches="4" totalbranches="4" coveredcodeelements="8" fullcoveredcodeelements="8" totalcodeelements="8" />
+    <class name="Wolfgang.Etl.FixedWidth.Attributes.FixedWidthSkipAttribute" coveredlines="23" coverablelines="23" totallines="95" coveredbranches="4" totalbranches="4" coveredcodeelements="4" fullcoveredcodeelements="4" totalcodeelements="4" />
+    <class name="Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException" coveredlines="14" coverablelines="14" totallines="75" coveredbranches="0" totalbranches="0" coveredcodeelements="4" fullcoveredcodeelements="4" totalcodeelements="4" />
+    <class name="Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException" coveredlines="8" coverablelines="8" totallines="75" coveredbranches="0" totalbranches="0" coveredcodeelements="4" fullcoveredcodeelements="4" totalcodeelements="4" />
+    <class name="Wolfgang.Etl.FixedWidth.Exceptions.LineTooShortException" coveredlines="11" coverablelines="11" totallines="61" coveredbranches="0" totalbranches="0" coveredcodeelements="3" fullcoveredcodeelements="3" totalcodeelements="3" />
+    <class name="Wolfgang.Etl.FixedWidth.Exceptions.MalformedLineException" coveredlines="14" coverablelines="14" totallines="94" coveredbranches="0" totalbranches="0" coveredcodeelements="4" fullcoveredcodeelements="4" totalcodeelements="4" />
+    <class name="Wolfgang.Etl.FixedWidth.FieldContext" coveredlines="25" coverablelines="25" totallines="102" coveredbranches="0" totalbranches="0" coveredcodeelements="8" fullcoveredcodeelements="8" totalcodeelements="8" />
+    <class name="Wolfgang.Etl.FixedWidth.FixedWidthConverter" coveredlines="161" coverablelines="174" totallines="525" coveredbranches="70" totalbranches="76" coveredcodeelements="6" fullcoveredcodeelements="4" totalcodeelements="6" />
+    <class name="Wolfgang.Etl.FixedWidth.FixedWidthExtractor`1" coveredlines="281" coverablelines="310" totallines="1018" coveredbranches="81" totalbranches="100" coveredcodeelements="37" fullcoveredcodeelements="32" totalcodeelements="38" />
+    <class name="Wolfgang.Etl.FixedWidth.FixedWidthLoader`1" coveredlines="189" coverablelines="202" totallines="675" coveredbranches="51" totalbranches="64" coveredcodeelements="24" fullcoveredcodeelements="22" totalcodeelements="25" />
+    <class name="Wolfgang.Etl.FixedWidth.FixedWidthReport" coveredlines="6" coverablelines="6" totallines="73" coveredbranches="0" totalbranches="0" coveredcodeelements="3" fullcoveredcodeelements="3" totalcodeelements="3" />
+    <class name="Wolfgang.Etl.FixedWidth.Parsing.FieldDescriptor" coveredlines="50" coverablelines="50" totallines="160" coveredbranches="4" totalbranches="6" coveredcodeelements="11" fullcoveredcodeelements="11" totalcodeelements="11" />
+    <class name="Wolfgang.Etl.FixedWidth.Parsing.FieldMap" coveredlines="67" coverablelines="67" totallines="197" coveredbranches="22" totalbranches="22" coveredcodeelements="14" fullcoveredcodeelements="14" totalcodeelements="14" />
+    <class name="Wolfgang.Etl.FixedWidth.Parsing.FieldMapResult" coveredlines="29" coverablelines="29" totallines="99" coveredbranches="2" totalbranches="2" coveredcodeelements="6" fullcoveredcodeelements="6" totalcodeelements="6" />
+    <class name="Wolfgang.Etl.FixedWidth.Parsing.FixedWidthLineParser" coveredlines="174" coverablelines="174" totallines="522" coveredbranches="63" totalbranches="66" coveredcodeelements="11" fullcoveredcodeelements="11" totalcodeelements="11" />
+    <class name="Wolfgang.Etl.FixedWidth.Parsing.FixedWidthMemoryExtensions" coveredlines="8" coverablelines="8" totallines="33" coveredbranches="8" totalbranches="8" coveredcodeelements="1" fullcoveredcodeelements="1" totalcodeelements="1" />
+  </assembly>
+</coverage>

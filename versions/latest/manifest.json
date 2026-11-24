@@ -1,4 +1,5 @@
 {
+  "docfx_version": "2.81.0+ba844df625370a6bd7c1ecab0d0ec4d1d9128ac4",
   "source_base_path": "D:/a/ETL-FixedWidth/ETL-FixedWidth/docfx_project",
   "xrefmap": "xrefmap.yml",
   "files": [
@@ -214,7 +215,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException",
-      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.yml\" sourcestartlinenumber=\"1\">The exception thrown when a field's raw string value cannot be converted to the\ntarget property type during a fixed-width read (extract) operation. Derives from\n<xref href=\"Wolfgang.Etl.FixedWidth.Exceptions.MalformedLineException\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.Exceptions.FieldConversionException.yml\" sourcestartlinenumber=\"1\">The exception thrown when a field's raw string value cannot be converted to the\ntarget property type during a fixed-width read (extract) operation, or when a\n<xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractor%601\" data-throw-if-not-resolved=\"false\"></xref> / <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthBinaryLoader%601\" data-throw-if-not-resolved=\"false\"></xref>\nfield cannot be decoded or encoded. Derives from <xref href=\"Wolfgang.Etl.FixedWidth.Exceptions.MalformedLineException\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
     },
     {
       "type": "ManagedReference",
@@ -578,7 +579,7 @@
       "Uid": null,
       "IsMRef": true,
       "Title": "Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder<T>",
-      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder-1.yml\" sourcestartlinenumber=\"1\">Builds a <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthSchema\" data-throw-if-not-resolved=\"false\"></xref> for <code class=\"typeparamref\">T</code> from a fluent, type-safe code\nAPI instead of <code>[FixedWidthField]</code> / <code>[FixedWidthSkip]</code> attributes (#23). Use it when the\nrecord type is not yours to decorate, when you prefer configuration-as-code, or when the layout is\nbuilt dynamically. The resulting schema is equivalent to one resolved from attributes — assign it to\n<xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractor%601.Schema\" data-throw-if-not-resolved=\"false\"></xref> / <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthLoader%601.Schema\" data-throw-if-not-resolved=\"false\"></xref> to\nuse it, or inspect it with <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthSchema.Fields\" data-throw-if-not-resolved=\"false\"></xref> / <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthSchema.ToDiagram\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
+      "Summary": "<p sourcefile=\"api/Wolfgang.Etl.FixedWidth.FixedWidthSchemaBuilder-1.yml\" sourcestartlinenumber=\"1\">Builds a <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthSchema\" data-throw-if-not-resolved=\"false\"></xref> for <code class=\"typeparamref\">T</code> from a fluent, type-safe code\nAPI instead of <code>[FixedWidthField]</code> / <code>[FixedWidthSkip]</code> attributes (#23). Use it when the\nrecord type is not yours to decorate, when you prefer configuration-as-code, or when the layout is\nbuilt dynamically. The resulting schema is equivalent to one resolved from attributes — pass it as\n<xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthExtractorOptions%601.Schema\" data-throw-if-not-resolved=\"false\"></xref> / <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthLoaderOptions.Schema\" data-throw-if-not-resolved=\"false\"></xref> to\nuse it, or inspect it with <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthSchema.Fields\" data-throw-if-not-resolved=\"false\"></xref> / <xref href=\"Wolfgang.Etl.FixedWidth.FixedWidthSchema.ToDiagram\" data-throw-if-not-resolved=\"false\"></xref>.</p>\n"
     },
     {
       "type": "ManagedReference",

@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/docfx_project/docs/getting-started.md/#L1">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/docfx_project/docs/getting-started.md/#L1">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -76,7 +76,7 @@
 <p>This guide will help you quickly get up and running with Wolfgang.Etl.FixedWidth.</p>
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
-<li>.NET 8.0 SDK or later to follow this guide (the package also targets net462, net481, netstandard2.0, net5.0, net6.0, and net7.0 for older runtimes)</li>
+<li>.NET 10.0 SDK to follow this guide (the package also targets net462, net481, netstandard2.0, net5.0, net6.0, and net7.0 for older runtimes)</li>
 </ul>
 <h2 id="installation">Installation</h2>
 <h3 id="via-nuget-package-manager">Via NuGet Package Manager</h3>
@@ -160,7 +160,11 @@ await loader.LoadAsync(recordsAsyncEnumerable, CancellationToken.None);
 <p>For multi-GB files, opt in to byte-offset tracking so a crashed run can resume without re-reading. Persist <code>CurrentByteOffset</code> after each record and pass it back as <code>StartByteOffset</code> on restart:</p>
 <pre><code class="lang-csharp">// First run
 await using var stream = File.OpenRead(&quot;huge.dat&quot;);
-using var extractor = new FixedWidthExtractor&lt;Record&gt;(stream) { TrackByteOffset = true };
+using var extractor = new FixedWidthExtractor&lt;Record&gt;
+(
+    stream,
+    new FixedWidthExtractorStreamOptions&lt;Record&gt; { TrackByteOffset = true }
+);
 await foreach (var record in extractor.ExtractAsync(token))
 {
     Process(record);
@@ -169,7 +173,11 @@ await foreach (var record in extractor.ExtractAsync(token))
 
 // Resume after a crash
 await using var stream = File.OpenRead(&quot;huge.dat&quot;);
-using var extractor = new FixedWidthExtractor&lt;Record&gt;(stream) { StartByteOffset = LoadCheckpoint() };
+using var extractor = new FixedWidthExtractor&lt;Record&gt;
+(
+    stream,
+    new FixedWidthExtractorStreamOptions&lt;Record&gt; { StartByteOffset = LoadCheckpoint() }
+);
 await foreach (var record in extractor.ExtractAsync(token)) { /* the remainder */ }
 </code></pre>
 <p>Terminators (<code>\n</code>/<code>\r</code>/<code>\r\n</code>), multi-byte UTF-8, and a leading BOM are counted exactly. Tracking is opt-in and requires the <code>Stream</code> constructor (seekable for resume); the default read path is unchanged. On resume, header lines are not re-skipped and <code>SkipItemCount</code> applies from the resumed position.</p>
@@ -196,7 +204,7 @@ Console.WriteLine($&quot;Line width: {schema.ExpectedLineWidth}, fields: {schema
 // Total width: 24  |  Columns: 3 (2 fields + 1 skip)  |  Delimiter: none
 </code></pre>
 <h3 id="defining-the-layout-in-code">Defining the layout in code</h3>
-<p>When you can't decorate the record type, or the layout is chosen at runtime, build the schema with <code>FixedWidthSchemaBuilder&lt;T&gt;</code> and assign it to the extractor/loader <code>Schema</code> property instead of using attributes:</p>
+<p>When you can't decorate the record type, or the layout is chosen at runtime, build the schema with <code>FixedWidthSchemaBuilder&lt;T&gt;</code> and pass it as <code>Schema</code> in the extractor's or loader's options record instead of using attributes:</p>
 <pre><code class="lang-csharp">var schema = new FixedWidthSchemaBuilder&lt;CustomerRecord&gt;()
     .Field(r =&gt; r.CustomerId, index: 0, length: 8)
     .Field(r =&gt; r.Name, index: 1, length: 30)
@@ -204,7 +212,11 @@ Console.WriteLine($&quot;Line width: {schema.ExpectedLineWidth}, fields: {schema
     .Field(r =&gt; r.Balance, index: 3, length: 9, alignment: FieldAlignment.Right, format: &quot;0000000.00&quot;)
     .Build();
 
-using var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;(reader) { Schema = schema };
+using var extractor = new FixedWidthExtractor&lt;CustomerRecord&gt;
+(
+    reader,
+    new FixedWidthExtractorOptions&lt;CustomerRecord&gt; { Schema = schema }
+);
 </code></pre>
 <p>The lambda selectors are type-safe (no magic strings) and <code>index</code> is the zero-based column ordinal, matching <code>[FixedWidthField(index, length)]</code>. A built schema is equivalent to an attribute-resolved one — same validation and the same <code>Fields</code> / <code>ToDiagram()</code> introspection — and overrides any attributes on the type when set. See the <a href="examples.html#schemabuilder">SchemaBuilder example</a>.</p>
 <h3 id="binary--mainframe-records">Binary / mainframe records</h3>
@@ -307,7 +319,7 @@ await EtlPipeline
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/docfx_project/docs/getting-started.md/#L1" class="edit-link">Edit this page</a>
         </div>
 
         <div class="next-article d-print-none border-top" id="nextArticle"></div>

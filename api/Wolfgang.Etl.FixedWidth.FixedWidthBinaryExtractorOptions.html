@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.13.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.14.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,11 +75,11 @@
 
 
   <h1 id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions" class="text-break">
-Class FixedWidthBinaryExtractorOptions  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractorOptions.cs/#L22"><i class="bi bi-code-slash"></i></a>
+Class FixedWidthBinaryExtractorOptions  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractorOptions.cs/#L23"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
-    <dl><dt>Namespace</dt><dd><a class="xref" href="Wolfgang.html">Wolfgang</a>.<a class="xref" href="Wolfgang.Etl.html">Etl</a>.<a class="xref" href="Wolfgang.Etl.FixedWidth.html">FixedWidth</a></dd></dl>
+    <dl><dt>Namespace</dt><dd><span class="xref">Wolfgang</span>.<span class="xref">Etl</span>.<a class="xref" href="Wolfgang.Etl.FixedWidth.html">FixedWidth</a></dd></dl>
   <dl><dt>Assembly</dt><dd>Wolfgang.Etl.FixedWidth.dll</dd></dl>
   </div>
 
@@ -145,7 +145,8 @@ in constructor bodies, so no constructor can accidentally diverge from them.</p>
 Options are scoped to the <em>input shape</em> they configure, not to the type as a whole, so
 every property here is meaningful for the constructor it is passed to. The base-stage
 configuration (<code>ReportingInterval</code>, <code>MaximumItemCount</code>, <code>SkipItemCount</code>, <code>ErrorPolicy</code>)
-is inherited from the Abstractions record (ADR-0009).
+is carried on this record itself and projected onto <span class="xref">Wolfgang.Etl.Abstractions.ExtractorOptions</span> for the base stage; the record does
+not derive from it until the 2026-12-15 wave (#486), see the projection method below.
 </p>
 </div>
 
@@ -158,7 +159,7 @@ is inherited from the Abstractions record (ADR-0009).
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_Encoding" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.Encoding">
   Encoding
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractorOptions.cs/#L28"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractorOptions.cs/#L29"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.encoding">Encoding</a> used to decode text fields out of each binary record.
@@ -191,7 +192,7 @@ Defaults to <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_ErrorPolicy" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ErrorPolicy">
   ErrorPolicy
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractorOptions.cs/#L101"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractorOptions.cs/#L102"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the per-item error policy. Defaults to the abort policy the base stages use.</p>
@@ -229,7 +230,7 @@ Defaults to <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_MaximumItemCount" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.MaximumItemCount">
   MaximumItemCount
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractorOptions.cs/#L56"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractorOptions.cs/#L57"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the maximum number of items the stage extracts. Defaults to <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32.maxvalue">MaxValue</a>.</p>
@@ -267,7 +268,7 @@ Defaults to <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_ReportingInterval" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.ReportingInterval">
   ReportingInterval
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractorOptions.cs/#L36"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractorOptions.cs/#L37"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the number of items between progress reports. Defaults to <code>1000</code>.</p>
@@ -305,7 +306,7 @@ Defaults to <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthBinaryExtractorOptions_SkipItemCount" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthBinaryExtractorOptions.SkipItemCount">
   SkipItemCount
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractorOptions.cs/#L76"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractorOptions.cs/#L77"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Gets the number of items the stage skips before the first is yielded. Defaults to <code>0</code>.</p>
@@ -343,7 +344,7 @@ Defaults to <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractorOptions.cs/#L22" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthBinaryExtractorOptions.cs/#L23" class="edit-link">Edit this page</a>
         </div>
 
 

@@ -16,7 +16,7 @@
       <meta name="docfx:rel" content="../">
       
       
-      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.13.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthConverter.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthConverter%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
+      <meta name="docfx:docurl" content="https://github.com/Chris-Wolfgang/ETL-FixedWidth/new/v0.14.0/apiSpec/new?filename=Wolfgang_Etl_FixedWidth_FixedWidthConverter.md&amp;value=---%0Auid%3A%20Wolfgang.Etl.FixedWidth.FixedWidthConverter%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">
       <meta name="loc:inThisArticle" content="In this article">
       <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
       <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
@@ -75,11 +75,11 @@
 
 
   <h1 id="Wolfgang_Etl_FixedWidth_FixedWidthConverter" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthConverter" class="text-break">
-Class FixedWidthConverter  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L37"><i class="bi bi-code-slash"></i></a>
+Class FixedWidthConverter  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L40"><i class="bi bi-code-slash"></i></a>
   </h1>
 
   <div class="facts text-secondary">
-    <dl><dt>Namespace</dt><dd><a class="xref" href="Wolfgang.html">Wolfgang</a>.<a class="xref" href="Wolfgang.Etl.html">Etl</a>.<a class="xref" href="Wolfgang.Etl.FixedWidth.html">FixedWidth</a></dd></dl>
+    <dl><dt>Namespace</dt><dd><span class="xref">Wolfgang</span>.<span class="xref">Etl</span>.<a class="xref" href="Wolfgang.Etl.FixedWidth.html">FixedWidth</a></dd></dl>
   <dl><dt>Assembly</dt><dd>Wolfgang.Etl.FixedWidth.dll</dd></dl>
   </div>
 
@@ -149,7 +149,8 @@ convert a typed property value to its string representation. Rules:
 convert a header label to its padded string representation.
 </p>
 <p>
-<b>Value parsers</b> (<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-3">Func&lt;T1, T2, TResult&gt;</a> of <code>string, FieldContext, object</code>)
+<b>Value parsers</b> (<a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthValueParser.html">FixedWidthValueParser</a>: the field text as
+<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.readonlymemory-1">ReadOnlyMemory&lt;T&gt;</a> of <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a> plus its <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html">FieldContext</a>)
 convert a raw string read from the file back to the target property type.
 <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthConverter.html#Wolfgang_Etl_FixedWidth_FixedWidthConverter_DefaultParser">DefaultParser</a> is the built-in implementation used by
 <a class="xref" href="Wolfgang.Etl.FixedWidth.FixedWidthExtractor-1.html">FixedWidthExtractor&lt;TRecord&gt;</a> by default.
@@ -164,7 +165,7 @@ convert a raw string read from the file back to the target property type.
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_DefaultParser" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthConverter.DefaultParser">
   DefaultParser
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L244"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L257"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Converts a raw string read from the file to the target property type indicated by
@@ -208,7 +209,9 @@ new FixedWidthExtractorOptions&lt;TRecord&gt;
   recurses on the underlying type.</li><li><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>: returned as-is.</li><li>Empty string for non-nullable value types: returns the default value
   (e.g. <code>0</code> for <code>int</code>).</li><li><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetimeoffset">DateTimeOffset</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.timespan">TimeSpan</a>:
   parsed with <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html#Wolfgang_Etl_FixedWidth_FieldContext_Format">Format</a> using
-  <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture">InvariantCulture</a>.</li><li>All other types: parsed via <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.typedescriptor">TypeDescriptor</a> with
+  <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture">InvariantCulture</a>.</li><li>Integral, floating-point, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.decimal">decimal</a> and <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a> types:
+  parsed directly with <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture">InvariantCulture</a> (and the field's
+  <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.numberstyles">NumberStyles</a> where set).</li><li>All other types: parsed via <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.componentmodel.typedescriptor">TypeDescriptor</a> with
   <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.invariantculture">InvariantCulture</a>.</li></ul>
 </div>
 
@@ -230,7 +233,7 @@ the value does not match the expected format.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_Strict" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthConverter.Strict">
   Strict
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L71"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L81"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Converts the value to a string and throws a <a class="xref" href="Wolfgang.Etl.FixedWidth.Exceptions.FieldOverflowException.html">FieldOverflowException</a>
@@ -287,7 +290,7 @@ specified on the field attribute.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_StrictHeader" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthConverter.StrictHeader">
   StrictHeader
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L157"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L167"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Validates that the header label fits within <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html#Wolfgang_Etl_FixedWidth_FieldContext_FieldLength">FieldLength</a>,
@@ -343,7 +346,7 @@ different alignment or padding for header cells, supply a custom
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_Truncate" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthConverter.Truncate">
   Truncate
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L111"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L121"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Converts the value to a string and silently truncates it to
@@ -387,7 +390,7 @@ specified on the field attribute.</p>
 
   <h3 id="Wolfgang_Etl_FixedWidth_FixedWidthConverter_TruncateHeader" data-uid="Wolfgang.Etl.FixedWidth.FixedWidthConverter.TruncateHeader">
   TruncateHeader
-  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L189"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L199"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Silently truncates the header label to <a class="xref" href="Wolfgang.Etl.FixedWidth.FieldContext.html#Wolfgang_Etl_FixedWidth_FieldContext_FieldLength">FieldLength</a> if it
@@ -425,7 +428,7 @@ new FixedWidthLoaderOptions { HeaderConverter = FixedWidthConverter.TruncateHead
 </article>
 
         <div class="contribution d-print-none">
-          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.13.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L37" class="edit-link">Edit this page</a>
+          <a href="https://github.com/Chris-Wolfgang/ETL-FixedWidth/blob/v0.14.0/src/Wolfgang.Etl.FixedWidth/FixedWidthConverter.cs/#L40" class="edit-link">Edit this page</a>
         </div>
 
 
