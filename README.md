@@ -488,7 +488,7 @@ The package ships a Roslyn analyzer that catches `[FixedWidthField]` layout mist
 | ID | Severity | Flags |
 |----|----------|-------|
 | `FW003` | Error | Two columns declare the same `Index` (field mapping throws at runtime) |
-| `FW004` | Warning | A `DateTime` / `DateTimeOffset` / `TimeSpan` field with no `Format` (parsing and writing throw) |
+| `FW004` | Warning | A `DateTime` / `DateTimeOffset` / `TimeSpan` field with no `Format` (parsing and writing throw), or a `DateOnly` / `TimeOnly` field with no `Format` (the invariant default pattern rarely fits the field) |
 | `FW005` | Warning | A `Format` pattern wider than the field length (the value overflows on write) |
 | `FW007` | Warning | A mapped property with no public setter (extraction throws) |
 | `FW008` | Info | A mapped property with no public getter (loading throws) |

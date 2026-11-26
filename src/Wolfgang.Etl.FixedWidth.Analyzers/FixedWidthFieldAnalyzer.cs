@@ -62,7 +62,9 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
             context.Compilation.GetTypeByMetadataName(SkipAttributeFullName),
             context.Compilation.GetSpecialType(SpecialType.System_DateTime),
             context.Compilation.GetTypeByMetadataName("System.DateTimeOffset"),
-            context.Compilation.GetTypeByMetadataName("System.TimeSpan")
+            context.Compilation.GetTypeByMetadataName("System.TimeSpan"),
+            context.Compilation.GetTypeByMetadataName("System.DateOnly"),
+            context.Compilation.GetTypeByMetadataName("System.TimeOnly")
         );
 
         context.RegisterSymbolAction(c => AnalyzeType(c, known), SymbolKind.NamedType);
@@ -149,7 +151,8 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
                 FixedWidthDiagnostics.MissingTemporalFormat,
                 location,
                 property.Name,
-                property.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)
+                property.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat),
+                MissingFormatReason(property.Type, known)
             ));
             return;
         }
@@ -213,7 +216,9 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
             INamedTypeSymbol? skipAttribute,
             INamedTypeSymbol dateTime,
             INamedTypeSymbol? dateTimeOffset,
-            INamedTypeSymbol? timeSpan
+            INamedTypeSymbol? timeSpan,
+            INamedTypeSymbol? dateOnly,
+            INamedTypeSymbol? timeOnly
         )
         {
             FieldAttribute = fieldAttribute;
@@ -221,6 +226,8 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
             DateTime = dateTime;
             DateTimeOffset = dateTimeOffset;
             TimeSpan = timeSpan;
+            DateOnly = dateOnly;
+            TimeOnly = timeOnly;
         }
 
         public INamedTypeSymbol FieldAttribute { get; }
@@ -228,6 +235,10 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
         public INamedTypeSymbol DateTime { get; }
         public INamedTypeSymbol? DateTimeOffset { get; }
         public INamedTypeSymbol? TimeSpan { get; }
+
+        // Null when the compilation targets a framework without them (before .NET 6).
+        public INamedTypeSymbol? DateOnly { get; }
+        public INamedTypeSymbol? TimeOnly { get; }
     }
 
 
@@ -239,18 +250,47 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
 
     private static bool IsTemporal(ITypeSymbol type, KnownSymbols known)
     {
-        // Unwrap Nullable<T> so DateTime? / TimeSpan? are treated the same as their
-        // underlying value type.
+        type = UnwrapNullable(type);
+
+        return SymbolEqualityComparer.Default.Equals(type, known.DateTime)
+            || (known.DateTimeOffset is not null && SymbolEqualityComparer.Default.Equals(type, known.DateTimeOffset))
+            || (known.TimeSpan is not null && SymbolEqualityComparer.Default.Equals(type, known.TimeSpan))
+            || IsDateOnlyOrTimeOnly(type, known);
+    }
+
+
+
+    // The FW004 message tail: DateTime / DateTimeOffset / TimeSpan throw without a Format, while
+    // DateOnly / TimeOnly fall back to a culture default pattern that rarely fits a fixed-width field.
+    private static string MissingFormatReason(ITypeSymbol type, KnownSymbols known)
+        => IsDateOnlyOrTimeOnly(type, known)
+            ? "DateOnly and TimeOnly fall back to the invariant culture's default pattern, which rarely fits the field and may not parse back, so set an explicit Format"
+            : "DateTime, DateTimeOffset and TimeSpan require an explicit Format or both extraction and loading throw at runtime";
+
+
+
+    private static bool IsDateOnlyOrTimeOnly(ITypeSymbol type, KnownSymbols known)
+    {
+        type = UnwrapNullable(type);
+
+        return (known.DateOnly is not null && SymbolEqualityComparer.Default.Equals(type, known.DateOnly))
+            || (known.TimeOnly is not null && SymbolEqualityComparer.Default.Equals(type, known.TimeOnly));
+    }
+
+
+
+    // Unwrap Nullable<T> so DateTime? / TimeSpan? / DateOnly? are treated the same as their
+    // underlying value type.
+    private static ITypeSymbol UnwrapNullable(ITypeSymbol type)
+    {
         if (type is INamedTypeSymbol named
             && named.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T
             && named.TypeArguments.Length == 1)
         {
-            type = named.TypeArguments[0];
+            return named.TypeArguments[0];
         }
 
-        return SymbolEqualityComparer.Default.Equals(type, known.DateTime)
-            || (known.DateTimeOffset is not null && SymbolEqualityComparer.Default.Equals(type, known.DateTimeOffset))
-            || (known.TimeSpan is not null && SymbolEqualityComparer.Default.Equals(type, known.TimeSpan));
+        return type;
     }
 
 
