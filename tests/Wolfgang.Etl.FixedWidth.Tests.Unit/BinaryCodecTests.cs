@@ -80,10 +80,9 @@ public sealed class BinaryCodecTests
 
 
     [Theory]
-    [InlineData("-0.004", "00-00-0C")]   // truncates to zero -> positive zero, not 0x0D
     [InlineData("-0.0", "00-00-0C")]
+    [InlineData("-0.000", "00-00-0C")]   // zero fraction digits beyond the scale are allowed
     [InlineData("-0.01", "00-00-1D")]    // non-zero magnitude keeps its sign
-    [InlineData("0.004", "00-00-0C")]
     public void PackedDecimalEncode_never_writes_negative_zero(string value, string expectedHex)
     {
         _ = value ?? throw new ArgumentNullException(nameof(value));
@@ -170,7 +169,7 @@ public sealed class BinaryCodecTests
     [InlineData("0", 0, 1)]
     [InlineData("9999999", 0, 4)]
     [InlineData("-123", 0, 2)]
-    [InlineData("1234.567", 2, 4)]   // truncated to 1234.56 on encode
+    [InlineData("1234.560", 2, 4)]   // trailing zero beyond the scale is not a lost digit
     public void PackedDecimal_encode_round_trips(string value, int scale, int byteLength)
     {
         var v = decimal.Parse(value, CultureInfo.InvariantCulture);
@@ -181,6 +180,26 @@ public sealed class BinaryCodecTests
 
         Assert.Equal(expected, PackedDecimal.Decode(buffer, scale));
     }
+
+
+    [Theory]
+    [InlineData("1234.567", 2)]
+    [InlineData("0.004", 2)]
+    [InlineData("-0.004", 2)]
+    [InlineData("0.5", 0)]
+    public void PackedDecimalEncode_when_the_value_has_more_decimal_places_than_Scale_throws_OverflowException(string value, int scale)
+    {
+        _ = value ?? throw new ArgumentNullException(nameof(value));
+
+        var ex = Assert.Throws<OverflowException>
+        (
+            () => PackedDecimal.Encode(decimal.Parse(value, CultureInfo.InvariantCulture), scale, new byte[4])
+        );
+
+        Assert.Contains($"'{value}'", ex.Message, StringComparison.Ordinal);
+        Assert.Contains($"Scale of {scale}", ex.Message, StringComparison.Ordinal);
+    }
+
 
 
     [Fact]
