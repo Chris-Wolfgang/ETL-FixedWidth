@@ -740,6 +740,40 @@ public class FixedWidthLoaderTests
 
 
 
+    [Fact]
+    public async Task LoadAsync_when_ErrorPolicy_returns_Skip_writes_no_line_for_the_failing_record_and_continues()
+    {
+        var contexts = new List<ItemErrorContext>();
+        var writer = new StringWriter { NewLine = "\n" };
+        var loader = new FixedWidthLoader<TwoFieldRecord>(writer, new FixedWidthLoaderOptions
+        {
+            ErrorPolicy = context =>
+            {
+                contexts.Add(context);
+                return ItemErrorAction.Skip;
+            },
+        });
+
+        await loader.LoadAsync
+        (
+            new[]
+            {
+                new TwoFieldRecord { Name = "OK", Num = 1 },
+                new TwoFieldRecord { Name = "AB", Num = 1234567 },   // Num overflows its 5-char field
+                new TwoFieldRecord { Name = "CD", Num = 3 },
+            }.ToAsyncEnumerable()
+        );
+
+        Assert.Equal("OK   00001\nCD   00003\n", writer.ToString());
+        var context = Assert.Single(contexts);
+        Assert.Equal(2L, context.ItemNumber);
+        Assert.IsType<FieldOverflowException>(context.Exception);
+        Assert.Equal(1, loader.CurrentErrorItemCount);
+        Assert.Equal(2, loader.CurrentItemCount);
+    }
+
+
+
     // ------------------------------------------------------------------
     // TruncateHeader converter
     // ------------------------------------------------------------------
