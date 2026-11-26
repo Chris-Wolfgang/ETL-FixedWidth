@@ -96,7 +96,12 @@ public sealed record FixedWidthBinaryExtractorOptions
 
 
     /// <summary>
-    /// Gets the per-item error policy. Defaults to the abort policy the base stages use.
+    /// Gets the per-item error policy, consulted when a record fails to decode (a
+    /// <see cref="Exceptions.FieldConversionException"/>). <see cref="ItemErrorAction.Abort"/>
+    /// rethrows the exception and stops the run; <see cref="ItemErrorAction.Skip"/> drops that record,
+    /// counts it in <c>CurrentErrorItemCount</c> and continues with the next one. Defaults to the abort
+    /// policy the base stages use. A partial record at the end of the stream is not a per-item failure
+    /// and always throws.
     /// </summary>
     /// <exception cref="ArgumentNullException">The value is <see langword="null"/>.</exception>
     public Func<ItemErrorContext, ItemErrorAction> ErrorPolicy
