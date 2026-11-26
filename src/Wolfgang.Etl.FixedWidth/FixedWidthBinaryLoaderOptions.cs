@@ -96,7 +96,12 @@ public sealed record FixedWidthBinaryLoaderOptions
 
 
     /// <summary>
-    /// Gets the per-item error policy. Defaults to the abort policy the base stages use.
+    /// Gets the per-item error policy, consulted when a record fails to encode (a
+    /// <see cref="Exceptions.FieldConversionException"/>, for example a value too wide for its field).
+    /// <see cref="ItemErrorAction.Abort"/> rethrows the exception and stops the run;
+    /// <see cref="ItemErrorAction.Skip"/> writes nothing for that record, counts it in
+    /// <c>CurrentErrorItemCount</c> and continues with the next one. Defaults to the abort policy the
+    /// base stages use.
     /// </summary>
     /// <exception cref="ArgumentNullException">The value is <see langword="null"/>.</exception>
     public Func<ItemErrorContext, ItemErrorAction> ErrorPolicy
