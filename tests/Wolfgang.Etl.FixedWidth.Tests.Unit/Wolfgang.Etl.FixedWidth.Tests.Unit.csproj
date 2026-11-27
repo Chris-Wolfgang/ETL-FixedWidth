@@ -55,7 +55,7 @@
       Both are capped below 3.0.0 on the net462-net7.0 slots: runner 3.x drops those target
       frameworks entirely. The net8.0+ slots use runner 3.0.1 uncapped (it runs xunit v2 tests).
     -->
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" NoWarn="NU1701"
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" NoWarn="NU1701"
                       Condition="'$(TargetFramework)' == 'netcoreapp3.1' Or '$(TargetFramework)' == 'net5.0'"
                       allowedVersions="(,3.0.0)">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
