@@ -37,7 +37,7 @@ internal static class FixedWidthDiagnostics
         category: Category,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        description: "DateTime, DateTimeOffset and TimeSpan have no safe culture-neutral fixed-width representation, so the converter requires an explicit Format. Without one, ParseValue and the writer throw.",
+        description: "DateTime, DateTimeOffset and TimeSpan have no safe culture-neutral fixed-width representation, so the converter requires an explicit Format. Without one, ParseValue and the writer throw. DateOnly and TimeOnly are not reported: without a Format they are written and read as yyyyMMdd and HHmmss.",
         helpLinkUri: HelpLinkBase
     );
 
@@ -50,7 +50,7 @@ internal static class FixedWidthDiagnostics
         category: Category,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        description: "For a date/time field, the minimum width the custom Format pattern can write (quoted literals and escapes count as their text; optional and variable-width tokens count conservatively) is compared with the declared field length. A pattern that always writes more than the field holds overflows it, throwing FieldOverflowException on write. Standard single-character specifiers are not checked.",
+        description: "For a date/time field (DateTime, DateTimeOffset, TimeSpan, DateOnly or TimeOnly), the minimum width the custom Format pattern can write (quoted literals and escapes count as their text; optional and variable-width tokens count conservatively) is compared with the declared field length. A DateOnly or TimeOnly field with no Format is checked against its default, yyyyMMdd (8 characters) or HHmmss (6). A pattern that always writes more than the field holds overflows it, throwing FieldOverflowException on write. Standard single-character specifiers are not checked.",
         helpLinkUri: HelpLinkBase
     );
 

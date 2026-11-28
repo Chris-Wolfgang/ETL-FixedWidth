@@ -167,6 +167,68 @@ public sealed class FixedWidthBinaryLoaderTests
 
 
 
+    [Fact]
+    public async Task LoadAsync_when_a_packed_decimal_has_more_decimal_places_than_Scale_throws_FieldConversionException()
+    {
+        var records = new[] { new Account { AccountId = "ACCT0001", TransactionCount = 1, Balance = 12.345m } };   // Scale = 2
+        using var ms = new MemoryStream();
+        using var loader = new FixedWidthBinaryLoader<Account>(ms, options: null);
+
+        var ex = await Assert.ThrowsAsync<Exceptions.FieldConversionException>(async () =>
+            await loader.LoadAsync(ToAsync(records), CancellationToken.None));
+
+        Assert.IsType<OverflowException>(ex.InnerException);
+        Assert.Equal(nameof(Account.Balance), ex.FieldName);
+    }
+
+
+
+    [Fact]
+    public async Task LoadAsync_when_ErrorPolicy_returns_Skip_writes_nothing_for_the_failing_record_and_continues()
+    {
+        var contexts = new List<Wolfgang.Etl.Abstractions.ItemErrorContext>();
+        var records = new[]
+        {
+            new ShortCounter { Id = "A001", Count = 1, Amount = 1m },
+            new ShortCounter { Id = "A002", Count = 100_000, Amount = 1m },   // does not fit 2 signed bytes
+            new ShortCounter { Id = "A003", Count = 3, Amount = 1m },
+        };
+        using var ms = new MemoryStream();
+        using var loader = new FixedWidthBinaryLoader<ShortCounter>
+        (
+            ms,
+            new FixedWidthBinaryLoaderOptions
+            {
+                ErrorPolicy = context =>
+                {
+                    contexts.Add(context);
+                    return Wolfgang.Etl.Abstractions.ItemErrorAction.Skip;
+                },
+            }
+        );
+
+        await loader.LoadAsync(ToAsync(records), CancellationToken.None);
+
+        Assert.Equal(2 * loader.RecordByteLength, ms.Length);
+        var context = Assert.Single(contexts);
+        Assert.Equal(2L, context.ItemNumber);
+        Assert.IsType<Exceptions.FieldConversionException>(context.Exception);
+        Assert.Equal(1, loader.CurrentErrorItemCount);
+        Assert.Equal(2, loader.CurrentItemCount);
+
+        ms.Position = 0;
+        using var extractor = new FixedWidthBinaryExtractor<ShortCounter>(ms, options: null);
+        var ids = new List<string>();
+        await foreach (var record in extractor.ExtractAsync(CancellationToken.None))
+        {
+            ids.Add(record.Id);
+        }
+
+        Assert.Equal(new[] { "A001", "A003" }, ids);
+    }
+
+
+
     [ExcludeFromCodeCoverage]
     public sealed class TextAsInteger
     {

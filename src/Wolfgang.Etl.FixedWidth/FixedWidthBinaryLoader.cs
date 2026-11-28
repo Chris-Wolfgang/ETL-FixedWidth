@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Binary;
+using Wolfgang.Etl.FixedWidth.Exceptions;
 using Wolfgang.Etl.FixedWidth.Diagnostics;
 
 namespace Wolfgang.Etl.FixedWidth;
@@ -182,10 +183,9 @@ public sealed class FixedWidthBinaryLoader<[DynamicallyAccessedMembers(TrimmedMe
                 break;
             }
 
-            Array.Clear(buffer, 0, buffer.Length);
-            foreach (var descriptor in _map.Descriptors)
+            if (!TryEncodeRecord(item, buffer))
             {
-                EncodeField(descriptor, item, buffer);
+                continue;   // the error policy chose Skip for a record that failed to encode
             }
 
             await _stream.WriteAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false);
@@ -195,6 +195,36 @@ public sealed class FixedWidthBinaryLoader<[DynamicallyAccessedMembers(TrimmedMe
         }
 
         await _stream.FlushAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+
+
+    // Encodes one record into the buffer. A field that fails to encode (FieldConversionException, #686)
+    // is routed through the base per-item error policy (#681): Abort (the default ErrorPolicy) rethrows,
+    // and Skip counts the record in CurrentErrorItemCount and returns false so nothing is written for it.
+    // The record number still advances on a skip, so later errors name the record's position in the input.
+    private bool TryEncodeRecord(TRecord item, byte[] buffer)
+    {
+        Array.Clear(buffer, 0, buffer.Length);
+        try
+        {
+            foreach (var descriptor in _map.Descriptors)
+            {
+                EncodeField(descriptor, item, buffer);
+            }
+
+            return true;
+        }
+        catch (FieldConversionException ex)
+        {
+            var itemNumber = Interlocked.Increment(ref _currentRecordNumber);
+            if (HandleItemError(new ItemErrorContext(itemNumber, ex)) == ItemErrorAction.Abort)
+            {
+                throw;
+            }
+
+            return false;
+        }
     }
 
 

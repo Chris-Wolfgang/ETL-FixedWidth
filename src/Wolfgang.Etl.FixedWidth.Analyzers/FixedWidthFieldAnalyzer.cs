@@ -62,7 +62,9 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
             context.Compilation.GetTypeByMetadataName(SkipAttributeFullName),
             context.Compilation.GetSpecialType(SpecialType.System_DateTime),
             context.Compilation.GetTypeByMetadataName("System.DateTimeOffset"),
-            context.Compilation.GetTypeByMetadataName("System.TimeSpan")
+            context.Compilation.GetTypeByMetadataName("System.TimeSpan"),
+            context.Compilation.GetTypeByMetadataName("System.DateOnly"),
+            context.Compilation.GetTypeByMetadataName("System.TimeOnly")
         );
 
         context.RegisterSymbolAction(c => AnalyzeType(c, known), SymbolKind.NamedType);
@@ -135,13 +137,33 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(Diagnostic.Create(FixedWidthDiagnostics.NoPublicGetter, location, property.Name));
         }
 
-        // FW004 / FW005 — date/time fields need an explicit, field-sized Format.
+        AnalyzeTemporalFormat(context, known, property, attribute, location);
+    }
+
+
+
+    // FW004 / FW005 — date/time fields need a field-sized Format. DateOnly / TimeOnly without one
+    // use the converter's compact default, so they skip FW004 and FW005 checks that default.
+    private static void AnalyzeTemporalFormat
+    (
+        SymbolAnalysisContext context,
+        KnownSymbols known,
+        IPropertySymbol property,
+        AttributeData attribute,
+        Location location
+    )
+    {
         if (!IsTemporal(property.Type, known))
         {
             return;
         }
 
         var format = GetFormat(attribute);
+        if (string.IsNullOrEmpty(format))
+        {
+            format = DefaultFormat(property.Type, known);
+        }
+
         if (string.IsNullOrEmpty(format))
         {
             context.ReportDiagnostic(Diagnostic.Create
@@ -213,7 +235,9 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
             INamedTypeSymbol? skipAttribute,
             INamedTypeSymbol dateTime,
             INamedTypeSymbol? dateTimeOffset,
-            INamedTypeSymbol? timeSpan
+            INamedTypeSymbol? timeSpan,
+            INamedTypeSymbol? dateOnly,
+            INamedTypeSymbol? timeOnly
         )
         {
             FieldAttribute = fieldAttribute;
@@ -221,6 +245,8 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
             DateTime = dateTime;
             DateTimeOffset = dateTimeOffset;
             TimeSpan = timeSpan;
+            DateOnly = dateOnly;
+            TimeOnly = timeOnly;
         }
 
         public INamedTypeSymbol FieldAttribute { get; }
@@ -228,6 +254,10 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
         public INamedTypeSymbol DateTime { get; }
         public INamedTypeSymbol? DateTimeOffset { get; }
         public INamedTypeSymbol? TimeSpan { get; }
+
+        // Null when the compilation targets a framework without them (before .NET 6).
+        public INamedTypeSymbol? DateOnly { get; }
+        public INamedTypeSymbol? TimeOnly { get; }
     }
 
 
@@ -239,18 +269,55 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
 
     private static bool IsTemporal(ITypeSymbol type, KnownSymbols known)
     {
-        // Unwrap Nullable<T> so DateTime? / TimeSpan? are treated the same as their
-        // underlying value type.
+        type = UnwrapNullable(type);
+
+        return SymbolEqualityComparer.Default.Equals(type, known.DateTime)
+            || (known.DateTimeOffset is not null && SymbolEqualityComparer.Default.Equals(type, known.DateTimeOffset))
+            || (known.TimeSpan is not null && SymbolEqualityComparer.Default.Equals(type, known.TimeSpan))
+            || IsDateOnlyOrTimeOnly(type, known);
+    }
+
+
+
+    // The Format FixedWidthConverter uses for a field that sets none: "yyyyMMdd" for DateOnly and
+    // "HHmmss" for TimeOnly (keep in step with FixedWidthConverter.DefaultDateOnlyFormat /
+    // DefaultTimeOnlyFormat); null for DateTime / DateTimeOffset / TimeSpan, which have no default.
+    private static string? DefaultFormat(ITypeSymbol type, KnownSymbols known)
+    {
+        type = UnwrapNullable(type);
+
+        if (known.DateOnly is not null && SymbolEqualityComparer.Default.Equals(type, known.DateOnly))
+        {
+            return "yyyyMMdd";
+        }
+
+        if (known.TimeOnly is not null && SymbolEqualityComparer.Default.Equals(type, known.TimeOnly))
+        {
+            return "HHmmss";
+        }
+
+        return null;
+    }
+
+
+
+    private static bool IsDateOnlyOrTimeOnly(ITypeSymbol type, KnownSymbols known)
+        => DefaultFormat(type, known) is not null;
+
+
+
+    // Unwrap Nullable<T> so DateTime? / TimeSpan? / DateOnly? are treated the same as their
+    // underlying value type.
+    private static ITypeSymbol UnwrapNullable(ITypeSymbol type)
+    {
         if (type is INamedTypeSymbol named
             && named.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T
             && named.TypeArguments.Length == 1)
         {
-            type = named.TypeArguments[0];
+            return named.TypeArguments[0];
         }
 
-        return SymbolEqualityComparer.Default.Equals(type, known.DateTime)
-            || (known.DateTimeOffset is not null && SymbolEqualityComparer.Default.Equals(type, known.DateTimeOffset))
-            || (known.TimeSpan is not null && SymbolEqualityComparer.Default.Equals(type, known.TimeSpan));
+        return type;
     }
 
 

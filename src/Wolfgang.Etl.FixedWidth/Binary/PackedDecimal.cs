@@ -86,15 +86,19 @@ internal static class PackedDecimal
 
     /// <summary>
     /// Encodes <paramref name="value"/> as COMP-3 packed decimal into <paramref name="destination"/>,
-    /// whose length is the field's byte width. The value is truncated (COBOL default, not rounded) to
-    /// <paramref name="scale"/> implied decimal places.
+    /// whose length is the field's byte width, with <paramref name="scale"/> implied decimal places.
+    /// A value with more significant decimal places than <paramref name="scale"/> is rejected rather
+    /// than silently truncated (#689); trailing zeros beyond the scale (<c>1.50</c> at scale 1) are fine.
     /// </summary>
     /// <param name="value">The value to encode.</param>
     /// <param name="scale">The number of implied decimal places.</param>
     /// <param name="destination">The field bytes to write (its length is the field width).</param>
     /// <exception cref="ArgumentException"><paramref name="destination"/> is empty.</exception>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="scale"/> is negative.</exception>
-    /// <exception cref="OverflowException">The value needs more digits than the field can hold.</exception>
+    /// <exception cref="OverflowException">
+    /// The value has a non-zero fraction beyond <paramref name="scale"/> decimal places, or it needs more
+    /// digits than the field can hold.
+    /// </exception>
     internal static void Encode(decimal value, int scale, Span<byte> destination)
     {
         if (destination.Length == 0)
@@ -107,11 +111,20 @@ internal static class PackedDecimal
             throw new ArgumentOutOfRangeException(nameof(scale), scale, "Scale cannot be negative.");
         }
 
-        var unscaled = Math.Truncate(Math.Abs(value) * Pow10(scale));
+        var scaled = Math.Abs(value) * Pow10(scale);
+        var unscaled = Math.Truncate(scaled);
+        if (unscaled != scaled)
+        {
+            throw new OverflowException
+            (
+                $"Value '{value.ToString(CultureInfo.InvariantCulture)}' has more decimal places than the packed-decimal field's Scale of {scale}; " +
+                "round the value before loading it."
+            );
+        }
 
-        // Take the sign from the truncated magnitude so a value that truncates to zero (-0.004 at
-        // scale 2) encodes as +0 (0x0C), not negative zero (0x0D).
-        var negative = value < 0 && unscaled != 0;
+        // A zero value (including decimal negative zero such as -0.00m) is not less than zero, so it
+        // encodes as +0 (0x0C), never negative zero (0x0D).
+        var negative = value < 0;
 
         var maxDigits = (destination.Length * 2) - 1;
         var digits = unscaled.ToString("F0", CultureInfo.InvariantCulture);
