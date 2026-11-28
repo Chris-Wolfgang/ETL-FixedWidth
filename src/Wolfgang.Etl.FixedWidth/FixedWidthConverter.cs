@@ -20,7 +20,7 @@ namespace Wolfgang.Etl.FixedWidth;
 ///   <item><see cref="DateTime"/>, <see cref="DateTimeOffset"/>, and <see cref="TimeSpan"/>
 ///   require an explicit <see cref="FieldContext.Format"/>. An <see cref="InvalidOperationException"/>
 ///   is thrown if none is provided.</item>
-///   <item>On .NET 6 and later, <see cref="T:System.DateOnly"/> and <see cref="T:System.TimeOnly"/> with no
+///   <item>On .NET 6 and later, <c>DateOnly</c> and <c>TimeOnly</c> with no
 ///   <see cref="FieldContext.Format"/> are written and read as <c>yyyyMMdd</c> and <c>HHmmss</c>.</item>
 ///   <item>All other <see cref="IFormattable"/> types use <see cref="CultureInfo.InvariantCulture"/>
 ///   with the optional <see cref="FieldContext.Format"/> if supplied.</item>
@@ -330,7 +330,7 @@ public static class FixedWidthConverter
 
     /// <summary>
     /// The Format a value is written with: <paramref name="format"/> when set, otherwise the compact
-    /// default for <see cref="T:System.DateOnly"/> (<c>yyyyMMdd</c>) and <see cref="T:System.TimeOnly"/>
+    /// default for <c>DateOnly</c> (<c>yyyyMMdd</c>) and <c>TimeOnly</c>
     /// (<c>HHmmss</c>), otherwise <see langword="null"/>.
     /// </summary>
     internal static string? ResolveFormat(object? value, string? format)
