@@ -25,6 +25,12 @@ namespace Wolfgang.Etl.FixedWidth;
 /// </summary>
 /// <typeparam name="TSource">The source record type.</typeparam>
 /// <typeparam name="TDestination">The destination record type.</typeparam>
+/// <remarks>
+/// An exception thrown by the projection is passed to the options' <c>ErrorPolicy</c>.
+/// <see cref="ItemErrorAction.Abort"/>, the default, rethrows and stops the run;
+/// <see cref="ItemErrorAction.Skip"/> drops that item, counts it in <c>CurrentErrorItemCount</c> and
+/// continues with the next source item. Cancellation is never treated as an item failure.
+/// </remarks>
 /// <example>
 /// <code>
 /// using var extractor = new FixedWidthExtractor&lt;LegacyRecord&gt;(sourceReader);
@@ -198,12 +204,42 @@ public sealed class FixedWidthTransformer
                 break;
             }
 
-            var result = _transform(item);
+            if (!TryTransform(item, out var result))
+            {
+                continue;   // the error policy chose Skip for an item the projection failed on
+            }
+
             IncrementCurrentItemCount();
             yield return result;
         }
 
         LogTransformationCompleted();
+    }
+
+
+
+    // Runs the projection for one item. An exception it throws is routed through the base per-item
+    // error policy (#681): Abort (the default ErrorPolicy) rethrows, and Skip counts the item in
+    // CurrentErrorItemCount and returns false so the worker moves on to the next source item.
+    // Cancellation is never treated as an item failure.
+    private bool TryTransform(TSource item, out TDestination result)
+    {
+        try
+        {
+            result = _transform(item);
+            return true;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            var itemNumber = CurrentSkippedItemCount + CurrentItemCount + CurrentErrorItemCount + 1;
+            if (HandleItemError(new ItemErrorContext(itemNumber, ex)) == ItemErrorAction.Abort)
+            {
+                throw;
+            }
+
+            result = default!;
+            return false;
+        }
     }
 
 

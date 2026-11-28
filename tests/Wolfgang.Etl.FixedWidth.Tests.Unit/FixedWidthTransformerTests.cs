@@ -194,6 +194,51 @@ public class FixedWidthTransformerTests
 
 
     [Fact]
+    public async Task TransformAsync_when_ErrorPolicy_returns_Skip_drops_the_failing_item_and_continues()
+    {
+        var contexts = new List<ItemErrorContext>();
+        using var transformer = new FixedWidthTransformer<Src, Dst>
+        (
+            s => string.Equals(s.Name, "bob", StringComparison.Ordinal) ? throw new FormatException("bad bob") : new Dst { Name = s.Name },
+            new FixedWidthTransformerOptions
+            {
+                ErrorPolicy = context =>
+                {
+                    contexts.Add(context);
+                    return ItemErrorAction.Skip;
+                },
+            }
+        );
+
+        var results = await transformer.TransformAsync(ToAsync(Sources), CancellationToken.None).ToListAsync();
+
+        Assert.Equal(new[] { "alice", "carol" }, results.Select(r => r.Name));
+        var context = Assert.Single(contexts);
+        Assert.Equal(2L, context.ItemNumber);
+        Assert.IsType<FormatException>(context.Exception);
+        Assert.Equal(1, transformer.CurrentErrorItemCount);
+        Assert.Equal(2, transformer.CurrentItemCount);
+    }
+
+
+
+    [Fact]
+    public async Task TransformAsync_when_the_default_ErrorPolicy_is_used_rethrows_the_projection_exception()
+    {
+        using var transformer = new FixedWidthTransformer<Src, Dst>
+        (
+            s => string.Equals(s.Name, "bob", StringComparison.Ordinal) ? throw new FormatException("bad bob") : new Dst { Name = s.Name }
+        );
+
+        await Assert.ThrowsAsync<FormatException>(async () =>
+            await transformer.TransformAsync(ToAsync(Sources), CancellationToken.None).ToListAsync());
+
+        Assert.Equal(0, transformer.CurrentErrorItemCount);
+    }
+
+
+
+    [Fact]
     public void Constructor_null_transform_throws()
     {
         Assert.Throws<ArgumentNullException>(() => new FixedWidthTransformer<Src, Dst>(null!));
