@@ -710,6 +710,66 @@ public sealed class FixedWidthBinaryExtractorTests
 
 
     [Fact]
+    public async Task ExtractAsync_when_ErrorPolicy_returns_Skip_drops_the_corrupt_record_and_continues()
+    {
+        var corrupt = new byte[] { 0x00, 0x01, 0x23, 0x4F, 0x6C };   // 0xF is not a digit nibble
+        var data = Concat(Record("ACCT0001", 1, Balance1234_56), Record("ACCT0002", 2, corrupt), Record("ACCT0003", 3, Balance1234_56));
+        var contexts = new System.Collections.Generic.List<ItemErrorContext>();
+        using var extractor = new FixedWidthBinaryExtractor<Account>
+        (
+            new MemoryStream(data),
+            new FixedWidthBinaryExtractorOptions
+            {
+                ErrorPolicy = context =>
+                {
+                    contexts.Add(context);
+                    return ItemErrorAction.Skip;
+                },
+            }
+        );
+
+        var records = await extractor.ExtractAsync(CancellationToken.None).ToListAsync();
+
+        Assert.Equal(new[] { "ACCT0001", "ACCT0003" }, records.Select(r => r.AccountId).ToArray());
+        var context = Assert.Single(contexts);
+        Assert.Equal(2L, context.ItemNumber);
+        Assert.IsType<FieldConversionException>(context.Exception);
+        Assert.Equal(BitConverter.ToString(data, 17, 17), context.RawContent!());
+        Assert.Equal(1, extractor.CurrentErrorItemCount);
+        Assert.Equal(2, extractor.CurrentItemCount);
+    }
+
+
+
+    [Fact]
+    public async Task ExtractAsync_when_ErrorPolicy_returns_Abort_rethrows_the_FieldConversionException()
+    {
+        var corrupt = new byte[] { 0x00, 0x01, 0x23, 0x4F, 0x6C };
+        var data = Concat(Record("ACCT0001", 1, corrupt));
+        var calls = 0;
+        using var extractor = new FixedWidthBinaryExtractor<Account>
+        (
+            new MemoryStream(data),
+            new FixedWidthBinaryExtractorOptions
+            {
+                ErrorPolicy = _ =>
+                {
+                    calls++;
+                    return ItemErrorAction.Abort;
+                },
+            }
+        );
+
+        await Assert.ThrowsAsync<FieldConversionException>(async () =>
+            await extractor.ExtractAsync(CancellationToken.None).ToListAsync());
+
+        Assert.Equal(1, calls);
+        Assert.Equal(0, extractor.CurrentErrorItemCount);
+    }
+
+
+
+    [Fact]
     public async Task ExtractAsync_when_a_skipped_record_precedes_the_corrupt_one_reports_the_record_number_in_the_file()
     {
         var corrupt = new byte[] { 0x00, 0x01, 0x23, 0x45, 0x67 };   // 0x7 is not a sign nibble
