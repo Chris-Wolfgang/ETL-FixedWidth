@@ -167,6 +167,22 @@ public sealed class FixedWidthBinaryLoaderTests
 
 
 
+    [Fact]
+    public async Task LoadAsync_when_a_packed_decimal_has_more_decimal_places_than_Scale_throws_FieldConversionException()
+    {
+        var records = new[] { new Account { AccountId = "ACCT0001", TransactionCount = 1, Balance = 12.345m } };   // Scale = 2
+        using var ms = new MemoryStream();
+        using var loader = new FixedWidthBinaryLoader<Account>(ms, options: null);
+
+        var ex = await Assert.ThrowsAsync<Exceptions.FieldConversionException>(async () =>
+            await loader.LoadAsync(ToAsync(records), CancellationToken.None));
+
+        Assert.IsType<OverflowException>(ex.InnerException);
+        Assert.Equal(nameof(Account.Balance), ex.FieldName);
+    }
+
+
+
     [ExcludeFromCodeCoverage]
     public sealed class TextAsInteger
     {
