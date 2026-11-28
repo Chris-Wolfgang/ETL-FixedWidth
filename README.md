@@ -296,7 +296,7 @@ Writing is symmetric — `FixedWidthBinaryLoader<T>` encodes each field back to 
 
 - **Endianness.** `COMP` (`BinaryFieldType.Binary`) integers are read and written **big-endian** only, as mainframes store them. Little-endian binary integers are not supported.
 - **Width units.** Text-file field widths (`[FixedWidthField(index, length)]`) count UTF-16 `char`s, not bytes. With a multi-byte encoding (UTF-8 CJK text, for example) a line's byte length differs from its character length; when a layout is defined in bytes, use the binary extractor, whose widths are always bytes. Writing is narrower: the binary loader encodes a `BinaryFieldType.Text` field to exactly its byte length and throws `InvalidOperationException` if the encoding produces more or fewer bytes, so binary text writing requires an encoding with one byte per character (ASCII, EBCDIC, ISO-8859-x), not UTF-8 multi-byte text.
-- **Temporal formats.** `DateTime`, `DateTimeOffset` and `TimeSpan` fields need a `Format` (e.g. `"yyyyMMdd"`, `"HHmmss"`) to be parsed. On the .NET 6+ targets `DateOnly` and `TimeOnly` honour `[FixedWidthField(Format = ...)]` when parsing as well as when writing, so loader output reads back. In binary records a `BinaryFieldType.Text` field takes `[FixedWidthBinaryField(..., Format = "yyyyMMdd")]`; a `DateTime` / `DateTimeOffset` / `TimeSpan` text field without a `Format` is rejected when the field map is built.
+- **Temporal formats.** `DateTime`, `DateTimeOffset` and `TimeSpan` fields need a `Format` (e.g. `"yyyyMMdd"`, `"HHmmss"`) to be parsed. On the .NET 6+ targets `DateOnly` and `TimeOnly` honour `[FixedWidthField(Format = ...)]` when parsing as well as when writing, so loader output reads back; without a `Format` they are written and read as `yyyyMMdd` and `HHmmss` (in binary `Text` fields too). In binary records a `BinaryFieldType.Text` field takes `[FixedWidthBinaryField(..., Format = "yyyyMMdd")]`; a `DateTime` / `DateTimeOffset` / `TimeSpan` text field without a `Format` is rejected when the field map is built.
 
 ### Transforming between layouts
 
@@ -489,7 +489,7 @@ The package ships a Roslyn analyzer that catches `[FixedWidthField]` layout mist
 |----|----------|-------|
 | `FW003` | Error | Two columns declare the same `Index` (field mapping throws at runtime) |
 | `FW004` | Warning | A `DateTime` / `DateTimeOffset` / `TimeSpan` field with no `Format` (parsing and writing throw) |
-| `FW005` | Warning | A `Format` pattern wider than the field length (the value overflows on write) |
+| `FW005` | Warning | A `Format` pattern wider than the field length (the value overflows on write), including the `yyyyMMdd` / `HHmmss` default of a `DateOnly` / `TimeOnly` field with no `Format` |
 | `FW007` | Warning | A mapped property with no public setter (extraction throws) |
 | `FW008` | Info | A mapped property with no public getter (loading throws) |
 

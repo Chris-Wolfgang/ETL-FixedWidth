@@ -20,6 +20,8 @@ namespace Wolfgang.Etl.FixedWidth;
 ///   <item><see cref="DateTime"/>, <see cref="DateTimeOffset"/>, and <see cref="TimeSpan"/>
 ///   require an explicit <see cref="FieldContext.Format"/>. An <see cref="InvalidOperationException"/>
 ///   is thrown if none is provided.</item>
+///   <item>On .NET 6 and later, <see cref="T:System.DateOnly"/> and <see cref="T:System.TimeOnly"/> with no
+///   <see cref="FieldContext.Format"/> are written and read as <c>yyyyMMdd</c> and <c>HHmmss</c>.</item>
 ///   <item>All other <see cref="IFormattable"/> types use <see cref="CultureInfo.InvariantCulture"/>
 ///   with the optional <see cref="FieldContext.Format"/> if supplied.</item>
 ///   <item>Null values are converted to <see cref="string.Empty"/>.</item>
@@ -305,12 +307,13 @@ public static class FixedWidthConverter
             );
         }
 
-        // All other IFormattable types — use InvariantCulture, apply Format if supplied.
+        // All other IFormattable types — use InvariantCulture, apply Format if supplied
+        // (DateOnly / TimeOnly fall back to their compact default).
         if (value is IFormattable formattable)
         {
             return formattable.ToString
             (
-                context.Format,
+                ResolveFormat(value, context.Format),
                 CultureInfo.InvariantCulture
             );
         }
@@ -322,6 +325,46 @@ public static class FixedWidthConverter
         // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
         return value.ToString() ?? string.Empty;
     }
+
+
+
+    /// <summary>
+    /// The Format a value is written with: <paramref name="format"/> when set, otherwise the compact
+    /// default for <see cref="T:System.DateOnly"/> (<c>yyyyMMdd</c>) and <see cref="T:System.TimeOnly"/>
+    /// (<c>HHmmss</c>), otherwise <see langword="null"/>.
+    /// </summary>
+    internal static string? ResolveFormat(object? value, string? format)
+    {
+        if (!string.IsNullOrEmpty(format) || value is null)
+        {
+            return format;
+        }
+
+#if NET6_0_OR_GREATER
+        if (value is DateOnly)
+        {
+            return DefaultDateOnlyFormat;
+        }
+
+        if (value is TimeOnly)
+        {
+            return DefaultTimeOnlyFormat;
+        }
+#endif
+        return format;
+    }
+
+
+
+#if NET6_0_OR_GREATER
+    /// <summary>The Format a <see cref="DateOnly"/> field without one is written and read with.</summary>
+    internal const string DefaultDateOnlyFormat = "yyyyMMdd";
+
+
+
+    /// <summary>The Format a <see cref="TimeOnly"/> field without one is written and read with.</summary>
+    internal const string DefaultTimeOnlyFormat = "HHmmss";
+#endif
 
 
 
@@ -399,25 +442,23 @@ public static class FixedWidthConverter
     /// <summary>
     /// Format is honoured on write for every <see cref="IFormattable"/>; this mirrors it on read for
     /// <see cref="DateOnly"/> / <see cref="TimeOnly"/> so output written with a compact format
-    /// (e.g. "yyyyMMdd") can be read back. Without a Format the TypeConverter fallback applies.
+    /// (e.g. "yyyyMMdd") can be read back. Without a Format the same compact defaults the writer
+    /// uses apply (<see cref="DefaultDateOnlyFormat"/>, <see cref="DefaultTimeOnlyFormat"/>).
     /// </summary>
     private static bool TryParseDateOnlyTimeOnly(ReadOnlySpan<char> span, Type targetType, string? format, out object? result)
     {
         result = null;
-        if (string.IsNullOrEmpty(format))
-        {
-            return false;
-        }
+        var hasFormat = !string.IsNullOrEmpty(format);
 
         if (targetType == typeof(DateOnly))
         {
-            result = DateOnly.ParseExact(span, format.AsSpan(), CultureInfo.InvariantCulture);
+            result = DateOnly.ParseExact(span, (hasFormat ? format! : DefaultDateOnlyFormat).AsSpan(), CultureInfo.InvariantCulture);
             return true;
         }
 
         if (targetType == typeof(TimeOnly))
         {
-            result = TimeOnly.ParseExact(span, format.AsSpan(), CultureInfo.InvariantCulture);
+            result = TimeOnly.ParseExact(span, (hasFormat ? format! : DefaultTimeOnlyFormat).AsSpan(), CultureInfo.InvariantCulture);
             return true;
         }
 
