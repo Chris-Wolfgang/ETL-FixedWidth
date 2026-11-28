@@ -137,7 +137,22 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(Diagnostic.Create(FixedWidthDiagnostics.NoPublicGetter, location, property.Name));
         }
 
-        // FW004 / FW005 — date/time fields need an explicit, field-sized Format.
+        AnalyzeTemporalFormat(context, known, property, attribute, location);
+    }
+
+
+
+    // FW004 / FW005 — date/time fields need a field-sized Format. DateOnly / TimeOnly without one
+    // use the converter's compact default, so they skip FW004 and FW005 checks that default.
+    private static void AnalyzeTemporalFormat
+    (
+        SymbolAnalysisContext context,
+        KnownSymbols known,
+        IPropertySymbol property,
+        AttributeData attribute,
+        Location location
+    )
+    {
         if (!IsTemporal(property.Type, known))
         {
             return;
@@ -146,13 +161,17 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
         var format = GetFormat(attribute);
         if (string.IsNullOrEmpty(format))
         {
+            format = DefaultFormat(property.Type, known);
+        }
+
+        if (string.IsNullOrEmpty(format))
+        {
             context.ReportDiagnostic(Diagnostic.Create
             (
                 FixedWidthDiagnostics.MissingTemporalFormat,
                 location,
                 property.Name,
-                property.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat),
-                MissingFormatReason(property.Type, known)
+                property.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)
             ));
             return;
         }
@@ -260,22 +279,30 @@ public sealed class FixedWidthFieldAnalyzer : DiagnosticAnalyzer
 
 
 
-    // The FW004 message tail: DateTime / DateTimeOffset / TimeSpan throw without a Format, while
-    // DateOnly / TimeOnly fall back to a culture default pattern that rarely fits a fixed-width field.
-    private static string MissingFormatReason(ITypeSymbol type, KnownSymbols known)
-        => IsDateOnlyOrTimeOnly(type, known)
-            ? "DateOnly and TimeOnly fall back to the invariant culture's default pattern, which rarely fits the field and may not parse back, so set an explicit Format"
-            : "DateTime, DateTimeOffset and TimeSpan require an explicit Format or both extraction and loading throw at runtime";
+    // The Format FixedWidthConverter uses for a field that sets none: "yyyyMMdd" for DateOnly and
+    // "HHmmss" for TimeOnly (keep in step with FixedWidthConverter.DefaultDateOnlyFormat /
+    // DefaultTimeOnlyFormat); null for DateTime / DateTimeOffset / TimeSpan, which have no default.
+    private static string? DefaultFormat(ITypeSymbol type, KnownSymbols known)
+    {
+        type = UnwrapNullable(type);
+
+        if (known.DateOnly is not null && SymbolEqualityComparer.Default.Equals(type, known.DateOnly))
+        {
+            return "yyyyMMdd";
+        }
+
+        if (known.TimeOnly is not null && SymbolEqualityComparer.Default.Equals(type, known.TimeOnly))
+        {
+            return "HHmmss";
+        }
+
+        return null;
+    }
 
 
 
     private static bool IsDateOnlyOrTimeOnly(ITypeSymbol type, KnownSymbols known)
-    {
-        type = UnwrapNullable(type);
-
-        return (known.DateOnly is not null && SymbolEqualityComparer.Default.Equals(type, known.DateOnly))
-            || (known.TimeOnly is not null && SymbolEqualityComparer.Default.Equals(type, known.TimeOnly));
-    }
+        => DefaultFormat(type, known) is not null;
 
 
 

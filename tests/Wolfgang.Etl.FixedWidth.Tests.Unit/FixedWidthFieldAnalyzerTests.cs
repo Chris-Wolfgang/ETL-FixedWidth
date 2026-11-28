@@ -106,13 +106,32 @@ public sealed class FixedWidthFieldAnalyzerTests
     [InlineData("TimeOnly")]
     [InlineData("DateOnly?")]
     [InlineData("TimeOnly?")]
-    public async Task Reports_FW004_for_a_DateOnly_or_TimeOnly_field_without_a_format(string type)
+    public async Task Does_not_report_FW004_or_FW005_for_a_DateOnly_or_TimeOnly_field_without_a_format_that_fits_the_default(string type)
     {
+        // The default is yyyyMMdd (8) for DateOnly and HHmmss (6) for TimeOnly; 8 holds both.
         var diagnostics = await AnalyzeAsync(Wrap(
             "    [FixedWidthField(0, 8)] public " + type + " When { get; set; }"));
 
-        var fw004 = Assert.Single(diagnostics, d => string.Equals(d.Id, "FW004", StringComparison.Ordinal));
-        Assert.Contains("invariant culture's default pattern", fw004.GetMessage(System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal);
+        Assert.DoesNotContain(diagnostics, d => d.Id is "FW004" or "FW005");
+    }
+
+
+
+    [Theory]
+    [InlineData("DateOnly", 7, "yyyyMMdd", 8)]
+    [InlineData("TimeOnly", 5, "HHmmss", 6)]
+    [InlineData("DateOnly?", 7, "yyyyMMdd", 8)]
+    public async Task Reports_FW005_when_the_DateOnly_or_TimeOnly_default_format_is_wider_than_the_field(string type, int length, string defaultFormat, int width)
+    {
+        var diagnostics = await AnalyzeAsync(Wrap(
+            "    [FixedWidthField(0, " + length + ")] public " + type + " When { get; set; }"));
+
+        var fw005 = Assert.Single(diagnostics, d => string.Equals(d.Id, "FW005", StringComparison.Ordinal));
+        Assert.Equal
+        (
+            "The Format '" + defaultFormat + "' (writes at least " + width + " characters) on property 'When' is wider than the field length " + length + "; the formatted value overflows the field when writing",
+            fw005.GetMessage(System.Globalization.CultureInfo.InvariantCulture)
+        );
     }
 
 

@@ -1,3 +1,3 @@
 type: breaking
 
-Analyzer rules `FW004` (no `Format`) and `FW005` (`Format` wider than the field) now also cover `DateOnly` and `TimeOnly` fields, so an existing `DateOnly` / `TimeOnly` field without a fitting `Format` starts warning (an error under `TreatWarningsAsErrors`); add a `Format` such as `yyyyMMdd` or `HHmmss`.
+On .NET 6 and later, a `DateOnly` field with no `Format` is now written and read as `yyyyMMdd`, and a `TimeOnly` field as `HHmmss`, in text and binary `Text` fields. Before, they were written in the invariant culture's default pattern (`MM/dd/yyyy`, `HH:mm`) and read back through their `TypeConverter`, so a file written that way no longer reads without setting that `Format`. `HHmmss` drops fractional seconds; set a `Format` such as `HHmmssfff` to keep them. Analyzer rule `FW005` now checks those defaults against the field length, and `FW004` (no `Format`) still covers only `DateTime`, `DateTimeOffset` and `TimeSpan`.

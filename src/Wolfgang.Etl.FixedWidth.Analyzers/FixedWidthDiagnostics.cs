@@ -33,11 +33,11 @@ internal static class FixedWidthDiagnostics
     (
         id: "FW004",
         title: "Date/time fixed-width field requires a Format",
-        messageFormat: "Property '{0}' of type '{1}' is a [FixedWidthField] with no Format; {2}",
+        messageFormat: "Property '{0}' of type '{1}' is a [FixedWidthField] with no Format; DateTime, DateTimeOffset and TimeSpan require an explicit Format or both extraction and loading throw at runtime",
         category: Category,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        description: "DateTime, DateTimeOffset and TimeSpan have no safe culture-neutral fixed-width representation, so the converter requires an explicit Format. Without one, ParseValue and the writer throw. DateOnly and TimeOnly without a Format are written in the invariant culture's default pattern (for example MM/dd/yyyy) and read back through their TypeConverter, which rarely matches a fixed-width file's compact layout, so they need a Format too.",
+        description: "DateTime, DateTimeOffset and TimeSpan have no safe culture-neutral fixed-width representation, so the converter requires an explicit Format. Without one, ParseValue and the writer throw. DateOnly and TimeOnly are not reported: without a Format they are written and read as yyyyMMdd and HHmmss.",
         helpLinkUri: HelpLinkBase
     );
 
@@ -50,7 +50,7 @@ internal static class FixedWidthDiagnostics
         category: Category,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        description: "For a date/time field (DateTime, DateTimeOffset, TimeSpan, DateOnly or TimeOnly), the minimum width the custom Format pattern can write (quoted literals and escapes count as their text; optional and variable-width tokens count conservatively) is compared with the declared field length. A pattern that always writes more than the field holds overflows it, throwing FieldOverflowException on write. Standard single-character specifiers are not checked.",
+        description: "For a date/time field (DateTime, DateTimeOffset, TimeSpan, DateOnly or TimeOnly), the minimum width the custom Format pattern can write (quoted literals and escapes count as their text; optional and variable-width tokens count conservatively) is compared with the declared field length. A DateOnly or TimeOnly field with no Format is checked against its default, yyyyMMdd (8 characters) or HHmmss (6). A pattern that always writes more than the field holds overflows it, throwing FieldOverflowException on write. Standard single-character specifiers are not checked.",
         helpLinkUri: HelpLinkBase
     );
 
