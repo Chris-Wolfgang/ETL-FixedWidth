@@ -110,8 +110,9 @@ internal sealed class BinaryFieldDescriptor
         switch (Attribute.Type)
         {
             case BinaryFieldType.Text:
-                var text = value is IFormattable formattable && !string.IsNullOrEmpty(Attribute.Format)
-                    ? formattable.ToString(Attribute.Format, CultureInfo.InvariantCulture)
+                var format = FixedWidthConverter.ResolveFormat(value, Attribute.Format);
+                var text = value is IFormattable formattable && !string.IsNullOrEmpty(format)
+                    ? formattable.ToString(format, CultureInfo.InvariantCulture)
                     : Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
                 if (text.Length > length)
                 {

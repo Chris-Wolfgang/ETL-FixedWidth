@@ -32,6 +32,13 @@ namespace Wolfgang.Etl.FixedWidth;
 ///   The internal writer is flushed automatically at the end of
 ///   <c>LoadWorkerAsync</c>, and <see cref="System.IDisposable.Dispose"/> must be called to release it.</item>
 /// </list>
+/// <para>
+/// A record that fails to format (a <see cref="Exceptions.FieldOverflowException"/> for a value wider
+/// than its field, or any exception the <c>ValueConverter</c> throws) is passed to the options'
+/// <c>ErrorPolicy</c>. <see cref="ItemErrorAction.Abort"/>, the default, rethrows and stops the load;
+/// <see cref="ItemErrorAction.Skip"/> writes no line for that record, counts it in
+/// <c>CurrentErrorItemCount</c> and continues with the next one.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
@@ -768,15 +775,11 @@ public class FixedWidthLoader<[DynamicallyAccessedMembers(TrimmedMembers.Record)
                 break;
             }
 
-            lineBuffer.Clear();
-            FixedWidthLineParser.WriteRecord
-            (
-                lineWriter,
-                item,
-                fieldMap,
-                ValueConverter,
-                FieldDelimiter
-            );
+            if (!TryFormatRecord(lineWriter, lineBuffer, item, fieldMap))
+            {
+                continue;   // the error policy chose Skip for a record that failed to format
+            }
+
             Interlocked.Increment(ref _currentLineNumber);
 #if NET6_0_OR_GREATER
             foreach (var chunk in lineBuffer.GetChunks())
@@ -804,6 +807,41 @@ public class FixedWidthLoader<[DynamicallyAccessedMembers(TrimmedMembers.Record)
         LogLoadingCompleted();
     }
 #pragma warning restore MA0051
+
+
+
+    // Formats one record into the line buffer. A failure while formatting it (a FieldOverflowException
+    // from a value wider than its field, or any exception the ValueConverter throws) is routed through
+    // the base per-item error policy (#681): Abort (the default ErrorPolicy) rethrows, and Skip counts
+    // the record in CurrentErrorItemCount and returns false. Nothing reaches the output for a skipped
+    // record, because the line is only written after every field has been formatted.
+    private bool TryFormatRecord(TextWriter lineWriter, StringBuilder lineBuffer, TRecord item, FieldMapResult fieldMap)
+    {
+        lineBuffer.Clear();
+        try
+        {
+            FixedWidthLineParser.WriteRecord
+            (
+                lineWriter,
+                item,
+                fieldMap,
+                ValueConverter,
+                FieldDelimiter
+            );
+            return true;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            var itemNumber = CurrentSkippedItemCount + CurrentItemCount + CurrentErrorItemCount + 1;
+            if (HandleItemError(new ItemErrorContext(itemNumber, ex)) == ItemErrorAction.Abort)
+            {
+                throw;
+            }
+
+            lineBuffer.Clear();
+            return false;
+        }
+    }
 
 
 

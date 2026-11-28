@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Wolfgang.Etl.Abstractions;
 using Wolfgang.Etl.FixedWidth.Binary;
 using Wolfgang.Etl.FixedWidth.Diagnostics;
+using Wolfgang.Etl.FixedWidth.Exceptions;
 
 namespace Wolfgang.Etl.FixedWidth;
 
@@ -203,6 +204,26 @@ public sealed class FixedWidthBinaryExtractor<[DynamicallyAccessedMembers(Trimme
                 continue;
             }
 
+            if (!TryDecodeRecord(buffer, out var record))
+            {
+                continue;   // the error policy chose Skip for a record that failed to decode
+            }
+
+            IncrementCurrentItemCount();
+            yield return record;
+        }
+    }
+
+
+
+    // Decodes one record. A field that fails to decode (FieldConversionException, #686) is routed
+    // through the base per-item error policy (#681): Abort (the default ErrorPolicy) rethrows, and Skip
+    // drops the record, counts it in CurrentErrorItemCount and returns false so the worker reads the
+    // next one. A binary file has fixed-length records, so skipping one never loses the record framing.
+    private bool TryDecodeRecord(byte[] buffer, out TRecord record)
+    {
+        try
+        {
             // Boxed while the setters run so a struct record is populated, not a copy of it.
             var boxed = _map.Factory();
             foreach (var descriptor in _map.Descriptors)
@@ -210,8 +231,19 @@ public sealed class FixedWidthBinaryExtractor<[DynamicallyAccessedMembers(Trimme
                 descriptor.Setter(boxed, DecodeField(descriptor, buffer));
             }
 
-            IncrementCurrentItemCount();
-            yield return (TRecord)boxed;
+            record = (TRecord)boxed;
+            return true;
+        }
+        catch (FieldConversionException ex)
+        {
+            var raw = BitConverter.ToString(buffer);
+            if (HandleItemError(new ItemErrorContext(Interlocked.Read(ref _currentRecordNumber), ex, () => raw)) == ItemErrorAction.Abort)
+            {
+                throw;
+            }
+
+            record = default!;
+            return false;
         }
     }
 

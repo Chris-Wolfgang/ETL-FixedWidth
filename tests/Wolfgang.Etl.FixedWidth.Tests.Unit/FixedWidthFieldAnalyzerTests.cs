@@ -101,6 +101,79 @@ public sealed class FixedWidthFieldAnalyzerTests
 
 
 
+    [Theory]
+    [InlineData("DateOnly")]
+    [InlineData("TimeOnly")]
+    [InlineData("DateOnly?")]
+    [InlineData("TimeOnly?")]
+    public async Task Does_not_report_FW004_or_FW005_for_a_DateOnly_or_TimeOnly_field_without_a_format_that_fits_the_default(string type)
+    {
+        // The default is yyyyMMdd (8) for DateOnly and HHmmss (6) for TimeOnly; 8 holds both.
+        var diagnostics = await AnalyzeAsync(Wrap(
+            "    [FixedWidthField(0, 8)] public " + type + " When { get; set; }"));
+
+        Assert.DoesNotContain(diagnostics, d => d.Id is "FW004" or "FW005");
+    }
+
+
+
+    [Theory]
+    [InlineData("DateOnly", 7, "yyyyMMdd", 8)]
+    [InlineData("TimeOnly", 5, "HHmmss", 6)]
+    [InlineData("DateOnly?", 7, "yyyyMMdd", 8)]
+    public async Task Reports_FW005_when_the_DateOnly_or_TimeOnly_default_format_is_wider_than_the_field(string type, int length, string defaultFormat, int width)
+    {
+        var diagnostics = await AnalyzeAsync(Wrap(
+            "    [FixedWidthField(0, " + length + ")] public " + type + " When { get; set; }"));
+
+        var fw005 = Assert.Single(diagnostics, d => string.Equals(d.Id, "FW005", StringComparison.Ordinal));
+        Assert.Equal
+        (
+            "The Format '" + defaultFormat + "' (writes at least " + width + " characters) on property 'When' is wider than the field length " + length + "; the formatted value overflows the field when writing",
+            fw005.GetMessage(System.Globalization.CultureInfo.InvariantCulture)
+        );
+    }
+
+
+
+    [Fact]
+    public async Task FW004_for_a_DateTime_field_says_the_converter_throws()
+    {
+        var diagnostics = await AnalyzeAsync(Wrap(
+            "    [FixedWidthField(0, 8)] public DateTime When { get; set; }"));
+
+        var fw004 = Assert.Single(diagnostics, d => string.Equals(d.Id, "FW004", StringComparison.Ordinal));
+        Assert.Contains("throw at runtime", fw004.GetMessage(System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal);
+    }
+
+
+
+    [Theory]
+    [InlineData("DateOnly", 8, "yyyyMMdd")]
+    [InlineData("TimeOnly", 6, "HHmmss")]
+    public async Task Does_not_report_FW004_or_FW005_for_a_DateOnly_or_TimeOnly_field_with_a_fitting_format(string type, int length, string format)
+    {
+        var diagnostics = await AnalyzeAsync(Wrap(
+            "    [FixedWidthField(0, " + length + ", Format = \"" + format + "\")] public " + type + " When { get; set; }"));
+
+        Assert.DoesNotContain(diagnostics, d => d.Id is "FW004" or "FW005");
+    }
+
+
+
+    [Theory]
+    [InlineData("DateOnly", "yyyy-MM-dd")]
+    [InlineData("TimeOnly", "HH:mm:ss")]
+    public async Task Reports_FW005_when_a_DateOnly_or_TimeOnly_format_is_wider_than_the_field(string type, string format)
+    {
+        var diagnostics = await AnalyzeAsync(Wrap(
+            "    [FixedWidthField(0, 6, Format = \"" + format + "\")] public " + type + " When { get; set; }"));
+
+        Assert.Contains(diagnostics, d => string.Equals(d.Id, "FW005", StringComparison.Ordinal));
+    }
+
+
+
     [Fact]
     public async Task Does_not_report_FW004_when_a_format_is_present()
     {

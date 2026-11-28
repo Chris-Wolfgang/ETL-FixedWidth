@@ -1,0 +1,3 @@
+type: breaking
+
+On .NET 6 and later, a `DateOnly` field with no `Format` is now written and read as `yyyyMMdd`, and a `TimeOnly` field as `HHmmss`, in text and binary `Text` fields. Before, they were written in the invariant culture's default pattern (`MM/dd/yyyy`, `HH:mm`) and read back through their `TypeConverter`, so a file written that way no longer reads without setting that `Format`. `HHmmss` drops fractional seconds; set a `Format` such as `HHmmssfff` to keep them. Analyzer rule `FW005` now checks those defaults against the field length, and `FW004` (no `Format`) still covers only `DateTime`, `DateTimeOffset` and `TimeSpan`.
